@@ -4,7 +4,7 @@ window.DC = function (D) {
   const val = (s, t) => { const x = T[s]; if (!x || x.status !== 'ok') return null;
     if (x.mode === 'fytd' && t >= M.fy_end_epoch) return x.rate * (t - M.fy_end_epoch);
     if (x.freeze_t && t > x.freeze_t) t = x.freeze_t;   // never project debt past the statutory limit
-    return x.base + x.rate * (t - x.t0); };
+    return x.base + x.rate * (t - x.t0) + (x.steps || []).reduce((s, q) => s + q[2] * Math.min(1, Math.max(0, (t - q[0]) / (q[1] - q[0]))), 0); };   // steps: scheduled payment ramps [start, end, amount]
   const ia = t => { const a = val('debt_total', t), r = T.rate_all; return a && r ? a * r.base / 100 : null; };
   const DER = {
     debt_gdp_now: t => val('debt_total', t) / val('gdp', t) * 100,

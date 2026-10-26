@@ -12,7 +12,7 @@
     if (!x || x.status !== 'ok') return null;
     if (x.mode === 'fytd' && t >= M.fy_end_epoch) return x.rate * (t - M.fy_end_epoch);
     if (x.freeze_t && t > x.freeze_t) t = x.freeze_t;   // never project debt past the statutory limit
-    return x.base + x.rate * (t - x.t0);
+    return x.base + x.rate * (t - x.t0) + (x.steps || []).reduce((s, q) => s + q[2] * Math.min(1, Math.max(0, (t - q[0]) / (q[1] - q[0]))), 0);   // steps: scheduled payment ramps [start, end, amount]
   }
   const DER = {
     debt_gdp_now: t => { const a = val('debt_total', t), b = val('gdp', t); return a && b ? a / b * 100 : null; },
@@ -358,7 +358,7 @@
     modalTick = t => { const x = get(slug, t); mv.textContent = i.kind === 'pct' ? pct(x, 5) : i.kind === 'count' ? nf0.format(x) : usd(x, 2);
       if (m1) { m1.textContent = ppf(x / pop(t)); m2.textContent = ppf(x / tax()); }
       const mf = dlg.querySelector('#mf');
-      if (mf && !i.derived) { const dtt = Math.min(t, i.freeze_t || Infinity) - i.t0; mf.textContent = `${fv(i, i.base)} + ${i.kind === 'count' ? (+i.rate).toFixed(6) : usd(i.rate, 4)} × ${nf0.format(Math.round(dtt))} s = ${fv(i, i.base + i.rate * dtt)}`; }
+      if (mf && !i.derived) { const dtt = Math.min(t, i.freeze_t || Infinity) - i.t0; const stp = (i.steps || []).reduce((s, q) => s + q[2] * Math.min(1, Math.max(0, (Math.min(t, i.freeze_t || Infinity) - q[0]) / (q[1] - q[0]))), 0); mf.textContent = `${fv(i, i.base)} + ${i.kind === 'count' ? (+i.rate).toFixed(6) : usd(i.rate, 4)} × ${nf0.format(Math.round(dtt))} s${i.steps ? ` + ${fv(i, stp)} scheduled payments so far` : ''} = ${fv(i, i.base + i.rate * dtt + stp)}`; }
       if (i.derived) { dlg.querySelectorAll('[data-c]').forEach(e => { const c = e.dataset.c; e.textContent = fv(T[c] || {}, val(c, t)); });
         if (mf) mf.textContent = '= ' + fv(i, x);
         const md = dlg.querySelector('#mdays'); if (md) md.textContent = (x / T.debt_subject_limit.rate / 86400).toFixed(1); } };
@@ -402,6 +402,15 @@
         <p>DTS cash (FYTD, excl. debt issues/redemptions): ${pt(c.cash_from)} → ${pt(c.cash_to)}; 90-day cash flow ${usd(c.cash_flow_90d, 0)} over ${nf0.format(c.seconds)} s.</p>
         <p>Rate = ${c.ratio.toFixed(4)} × ${usd(c.cash_flow_90d, 0)} ÷ ${nf0.format(c.seconds)} s = ${usd(i.rate, 2)}/s.</p>`
         + (c.base_parts?.mts_month ? `<p>Base = MTS FYTD through ${esc(fmtDate(c.base_parts.mts_month))} ${usd(c.base_parts.mts_fytd, 0)} + ${c.ratio.toFixed(4)} × (DTS cash ${usd(c.base_parts.dts_cash_latest, 0)} − ${usd(c.base_parts.dts_cash_at_month_end, 0)}).</p>` : `<p>Base = ${c.ratio.toFixed(4)} × DTS cash ${usd(c.base_parts?.dts_cash_latest, 0)}.</p>`);
+    } else if (c.type === 'dts_seasonal') {
+      const pp = c.pace_parts || {};
+      inp = `<p>Budget/cash ratio ${c.ratio.toFixed(4)} = ${esc(c.ratio_src[0])} ${usd(c.ratio_src[1], 0)} ÷ ${esc(c.ratio_src[2])} ${usd(c.ratio_src[3], 0)}.</p>
+        <p>Projected DTS cash (excl. debt issues/redemptions) to the close of ${esc(fmtDate(c.next_bday))}: ${usd(c.cash_flow_next, 0)}${pp.customs_same_bday_last_month != null ? ` = non-customs receipts on the same weekdays a year earlier × ${pp.growth} trailing-year growth (${usd(pp.non_customs_same_window_last_year, 0)}) + customs duties on the same business day last month (${usd(pp.customs_same_bday_last_month, 0)})` : ` = outlays on the same weekdays a year earlier × ${pp.growth} trailing-year growth`}.</p>
+        <p>Rate = ${c.ratio.toFixed(4)} × ${usd(c.cash_flow_next, 0)} ÷ ${nf0.format(c.seconds_next)} s = ${usd(i.rate, 2)}/s. (For reference, the 90-day average cash flow was ${usd(c.cash_flow_90d, 0)}.)</p>`
+        + (c.base_parts?.mts_month ? `<p>Base = MTS FYTD through ${esc(fmtDate(c.base_parts.mts_month))} ${usd(c.base_parts.mts_fytd, 0)} + ${c.ratio.toFixed(4)} × (DTS cash ${usd(c.base_parts.dts_cash_latest, 0)} − ${usd(c.base_parts.dts_cash_at_month_end, 0)}).</p>` : `<p>Base = ${c.ratio.toFixed(4)} × DTS cash ${usd(c.base_parts?.dts_cash_latest, 0)}.</p>`);
+    } else if (c.type === 'coupon_calendar') {
+      inp = `<p>Ordinary business days add ${usd(c.drip_per_bday, 0)} (median of recent non-coupon days), so rate = ${usd(i.rate, 2)}/s. Scheduled coupon payments (projected; each from the same coupon date six months earlier, adjusted for half its six-month growth), added between 9 AM and 4 PM ET on the payment day:</p>
+        <table>${(c.coupons || []).map(q => `<tr><td>${esc(fmtDate(q[0]))}</td><td class="num">${usd(q[2], 0)}</td></tr>`).join('')}</table>`;
     } else if (c.type === 'share') {
       const P = T[c.parent];
       inp = `<p>Share of ${esc(P?.label || c.parent)} = ${(c.share * 100).toFixed(3)}% (${esc(c.basis || 'MTS')}, MTS lines ${esc((c.mts_lines || []).join(', '))}). Base = ${(c.share * 100).toFixed(3)}% × ${usd(P?.base, 0)}; rate = ${(c.share * 100).toFixed(3)}% × ${usd(P?.rate, 2)}/s = ${usd(i.rate, 2)}/s.</p>`;
@@ -421,7 +430,7 @@
       <tr><td>Base (official)</td><td class="num">${fv(i, i.base)}</td></tr>
       <tr><td>t0</td><td>${esc(ct(i.t0))}</td></tr>
       <tr><td>Rate per second</td><td class="num">${i.kind === 'count' ? (+i.rate).toFixed(6) : i.kind === 'pct' ? (+i.rate).toExponential(3) : usd(i.rate, 4)}</td></tr></table>
-      ${inp}<p><b>Now</b> = base + rate × (now − t0) = <span class="num" id="mf">—</span></p></div>`;
+      ${inp}<p><b>Now</b> = base + rate × (now − t0)${i.steps ? ' + scheduled payments so far' : ''} = <span class="num" id="mf">—</span></p></div>`;
   }
   dlg.addEventListener('close', () => { modalTick = null; history.replaceState(null, '', location.pathname); });
   function jump(slug) { const e = document.getElementById('t-' + slug); if (!e) return; e.scrollIntoView({behavior: 'smooth', block: 'center'}); e.classList.remove('hl'); void e.offsetWidth; e.classList.add('hl'); }

@@ -346,6 +346,35 @@ def src_dts_set():
     return out
 
 dtsset, dts_stale = cached("dts_set", src_dts_set)
+
+# Daily DTS flows (last ~800 days) for the seasonal / coupon-calendar projections (pipeline/seasonal.py).
+DTS_DAILY_CATS = {"Public Debt Cash Issues (Table IIIB)": ("Deposits", "ddep"), "Public Debt Cash Redemp. (Table IIIB)": ("Withdrawals", "dwd"),
+                  "Interest on Treasury Securities": ("Withdrawals", "int"), "DHS - Customs Duties, Taxes, and Fees": ("Deposits", "cus"),
+                  "DHS - Customs and Certain Excise Taxes": ("Deposits", "cus")}
+def src_dts_daily():
+    since = (dt.datetime.fromtimestamp(NOW, ET).date() - dt.timedelta(days=830)).isoformat()
+    def q(flt):
+        out, pg = [], 1
+        while True:
+            u = f"{FD}/v1/accounting/dts/deposits_withdrawals_operating_cash?" + urllib.parse.urlencode(
+                {"filter": flt, "fields": "record_date,transaction_type,transaction_catg,transaction_today_amt", "sort": "record_date",
+                 "page[size]": 10000, "page[number]": pg}, safe=":,")
+            j = json.loads(get(u, timeout=60)); out += j["data"]
+            if pg >= j["meta"]["total-pages"]: return out
+            pg += 1
+    acc = {}
+    for r in q(f"record_date:gte:{since},transaction_catg:eq:null"):
+        acc.setdefault(r["record_date"], {})["dep" if r["transaction_type"].startswith("Dep") else "wd"] = float(r["transaction_today_amt"] or 0) * 1e6
+    for c, (tt, key) in DTS_DAILY_CATS.items():
+        for r in q(f"record_date:gte:{since},transaction_type:eq:{tt},transaction_catg:eq:{c}"):
+            a = acc.setdefault(r["record_date"], {}); a[key] = a.get(key, 0.0) + float(r["transaction_today_amt"] or 0) * 1e6
+    rows = {d: {"rev": a["dep"] - a.get("ddep", 0.0), "out": a["wd"] - a.get("dwd", 0.0), "int": a.get("int", 0.0), "cus": a.get("cus", 0.0)}
+            for d, a in acc.items() if "dep" in a and "wd" in a and "ddep" in a and "dwd" in a}
+    if len(rows) < 450: raise ValueError(f"only {len(rows)} complete DTS days")
+    return rows
+dts_daily, dts_daily_stale = cached("dts_daily", src_dts_daily)
+import seasonal as SEA
+HIST = SEA.History(dts_daily) if dts_daily else None
 DTS_TABLE_URL = "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash"
 
 if mts:
@@ -379,7 +408,23 @@ if mts:
             calc = {"type": "dts_ratio", "ratio": ratio, "ratio_src": [f"FY{FY-1} MTS total", mts_prev_fy, f"FY{FY-1} DTS cash", P[cash]],
                     "cash_from": [D90["date"], D90[cash]], "cash_to": [L["date"], L[cash]], "cash_flow_90d": flow90, "seconds": days90,
                     "base_parts": ({"mts_month": base_d, "mts_fytd": mts_m, "dts_cash_at_month_end": (dm[cash] if dm else 0), "dts_cash_latest": L[cash]} if base_d else {"dts_cash_latest": L[cash]})}
-            totals[slug] = dict(base=est, t0=t_l, rate=ratio * flow90 / days90, as_of=L["date"], how=how, ratio=ratio, calc=calc,
+            # Pace: projected cash flow to the next business day's close (pipeline/seasonal.py), x the same ratio.
+            # Fallback (not enough daily history): the old 90-day average cash pace.
+            d_l = dt.date.fromisoformat(L["date"]); n_b = SEA.next_bday(d_l); t_n = eod_et(n_b.isoformat())
+            if HIST and SEA.has_year_history(HIST, d_l):
+                kind = "rev" if cash == "receipts" else "out"
+                fexp = SEA.expected_flow(HIST, kind, d_l, n_b)
+                parts = ({"non_customs_same_window_last_year": SEA.same_window_last_year(HIST, "revx", d_l, n_b), "growth": SEA.growth_note(HIST, "revx", d_l),
+                          "customs_same_bday_last_month": SEA.customs_prev_month(HIST, d_l, n_b)} if kind == "rev" else
+                         {"same_window_last_year": fexp, "growth": SEA.growth_note(HIST, "out", d_l)})
+                rate = ratio * fexp / (t_n - t_l)
+                calc.update({"type": "dts_seasonal", "next_bday": n_b.isoformat(), "cash_flow_next": fexp, "seconds_next": t_n - t_l, "pace_parts": parts})
+                pace_txt = (f"Ticks toward the projected close for {n_b.isoformat()}: expected cash ${fexp/1e9:,.1f}B × {ratio:.4f} "
+                            + ("(non-customs receipts from the same weekdays a year earlier, scaled by the trailing-year growth, plus customs duties from the same business day last month, since tariffs arrive in one monthly lump)"
+                               if kind == "rev" else "(outlays on the same weekdays a year earlier, scaled by the trailing-year growth)"))
+            else:
+                rate = ratio * flow90 / days90; pace_txt = "Ticks at the last 90 days' cash pace × the same ratio (fallback: daily DTS history unavailable)"
+            totals[slug] = dict(base=est, t0=t_l, rate=rate, as_of=L["date"], how=how, ratio=ratio, calc=calc, pace_txt=pace_txt, anchor=(base_d or "dts"),
                                 prev=mts_prev_fy, ttm=sum(val(d, codes, "current_month_rcpt_outly_amt") for d in last12))
             # ratio stability backtest: FY-2 ratio applied to FY-1 cash vs the official FY-1 total
             mts_prev2 = sum(float(r["prior_fytd_rcpt_outly_amt"]) for r in mts[prev_fy_end_d] if r["line_code_nbr"] in codes and r.get("prior_fytd_rcpt_outly_amt") not in (None, "null"))
@@ -395,8 +440,8 @@ if mts:
             x = totals[slug]
             add(slug, label=label, group="fytd", kind="usd", mode="fytd", base=x["base"], t0=x["t0"], rate=x["rate"], as_of=x["as_of"],
                 fy=FY, prev_fy_total=x["prev"], ttm=x["ttm"], source=DTS_TABLE_URL, source_name="Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement",
-                method=f"FY{FY} to date, budget basis, re-based every business day: {x['how']}. Ticks at the last 90 days' cash pace × the same ratio. FY{FY-1} final (MTS): ${(x['prev'] or 0)/1e9:,.1f}B. Resets to $0 every Oct 1.",
-                stale=dts_stale or mts_stale, basis="dts", calc=x["calc"])
+                method=f"FY{FY} to date, budget basis, re-based every business day: {x['how']}. {x['pace_txt']}. Between Treasury statements the figure is our projection; the official number replaces it every business day. FY{FY-1} final (MTS): ${(x['prev'] or 0)/1e9:,.1f}B. Resets to $0 every Oct 1.",
+                stale=dts_stale or mts_stale, basis="dts", calc=x["calc"], anchor=x["anchor"])
         else:   # fallback: MTS only
             fytd = val(base_d, codes, "current_fytd_rcpt_outly_amt") if base_d else 0.0
             ttm = sum(val(d, codes, "current_month_rcpt_outly_amt") for d in last12)
@@ -417,19 +462,41 @@ if mts:
     sp, rv = T["spending"], T["revenue"]
     add("deficit", label="Federal deficit", group="fytd", kind="usd", mode="fytd", base=sp["base"] - rv["base"], t0=sp["t0"],
         rate=sp["rate"] - rv["rate"], as_of=sp["as_of"], fy=FY, prev_fy_total=(sp["prev_fy_total"] or 0) - (rv["prev_fy_total"] or 0),
-        source=sp["source"], source_name=sp["source_name"], method="Spending minus revenue, both re-based daily and ticking.", stale=sp.get("stale"), basis=sp.get("basis"),
+        source=sp["source"], source_name=sp["source_name"], method="Spending minus revenue, both re-based daily and ticking.", stale=sp.get("stale"), basis=sp.get("basis"), anchor=sp.get("anchor"),
         calc={"type": "difference", "of": ["spending", "revenue"]})
     META["mts_latest"] = latest_d
     if dtsset:
         L, D90 = dtsset["latest"], dtsset["d90"]; P = dtsset["fyend_prev"]
         if "interest" in L and L["fy"] == FY:
             flow = L["interest"] - D90.get("interest", 0) if D90["fy"] == L["fy"] else L["interest"] + P.get("interest", 0) - D90.get("interest", 0)
-            add("interest_cash", label="Interest paid to bondholders (cash)", group="fytd", kind="usd", mode="fytd", base=L["interest"], t0=eod_et(L["date"]),
-                rate=flow / (eod_et(L["date"]) - eod_et(D90["date"])), as_of=L["date"], fy=FY, prev_fy_total=P.get("interest"),
-                source=DTS_TABLE_URL, source_name="Treasury Daily Treasury Statement (Interest on Treasury Securities)",
-                method=f"Cash interest paid on Treasury securities FY{FY} to date, re-based every business day; ticks at the last 90 days' average. Payments are lumpy (big on the 15th and month-end).", stale=dts_stale,
-                calc={"type": "two_point", "from": [D90["date"], D90.get("interest", 0)], "to": [L["date"], L["interest"]], "flow": flow,
-                      "note": "FYTD cash; across Oct 1 the flow adds the prior FY's Sep 30 total"})
+            t_l = eod_et(L["date"]); d_l = dt.date.fromisoformat(L["date"])
+            kw = dict(label="Interest paid to bondholders (cash)", group="fytd", kind="usd", mode="fytd", base=L["interest"], t0=t_l, as_of=L["date"], fy=FY,
+                      prev_fy_total=P.get("interest"), source=DTS_TABLE_URL, source_name="Treasury Daily Treasury Statement (Interest on Treasury Securities)", stale=dts_stale)
+            if HIST and SEA.has_year_history(HIST, d_l):
+                # Coupon calendar: interest is paid in lumps on the 15th and at month-end; a smooth average misses every one of them.
+                n_b = SEA.next_bday(d_l); t_n = eod_et(n_b.isoformat())
+                until = min(d_l + dt.timedelta(days=100), dt.datetime.fromtimestamp(FY_END - 1, ET).date())
+                cps, drip = SEA.upcoming_coupons(HIST, d_l, until)
+                nb = 0; x_ = SEA.next_bday(d_l)
+                while x_ <= n_b: nb += 1; x_ = SEA.next_bday(x_)
+                rate = drip * nb / (t_n - t_l)
+                def at(d_, h): return dt.datetime(d_.year, d_.month, d_.day, h, tzinfo=ET).timestamp()
+                steps = [[at(sd, 9), at(sd, 16), round(a, 2), sd.isoformat()] for sd, _, a in cps]
+                nxt = cps[0] if cps else None
+                add("interest_cash", **kw, rate=rate, steps=steps,
+                    method=(f"Cash interest paid on Treasury securities FY{FY} to date, official through {L['date']} and re-based every business day. "
+                            "Treasury pays coupons in lumps on the 15th and at month-end (next business day if that is a holiday or weekend), so the projection follows that calendar: "
+                            "each upcoming payment is estimated from the payment for the same coupon date six months earlier (notes and bonds pay every six months), adjusted for half of its six-month growth; "
+                            f"other business days add the median ordinary day (${drip/1e6:,.1f}M)."
+                            + (f" Next projected payment: ${nxt[2]/1e9:,.1f}B on {nxt[0].isoformat()}." if nxt else "")
+                            + " Projected amounts are estimates until Treasury's statement for that day is published."),
+                    calc={"type": "coupon_calendar", "drip_per_bday": drip, "next_bday": n_b.isoformat(), "seconds_next": t_n - t_l,
+                          "coupons": [[sd.isoformat(), nds, a] for sd, nds, a in cps], "flow_90d": flow})
+            else:
+                add("interest_cash", **kw, rate=flow / (t_l - eod_et(D90["date"])),
+                    method=f"Cash interest paid on Treasury securities FY{FY} to date, re-based every business day; ticks at the last 90 days' average (fallback: daily DTS history unavailable). Payments are lumpy (big on the 15th and month-end).",
+                    calc={"type": "two_point", "from": [D90["date"], D90.get("interest", 0)], "to": [L["date"], L["interest"]], "flow": flow,
+                          "note": "FYTD cash; across Oct 1 the flow adds the prior FY's Sep 30 total"})
 else:
     for s, (l, c) in list(TOTALS.items()) + list(REV.items()) + list(OUT.items()):
         unavailable(s, l, "fytd", MTS_URL, "MTS API unreachable and no cache")
@@ -679,6 +746,13 @@ DERIVED = {
 }
 
 # ---------------------------------------------------------------- validation (daily)
+def project(x, t):
+    """Same math as core.js/app.js val(): base + rate x elapsed (capped at freeze_t) + any scheduled payment ramps."""
+    if x.get("freeze_t") and t > x["freeze_t"]: t = x["freeze_t"]
+    v = x["base"] + x["rate"] * (t - x["t0"])
+    for s0, s1, a, *_ in x.get("steps") or []:
+        v += a * min(1.0, max(0.0, (t - s0) / (s1 - s0)))
+    return v
 THR = {"debt_intragov": 0.5, "revenue": 3.0, "spending": 3.0, "interest_cash": 10.0}
 prev_path = os.path.join(DATA, "data.json")
 if os.path.exists(prev_path):
@@ -691,10 +765,13 @@ if os.path.exists(prev_path):
             if slug == "population": continue              # own cross-check vs the Census clock (above)
             if n.get("share") is not None: continue         # split tickers follow their parent total
             if p.get("mode") == "fytd" and n.get("fy") != p.get("fy"): continue
-            proj = p["base"] + p["rate"] * (n["t0"] - p["t0"])
+            proj = project(p, n["t0"])
             if n["base"] == 0: continue
             err = (proj - n["base"]) / abs(n["base"]) * 100
-            switched = p.get("basis") != n.get("basis") or p.get("source") != n.get("source")
+            # Like-for-like: a change of basis/source, or of the official anchor (e.g. the first MTS of the year replacing
+            # the DTS-only estimate), re-bases the figure; that jump is not a projection error.
+            switched = (p.get("basis") != n.get("basis") or p.get("source") != n.get("source")
+                        or (p.get("anchor") is not None and p.get("anchor") != n.get("anchor")))
             validation_rows.append({"ticker": slug, "from": p["as_of"], "to": n["as_of"], "projected": round(proj, 2),
                                     "official": n["base"], "error_pct": round(err, 4),
                                     "mode": ("method_switch_" + str(p.get("basis") or "mts") + "_to_" + str(n.get("basis"))) if switched else ("daily_vs_dts" if n.get("basis") == "dts" else "daily")})

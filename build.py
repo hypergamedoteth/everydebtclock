@@ -34,7 +34,7 @@ def val(s, t=NOW):
     if not x or x.get("status") != "ok": return None
     if x.get("mode") == "fytd" and t >= M["fy_end_epoch"]: return x["rate"] * (t - M["fy_end_epoch"])
     if x.get("freeze_t") and t > x["freeze_t"]: t = x["freeze_t"]     # never project debt past the statutory limit
-    return x["base"] + x["rate"] * (t - x["t0"])
+    return x["base"] + x["rate"] * (t - x["t0"]) + sum(a * min(1.0, max(0.0, (t - s0) / (s1 - s0))) for s0, s1, a, *_ in x.get("steps") or [])
 def ia(t=NOW):
     a, r = val("debt_total", t), T.get("rate_all")
     return a * r["base"] / 100 if a and r else None
