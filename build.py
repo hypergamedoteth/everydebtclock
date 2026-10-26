@@ -272,9 +272,9 @@ def place_card(ix):
             f'<div class="pcv num" id="pcv">{usd0(v)}</div>'
             f'<div class="pcs"><span class="num" id="pcp">{usd2(v / p["population"])}</span> per <span id="pcd">{html.escape(p["demonym"])}</span> · '
             f'<span id="pcb">projected from official {fdate(p["base_date"])} figures</span> · <span class="go">See <span id="pcg">{html.escape(p["name"])}</span> →</span></div></a>'
-            f'<label class="pcchg">Change <select id="pcsel" aria-label="Pick a state or country">{opts}</select></label>'
+            f'<label class="pcchg">Change <select id="pcsel" aria-label="Pick a place">{opts}</select></label>'
             f'<script type="application/json" id="placesix">{js_ix}</script></div>'
-            f'<a class="pchub" href="{ix["hub"]}">See every state &amp; country →</a><!--/PLACES-->')
+            f'<a class="pchub" href="{ix["hub"]}">See {html.escape(ix["hub_label"].lower().replace("all ", "all ", 1))} →</a><!--/PLACES-->')
 PCARD = place_card(PIX)
 if "<!--PLACES-->" in idx: idx = re.sub(r"<!--PLACES-->.*?<!--/PLACES-->", lambda m: PCARD, idx, flags=re.S)
 else: idx = idx.replace("<!--/SSR--></main>", "<!--/SSR-->" + PCARD + "</main>", 1)
@@ -689,9 +689,23 @@ open(f"{R}/robots.txt", "w").write(f"User-agent: *\nAllow: /\nDisallow: /cache/\
 
 # ---------------------------------------------------------------- standalone
 css, js = open(f"{R}/style.css").read(), open(f"{R}/app.js").read()
-single = (idx.replace('<link rel="stylesheet" href="style.css">', f"<style>{css}</style>")
+idx_ = re.sub(r'(href|src)="(style\.css|app\.js)\?v=[^"]*"', r'\1="\2"', idx)
+single = (idx_.replace('<link rel="stylesheet" href="style.css">', f"<style>{css}</style>")
              .replace("<!--DATA-->", "<script>window.DEBTCLOCK_DATA=" + json.dumps(D, separators=(",", ":")).replace("</", "<\\/") + ";</script>")
              .replace('<script src="app.js"></script>', f"<script>{js}</script>"))
 os.makedirs(f"{R}/dist", exist_ok=True)
 open(f"{R}/dist/debtclock-standalone.html", "w").write(single)
 print(f"standalone: {len(single)//1024} KB; share pages: {len(urls)-1}; og images: {len(os.listdir(R+'/og'))}; site={SITE}")
+
+# ---------------------------------------------------------------- asset versions: ?v=<content hash> on every first-party CSS/JS reference
+# so a deploy that changes style.css / app.js / core.js is picked up at once instead of after the 4-hour browser/CDN cache.
+import hashlib, glob as _glob
+AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in ("style.css", "app.js", "core.js") if os.path.exists(f"{R}/{a}")}
+_vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
+_pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html")] + _glob.glob(f"{R}/t/*.html")
+          + [f for d in ["states", "countries"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
+for f in _pages:
+    if not os.path.exists(f): continue
+    s_ = open(f).read(); n_ = _vre.sub(lambda m: f'{m.group(1)}{m.group(2)}{m.group(3)}?v={AV[m.group(3)]}"', s_)
+    if n_ != s_: open(f, "w").write(n_)
+print("asset versions:", AV)
