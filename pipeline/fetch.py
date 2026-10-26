@@ -515,6 +515,47 @@ if dsl:
         add("debt_limit", label="Statutory debt limit", group="debt", kind="usd", base=by[last]["limit"], rate=0, t0=tl, as_of=last, fixed=True,
             source=DSL_URL, source_name="Treasury Daily Treasury Statement, Table III-C", method="Set by Congress. Changes only when the law changes.", stale=dsl_stale)
 
+# ---- debt-limit rule: never project the debt past the statutory limit
+# When debt subject to the limit sits at (or within AT_LIMIT_MARGIN of) the limit, or has gone flat near it,
+# Treasury is using extraordinary measures: debt stops growing, so the clock must stop projecting growth.
+# Otherwise each debt ticker gets freeze_t = the moment its projected debt subject to limit would reach the limit,
+# so a long gap between refreshes can never carry the clock past what the law allows.
+AT_LIMIT_MARGIN = 25e9          # $25B: under extraordinary measures Treasury keeps the gap far smaller than this
+FLAT_RANGE = 5e9                # last 5 closes within $5B of each other ...
+FLAT_NEAR = 150e9               # ... while within $150B of the limit = held at the limit
+if dsl and T.get("debt_subject_limit", {}).get("status") == "ok" and T.get("debt_limit", {}).get("status") == "ok":
+    sl, lim = T["debt_subject_limit"], T["debt_limit"]["base"]
+    last5 = [by[d]["subj"] for d in ds[-5:]]
+    rng = max(last5) - min(last5); head = lim - sl["base"]
+    at_limit = head <= AT_LIMIT_MARGIN or (len(last5) >= 5 and rng <= FLAT_RANGE and head <= FLAT_NEAR)
+    held = ("debt_total", "debt_public", "debt_intragov", "debt_subject_limit")
+    st = {"at_limit": at_limit, "limit": lim, "subject_to_limit": sl["base"], "headroom": head, "as_of": sl["as_of"],
+          "last5_range": rng, "margin": AT_LIMIT_MARGIN, "source": DSL_URL, "freeze_t": None}
+    if at_limit:
+        note = (f" At the debt limit: debt subject to the limit was ${sl['base']/1e12:,.3f}T on {sl['as_of']}, "
+                f"${head/1e9:,.1f}B under the ${lim/1e12:,.3f}T limit. Treasury is using extraordinary measures, so this ticker "
+                "holds at the latest official figure instead of projecting growth.")
+        for k in held:
+            if T.get(k, {}).get("status") == "ok":
+                T[k]["rate_trend"] = T[k]["rate"]; T[k]["rate"] = 0.0; T[k]["held_at_limit"] = True; T[k]["method"] += note
+    elif sl["rate"] > 0:
+        ft = sl["t0"] + head / sl["rate"]
+        st["freeze_t"] = ft
+        for k in held:
+            if T.get(k, {}).get("status") == "ok": T[k]["freeze_t"] = ft
+    META["debt_limit_status"] = st
+
+# ---- Treasury Historical Debt Outstanding (fiscal-year end totals, 1790 to latest), for the by-year page
+DO_URL = "https://fiscaldata.treasury.gov/datasets/historical-debt-outstanding/historical-debt-outstanding"
+def src_debt_outstanding():
+    rows = fd("v2/accounting/od/debt_outstanding", sort="record_date", **{"page[size]": 400},
+              fields="record_date,debt_outstanding_amt,record_fiscal_year")
+    if len(rows) < 200: raise ValueError(f"only {len(rows)} rows")
+    return [[int(r["record_fiscal_year"]), r["record_date"], float(r["debt_outstanding_amt"])] for r in rows]
+dout, dout_stale = cached("debt_outstanding", src_debt_outstanding)
+if dout:
+    META["debt_by_fy"] = dout; META["debt_by_fy_stale"] = bool(dout_stale); META["debt_by_fy_source"] = DO_URL
+
 # ---- Federal Reserve holdings of Treasuries (NY Fed SOMA, weekly)
 SOMA_URL = "https://www.newyorkfed.org/markets/soma-holdings"
 def src_soma():
