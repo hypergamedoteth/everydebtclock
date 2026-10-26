@@ -11,6 +11,7 @@
     const x = T[slug];
     if (!x || x.status !== 'ok') return null;
     if (x.mode === 'fytd' && t >= M.fy_end_epoch) return x.rate * (t - M.fy_end_epoch);
+    if (x.freeze_t && t > x.freeze_t) t = x.freeze_t;   // never project debt past the statutory limit
     return x.base + x.rate * (t - x.t0);
   }
   const DER = {
@@ -66,6 +67,8 @@
 
   // ---------- render
   const app = document.getElementById('app');
+  app.querySelectorAll('.ssr').forEach(e => e.remove());   // build-time static fallback (for crawlers / no-JS); replaced by the live clock
+  const DLS = M.debt_limit_status || {};
   const live = []; // {el, fn}
   const pop = t => val('population', t), tax = () => T.tax_returns?.base;
   const PPB = `Debt ÷ US population projected to now from the Census Vintage 2025 estimate (${nf0.format(T.population?.base || 0)} on Jul 1, 2025) at Census's stated growth rate. Official-basis figure: debt ÷ that Jul 1, 2025 estimate.`;
@@ -126,13 +129,14 @@
   st.textContent = `Recalibrated ${new Date(M.generated_epoch * 1000).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'})}`;
   if (age > 36) app.insertAdjacentHTML('beforeend', `<div class="banner">Data last recalibrated ${Math.floor(age / 24)} day(s) ago. Tickers are still projecting from the last official figures.</div>`);
   if (fyRolled()) app.insertAdjacentHTML('beforeend', `<div class="banner">New fiscal year FY${curFY()} started Oct 1 — fiscal-year counters reset to $0 and are projecting until the next official update.</div>`);
+  if (DLS.at_limit) app.insertAdjacentHTML('beforeend', `<div class="banner">At the debt limit: Treasury is using extraordinary measures. Debt subject to the limit was ${usd(DLS.subject_to_limit)} on ${fmtDate(DLS.as_of)}, ${usd(DLS.headroom)} under the ${usd(DLS.limit)} limit, so the debt counters hold at Treasury's latest official figures instead of projecting growth.</div>`);
   if ((M.flags || []).length) app.insertAdjacentHTML('beforeend', `<div class="banner">Drift alert: ${M.flags.join(', ')} exceeded the validation threshold on the last check.</div>`);
 
   // lead hero: total national debt
   const d = info('debt_total');
   const hero = document.createElement('div'); hero.className = 'hero lead'; hero.id = 't-debt_total';
   if (d.status === 'ok') {
-    hero.innerHTML = `<div class="k">US national debt · live</div><div class="big num" id="hv">—</div>
+    hero.innerHTML = `<div class="k">US national debt · ${d.held_at_limit ? 'held at the debt limit (official figure)' : 'live'}</div><div class="big num" id="hv">—</div>
     <div class="sub"><span>${rateTxt(d.rate)}</span><span class="note">rate: 90-day least-squares trend (${d.calc?.n || '—'} daily closes), backtested vs next Treasury close, avg error ${d.validation?.mean_abs_error_pct != null ? d.validation.mean_abs_error_pct.toFixed(3) + '%' : 'n/a'}</span><span>Since you opened this page: <span class="num" id="hs">$0</span> more debt · <span class="num" id="hi">$0</span> in interest</span></div>
     <div class="trio"><div><span class="l" title="${esc(PPB)}">Per person (projected population)</span><span class="num" id="h1">—</span></div><div><span class="l">Per tax return filed</span><span class="num" id="h2">—</span></div><div><span class="l">Per household</span><span class="num" id="h3">—</span></div></div>
     <div class="meta" style="margin-top:10px">${badges(d)}<span class="badge">source: Treasury Debt to the Penny</span></div>`;
@@ -301,8 +305,8 @@
   function openModal(slug) {
     const i = info(slug); if (!i) return;
     const base = location.href.split('#')[0].replace(/[^/]*$/, '');
-    const share = `${base}t/${slug}.html`;
-    const embed = `<iframe src="${base}widget.html?t=${slug}" width="360" height="150" style="border:0" loading="lazy" title="${esc(i.label)} — live"></iframe>`;
+    const share = i.historical ? `${base}national-debt-by-year/#fy${String(i.as_of || '').replace('FY', '')}` : `${base}t/${slug}.html`;
+    const embed = `<iframe src="${base}widget.html?t=${slug}" width="360" height="150" style="border:0" loading="lazy" title="${esc(i.label)} — live"></iframe><br><a href="${base}?ref=embed" rel="nofollow">Every Debt Clock</a>`;
     const v = i.validation;
     dlg.innerHTML = `<h3>${esc(i.label)}</h3><div class="big num" id="mv">—</div>
       <div class="meta">${badges(i)}</div>
@@ -320,7 +324,7 @@
     modalTick = t => { const x = get(slug, t); mv.textContent = i.kind === 'pct' ? pct(x, 5) : i.kind === 'count' ? nf0.format(x) : usd(x, 2);
       if (m1) { m1.textContent = ppf(x / pop(t)); m2.textContent = ppf(x / tax()); }
       const mf = dlg.querySelector('#mf');
-      if (mf && !i.derived) { const dtt = t - i.t0; mf.textContent = `${fv(i, i.base)} + ${i.kind === 'count' ? (+i.rate).toFixed(6) : usd(i.rate, 4)} × ${nf0.format(Math.round(dtt))} s = ${fv(i, i.base + i.rate * dtt)}`; }
+      if (mf && !i.derived) { const dtt = Math.min(t, i.freeze_t || Infinity) - i.t0; mf.textContent = `${fv(i, i.base)} + ${i.kind === 'count' ? (+i.rate).toFixed(6) : usd(i.rate, 4)} × ${nf0.format(Math.round(dtt))} s = ${fv(i, i.base + i.rate * dtt)}`; }
       if (i.derived) { dlg.querySelectorAll('[data-c]').forEach(e => { const c = e.dataset.c; e.textContent = fv(T[c] || {}, val(c, t)); });
         if (mf) mf.textContent = '= ' + fv(i, x);
         const md = dlg.querySelector('#mdays'); if (md) md.textContent = (x / T.debt_subject_limit.rate / 86400).toFixed(1); } };

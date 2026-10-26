@@ -116,3 +116,8 @@ section,.tile,.hero{scroll-margin-top:96px}
 .math{border:1px solid #2a3140;border-radius:8px;padding:10px;margin:10px 0;font-size:.88em}.math table{width:100%;border-collapse:collapse;margin:6px 0}
 .math td{padding:2px 4px;border-bottom:1px solid #1d2330}.math td.num{text-align:right}.math .small{font-size:.85em;opacity:.75;margin:2px 0}
 #mf,.math .num{white-space:normal;overflow-wrap:anywhere}
+/* build-time text: intro (always shown), static fallback (removed by app.js), quick-answer links */
+.intro{max-width:1280px;margin:0 auto;padding:14px 14px 0}.intro h1{font-size:19px;margin:4px 0 6px;letter-spacing:.02em}
+.intro p{color:#c2ccda;font-size:13.5px;line-height:1.55;max-width:980px;margin:0}
+.ssr table.v td,.ssr table.v th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}.ssr table.v td+td{font-family:var(--mono)}
+.answers{max-width:1280px;margin:0 auto;padding:0 14px 50px}.answers ul{list-style:none;padding:0;margin:0 0 18px;display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px}
