@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Every Debt Clock widget</title><meta name="robots" content="noindex"><style>
+body{margin:0;background:#0e131b;color:#e8edf5;font-family:-apple-system,Segoe UI,Roboto,sans-serif}
+.w{padding:12px 14px;border:1px solid #1c2533;border-radius:12px;height:calc(100vh - 2px);box-sizing:border-box}
+.l{font-size:12px;color:#8a97ab}.v{font:600 24px ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;margin:4px 0}
+.p{font:12px ui-monospace,Menlo,monospace;color:#b8c3d4}.s{font-size:10px;color:#5c687a;margin-top:6px}a{color:#5aa9ff}</style></head>
+<body><div class="w"><div class="l" id="l">…</div><div class="v" id="v">—</div><div class="p" id="p"></div><div class="s" id="s"></div></div>
+<script src="core.js"></script>
+<script>(async()=>{const slug=new URLSearchParams(location.search).get('t')||'debt_total';
+const D=window.DEBTCLOCK_DATA||await (await fetch('data/data.json',{cache:'no-store'})).json(),C=DC(D),i=C.info(slug);
+if(!i||i.status!=='ok'){document.getElementById('v').textContent='source unavailable';return}
+document.getElementById('l').textContent=i.label+' · live';
+document.getElementById('s').innerHTML=(i.derived?'Live calculation from official tickers':`${i.fixed?'Fixed':'Projected from'} official ${i.as_of} · <a target="_blank" href="${i.source}">${i.source_name}</a>`)+` · <a target="_blank" href="index.html#t=${slug}">Every Debt Clock</a>`;
+(function fr(){const t=Date.now()/1000,v=C.get(slug,t);document.getElementById('v').textContent=C.fmt(i,v);
+if(i.kind==='usd'&&slug!=='debt_per_household')document.getElementById('p').textContent=`${C.ppf(v/C.pop(t))} per person · ${C.ppf(v/C.tax)} per tax return filed`;requestAnimationFrame(fr)})()})()</script></body></html>

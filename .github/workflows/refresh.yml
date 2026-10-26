@@ -1,0 +1,82 @@
+name: Refresh data and deploy
+
+on:
+  schedule:
+    # Cron is UTC. 11:30 UTC = 6:30 AM CDT / 5:30 AM CST (morning recalibration).
+    - cron: "30 11 * * *"
+    # 21:45 UTC weekdays = 4:45 PM CDT / 3:45 PM CST, after Treasury's afternoon Debt to the Penny + DTS release.
+    - cron: "45 21 * * 1-5"
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: refresh-deploy
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install fonts and Python deps
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y fonts-dejavu-core
+          python -m pip install --upgrade pip
+          pip install Pillow openpyxl
+
+      - name: Fetch official data (skipped on plain pushes)
+        if: github.event_name != 'push'
+        run: python3 pipeline/fetch.py
+
+      - name: Build site
+        env:
+          DEBTCLOCK_SITE_URL: https://everydebtclock.com
+        run: python3 build.py
+
+      - name: Guard against placeholder URLs
+        run: |
+          if grep -rIlE "example[.]com" --exclude-dir=.git --exclude-dir=.github . ; then
+            echo "Placeholder URL found"; exit 1
+          fi
+
+      - name: Commit refreshed data
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "debtclock-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data og t sitemap.xml robots.txt index.html dist cache
+          git diff --cached --quiet || git commit -m "data: refresh $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push
+
+      - uses: actions/configure-pages@v5
+
+      - name: Stage Pages artifact (public files only)
+        run: |
+          mkdir -p _site
+          cp -r index.html 404.html CNAME robots.txt sitemap.xml style.css app.js core.js widget.html \
+                apple-touch-icon.png icon-512.png data og t dist _site/
+          rm -f _site/data/validation_log.csv
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
+      # Runs after deploy so a flagged figure is still published with its ⚠ badge, but the run goes red and GitHub emails you.
+      - name: Fail on validation flags or unavailable tickers
+        run: python3 pipeline/check_flags.py

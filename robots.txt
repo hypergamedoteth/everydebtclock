@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /cache/
+Disallow: /pipeline/
+Disallow: /widget.html
+Sitemap: https://everydebtclock.com/sitemap.xml
