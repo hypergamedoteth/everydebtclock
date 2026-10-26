@@ -87,3 +87,8 @@ Static files only: Cloudflare Pages or GitHub Pages (free), Cloudflare CDN in fr
 - **Show the math** on every ticker: base, t0 (CT), rate per second, inputs, and the formula with live numbers.
 - **Lead hero:** total national debt (live). Secondary: debt-limit headroom, days left, projected date (Oct 26, 2026).
 - **Audit.** `../audit/audit.py` compares each base with its source. Pipeline data contract and sources: `../handoff/SOURCES.md`.
+
+## Deploy
+- Repo: https://github.com/hypergamedoteth/everydebtclock (public), branch `main`.
+- GitHub Pages, source = GitHub Actions (`.github/workflows/refresh.yml`), custom domain `everydebtclock.com` (`CNAME`).
+- Workflow runs at 11:30 UTC daily and 21:45 UTC weekdays, plus on push and manual dispatch.
