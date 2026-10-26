@@ -139,7 +139,8 @@ PL_CSS = """.brand a,.brand{color:inherit}.tile .pp{grid-template-columns:1fr 1f
 details.det{margin:8px 0}details.det summary{cursor:pointer;color:var(--blue);font-size:13px;margin:6px 0}
 table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:right}.dnote{color:var(--mut);font-size:12.5px}
 .badge.ann{border-color:#5a3a12;color:var(--amber)}
-#details table.v td{color:var(--txt)}#details table.v tr.sub td{color:var(--mut);padding-left:22px}#details h3{color:var(--txt);margin:18px 0 4px}"""
+#details table.v td{color:var(--txt)}#details table.v tr.sub td{color:var(--mut);padding-left:22px}#details h3{color:var(--txt);margin:18px 0 4px}
+.hero .sec2{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:13px;color:var(--mut);line-height:1.45}.hero .sec2 b{color:var(--txt);font-size:15px;margin:0 4px}.hero .sec2 .l{color:var(--dim);text-transform:uppercase;letter-spacing:.04em;font-size:11px}.hero .sec2 .note{display:block;font-size:12px}"""
 
 def tile_html(tid, label, value_txt, acc, badge, rate_txt="fixed", pp=None, tick=None, dlg=None, wide=False):
     """One tile in the US homepage style. tick = (base, rate, t0) makes the value tick; dlg = dict for the tap dialog."""
@@ -157,6 +158,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     _cur(p); T = texts(p)
     c = calc(p); pop = p["population"]; cs = p["components"]; name = p["name"]; dem = p.get("demonym", "resident")
     pub = p.get("publisher", "official data")
+    rep = p.get("reporter", name); rep_its = p.get("reporter_its", "its")  # who reports the headline figure (e.g. "The Census Bureau" / "California's")
     url = f"{SITE}/{sec_dir}/{p['slug']}/"
     t0, rate = c["t0"], c["rate"]
     proj = c["total"] + (rate * (now - t0) if rate else 0)
@@ -186,7 +188,8 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     proj_badge = f'<span class="badge proj" title="Projected every frame from the official figure of {E(as_of)}">PROJECTED · from {E(as_of)}</span>'
     fix_badge = lambda d_: f'<span class="badge fix" title="Official figure that does not change until the next official report">FIXED · {E(_fd(d_))}</span>'
     ann_badge = f'<span class="badge ann" title="{E(p.get("cadence", ""))}">{T["freq"].upper()} DATA · reported {T["once"]}</span>'
-    src_list = [(x["source_name"], x["source_url"]) for x in cs] + [(pop["source_name"], pop["source_url"])] + [(s_["name"], s_["url"]) for s_ in p.get("extra_sources", [])]
+    src_list = list(dict.fromkeys([(x["source_name"], x["source_url"]) for x in cs])) + [(pop["source_name"], pop["source_url"])] + list(dict.fromkeys([(q["source_name"], q["source_url"]) for q in ([p["secondary"]] + p["secondary"].get("parts", []) if p.get("secondary") else [])])) + [(s_["name"], s_["url"]) for s_ in p.get("extra_sources", [])]
+    sec2 = p.get("secondary")  # optional: the place's own, fresher official figure on a narrower scope, shown under the headline (never added to it)
 
     def dlg(label, method, src_name, src_url, locator="", base=None, r=None, official=None):
         return {"l": label, "m": method, "s": src_name, "u": src_url, "loc": locator, "b": base, "r": r, "t0": t0 if r else None,
@@ -201,9 +204,9 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     # ---- intro (mirrors the US intro paragraph: official figure first, then how the clock projects)
     parts = " and ".join(f"{_b(x['value'])} of {E(x['label'].lower())}" for x in cs)
     proj_txt = (f"The clock below starts from that official figure and projects forward at {T['pace']} (about {_short(abs(rate) * 86400)} a day{'' if up_ else ' less'}), "
-                f"the official change from {_fd(cs[0]['prior_as_of'])} to {as_of}. {E(name)} reports its debt {T['once']}, not daily, so the ticking number is a projection, not an official figure; "
+                f"the official change from {_fd(cs[0]['prior_as_of'])} to {as_of}. {E(rep)} reports {E(rep_its)} debt {T['once']}, not daily, so the ticking number is a projection, not an official figure; "
                 f"it re-bases when the next {T['report']} come out.") if rate else \
-               f"{E(name)} reports its debt {T['once']} and only one official figure is available, so the clock shows the official figure without projecting."
+               f"{E(rep)} reports {E(rep_its)} debt {T['once']} and only one official figure is available, so the clock shows the official figure without projecting."
     others = [o for o in places if o["slug"] != p["slug"]]
     crumb = (f'<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../states/">All {E(hub_label(places))}</a>'
              + "".join(f'<span>·</span><a href="../../{dict((k, d) for k, d, _, _ in SECTIONS)[o["kind"]]}/{o["slug"]}/">{E(o["name"])}</a>' for o in sorted(others, key=lambda x: x["name"])[:8]) + '</div>')
@@ -218,16 +221,18 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     hero = (f'<div class="hero lead" id="t-total" data-b="{c["total"]}" data-r="{rate or 0}" data-t="{t0}" data-d=\'{E(json.dumps(hero_d), quote=True)}\'>'
             f'<div class="k">{E(name)} {E(T["head"])} · {"live" if rate else "official"}</div><div class="big num" id="hv">{_usd0(proj)}</div>')
     if rate:
-        hero += (f'<div class="sub"><span>{_rate_txt(rate)}</span><span class="note">rate: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(name)} reports {T["once"]}, so this is a projection</span>'
+        hero += (f'<div class="sub"><span>{_rate_txt(rate)}</span><span class="note">rate: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}, so this is a projection</span>'
                  f'<span>Since you opened this page: <span class="num" id="hs">{CUR}0</span> {"more" if up_ else "less"} debt</span></div>')
     else:
-        hero += f'<div class="sub"><span>fixed</span><span class="note">{E(name)} reports {T["once"]}; one official figure available</span></div>'
+        hero += f'<div class="sub"><span>fixed</span><span class="note">{E(rep)} reports {T["once"]}; one official figure available</span></div>'
     trio_x = [(x["short"] + " · official " + _fd(x["as_of"]), _usd0(x["value"])) for x in cs[:2]] if len(cs) > 1 else \
              [(f"Official · {_fd(c['as_of'])}", _usd0(c["total"]))]
     trio_x += [(h["label"], h["value"]) for h in p.get("hero_extra", [])]
     hero += ('<div class="trio">' + f'<div><span class="l">Per {E(dem)} ({E(T["pop_tag"])}, {_fd(pop["as_of"])})</span><span class="num" data-pp="{pop["value"]}">{_usd2(proj / pop["value"])}</span></div>'
              + "".join(f'<div><span class="l">{E(l)}</span><span class="num">{E(v)}</span></div>' for l, v in trio_x[:2]) + "</div>"
-             f'<div class="meta" style="margin-top:10px">{proj_badge if rate else fix_badge(c["as_of"])}{ann_badge}<span class="badge">source: {E(pub)}</span></div></div>')
+             + (f'<div class="sec2"><span class="l">{E(sec2["label"])} · official {E(_fd(sec2["as_of"]))}</span> <b class="num">{_usd0(sec2["value"])}</b> '
+                f'<span class="note">{E(sec2["publisher"])}. {E(sec2["scope"])}</span></div>' if sec2 else "")
+             + f'<div class="meta" style="margin-top:10px">{proj_badge if rate else fix_badge(c["as_of"])}{ann_badge}<span class="badge">source: {E(pub)}</span></div></div>')
 
     # ---- What changed: official annual figures, newest first, with a NOW card (mirrors the US recent-closes strip)
     wc = ""
@@ -261,6 +266,10 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                                pp=[(f"Per {dem} ({T['pop_tag']} pop.)", _usd2((x["value"] + (r_ * (now - t0) if r_ else 0)) / pop["value"]), pop["value"]), ("Official", _short(x["value"]), None)],
                                tick=(x["value"], r_, t0) if r_ else None,
                                dlg=dlg(x["label"], x.get("includes", ""), x["source_name"], x["source_url"], x.get("source_locator", ""), base=x["value"], r=r_, official=f"{_usd0(x['value'])} official, {_fd(x['as_of'])}")))
+    if sec2:
+        tiles.append(tile_html("secondary", sec2["label"], _usd0(sec2["value"]), ACC[4], fix_badge(sec2["as_of"]), f"{_when(p, sec2['as_of'])} · not added to the total",
+                               pp=[(f"Per {dem}", _usd2(sec2["value"] / pop["value"]), None), ("Published by", sec2.get("publisher_short", sec2["publisher"]), None)],
+                               dlg=dlg(sec2["label"], sec2["scope"] + " " + sec2.get("includes", ""), sec2["source_name"], sec2["source_url"], sec2.get("source_locator", ""), official=f"{_usd0(sec2['value'])} official, {_fd(sec2['as_of'])}")))
     if rate:
         tiles.append(tile_html("yr_change", f"Change over the latest official {T['period']}", _sg(yr_change) + _usd0(abs(yr_change)), ACC[3], fix_badge(c["as_of"]),
                                f"{_fd(cs[0]['prior_as_of'])} → {as_of}",
@@ -276,7 +285,8 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
 
     # ---- one section per component: its breakdown and facts as fixed tiles (dense grid, like the US detail grids)
     comp_secs = ""
-    for i, x in enumerate(cs):
+    sec_parts = (sec2 or {}).get("parts", [])  # the secondary source's own parts (e.g. Texas BRB state and local reports): fixed tiles, never added
+    for i, x in enumerate(cs + sec_parts):
         tl = ""
         for j, b in enumerate(x.get("breakdown", [])):
             share = b["value"] / (b.get("of") or x["value"]) * 100
@@ -333,12 +343,12 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                 f'{" (" + E(x.get("source_locator", "")) + ")" if x.get("source_locator") else ""}</p>'
                 f'<table class="v"><tr><th>Part</th><th>Amount</th></tr>{rows}<tr><td><b>Total</b></td><td class="num"><b>{_usd0(x["value"])}</b></td></tr></table><p class="dnote">{E(x.get("includes", ""))}</p>')
     details = (f'<section id="details"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>Details</h2><span class="h2n">Full official tables</span></div>'
-               f'<div class="sk foot">{"".join(comp_table(x) for x in cs)}{det_hist}</div></section>')
+               f'<div class="sk foot">{"".join(comp_table(x) for x in cs)}{det_hist}{comp_table(sec2) if sec2 else ""}{"".join(comp_table(x) for x in sec_parts)}</div></section>')
 
     # ---- How it works (mirrors the US method panel)
     if rate:
         meth = (f'<p><b>The live number</b> = latest official total + ({T["rate_phrase"]} × seconds since that total). '
-                f'{E(name)} publishes its debt {T["once"]}, not daily, so this is a projection between {T["report"]}, not an official figure.</p>'
+                f'{E(rep)} publishes {E(rep_its)} debt {T["once"]}, not daily, so this is a projection between {T["report"]}, not an official figure.</p>'
                 f'<p><code>projected = {c["total"]:,.0f} + {rate:,.4f} × (seconds since {as_of} 11:59:59 PM CT)</code></p>'
                 + (f'<p>The rate is each part\'s official change over its latest {T["period"]}, added up: ' + "; ".join(f'{E(x["short"].lower())} {_usd0(x["value"])} − {_usd0(x["prior_value"])} = {_usd0(x["value"] - x["prior_value"])}' for x in cs) + '; combined '
                    if len(cs) > 1 else f'<p>The rate is the official change from {_fd(cs[0]["prior_as_of"])} to {as_of}: {_usd0(c["total"])} − {_usd0(prior_total)} = ')
@@ -422,7 +432,7 @@ const val=k=>k.b+k.r*(Date.now()/1000-k.t);document.getElementById('hsort').onch
 ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='total'?val(b)-val(a):val(b)/b.pop-val(a)/a.pop);ts.forEach(k=>g.appendChild(k.e))})};
 (function f(){T.forEach(k=>{if(!k.r)return;const v=val(k);k.v.textContent=usd(v,0,k.c);k.p.textContent=usd(v/k.pop,2,k.c)});requestAnimationFrame(f)})()})()</script>"""
     body = (f'{header}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>{E(hub_label(places)[0].upper() + hub_label(places)[1:])}</h1><p>Every place with a live clock, built from figures its own government publishes. Each clock shows who publishes the numbers and how often, '
-            f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: some states publish state and local debt together, others only state debt, and countries are shown in their own currency.</p></section>'
+            f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.</p></section>'
             f'<main id="app">{sort}{secs}</main>'
             f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li><li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../privacy.html">Privacy</a></footer>{script}</body></html>')
     hub_css = PL_CSS + ".hubsort{display:flex;justify-content:flex-end;margin:4px 2px -14px;font-size:12px;color:var(--mut)}.hubsort select{margin-left:6px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit;font-size:12px}.tile.hubt .lab span:last-child{font-size:11px;color:var(--dim)}"
