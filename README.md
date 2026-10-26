@@ -63,10 +63,12 @@ FIP gotcha: requesting a `fields=` subset makes the API collapse identical rows.
 - The modal adds "Post on X" (intent link the visitor clicks) and "Share image".
 - Site URL defaults to `https://everydebtclock.com` (override with `DEBTCLOCK_SITE_URL` for previews).
 
-## Cron plan (America/Chicago)
-- `0 6 * * *` — morning recalibration (Census, BEA, MTS on release days ~8th business day, OMB).
-- `30 15 * * 1-5` — after Treasury's ~4 PM ET release of Debt to the Penny + Daily Treasury Statement.
-Run as a GitHub Actions scheduled workflow (free) that commits `data/` and redeploys.
+## Cron plan (`.github/workflows/refresh.yml`, cron in UTC)
+- `30 11 * * *` — full morning recalibration (Census, BEA, MTS on release days ~8th business day, OMB, Canada).
+- `*/15 19-20 * * 1-5` and `0 21 * * 1-5` — weekday checks every 15 min, 2:00–4:00 PM CDT / 1:00–3:00 PM CST. Each runs `pipeline/check_new.py` and only fetches, commits and deploys when Treasury's Debt to the Penny has a newer `record_date` than `data/data.json`.
+- `45 21 * * 1-5` — full end-of-day refresh, 4:45 PM CDT / 3:45 PM CST.
+- Manual runs (`workflow_dispatch`) are gated the same way unless `force` is checked. Pushes rebuild and deploy without fetching.
+- Only source data (`data/`, `cache/`, `places/`) is committed; pages are rebuilt and deployed from the runner. `/api/daily.json` has `as_of` (build time) and `fetched_at` (when the Treasury data was pulled).
 
 ## Hosting
 Static files only: Cloudflare Pages or GitHub Pages (free), Cloudflare CDN in front. Approx. cost: $0 plus a domain (~$10–15/yr). Treasury APIs are free and keyless.

@@ -413,10 +413,13 @@ def build_api():
             avg90 = {"amount_per_day": round((cf["last"][1] - cf["first"][1]) / (d1 - d0).days, 2),
                      "from_date": cf["first"][0], "to_date": cf["last"][0], "method": "(last - first) / calendar days"}
     proj = val("debt_total")
+    fe = M.get("debt_fetched_epoch") if "debt_fetched_epoch" in M else M.get("generated_epoch")   # older data.json: fetch-run time
+    fetched_ct = dt.datetime.fromtimestamp(fe, ZoneInfo("America/Chicago")) if fe else None
     hh = (T.get("households") or {}).get("base")
     api = {
         "schema_version": 2,
         "as_of": build_ct.isoformat(timespec="seconds"),
+        "fetched_at": fetched_ct.isoformat(timespec="seconds") if fetched_ct else None,   # when Treasury data was pulled (as_of = page build time)
         "treasury_record_date": rec_date if official is not None else None,
         "total_debt_official": round(official, 2) if official is not None else None,
         "total_debt_projected_now": round(proj) if proj is not None else None,

@@ -231,6 +231,9 @@ add("tax_returns", label="Individual income tax returns filed", group="people", 
 THR0 = {"debt_intragov": 0.5}
 debt, debt_stale = cached("debt_to_penny", src_debt)
 if isinstance(debt, list): debt = {"rows": debt, "year_ago": None}     # pre-Phase-3 cache format
+# When the Debt to the Penny rows were actually pulled from Treasury (cache time if this run fell back to cache).
+try: META["debt_fetched_epoch"] = NOW if not debt_stale else json.load(open(os.path.join(CACHE, "debt_to_penny.json")))["fetched"]
+except Exception: META["debt_fetched_epoch"] = None
 if debt:
     year_ago = debt["year_ago"]; rows = sorted(debt["rows"], key=lambda r: r["record_date"])
     latest = rows[-1]; t_latest = eod_et(latest["record_date"])
