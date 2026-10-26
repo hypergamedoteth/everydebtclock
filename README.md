@@ -11,7 +11,7 @@ Every number ticks like usdebtclock.org, but each one starts from an **official 
 | `index.html`, `style.css`, `app.js` | Static front end, no build step. `requestAnimationFrame` loop updates every ticker every frame |
 | `widget.html?t=<slug>` | Embeddable single-ticker widget (iframe) |
 | `cache/` | Last good response per source (used if a source is down; tile shows "cached") |
-| `shots/` | Screenshots (mobile 390×844 @2x, desktop 1280×900) |
+| `analytics.html` (optional) or `ANALYTICS_HTML` env | Analytics snippet injected before `</head>` on every page; empty by default |
 
 ## Ticker model
 `value(t) = base + rate × (t − t0)`

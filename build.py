@@ -12,6 +12,18 @@ from PIL import Image, ImageDraw, ImageFont
 
 R = os.path.dirname(os.path.abspath(__file__))
 SITE = os.environ.get("DEBTCLOCK_SITE_URL", "https://everydebtclock.com").rstrip("/")
+# Analytics hook: empty by default. Set ANALYTICS_HTML (raw HTML snippet) or put it in analytics.html next to build.py.
+# The env var wins if both exist. It is injected before </head> on index.html, every t/ page, 404.html and the standalone.
+ANALYTICS_HTML = os.environ.get("ANALYTICS_HTML")
+if ANALYTICS_HTML is None and os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "analytics.html")):
+    ANALYTICS_HTML = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "analytics.html")).read()
+ANALYTICS_HTML = (ANALYTICS_HTML or "").strip()
+def with_analytics(page):
+    """Replace the <!--ANALYTICS-->...<!--/ANALYTICS--> block (or insert one before </head>)."""
+    block = f"<!--ANALYTICS-->{ANALYTICS_HTML}<!--/ANALYTICS-->"
+    if "<!--ANALYTICS-->" in page:
+        return re.sub(r"<!--ANALYTICS-->.*?<!--/ANALYTICS-->", lambda m: block, page, flags=re.S)
+    return page.replace("</head>", block + "\n</head>", 1)
 D = json.load(open(f"{R}/data/data.json"))
 T, M, DV = D["tickers"], D["meta"], D["derived"]
 NOW = time.time()
@@ -77,7 +89,10 @@ def label(slug, i):
 FD = "/usr/share/fonts/truetype/dejavu/"
 F = lambda n, s: ImageFont.truetype(FD + n, s)
 os.makedirs(f"{R}/og", exist_ok=True)
-gen_ct = dt.datetime.fromtimestamp(M["generated_epoch"], ZoneInfo("America/Chicago"))
+gen_ct = dt.datetime.fromtimestamp(M["generated_epoch"], ZoneInfo("America/Chicago"))   # when data.json was fetched
+# Every static number (share images, page text, meta descriptions) is computed at NOW, so it is labelled with NOW too.
+build_ct = dt.datetime.fromtimestamp(NOW, ZoneInfo("America/Chicago"))
+STAMP = build_ct.strftime("%b %-d, %Y %-I:%M %p") + " CT"
 def fit(draw, text, font_name, max_w, start):
     s = start
     while s > 20:
@@ -113,7 +128,7 @@ def og(path, title, big, lines, badge, col, note="Official US data · recalibrat
     for k, ln in enumerate(note.split("\n")):
         d.text((W - 60 - d.textlength(ln, font=F("DejaVuSans.ttf", 21)), 412 + 32 * k), ln, font=F("DejaVuSans.ttf", 21), fill="#8a97ab")
     d.text((60, H - 56), SITE.replace("https://", ""), font=F("DejaVuSans-Bold.ttf", 24), fill="#5aa9ff")
-    stamp = f"Snapshot {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT"
+    stamp = f"Projected to {STAMP}"
     d.text((W - 60 - d.textlength(stamp, font=F("DejaVuSans.ttf", 20)), H - 52), stamp, font=F("DejaVuSans.ttf", 20), fill="#5c687a")
     im.save(path, optimize=True)
 
@@ -149,7 +164,11 @@ meta = f"""<!--META--><title>Every Debt Clock: live US national debt, deficit an
 idx = re.sub(r"<!--META-->.*?<!--/META-->", lambda m: meta, idx, flags=re.S)
 idx = re.sub(r'<meta property="og:title" content="US Debt Clock — live &amp; verified"><meta property="og:type" content="website">\n?', "", idx)
 idx = idx.replace('<meta property="og:title" content="US Debt Clock — live & verified"><meta property="og:type" content="website">\n', "")
+idx = with_analytics(idx)
 open(f"{R}/index.html", "w").write(idx)
+if os.path.exists(f"{R}/404.html"):
+    p404 = with_analytics(open(f"{R}/404.html").read())
+    open(f"{R}/404.html", "w").write(p404)
 
 # ---------------------------------------------------------------- share pages
 os.makedirs(f"{R}/t", exist_ok=True)
@@ -172,7 +191,7 @@ for slug, i in ALL.items():
     if x is None: continue
     lab = label(slug, i); url = f"{SITE}/t/{slug}.html"
     usdpp = i.get("kind") == "usd" and slug != "debt_per_household"
-    d1 = (f"{lab}: {fmt(i, x, True)} as of {gen_ct.strftime('%b %-d, %Y')}" + (f" ({ppf(x/POP)} per person, {ppf(x/TAX)} per tax return filed)" if usdpp else "") +
+    d1 = (f"{lab}: {fmt(i, x, True)} projected to {build_ct.strftime('%b %-d, %Y')}" + (f" ({ppf(x/POP)} per person, {ppf(x/TAX)} per tax return filed)" if usdpp else "") +
           f". Live counter from official data ({i.get('source_name') or 'computed from official Treasury tickers'}), recalibrated and checked daily.")
     sub = {k: T[k] for k in need if k in T}
     if not i.get("derived"): sub[slug] = T[slug]
@@ -206,12 +225,12 @@ for slug, i in ALL.items():
 <p><b>Per person</b> divides by the US population: Census Vintage 2025 estimate for July 1, 2025, projected forward at Census's stated growth rate ({POP:,.0f} at build time). <b>Per tax return filed</b> divides by {TAX:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2); a joint return counts once and returns with zero tax liability are included.</p>
 <a class="cta" href="../index.html#t={slug}">Open the full live clock →</a>
 <div class="rel"><b>Related:</b><br>{''.join(f'<a href="{s}.html">{html.escape(ALL[s].get("label", s))}</a>' for s in rel)}</div>
-<footer>Snapshot value in this page's text: {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT. The number above ticks live in your browser.</footer>
+<footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser.</footer>
 </main><script>window.DEBTCLOCK_DATA={data};</script><script src="../core.js"></script>
 <script>(function(){{const C=DC(window.DEBTCLOCK_DATA),i=C.info({json.dumps(slug)}),v=document.getElementById('v'),p1=document.getElementById('p1'),p2=document.getElementById('p2');
 (function f(){{const t=Date.now()/1000,x=C.get({json.dumps(slug)},t);v.textContent=C.fmt(i,x);if(p1){{p1.textContent=C.ppf(x/C.pop(t));p2.textContent=C.ppf(x/C.tax)}}requestAnimationFrame(f)}})()}})()</script>
 </body></html>"""
-    open(f"{R}/t/{slug}.html", "w").write(page)
+    open(f"{R}/t/{slug}.html", "w").write(with_analytics(page))
 
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()
