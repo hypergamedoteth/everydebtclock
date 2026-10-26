@@ -482,6 +482,12 @@ if debt:
                               "d_public": float(b["debt_held_public_amt"]) - float(a["debt_held_public_amt"]),
                               "d_intragov": float(b["intragov_hold_amt"]) - float(a["intragov_hold_amt"])} for a, b in zip(rows, rows[1:])][::-1]
 
+# ---- official daily closes for /api/daily.json (last 45 records, newest first; real Treasury rows only)
+if debt:
+    rows = sorted(debt["rows"], key=lambda r: r["record_date"])[-45:]
+    META["debt_closes"] = [[r["record_date"], float(r["tot_pub_debt_out_amt"])] for r in rows][::-1]
+    META["debt_closes_stale"] = bool(debt_stale)
+
 # ---- debt subject to the statutory limit (DTS Table III-C, daily)
 DSL_URL = "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit"
 def src_dsl():

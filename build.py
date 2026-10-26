@@ -239,6 +239,74 @@ open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<ur
     "".join(f"<url><loc>{u}</loc><lastmod>{lm}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
 open(f"{R}/robots.txt", "w").write(f"User-agent: *\nAllow: /\nDisallow: /cache/\nDisallow: /pipeline/\nDisallow: /widget.html\nSitemap: {SITE}/sitemap.xml\n")
 
+# ---------------------------------------------------------------- /api/daily.json + /api/daily.txt
+# Small, stable feed for the daily X post. Only real fetched Treasury rows; anything we can't compute is null.
+def build_api():
+    td = T.get("debt_total") or {}
+    closes = M.get("debt_closes")
+    if not closes and M.get("recent_closes"):          # older data.json: fall back to the What-changed rows (also official)
+        closes = [[r["date"], r["total"]] for r in M["recent_closes"]]
+    closes = sorted(((c[0], float(c[1])) for c in (closes or [])), key=lambda c: c[0], reverse=True)
+    ok = td.get("status") == "ok" and closes and closes[0][0] == td.get("as_of")
+    rec_date, official = (closes[0] if ok else (td.get("as_of"), None))
+    if official is None and td.get("status") == "ok" and not td.get("stale"): official = td.get("base")
+    def chg(days):
+        if not ok: return None
+        if days == 1:
+            prev = closes[1] if len(closes) > 1 else None
+        else:
+            cut = (dt.date.fromisoformat(rec_date) - dt.timedelta(days=days)).isoformat()
+            prev = next((c for c in closes if c[0] <= cut), None)
+        if not prev: return None
+        return {"amount": round(official - prev[1], 2), "from_date": prev[0], "from_value": round(prev[1], 2)}
+    avg90 = None
+    cf = (td.get("calc") or {})
+    if cf.get("first") and cf.get("last"):
+        d0, d1 = dt.date.fromisoformat(cf["first"][0]), dt.date.fromisoformat(cf["last"][0])
+        if (d1 - d0).days > 0:
+            avg90 = {"amount_per_day": round((cf["last"][1] - cf["first"][1]) / (d1 - d0).days, 2),
+                     "from_date": cf["first"][0], "to_date": cf["last"][0], "method": "(last - first) / calendar days"}
+    proj = val("debt_total")
+    hh = (T.get("households") or {}).get("base")
+    api = {
+        "schema_version": 1,
+        "as_of": build_ct.isoformat(timespec="seconds"),
+        "treasury_record_date": rec_date if official is not None else None,
+        "total_debt_official": round(official, 2) if official is not None else None,
+        "total_debt_projected_now": round(proj) if proj is not None else None,
+        "change_1d_official": chg(1),
+        "change_7d_official": chg(7),
+        "change_30d_official": chg(30),
+        "avg_daily_change_90d": avg90,
+        "per_second_rate": round(td["rate"], 2) if td.get("status") == "ok" else None,
+        "per_second_rate_method": "90-day least-squares trend of Debt to the Penny" if td.get("status") == "ok" else None,
+        "debt_per_person": round(proj / POP, 2) if proj and POP else None,
+        "debt_per_household": round(proj / hh, 2) if proj and hh else None,
+        "per_person_basis": "projected now; Census population (projected) and Census CPS ASEC 2025 households",
+        "stale": bool(td.get("stale") or M.get("debt_closes_stale")),
+        "source_url": td.get("source") or "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
+        "source_api": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/debt_to_penny",
+        "site_url": SITE,
+    }
+    os.makedirs(f"{R}/api", exist_ok=True)
+    json.dump(api, open(f"{R}/api/daily.json", "w"), indent=1)
+    # one plain-English, nonpartisan line
+    def big(x):
+        a = abs(x)
+        return f"${a/1e12:,.3f} trillion" if a >= 1e12 else f"${a/1e9:,.1f} billion" if a >= 1e9 else f"${a/1e6:,.1f} million" if a >= 1e6 else f"${a:,.0f}"
+    if api["total_debt_official"] is None:
+        line = ""
+    else:
+        line = f"US national debt: {big(api['total_debt_official'])} (Treasury, {fdate(rec_date)})."
+        c = api["change_1d_official"]
+        if c:
+            word = "Up" if c["amount"] > 0 else "Down" if c["amount"] < 0 else "Unchanged"
+            line += f" {word}{' ' + big(c['amount']) if c['amount'] else ''} since the prior record ({fdate(c['from_date'])})."
+        line += f" {SITE.replace('https://', '')}"
+    open(f"{R}/api/daily.txt", "w").write(line + "\n")
+    return api
+API = build_api()
+
 # ---------------------------------------------------------------- standalone
 css, js = open(f"{R}/style.css").read(), open(f"{R}/app.js").read()
 single = (idx.replace('<link rel="stylesheet" href="style.css">', f"<style>{css}</style>")

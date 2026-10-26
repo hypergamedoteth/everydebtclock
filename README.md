@@ -9,6 +9,7 @@ Every number ticks like usdebtclock.org, but each one starts from an **official 
 | `pipeline/run_daily.sh` | fetch → validate → build (cron entry point) |
 | `build.py` | Inlines CSS/JS/data into `dist/debtclock-standalone.html`; writes per-ticker share pages `t/<slug>.html` |
 | `index.html`, `style.css`, `app.js` | Static front end, no build step. `requestAnimationFrame` loop updates every ticker every frame |
+| `api/daily.json`, `api/daily.txt` | Small stable feed for the daily X post (official Debt to the Penny close, 1/7/30-day official changes, 90-day average, projected now, per person/household) and one plain-English post line. Crawlable, not in the sitemap. Null when a value cannot be computed. |
 | `widget.html?t=<slug>` | Embeddable single-ticker widget (iframe) |
 | `cache/` | Last good response per source (used if a source is down; tile shows "cached") |
 | `analytics.html` (optional) or `ANALYTICS_HTML` env | Analytics snippet injected before `</head>` on every page; empty by default |
