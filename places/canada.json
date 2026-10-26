@@ -164,12 +164,12 @@
  ],
  "hero_extra": [
   {
-   "label": "Official figure in US$ (BoC rate 2026-10-19: 1.4097)",
-   "value": "US$1.170 trillion"
+   "label": "Official figure in US$ (BoC rate 2026-10-20: 1.4054)",
+   "value": "US$1.174 trillion"
   }
  ],
  "fx_note": {
-  "date": "2026-10-19",
-  "usdcad": 1.4097
+  "date": "2026-10-20",
+  "usdcad": 1.4054
  }
 }
