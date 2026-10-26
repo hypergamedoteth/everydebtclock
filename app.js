@@ -147,6 +147,39 @@
   } else hero.innerHTML = `<div class="k">US national debt</div><div class="big">source unavailable</div>`;
   app.appendChild(hero);
 
+  // ---------- "Your state" card (server-rendered with the default place; see build.py place_card)
+  const pc = document.getElementById('placecard');
+  if (pc) {
+    const hub = pc.nextElementSibling; app.appendChild(pc); if (hub && hub.classList.contains('pchub')) app.appendChild(hub);
+    let IX = null; try { IX = JSON.parse(document.getElementById('placesix').textContent); } catch (e) {}
+    const P = IX ? IX.places : [], by = s => P.find(x => x.slug === s), KEY = 'edc.place';
+    const $ = id => pc.querySelector('#' + id), sel = $('pcsel');
+    let cur = by(IX && IX.default), how = 'default';
+    const kindWord = x => x.kind === 'country' ? 'country' : 'state';
+    function show(p, why) {
+      if (!p) return; cur = p; how = why;
+      $('pck').textContent = why === 'default' ? 'Featured ' + kindWord(p) : 'Your ' + kindWord(p);
+      $('pcn').textContent = p.name; $('pclab').textContent = p.label; $('pcd').textContent = p.demonym; $('pcg').textContent = p.name;
+      $('pcb').textContent = p.rate ? 'projected from official ' + fmtDate(p.base_date) + ' figures' : 'official, ' + fmtDate(p.base_date);
+      $('pcl').href = p.url; sel.value = p.slug;
+    }
+    let saved = null; try { saved = by(localStorage.getItem(KEY)); } catch (e) {}
+    if (saved) show(saved, 'saved');
+    else if (P.length > 1 && /^https?:$/.test(location.protocol)) {
+      // /api/geo is a Cloudflare Worker: {"country":"US","region_code":"TX"}. Any failure, a slow answer (800 ms) or a place without a page keeps the default.
+      const ac = typeof AbortController === 'function' ? new AbortController() : null, to = setTimeout(() => ac && ac.abort(), 800);
+      fetch('/api/geo', {cache: 'no-store', signal: ac ? ac.signal : undefined}).then(r => r.ok ? r.json() : null).then(g => {
+        if (!g || !g.country) return;
+        const c = String(g.country).toUpperCase(), r = String(g.region_code || '').toUpperCase();
+        const m = P.find(x => x.kind === 'state' && x.country === c && x.region_code === r) || P.find(x => x.kind === 'country' && x.country === c);
+        if (m && how === 'default') show(m, 'geo');
+      }).catch(() => {}).finally(() => clearTimeout(to));
+    }
+    sel.onchange = () => { const p = by(sel.value); if (!p) return; try { localStorage.setItem(KEY, p.slug); } catch (e) {} show(p, 'saved'); };
+    const pv = $('pcv'), pp = $('pcp');
+    live.push(t => { if (!cur) return; const x = cur.base + cur.rate * (t - cur.t0); pv.textContent = usd(x); pp.textContent = usd(x / cur.population, 2); });
+  }
+
   // secondary hero: debt-limit headroom (below the national debt)
   const sl = T.debt_subject_limit, lim = T.debt_limit;
   if (sl?.status === 'ok' && lim?.status === 'ok' && sl.rate > 0) {

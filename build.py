@@ -257,6 +257,27 @@ PLNAV = ("<!--PLNAV-->" + ('<nav class="plnav"><a href="./" class="on">United St
          if any(p["kind"] == k for p in PLACES_LIVE)) + "</nav>" if PLACES_LIVE else "") + "<!--/PLNAV-->")
 if "<!--PLNAV-->" in idx: idx = re.sub(r"<!--PLNAV-->.*?<!--/PLNAV-->", lambda m: PLNAV, idx, flags=re.S)
 else: idx = idx.replace('<span class="live">', PLNAV + '<span class="live">', 1)
+# "Your state" card under the US hero: one compact card for the visitor's place (picked client-side in app.js from
+# /api/geo, a saved choice, or the default), driven by the same index as api/places.json. Server-rendered with the
+# default place so the card's height never changes when JS picks another place.
+PIX = places_build.index(PLACES_LIVE, NOW)
+def place_card(ix):
+    if not ix["places"]: return "<!--PLACES--><!--/PLACES-->"
+    p = next(x for x in ix["places"] if x["slug"] == ix["default"])
+    v = p["base"] + p["rate"] * (NOW - p["t0"])
+    opts = "".join(f'<option value="{x["slug"]}"{" selected" if x is p else ""}>{html.escape(x["name"])}</option>' for x in ix["places"])
+    js_ix = json.dumps(ix, separators=(",", ":")).replace("</", "<\\/")
+    return (f'<!--PLACES--><div class="placecard" id="placecard"><a class="pcmain" id="pcl" href="{p["url"]}">'
+            f'<div class="k"><span id="pck">Featured state</span> · <b id="pcn">{html.escape(p["name"])}</b> <span id="pclab">{html.escape(p["label"])}</span></div>'
+            f'<div class="pcv num" id="pcv">{usd0(v)}</div>'
+            f'<div class="pcs"><span class="num" id="pcp">{usd2(v / p["population"])}</span> per <span id="pcd">{html.escape(p["demonym"])}</span> · '
+            f'<span id="pcb">projected from official {fdate(p["base_date"])} figures</span> · <span class="go">See <span id="pcg">{html.escape(p["name"])}</span> →</span></div></a>'
+            f'<label class="pcchg">Change <select id="pcsel" aria-label="Pick a state or country">{opts}</select></label>'
+            f'<script type="application/json" id="placesix">{js_ix}</script></div>'
+            f'<a class="pchub" href="{ix["hub"]}">See every state &amp; country →</a><!--/PLACES-->')
+PCARD = place_card(PIX)
+if "<!--PLACES-->" in idx: idx = re.sub(r"<!--PLACES-->.*?<!--/PLACES-->", lambda m: PCARD, idx, flags=re.S)
+else: idx = idx.replace("<!--/SSR--></main>", "<!--/SSR-->" + PCARD + "</main>", 1)
 idx = with_analytics(idx)
 open(f"{R}/index.html", "w").write(idx)
 if os.path.exists(f"{R}/404.html"):

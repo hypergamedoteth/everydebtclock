@@ -123,3 +123,13 @@ section,.tile,.hero{scroll-margin-top:96px}
 .ssr table.v td,.ssr table.v th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}.ssr table.v td+td{font-family:var(--mono)}
 .answers{max-width:1280px;margin:0 auto;padding:0 14px 50px}.answers ul{list-style:none;padding:0;margin:0 0 18px;display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px}
 .site-foot{max-width:1280px;margin:0 auto;padding:0 14px 40px;color:var(--dim);font-size:12px}
+.placecard{display:flex;align-items:center;gap:10px 14px;border:1px solid var(--line);background:var(--panel);border-left:3px solid var(--red);border-radius:14px;padding:10px 14px;margin:-6px 0 4px;min-height:76px}
+.placecard .pcmain{flex:1;min-width:0;color:inherit;display:block}.placecard .pcmain:hover .go{text-decoration:underline}
+.placecard .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.placecard .k b{color:var(--txt);font-weight:700}
+.placecard .pcv{font-size:clamp(20px,4.4vw,30px);font-weight:600;color:#fff;margin:2px 0 1px;line-height:1.15}
+.placecard .pcs{font-size:12px;color:var(--mut)}.placecard .pcs .num{color:var(--txt)}.placecard .go{color:var(--blue);white-space:nowrap}
+.pcchg{font-size:11px;color:var(--mut);display:flex;align-items:center;gap:6px;flex:none}
+.pcchg select{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:5px 8px;font:inherit;font-size:12px;max-width:170px}
+.pchub{display:inline-block;font-size:12.5px;margin:2px 4px 18px}
+.crumb{display:flex;flex-wrap:wrap;gap:4px 8px;font-size:12px;margin:2px 0 6px}.crumb span{color:var(--dim)}
+@media (max-width:640px){.placecard{flex-wrap:wrap;padding:9px 11px;gap:6px 10px}.placecard .pcs{font-size:11.5px}.pcchg{width:100%;justify-content:flex-end;margin-top:-2px}}

@@ -13,6 +13,8 @@ SECTIONS = [("state", "states", "States", "US state debt clocks"),
             ("country", "countries", "Countries", "Country debt clocks")]
 # Shown on an index page as "coming soon" (names only, no numbers).
 COMING = {"state": ["California", "Florida", "New York"], "country": ["Canada"]}
+# Shown on the homepage "Your state" card when the visitor's location is unknown or has no page yet.
+DEFAULT_PLACE = "texas"
 ACC = ["var(--red)", "var(--blue)", "var(--violet)", "var(--amber)", "var(--teal)"]
 E = html.escape
 
@@ -59,15 +61,32 @@ def nav_html(places, depth, current=None, cls="pl"):
     items += [(f"{up}{d}/", lab, current == k) for k, d, lab, _ in SECTIONS if k in kinds]
     return f'<nav class="{cls}">' + "".join(f'<a href="{h}"{" class=on" if on else ""}>{lab}</a>' for h, lab, on in items) + "</nav>"
 
+def index(places, now):
+    """Machine-readable list of every live place (api/places.json and the homepage card).
+    value(t) = base + rate * (t - t0); rate is 0 when the place has no official trend."""
+    sec = {k: d for k, d, _, _ in SECTIONS}
+    out = []
+    for p in sorted(places, key=lambda x: (x["kind"], x["name"])):
+        c = calc(p)
+        out.append({"slug": p["slug"], "name": p["name"], "kind": p["kind"], "country": p.get("country"), "region_code": p.get("region_code"),
+                    "demonym": p.get("demonym", "resident"), "label": "state + local debt" if p["kind"] == "state" else "government debt",
+                    "base": c["total"], "base_date": c["as_of"], "t0": c["t0"], "rate": c["rate"] or 0,
+                    "population": p["population"]["value"], "publisher": p.get("publisher"), "url": f'{sec[p["kind"]]}/{p["slug"]}/'})
+    default = DEFAULT_PLACE if any(x["slug"] == DEFAULT_PLACE for x in out) else (out[0]["slug"] if out else None)
+    return {"_doc": "Live place clocks on everydebtclock.com. value(t) = base + rate * (t - t0), t in Unix seconds; rate 0 = official figure, not projected. url is relative to https://everydebtclock.com/.",
+            "generated": dt.datetime.fromtimestamp(now, CT).isoformat(timespec="seconds"), "default": default, "hub": "states/", "places": out}
+
 def build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, stamp, now):
     places = load(R)
     urls = []
+    os.makedirs(f"{R}/api", exist_ok=True)
+    with open(f"{R}/api/places.json", "w") as f: json.dump(index(places, now), f, indent=1)
     os.makedirs(f"{R}/og/places", exist_ok=True)
     for k, d, lab, desc_ in SECTIONS:
         live = [p for p in places if p["kind"] == k]
         if not live: continue
         for p in live: urls.append(place_page(R, SITE, with_analytics, og, stamp, now, p, d, places))
-        urls.append(index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, k, d, lab, desc_, live, places))
+        urls.append(index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, k, d, lab, desc_, live, places, now))
     return urls
 
 def meta_head(SITE, url, title, desc, img, depth, extra_css="", ld="", css_link=True):
@@ -153,7 +172,10 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                 f"the official change from {_fd(cs[0]['prior_as_of'])} to {as_of}. {E(name)} reports its debt once a year, not daily, so the ticking number is a projection, not an official figure; "
                 f"it re-bases when the next annual reports come out.") if rate else \
                f"{E(name)} reports its debt once a year and only one official year is available, so the clock shows the official figure without projecting."
-    intro = (f'<section class="intro" id="intro"><h1>{E(name)} Debt Clock</h1>'
+    others = [o for o in places if o["slug"] != p["slug"]]
+    crumb = (f'<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../states/">Every state &amp; country</a>'
+             + "".join(f'<span>·</span><a href="../../{dict((k, d) for k, d, _, _ in SECTIONS)[o["kind"]]}/{o["slug"]}/">{E(o["name"])}</a>' for o in sorted(others, key=lambda x: x["name"])[:8]) + '</div>')
+    intro = (f'<section class="intro" id="intro">{crumb}<h1>{E(name)} Debt Clock</h1>'
              f'<p>{E(name)} state and local governments owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) at the end of fiscal year {fy} (<b>{as_of}</b>), according to the '
              + " and the ".join(f'<a href="{E(x["source_url"])}" rel="noopener">{E(x["source_name"].split(" (")[0])}</a>' for x in cs)
              + f': {parts}. That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by the Census Bureau\'s estimate of {pop["value"]:,} {E(name)} residents on {_fd(pop["as_of"])}. {proj_txt}</p></section>')
@@ -300,7 +322,9 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
 
     links = (f'<section class="answers" id="answers"><div class="sh"><h2>More clocks</h2></div><ul>'
              f'<li><a href="../../">US national debt clock (live, checked daily against Treasury)</a></li>'
-             f'<li><a href="../">All {E(sec_dir)}</a></li><li><a href="../../national-debt-per-person/">US national debt per person</a></li></ul></section>')
+             f'<li><a href="../../states/">Every state &amp; country debt clock</a></li><li><a href="../../national-debt-per-person/">US national debt per person</a></li></ul>'
+             + ('<div class="sh"><h2>Other places</h2></div><ul>' + "".join(f'<li><a href="../../{dict((k, d) for k, d, _, _ in SECTIONS)[o["kind"]]}/{o["slug"]}/">{E(o["name"])} debt clock</a></li>' for o in sorted(others, key=lambda x: x["name"])) + '</ul>' if others else '')
+             + '</section>')
 
     script = f"""<script>(function(){{const nf0=new Intl.NumberFormat('en-US',{{maximumFractionDigits:0}}),nf2=new Intl.NumberFormat('en-US',{{minimumFractionDigits:2,maximumFractionDigits:2}});
 const usd=(v,d)=>(v<0?'−$':'$')+(d?nf2:nf0).format(Math.abs(v)),short=v=>{{const a=Math.abs(v);return '$'+(a>=1e12?(a/1e12).toFixed(2)+'T':a>=1e9?(a/1e9).toFixed(2)+'B':(a/1e6).toFixed(1)+'M')}};
@@ -325,27 +349,48 @@ ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))
     return url
 
-def index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, kind, sec_dir, lab, desc_, live, places):
+def index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, kind, sec_dir, lab, desc_, live, places, now):
+    """Hub of every live place (all kinds), driven by the same index as api/places.json. /states/ is the main hub;
+    /countries/ gets the same hub with countries first. Tiles tick; a sort control reorders them client-side."""
     url = f"{SITE}/{sec_dir}/"
-    tiles = ""
-    for i, p in enumerate(sorted(live, key=lambda x: x["name"])):
-        c = calc(p)
-        tiles += (f'<a class="tile fixed" href="{p["slug"]}/" style="--acc:var(--red);display:block;color:inherit"><div class="lab"><span>{E(p["name"])} · state + local debt</span></div>'
-                  f'<div class="val num">{_usd0(c["total"])}</div><div class="pp"><div><span class="l">Per {E(p.get("demonym", "resident"))}</span><span class="num">{_usd2(c["total"] / p["population"]["value"])}</span></div>'
-                  f'<div><span class="l">Official as of</span><span class="num">{_fd(c["as_of"])}</span></div></div>'
-                  f'<div class="meta"><span class="rate">{"live clock" if c["rate"] else "official"}</span><span class="badge fix">OFFICIAL · {_fd(c["as_of"])}</span></div></a>')
-    soon = [n for n in COMING.get(kind, []) if n not in {p["name"] for p in live}] + (["The other states"] if kind == "state" else [])
-    tiles += "".join(f'<div class="tile na" style="--acc:var(--mut)"><div class="lab"><span>{E(n)}</span></div><div class="val">coming soon</div></div>' for n in soon)
+    ix = index(places, now)["places"]
+    up = "../"
+    order = sorted(SECTIONS, key=lambda s_: s_[0] != kind)
+    secs = ""
+    for k, d, lab_, desc2 in order:
+        items = [x for x in ix if x["kind"] == k]
+        tiles = ""
+        for x in items:
+            v = x["base"] + x["rate"] * (now - x["t0"])
+            tiles += (f'<a class="tile hubt" href="{up}{x["url"]}" style="--acc:var(--red);display:block;color:inherit" data-name="{E(x["name"])}" data-b="{x["base"]}" data-r="{x["rate"]}" data-t="{x["t0"]}" data-pop="{x["population"]}">'
+                      f'<div class="lab"><span>{E(x["name"])}</span><span>{E(x["label"])}</span></div>'
+                      f'<div class="val num">{_usd0(v)}</div><div class="pp"><div><span class="l">Per {E(x["demonym"])}</span><span class="num hpp">{_usd2(v / x["population"])}</span></div>'
+                      f'<div><span class="l">Official total</span><span class="num">{_short(x["base"])}</span></div></div>'
+                      f'<div class="meta"><span class="rate{" up" if x["rate"] > 0 else ""}">{_rate_txt(x["rate"]) if x["rate"] else "official"}</span>'
+                      f'<span class="badge {"proj" if x["rate"] else "fix"}">{"PROJECTED" if x["rate"] else "OFFICIAL"} · from {_fd(x["base_date"])}</span></div></a>')
+        soon = [n for n in COMING.get(k, []) if n not in {x["name"] for x in items}] + (["The other states"] if k == "state" else [])
+        tiles += "".join(f'<div class="tile na" style="--acc:var(--mut)"><div class="lab"><span>{E(n)}</span></div><div class="val">coming soon</div></div>' for n in soon)
+        if not items and not soon: continue
+        secs += (f'<section id="{d}"><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>{E(lab_)}</h2>'
+                 f'<span class="h2n">{" · ".join(t_ for t_ in [f"{len(items)} live" if items else "", f"{len([n for n in soon if n in COMING.get(k, [])])} coming soon" if soon else ""] if t_)}</span></div><div class="grid hub">{tiles}</div></section>')
+    names = ", ".join(x["name"] for x in ix)
     title = f"{lab} Debt Clocks | Every Debt Clock"
-    desc = f"{desc_}: official government debt figures with sources, starting with " + ", ".join(p["name"] for p in live) + "."
+    desc = f"{desc_}: live clocks projected from official government debt figures, with sources. Now live: {names}."
     header = (f'<header class="top"><div class="topin"><a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>{nav_html(places, 1, kind, "plnav")}'
               f'<span class="live"><span class="dot"></span><span>official data</span></span></div></header>')
-    body = (f'{header}<section class="intro"><h1>{E(desc_)}</h1><p>Each clock shows the latest official debt figures for the place, who publishes them and how often, '
-            f'with every number linked to its source. Most state and local debt is reported once a year, so these clocks say clearly which numbers are official and which are projected.</p></section>'
-            f'<main id="app"><section><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>{E(lab)}</h2><span class="h2n">Live and coming soon</span></div>'
-            f'<div class="grid">{tiles}</div></section></main>'
-            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../privacy.html">Privacy</a></footer></body></html>')
-    page = meta_head(SITE, url, title, desc, "og/home.png", 1, PL_CSS) + body
+    sort = ('<div class="hubsort"><label>Sort <select id="hsort"><option value="name">A–Z</option><option value="total">Total debt</option>'
+            '<option value="pp">Debt per resident</option></select></label></div>')
+    script = """<script>(function(){const nf0=new Intl.NumberFormat('en-US',{maximumFractionDigits:0}),nf2=new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const usd=(v,d)=>(v<0?'−$':'$')+(d?nf2:nf0).format(Math.abs(v)),T=[...document.querySelectorAll('.hubt')].map(e=>({e,v:e.querySelector('.val'),p:e.querySelector('.hpp'),b:+e.dataset.b,r:+e.dataset.r,t:+e.dataset.t,pop:+e.dataset.pop}));
+const val=k=>k.b+k.r*(Date.now()/1000-k.t);document.getElementById('hsort').onchange=ev=>{const m=ev.target.value;document.querySelectorAll('.grid.hub').forEach(g=>{const ts=T.filter(k=>k.e.parentNode===g);
+ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='total'?val(b)-val(a):val(b)/b.pop-val(a)/a.pop);const first=g.querySelector('.tile.na');ts.forEach(k=>g.insertBefore(k.e,first))})};
+(function f(){T.forEach(k=>{if(!k.r)return;const v=val(k);k.v.textContent=usd(v);k.p.textContent=usd(v/k.pop,2)});requestAnimationFrame(f)})()})()</script>"""
+    body = (f'{header}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>State and country debt clocks</h1><p>Every place with a live clock, built from figures its own government publishes. Each clock shows who publishes the numbers and how often, '
+            f'with every number linked to its source. Most state and local debt is reported once a year, so the ticking numbers are labelled projections from the latest official figures.</p></section>'
+            f'<main id="app">{sort}{secs}</main>'
+            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li><li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../privacy.html">Privacy</a></footer>{script}</body></html>')
+    hub_css = PL_CSS + ".hubsort{display:flex;justify-content:flex-end;margin:4px 2px -14px;font-size:12px;color:var(--mut)}.hubsort select{margin-left:6px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit;font-size:12px}.tile.hubt .lab span:last-child{font-size:11px;color:var(--dim)}"
+    page = meta_head(SITE, url, title, desc, "og/home.png", 1, hub_css) + body
     os.makedirs(f"{R}/{sec_dir}", exist_ok=True)
     open(f"{R}/{sec_dir}/index.html", "w").write(with_analytics(page))
     return url

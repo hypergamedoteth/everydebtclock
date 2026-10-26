@@ -2,6 +2,8 @@
  "_doc": "One file per place. build.py renders /states/<slug>/ (kind=state) or /countries/<slug>/ (kind=country) from this file. Every number must be an official published figure with its source; amounts in US dollars.",
  "slug": "texas",
  "kind": "state",
+ "country": "US",
+ "region_code": "TX",
  "name": "Texas",
  "demonym": "Texan",
  "status": "live",
