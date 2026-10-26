@@ -66,7 +66,7 @@ jobs:
       - name: Stage Pages artifact (public files only)
         run: |
           mkdir -p _site
-          cp -r index.html 404.html CNAME robots.txt sitemap.xml style.css app.js core.js widget.html \
+          cp -r index.html 404.html privacy.html CNAME robots.txt sitemap.xml style.css app.js core.js widget.html \
                 apple-touch-icon.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person national-debt-by-year when-will-debt-hit-41-trillion states _site/
           rm -f _site/data/validation_log.csv
 

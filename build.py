@@ -344,7 +344,7 @@ for slug, i in ALL.items():
 <p><b>* Per person (projected population)</b> divides by the US population projected to now: the official Census Vintage 2025 estimate for July 1, 2025 ({POP_OFF:,.0f}), projected forward at Census's stated growth rate ({POP:,.0f} at build time).{pp_off} <b>Per tax return filed</b> divides by {TAX:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2); a joint return counts once and returns with zero tax liability are included.</p>
 <a class="cta" href="../index.html#t={slug}">Open the full live clock →</a>
 <div class="rel"><b>Related:</b><br>{''.join(f'<a href="{s}.html">{html.escape(ALL[s].get("label", s))}</a>' for s in rel)}</div>
-<footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser.</footer>
+<footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser. · <a href="../privacy.html">Privacy</a></footer>
 </main><script>window.DEBTCLOCK_DATA={data};</script><script src="../core.js"></script>
 <script>(function(){{const C=DC(window.DEBTCLOCK_DATA),i=C.info({json.dumps(slug)}),v=document.getElementById('v'),p1=document.getElementById('p1'),p2=document.getElementById('p2');
 (function f(){{const t=Date.now()/1000,x=C.get({json.dumps(slug)},t);v.textContent=C.fmt(i,x);if(p1){{p1.textContent=C.ppf(x/C.pop(t));p2.textContent=C.ppf(x/C.tax)}}requestAnimationFrame(f)}})()}})()</script>
@@ -472,7 +472,7 @@ def answer_page(slug, title, desc, h1, body, ld="", og_img="og/debt_total.png"):
 {held_note}{body}
 <a class="cta" href="../">Open the live national debt clock →</a>
 <div class="rel"><b>More answers:</b><br>{more}<a href="../t/debt_total.html">US national debt, live</a></div>
-<footer>Every figure on this page is an official published number unless it is labelled "projected". Page built {STAMP} from data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT; it is rebuilt after every Treasury update.</footer>
+<footer>Every figure on this page is an official published number unless it is labelled "projected". Page built {STAMP} from data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT; it is rebuilt after every Treasury update. · <a href="../privacy.html">Privacy</a></footer>
 </main></body></html>"""
     os.makedirs(f"{R}/{slug}", exist_ok=True)
     open(f"{R}/{slug}/index.html", "w").write(with_analytics(page))

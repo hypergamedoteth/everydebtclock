@@ -122,3 +122,4 @@ section,.tile,.hero{scroll-margin-top:96px}
 .intro p{color:#c2ccda;font-size:13.5px;line-height:1.55;max-width:980px;margin:0}
 .ssr table.v td,.ssr table.v th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}.ssr table.v td+td{font-family:var(--mono)}
 .answers{max-width:1280px;margin:0 auto;padding:0 14px 50px}.answers ul{list-style:none;padding:0;margin:0 0 18px;display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px}
+.site-foot{max-width:1280px;margin:0 auto;padding:0 14px 40px;color:var(--dim);font-size:12px}
