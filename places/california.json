@@ -1,0 +1,192 @@
+{
+ "_doc": "One file per place. build.py renders /states/<slug>/ (kind=state) or /countries/<slug>/ (kind=country) from this file. Every number must be an official published figure with its source. Amounts in US dollars. Headline is Census state + local debt (same source and definition for every state); the state's own fresher, narrower figure is the secondary line.",
+ "slug": "california",
+ "kind": "state",
+ "country": "US",
+ "region_code": "CA",
+ "name": "California",
+ "demonym": "Californian",
+ "status": "live",
+ "publisher": "US Census Bureau",
+ "reporter": "The Census Bureau",
+ "reporter_its": "California's state + local",
+ "title": "California Debt Clock: Live State and Local Debt, From Official Data",
+ "cadence": "Annual. The Census Bureau's Annual Survey of State and Local Government Finances comes out about two years after the fiscal year (survey year 2024: July 2026; survey year 2023: July 2025).",
+ "next_update": "The next Census figures, for survey year 2025, are expected around mid-2027, based on the last two release dates. The state's own report (shown as a secondary line) updates sooner.",
+ "fiscal_year_end_note": "California's fiscal year ends June 30. Census survey year 2024 covers each government's fiscal year that ended between July 1, 2023 and June 30, 2024; the clock dates it June 30, 2024, the end of that window.",
+ "population": {
+  "value": 39355309,
+  "prior_value": 39364774,
+  "as_of": "2025-07-01",
+  "prior_as_of": "2024-07-01",
+  "source_name": "Census Bureau, Vintage 2025 state population estimates (NST-EST2025)",
+  "source_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv"
+ },
+ "components": [
+  {
+   "key": "state",
+   "label": "State government debt",
+   "short": "State debt",
+   "value": 166390802000,
+   "as_of": "2024-06-30",
+   "prior_value": 162000792000,
+   "prior_as_of": "2023-06-30",
+   "source_name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN (State and Local Government Finances by Level of Government: U.S. and States: 2017-2024), Debt - Total Debt Outstanding (LF0231)",
+   "source_url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US06",
+   "source_locator": "California, Government type 'State', items LF0231 Total, LF0233 Long-term and LF0232 Short-term Debt Outstanding, survey year 2024; amounts published in $1,000",
+   "includes": "All debt of the California state government as Census defines it: long-term and short-term debt of the state and its dependent agencies, whatever the source of repayment. Census uses the same definition for every state.",
+   "history": [
+    [
+     "2017-06-30",
+     147103818000
+    ],
+    [
+     "2018-06-30",
+     149375368000
+    ],
+    [
+     "2019-06-30",
+     143344994000
+    ],
+    [
+     "2020-06-30",
+     142979100000
+    ],
+    [
+     "2021-06-30",
+     144313743000
+    ],
+    [
+     "2022-06-30",
+     159573569000
+    ],
+    [
+     "2023-06-30",
+     162000792000
+    ],
+    [
+     "2024-06-30",
+     166390802000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Long-term debt outstanding (Census item LF0233)",
+     "value": 163730277000,
+     "tile_label": "Long-term debt"
+    },
+    {
+     "label": "Short-term debt outstanding (Census item LF0232)",
+     "value": 2660525000,
+     "tile_label": "Short-term debt"
+    }
+   ]
+  },
+  {
+   "key": "local",
+   "label": "Local government debt",
+   "short": "Local debt",
+   "value": 430810688000,
+   "as_of": "2024-06-30",
+   "prior_value": 419044129000,
+   "prior_as_of": "2023-06-30",
+   "source_name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN (State and Local Government Finances by Level of Government: U.S. and States: 2017-2024), Debt - Total Debt Outstanding (LF0231)",
+   "source_url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US06",
+   "source_locator": "California, Government type 'Local', items LF0231 Total, LF0233 Long-term and LF0232 Short-term Debt Outstanding, survey year 2024; amounts published in $1,000",
+   "includes": "All debt of California's counties, cities, towns, school districts and special districts, on the same Census definition. Census estimates local totals from a sample of local governments in most years (2022 was a full count, the Census of Governments); coefficient of variation for 2024: 0.72%.",
+   "history": [
+    [
+     "2017-06-30",
+     315093933000
+    ],
+    [
+     "2018-06-30",
+     343766699000
+    ],
+    [
+     "2019-06-30",
+     362418057000
+    ],
+    [
+     "2020-06-30",
+     379063546000
+    ],
+    [
+     "2021-06-30",
+     399742828000
+    ],
+    [
+     "2022-06-30",
+     399529334000
+    ],
+    [
+     "2023-06-30",
+     419044129000
+    ],
+    [
+     "2024-06-30",
+     430810688000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Long-term debt outstanding (Census item LF0233)",
+     "value": 429510742000,
+     "tile_label": "Long-term debt"
+    },
+    {
+     "label": "Short-term debt outstanding (Census item LF0232)",
+     "value": 1299946000,
+     "tile_label": "Short-term debt"
+    }
+   ]
+  }
+ ],
+ "secondary": {
+  "label": "State's own report: state bonds",
+  "publisher": "California State Controller, audited ACFR FY2025",
+  "publisher_short": "State Controller",
+  "scope": "Narrower scope and a year newer: general obligation and revenue bonds of the state government only (principal), no local debt and no other state borrowing. Not added to the total.",
+  "value": 102232832000,
+  "as_of": "2025-06-30",
+  "source_name": "California State Controller, Annual Comprehensive Financial Report FY2025, Note 10 Table 13 Schedule of Changes in Long-term Obligations",
+  "source_url": "https://www.sco.ca.gov/Files-ARD/ACFR/ACFR25web.pdf",
+  "source_locator": "Note 10, Table 13, printed pages 115–116 (PDF pages 134–135); amounts in thousands",
+  "includes": "Voter-approved bonds backed by the full faith and credit of the State, principal outstanding (governmental $71.87B + business-type $0.90B). Excludes unamortized premiums. Bonds repaid from specific revenues (lease payments, water and power charges, university fees and similar), principal outstanding (governmental $14.99B + business-type $14.48B). Excludes unamortized premiums.",
+  "breakdown": [
+   {
+    "label": "General obligation bonds",
+    "value": 72771230000
+   },
+   {
+    "label": "Revenue bonds",
+    "value": 29461602000
+   }
+  ],
+  "prior_value": 101360508000,
+  "prior_as_of": "2024-06-30"
+ },
+ "extra_sources": [
+  {
+   "name": "US Census Bureau, 2024 State & Local Government Finance Datasets and Tables (release page)",
+   "url": "https://www.census.gov/data/datasets/2024/econ/local/public-use-datasets.html"
+  },
+  {
+   "name": "US Census Bureau, 2024 Annual Survey of Local Government Finances methodology",
+   "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2024/2024_methodology.pdf"
+  },
+  {
+   "name": "Census data API download used for these figures (California)",
+   "url": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US06"
+  }
+ ],
+ "notes": [
+  "Census publishes California's state + local total as $597.20 billion for 2024 (coefficient of variation 0.52%) and $581.04 billion for 2023. State + local here is exactly Census's state figure plus its local figure.",
+  "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the live clock projects from June 30, 2024. The state's own report (California State Controller, audited ACFR FY2025) is fresher but narrower; it is shown separately and never added. Census does not publish a reconciliation to state reports, so we do not itemize the gap.",
+  "About the state's own figure: Figures are principal outstanding from Table 13. The ACFR's Debt Administration summary reports $112.6 billion of bonded debt, which includes unamortized bond premiums; we leave premiums out so the figure counts what the State has to repay at maturity.",
+  "About the state's own figure: The State Treasurer's 2025 Debt Affordability Report counts $81.67 billion of General Fund-supported and self-liquidating GO and lease revenue bonds at June 30, 2025; it leaves out agency revenue bonds that the ACFR includes.",
+  "About the state's own figure: Not included: local government debt; the University of California (reported as a discretely presented component unit); commercial paper and other short-term borrowings; conduit debt; leases; unfunded pension and retiree-health liabilities; and California's share of the federal debt.",
+  "Not included: unfunded pension and retiree-health liabilities, and the state's share of the federal debt."
+ ],
+ "legend": "California state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection from the latest Census year, shown here next to the official totals."
+}
