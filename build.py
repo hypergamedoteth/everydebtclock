@@ -53,7 +53,8 @@ def get(s):
     except Exception: return None
 ALL = {k: v for k, v in T.items() if v.get("status") == "ok"}
 ALL.update({k: dict(v, derived=True, status="ok") for k, v in DV.items() if k in DER})
-POP = val("population"); TAX = T["taxpayers"]["base"]
+POP = val("population"); TAX = T["tax_returns"]["base"]
+POP_OFF = T["population"]["base"]; POP_OFF_DATE = T["population"]["as_of"]   # official Census Vintage 2025, Jul 1, 2025
 
 def fmt(i, x, short=False):
     if x is None: return "—"
@@ -132,15 +133,17 @@ def og(path, title, big, lines, badge, col, note="Official US data · recalibrat
     d.text((W - 60 - d.textlength(stamp, font=F("DejaVuSans.ttf", 20)), H - 52), stamp, font=F("DejaVuSans.ttf", 20), fill="#5c687a")
     im.save(path, optimize=True)
 
+for f in os.listdir(f"{R}/og"):   # drop share images for tickers that no longer exist (e.g. renamed slugs)
+    if f.endswith(".png") and f[:-4] != "home" and f[:-4] not in ALL: os.remove(f"{R}/og/{f}")
 home_debt = val("debt_total")
 og(f"{R}/og/home.png", "US national debt · ticking live", fmt({"kind": "usd"}, home_debt),
-   [("Per person", ppf(home_debt / POP)), ("Per tax return", ppf(home_debt / TAX))],
+   [("Per person (projected pop.)", ppf(home_debt / POP)), ("Per tax return filed", ppf(home_debt / TAX))],
    f"+{fmt({'kind':'usd'}, T['debt_total']['rate'] * 86400, True)}/day", "#ff4d5e",
    f"Treasury Debt to the Penny, {fdate(T['debt_total']['as_of'])} close\nprojected at the 90-day trend · checked daily")
 for slug, i in ALL.items():
     x = get(slug)
     if x is None: continue
-    lines = [("Per person", ppf(x / POP)), ("Per tax return", ppf(x / TAX))] if i.get("kind") == "usd" and slug != "debt_per_household" else \
+    lines = [("Per person (projected pop.)", ppf(x / POP)), ("Per tax return filed", ppf(x / TAX))] if i.get("kind") == "usd" and slug != "debt_per_household" else \
             [("As of", fdate(i.get("as_of")) or "live"), ("Source", (i.get("source_name") or "Computed from official tickers")[:34])]
     mt = mode_txt(i).split(" · ")
     og(f"{R}/og/{slug}.png", label(slug, i), fmt(i, x), lines, mt[0], GROUP_COL.get(i.get("group"), "#5aa9ff"),
@@ -175,7 +178,7 @@ os.makedirs(f"{R}/t", exist_ok=True)
 for f in os.listdir(f"{R}/t"): os.remove(f"{R}/t/{f}")
 RELATED = {}
 for slug, i in ALL.items(): RELATED.setdefault(i.get("group"), []).append(slug)
-need = {"population", "taxpayers", "households", "debt_total", "gdp", "spending", "revenue", "out_interest", "rate_all", "debt_limit",
+need = {"population", "tax_returns", "households", "debt_total", "gdp", "spending", "revenue", "out_interest", "rate_all", "debt_limit",
         "debt_subject_limit", "fed_treasuries", "debt_public", "m2"}
 PAGE_CSS = """body{margin:0;background:#07090d;color:#e8edf5;font-family:-apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif;line-height:1.5}
 main{max-width:760px;margin:0 auto;padding:22px 16px 60px}a{color:#5aa9ff;text-decoration:none}
@@ -191,13 +194,15 @@ for slug, i in ALL.items():
     if x is None: continue
     lab = label(slug, i); url = f"{SITE}/t/{slug}.html"
     usdpp = i.get("kind") == "usd" and slug != "debt_per_household"
-    d1 = (f"{lab}: {fmt(i, x, True)} projected to {build_ct.strftime('%b %-d, %Y')}" + (f" ({ppf(x/POP)} per person, {ppf(x/TAX)} per tax return filed)" if usdpp else "") +
+    d1 = (f"{lab}: {fmt(i, x, True)} projected to {build_ct.strftime('%b %-d, %Y')}" + (f" ({ppf(x/POP)} per person on projected population, {ppf(x/TAX)} per tax return filed)" if usdpp else "") +
           f". Live counter from official data ({i.get('source_name') or 'computed from official Treasury tickers'}), recalibrated and checked daily.")
     sub = {k: T[k] for k in need if k in T}
     if not i.get("derived"): sub[slug] = T[slug]
     data = json.dumps({"tickers": sub, "meta": {k: M[k] for k in ("fy_end_epoch", "fy")}, "derived": {slug: DV[slug]} if i.get("derived") else {}},
                       separators=(",", ":")).replace("</", "<\\/")
     rel = [s for s in RELATED.get(i.get("group"), []) if s != slug][:10]
+    pp_off = (f" Official basis, no projection: {ppf(i['base'] / POP_OFF)} per person = Treasury's {fdate(i.get('as_of'))} close ÷ the {POP_OFF:,.0f} Census estimate for {fdate(POP_OFF_DATE)}."
+              if slug == "debt_total" and i.get("base") and POP_OFF else "")
     v = i.get("validation") or {}
     check = (f"<p><b>Daily check.</b> Yesterday's projection vs {html.escape(v.get('against',''))}: {v['last_error_pct']:+.3f}% (threshold ±{v.get('threshold_pct')}%)"
              + (f"; average |error| over {v['n']} days {v['mean_abs_error_pct']:.3f}%" if v.get("mean_abs_error_pct") is not None else "") + ".</p>") if v.get("last_error_pct") is not None else ""
@@ -217,12 +222,12 @@ for slug, i in ALL.items():
 <a class="brand" href="../index.html">EVERY <b>DEBT</b> CLOCK</a>
 <h1>{html.escape(lab)}</h1>
 <div class="v" id="v">{html.escape(fmt(i, x))}</div>
-{f'<div class="pp"><div><span class="l">Per person</span><span class="n" id="p1">{ppf(x/POP)}</span></div><div><span class="l">Per tax return filed</span><span class="n" id="p2">{ppf(x/TAX)}</span></div></div>' if usdpp else ''}
+{f'<div class="pp"><div><span class="l" title="Debt ÷ US population projected to now from Census Vintage 2025 (Jul 1, 2025 estimate) at the Census Bureau&#39;s stated growth rate">Per person (projected population)*</span><span class="n" id="p1">{ppf(x/POP)}</span></div><div><span class="l">Per tax return filed</span><span class="n" id="p2">{ppf(x/TAX)}</span></div></div>' if usdpp else ''}
 <span class="b">{html.escape(mode_txt(i))}</span>{'<span class="b">official source cached (last run failed)</span>' if i.get('stale') else ''}
 <p><b>How it's calculated.</b> {html.escape(i.get('method') or '')}</p>
 {f'<p><b>Source.</b> <a href="{html.escape(i["source"])}" rel="noopener">{html.escape(i.get("source_name") or i["source"])}</a>, official as of {fdate(i.get("as_of"))}.</p>' if i.get('source') else ''}
 {check}
-<p><b>Per person</b> divides by the US population: Census Vintage 2025 estimate for July 1, 2025, projected forward at Census's stated growth rate ({POP:,.0f} at build time). <b>Per tax return filed</b> divides by {TAX:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2); a joint return counts once and returns with zero tax liability are included.</p>
+<p><b>* Per person (projected population)</b> divides by the US population projected to now: the official Census Vintage 2025 estimate for July 1, 2025 ({POP_OFF:,.0f}), projected forward at Census's stated growth rate ({POP:,.0f} at build time).{pp_off} <b>Per tax return filed</b> divides by {TAX:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2); a joint return counts once and returns with zero tax liability are included.</p>
 <a class="cta" href="../index.html#t={slug}">Open the full live clock →</a>
 <div class="rel"><b>Related:</b><br>{''.join(f'<a href="{s}.html">{html.escape(ALL[s].get("label", s))}</a>' for s in rel)}</div>
 <footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser.</footer>
@@ -231,6 +236,14 @@ for slug, i in ALL.items():
 (function f(){{const t=Date.now()/1000,x=C.get({json.dumps(slug)},t);v.textContent=C.fmt(i,x);if(p1){{p1.textContent=C.ppf(x/C.pop(t));p2.textContent=C.ppf(x/C.tax)}}requestAnimationFrame(f)}})()}})()</script>
 </body></html>"""
     open(f"{R}/t/{slug}.html", "w").write(with_analytics(page))
+
+# ---------------------------------------------------------------- redirects for renamed slugs (not in the sitemap)
+REDIRECTS = {"taxpayers": "tax_returns"}
+for old, new in REDIRECTS.items():
+    open(f"{R}/t/{old}.html", "w").write(f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Moved | Every Debt Clock</title>
+<link rel="canonical" href="{SITE}/t/{new}.html"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url={new}.html">
+<script>location.replace("{new}.html" + location.hash)</script></head><body><p>This page moved to <a href="{new}.html">{new}.html</a>.</p></body></html>
+""")
 
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()
@@ -269,7 +282,7 @@ def build_api():
     proj = val("debt_total")
     hh = (T.get("households") or {}).get("base")
     api = {
-        "schema_version": 1,
+        "schema_version": 2,
         "as_of": build_ct.isoformat(timespec="seconds"),
         "treasury_record_date": rec_date if official is not None else None,
         "total_debt_official": round(official, 2) if official is not None else None,
@@ -280,9 +293,17 @@ def build_api():
         "avg_daily_change_90d": avg90,
         "per_second_rate": round(td["rate"], 2) if td.get("status") == "ok" else None,
         "per_second_rate_method": "90-day least-squares trend of Debt to the Penny" if td.get("status") == "ok" else None,
-        "debt_per_person": round(proj / POP, 2) if proj and POP else None,
-        "debt_per_household": round(proj / hh, 2) if proj and hh else None,
-        "per_person_basis": "projected now; Census population (projected) and Census CPS ASEC 2025 households",
+        "debt_per_person_official": round(official / POP_OFF, 2) if official is not None and POP_OFF else None,
+        "census_population_official": int(POP_OFF) if POP_OFF else None,
+        "census_population_vintage": "Census Vintage 2025 (NST-EST2025)" if POP_OFF else None,
+        "census_population_date": POP_OFF_DATE if POP_OFF else None,
+        "debt_per_person_projected_now": round(proj / POP, 2) if proj and POP else None,
+        "population_projected_now": round(POP) if POP else None,
+        "debt_per_household_official": round(official / hh, 2) if official is not None and hh else None,
+        "debt_per_household_projected_now": round(proj / hh, 2) if proj and hh else None,
+        "households_official": int(hh) if hh else None,
+        "households_source": "Census CPS ASEC 2025" if hh else None,
+        "per_person_basis": "_official = Treasury close / official Census estimate (no projection); _projected_now = projected debt / population projected at Census's stated rate",
         "stale": bool(td.get("stale") or M.get("debt_closes_stale")),
         "source_url": td.get("source") or "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
         "source_api": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/debt_to_penny",

@@ -85,5 +85,5 @@ Static files only: Cloudflare Pages or GitHub Pages (free), Cloudflare CDN in fr
 - **"Per tax return filed"** replaces "per taxpayer" everywhere. The IRS count includes zero-liability returns, and a joint return counts once.
 - **Debt.** One 90-day OLS window for total, public, and intragov, so the parts sum exactly. The hero shows the window plus backtest error; the modal shows the 1-year average rate for context.
 - **Show the math** on every ticker: base, t0 (CT), rate per second, inputs, and the formula with live numbers.
-- **Lead hero:** debt-limit headroom, days left, and projected date ("our projection, before extraordinary measures").
+- **Lead hero:** total national debt (live). Secondary: debt-limit headroom, days left, projected date (Oct 26, 2026).
 - **Audit.** `../audit/audit.py` compares each base with its source. Pipeline data contract and sources: `../handoff/SOURCES.md`.

@@ -217,15 +217,15 @@ else:
     unavailable("population", "US population", "people", NST_PAGE, "Census estimates and population clock unreachable, no cache")
 
 HOUSEHOLDS = 134_790_000   # CPS ASEC 2025, Table HH-1 (FRED TTLHH = 134,790 thousand)
-TAXPAYERS = 162_754_810    # IRS Data Book FY2025, Table 1-2: individual income tax returns filed
+TAX_RETURNS = 162_754_810    # IRS Data Book FY2025, Table 1-2: individual income tax returns filed
 add("households", label="US households", group="people", kind="count", base=HOUSEHOLDS, rate=0, t0=NOW, as_of="2025",
     source=HH_URL, source_name="Census CPS ASEC 2025, Table HH-1", method="Annual survey figure (134.79M). Updated each December.", fixed=True,
     calc={"type": "fixed", "base_src": ["2025", HOUSEHOLDS, HH_URL]})
-add("taxpayers", label="Individual income tax returns filed", group="people", kind="count", base=TAXPAYERS, rate=0, t0=NOW, as_of="FY2025",
+add("tax_returns", label="Individual income tax returns filed", group="people", kind="count", base=TAX_RETURNS, rate=0, t0=NOW, as_of="FY2025",
     source=IRS_URL, source_name="IRS Data Book FY2025, Table 1-2",
     method=("162,754,810 individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2). Used as the 'per tax return filed' denominator. "
             "It counts returns, not people: a joint return counts once, and returns with zero tax liability are included."), fixed=True,
-    calc={"type": "fixed", "base_src": ["FY2025", TAXPAYERS, IRS_URL]})
+    calc={"type": "fixed", "base_src": ["FY2025", TAX_RETURNS, IRS_URL]})
 
 # ---- debt (daily)
 THR0 = {"debt_intragov": 0.5}
@@ -672,7 +672,7 @@ with open(logp, "a", newline="") as f:
         w.writerow({"run_iso": META["generated_iso"], **r, "flag": (not r["mode"].startswith("method_switch")) and r["error_pct"] is not None and abs(r["error_pct"]) > thr})
 
 flags = [s for s, t in T.items() if t.get("validation", {}).get("flag")]
-META.update({"errors": errors, "flags": flags, "denominators": {"population": "population", "taxpayers": "taxpayers"}})
+META.update({"errors": errors, "flags": flags, "denominators": {"population": "population", "tax_returns": "tax_returns"}})
 out = {"meta": META, "tickers": T, "derived": DERIVED}
 json.dump(out, open(prev_path, "w"), indent=1)
 json.dump(out, open(os.path.join(DATA, f"data-{dt.datetime.fromtimestamp(NOW, ET).date()}.json"), "w"))
