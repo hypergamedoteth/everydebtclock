@@ -1,0 +1,216 @@
+{
+ "_doc": "One file per place. build.py renders /states/<slug>/ (kind=state) or /countries/<slug>/ (kind=country) from this file. Every number must be an official published figure with its source. Amounts in US dollars. Headline is Census state + local debt (same source and definition for every state); the state's own fresher, narrower figure is the secondary line.",
+ "slug": "new-york",
+ "kind": "state",
+ "country": "US",
+ "region_code": "NY",
+ "name": "New York",
+ "demonym": "New Yorker",
+ "status": "live",
+ "publisher": "US Census Bureau",
+ "reporter": "The Census Bureau",
+ "reporter_its": "New York's state + local",
+ "title": "New York Debt Clock: Live State and Local Debt, From Official Data",
+ "cadence": "Annual. The Census Bureau's Annual Survey of State and Local Government Finances comes out about two years after the fiscal year (survey year 2024: July 2026; survey year 2023: July 2025).",
+ "next_update": "The next Census figures, for survey year 2025, are expected around mid-2027, based on the last two release dates. The state's own report (shown as a secondary line) updates sooner.",
+ "fiscal_year_end_note": "New York's fiscal year ends March 31 Census survey year 2024 covers each government's fiscal year that ended between July 1, 2023 and June 30, 2024; the clock dates it June 30, 2024, the end of that window (New York State's own fiscal year ended March 31, 2024).",
+ "population": {
+  "value": 20002427,
+  "prior_value": 20001419,
+  "as_of": "2025-07-01",
+  "prior_as_of": "2024-07-01",
+  "debt_match_date": "2026-03-31",
+  "source_name": "Census Bureau, Vintage 2025 state population estimates (NST-EST2025)",
+  "source_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv"
+ },
+ "components": [
+  {
+   "key": "state",
+   "label": "State government debt",
+   "short": "State debt",
+   "value": 120585799000,
+   "as_of": "2024-06-30",
+   "prior_value": 128597547000,
+   "prior_as_of": "2023-06-30",
+   "source_name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN (State and Local Government Finances by Level of Government: U.S. and States: 2017-2024), Debt - Total Debt Outstanding (LF0231)",
+   "source_url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US36",
+   "source_locator": "New York, Government type 'State', items LF0231 Total, LF0233 Long-term and LF0232 Short-term Debt Outstanding, survey year 2024; amounts published in $1,000",
+   "includes": "All debt of the New York state government as Census defines it: long-term and short-term debt of the state and its dependent agencies, whatever the source of repayment. Census uses the same definition for every state.",
+   "history": [
+    [
+     "2017-06-30",
+     145204588000
+    ],
+    [
+     "2018-06-30",
+     147959031000
+    ],
+    [
+     "2019-06-30",
+     150744529000
+    ],
+    [
+     "2020-06-30",
+     156004196000
+    ],
+    [
+     "2021-06-30",
+     170355214000
+    ],
+    [
+     "2022-06-30",
+     142366249000
+    ],
+    [
+     "2023-06-30",
+     128597547000
+    ],
+    [
+     "2024-06-30",
+     120585799000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Long-term debt outstanding (Census item LF0233)",
+     "value": 120013799000,
+     "tile_label": "Long-term debt"
+    },
+    {
+     "label": "Short-term debt outstanding (Census item LF0232)",
+     "value": 572000000,
+     "tile_label": "Short-term debt"
+    }
+   ]
+  },
+  {
+   "key": "local",
+   "label": "Local government debt",
+   "short": "Local debt",
+   "value": 212069167000,
+   "as_of": "2024-06-30",
+   "prior_value": 203693718000,
+   "prior_as_of": "2023-06-30",
+   "source_name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN (State and Local Government Finances by Level of Government: U.S. and States: 2017-2024), Debt - Total Debt Outstanding (LF0231)",
+   "source_url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US36",
+   "source_locator": "New York, Government type 'Local', items LF0231 Total, LF0233 Long-term and LF0232 Short-term Debt Outstanding, survey year 2024; amounts published in $1,000",
+   "includes": "All debt of New York's counties, cities, towns, school districts and special districts, on the same Census definition. Census estimates local totals from a sample of local governments in most years (2022 was a full count, the Census of Governments); coefficient of variation for 2024: 0.48%.",
+   "history": [
+    [
+     "2017-06-30",
+     210285998000
+    ],
+    [
+     "2018-06-30",
+     207554816000
+    ],
+    [
+     "2019-06-30",
+     211652175000
+    ],
+    [
+     "2020-06-30",
+     220183841000
+    ],
+    [
+     "2021-06-30",
+     214008850000
+    ],
+    [
+     "2022-06-30",
+     198657867000
+    ],
+    [
+     "2023-06-30",
+     203693718000
+    ],
+    [
+     "2024-06-30",
+     212069167000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Long-term debt outstanding (Census item LF0233)",
+     "value": 205381415000,
+     "tile_label": "Long-term debt"
+    },
+    {
+     "label": "Short-term debt outstanding (Census item LF0232)",
+     "value": 6687751000,
+     "tile_label": "Short-term debt"
+    }
+   ]
+  }
+ ],
+ "secondary": {
+  "label": "State's own report: state debt",
+  "publisher": "New York State Comptroller, Basic Financial Statements FY2026",
+  "publisher_short": "Comptroller",
+  "scope": "Narrower scope and two years newer: state government debt only (principal), no New York City or other local debt, and no public-authority debt such as the MTA's own. Not added to the total.",
+  "value": 60120000000,
+  "as_of": "2026-03-31",
+  "source_name": "New York State Comptroller, Basic Financial Statements FY2026, MD&A Table 5 Outstanding Debt as of March 31, 2026 and 2025",
+  "source_url": "https://www.osc.ny.gov/files/reports/finance/pdf/nys-basic-financial-statements-2026.pdf",
+  "source_locator": "Management's Discussion and Analysis, Table 5, printed page 21 (PDF page 23); $ millions",
+  "includes": "Bonds, notes and other financing arrangements of the State's primary government (governmental and business-type activities), principal only: State-supported debt as defined by the State Finance Law plus installation, mortgage-loan and other long-term commitments. Excludes $6.0 billion of unamortized premiums.",
+  "breakdown": [
+   {
+    "label": "General obligation bonds (voter-approved)",
+    "value": 2049000000
+   },
+   {
+    "label": "Other financing arrangements (personal income tax, sales tax and other State-supported revenue bonds)",
+    "value": 57842000000
+   },
+   {
+    "label": "   of which business-type activities (SUNY, CUNY and others)",
+    "value": 12403000000,
+    "sub": true,
+    "tile_label": "Other financing arrangements, business-type"
+   },
+   {
+    "label": "Installation commitments",
+    "value": 134000000
+   },
+   {
+    "label": "Mortgage loan commitments",
+    "value": 67000000
+   },
+   {
+    "label": "Other long-term debt",
+    "value": 28000000
+   }
+  ],
+  "prior_value": 56030000000,
+  "prior_as_of": "2025-03-31"
+ },
+ "extra_sources": [
+  {
+   "name": "US Census Bureau, 2024 State & Local Government Finance Datasets and Tables (release page)",
+   "url": "https://www.census.gov/data/datasets/2024/econ/local/public-use-datasets.html"
+  },
+  {
+   "name": "US Census Bureau, 2024 Annual Survey of Local Government Finances methodology",
+   "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2024/2024_methodology.pdf"
+  },
+  {
+   "name": "Census data API download used for these figures (New York)",
+   "url": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US36"
+  },
+  {
+   "name": "New York State Comptroller, Basic Financial Statements FY2025 (March 31, 2024 figures, Table 5)",
+   "url": "https://www.osc.ny.gov/files/reports/finance/pdf/nys-basic-financial-statements-2025.pdf"
+  }
+ ],
+ "notes": [
+  "Census publishes New York's state + local total as $332.65 billion for 2024 (coefficient of variation 0.30%) and $332.29 billion for 2023. State + local here is exactly Census's state figure plus its local figure.",
+  "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the live clock projects from June 30, 2024. The state's own report (New York State Comptroller, Basic Financial Statements FY2026) is fresher but narrower; it is shown separately and never added. Census does not publish a reconciliation to state reports, so we do not itemize the gap.",
+  "The 2023→2024 change (+$0.36 billion) is smaller than about two standard errors of the Census estimate (about $2.0 billion at a 0.30% coefficient of variation), so the direction of the projected trend is uncertain.",
+  "About the state's own figure: We count principal outstanding ($60,120 million). Table 5's published total of $66,133 million also includes $6,013 million of unamortized bond premiums.",
+  "About the state's own figure: The Comptroller reports $46.2 billion of debt outstanding for local governments outside New York City for local fiscal years ending in 2024; it is a different date and scope, so it is not added here.",
+  "About the state's own figure: Not included: New York City's debt; other local government debt; public authorities' own (non-State-supported) debt such as the MTA's; collateralized borrowings ($2.1 billion); unfunded pension and retiree-health liabilities; and New York's share of the federal debt.",
+  "Not included: unfunded pension and retiree-health liabilities, and the state's share of the federal debt."
+ ],
+ "legend": "New York state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection from the latest Census year, shown here next to the official totals."
+}
