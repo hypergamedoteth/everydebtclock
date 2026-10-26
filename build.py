@@ -660,7 +660,8 @@ PLACE_URLS = places_build.build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, 
 lm = gen_ct.date().isoformat()
 urls = ([(f"{SITE}/", "1.0", "hourly")] + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
         [(u, "0.8", "weekly") for u in PLACE_URLS] +
-        [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None])
+        [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None] +
+        ([(f"{SITE}/privacy.html", "0.2", "yearly")] if os.path.exists(f"{R}/privacy.html") else []))
 open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     "".join(f"<url><loc>{u}</loc><lastmod>{lm}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
 open(f"{R}/robots.txt", "w").write(f"User-agent: *\nAllow: /\nDisallow: /cache/\nDisallow: /pipeline/\nDisallow: /widget.html\nSitemap: {SITE}/sitemap.xml\n")

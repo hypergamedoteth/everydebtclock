@@ -320,7 +320,7 @@ dlg.addEventListener('close',()=>mt=null);document.querySelectorAll('[data-d]').
 ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);k.ppx.forEach(e=>e.textContent=usd(v/+e.dataset.pp,2))}})}}if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
 
     page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + intro + '<main id="app">' + hero + wc + debt_sec + comp_secs + people + hist + details + method
-            + '</main><dialog id="dlg"></dialog>' + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled</footer>' + script + "</body></html>")
+            + '</main><dialog id="dlg"></dialog>' + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../privacy.html">Privacy</a></footer>' + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))
     return url
@@ -344,7 +344,7 @@ def index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, kind, sec_dir, lab, d
             f'with every number linked to its source. Most state and local debt is reported once a year, so these clocks say clearly which numbers are official and which are projected.</p></section>'
             f'<main id="app"><section><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>{E(lab)}</h2><span class="h2n">Live and coming soon</span></div>'
             f'<div class="grid">{tiles}</div></section></main>'
-            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li></ul></section><footer class="site-foot">Every Debt Clock</footer></body></html>')
+            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../privacy.html">Privacy</a></footer></body></html>')
     page = meta_head(SITE, url, title, desc, "og/home.png", 1, PL_CSS) + body
     os.makedirs(f"{R}/{sec_dir}", exist_ok=True)
     open(f"{R}/{sec_dir}/index.html", "w").write(with_analytics(page))
