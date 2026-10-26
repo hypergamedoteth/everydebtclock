@@ -244,7 +244,7 @@ ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="k">US n
 import places_build
 PLACES_LIVE = places_build.load(R) if os.path.isdir(f"{R}/places") else []
 links = (f"""<!--LINKS-->""" + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
-         f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> (state + local)</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
+         f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> ({html.escape(p.get("link_label", "state + local"))})</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
          + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
 <div class="sh"><h2>Popular counters</h2></div><ul>{''.join(f'<li><a href="t/{k}.html">{html.escape(label(k, ALL[k]))}</a></li>' for k in KEY_TICKERS if k in ALL)}</ul><!--/LINKS-->""")
 if "<!--INTRO-->" in idx: idx = re.sub(r"<!--INTRO-->.*?<!--/INTRO-->", lambda m: intro, idx, flags=re.S)
@@ -265,12 +265,13 @@ def place_card(ix):
     if not ix["places"]: return "<!--PLACES--><!--/PLACES-->"
     p = next(x for x in ix["places"] if x["slug"] == ix["default"])
     v = p["base"] + p["rate"] * (NOW - p["t0"])
+    cu = lambda s_: s_.replace("$", p.get("sym", "$"), 1)
     opts = "".join(f'<option value="{x["slug"]}"{" selected" if x is p else ""}>{html.escape(x["name"])}</option>' for x in ix["places"])
     js_ix = json.dumps(ix, separators=(",", ":")).replace("</", "<\\/")
     return (f'<!--PLACES--><div class="placecard" id="placecard"><a class="pcmain" id="pcl" href="{p["url"]}">'
-            f'<div class="k"><span id="pck">Featured state</span> · <b id="pcn">{html.escape(p["name"])}</b> <span id="pclab">{html.escape(p["label"])}</span></div>'
-            f'<div class="pcv num" id="pcv">{usd0(v)}</div>'
-            f'<div class="pcs"><span class="num" id="pcp">{usd2(v / p["population"])}</span> per <span id="pcd">{html.escape(p["demonym"])}</span> · '
+            f'<div class="k"><span id="pck">Featured {"country" if p["kind"] == "country" else "state"}</span> · <b id="pcn">{html.escape(p["name"])}</b> <span id="pclab">{html.escape(p["label"])}</span></div>'
+            f'<div class="pcv num" id="pcv">{cu(usd0(v))}</div>'
+            f'<div class="pcs"><span class="num" id="pcp">{cu(usd2(v / p["population"]))}</span> per <span id="pcd">{html.escape(p["demonym"])}</span> · '
             f'<span id="pcb">projected from official {fdate(p["base_date"])} figures</span> · <span class="go">See <span id="pcg">{html.escape(p["name"])}</span> →</span></div></a>'
             f'<label class="pcchg">Change <select id="pcsel" aria-label="Pick a place">{opts}</select></label>'
             f'<script type="application/json" id="placesix">{js_ix}</script></div>'

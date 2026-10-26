@@ -177,7 +177,8 @@
     }
     sel.onchange = () => { const p = by(sel.value); if (!p) return; try { localStorage.setItem(KEY, p.slug); } catch (e) {} show(p, 'saved'); };
     const pv = $('pcv'), pp = $('pcp');
-    live.push(t => { if (!cur) return; const x = cur.base + cur.rate * (t - cur.t0); pv.textContent = usd(x); pp.textContent = usd(x / cur.population, 2); });
+    const cu = (v, d) => { const s = usd(v, d), c = cur.sym || '$'; return c === '$' ? s : s.replace('$', c); };
+    live.push(t => { if (!cur) return; const x = cur.base + cur.rate * (t - cur.t0); pv.textContent = cu(x); pp.textContent = cu(x / cur.population, 2); });
   }
 
   // secondary hero: debt-limit headroom (below the national debt)
