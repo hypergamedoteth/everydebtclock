@@ -38,7 +38,8 @@
     {
      "label": "   of which repaid from general revenue (not self-supporting)",
      "value": 5884180000,
-     "sub": true
+     "sub": true,
+     "tile_label": "General obligation repaid from general revenue"
     },
     {
      "label": "Non-general-obligation revenue debt (colleges, water, highways, housing, etc.)",
@@ -47,7 +48,8 @@
     {
      "label": "   of which repaid from general revenue (not self-supporting)",
      "value": 792390000,
-     "sub": true
+     "sub": true,
+     "tile_label": "Revenue debt repaid from general revenue"
     },
     {
      "label": "Conduit, component and related organizations (not a legal liability of the state)",
@@ -75,6 +77,24 @@
      "2025-08-31",
      77051105000
     ]
+   ],
+   "facts": [
+    {
+     "label": "Debt service paid from general revenue, FY2025",
+     "value": 715800000,
+     "kind": "usd",
+     "as_of": "2025-08-31",
+     "note": "Scheduled debt service on state debt repaid from general revenue in fiscal year 2025 (FY2024: $699.5 million).",
+     "source_locator": "Chapter 2, 'Scheduled Debt-Service Payments from General Revenue', printed page 17"
+    },
+    {
+     "label": "Constitutional debt limit used (limit 5%)",
+     "value": 1.58,
+     "kind": "pct",
+     "as_of": "2025-08-31",
+     "note": "Maximum annual debt service on general-revenue debt, including authorized but unissued debt, as a share of the 3-year average of unrestricted general revenue: 0.88% outstanding + 0.69% authorized but unissued = 1.58% as published (FY2024: 1.70%). The constitution bars new tax-supported debt above 5%.",
+     "source_locator": "Overview, 'Constitutional Debt Limit', page iii"
+    }
    ]
   },
   {
@@ -92,46 +112,48 @@
    "breakdown": [
     {
      "label": "Tax-supported (general obligation, backed by property taxes)",
-     "value": 257022700000
+     "value": 257022700000,
+     "group": "By how it is repaid"
     },
     {
      "label": "Revenue debt (water, sewer, electric and other project revenue)",
-     "value": 111863300000
+     "value": 111863300000,
+     "group": "By how it is repaid"
     },
     {
-     "label": "   School districts",
+     "label": "School districts",
      "value": 148382100000,
-     "sub": true
+     "group": "By type of government"
     },
     {
-     "label": "   Cities, towns, villages",
+     "label": "Cities, towns, villages",
      "value": 113373900000,
-     "sub": true
+     "group": "By type of government"
     },
     {
-     "label": "   Water districts and authorities",
+     "label": "Water districts and authorities",
      "value": 55807200000,
-     "sub": true
+     "group": "By type of government"
     },
     {
-     "label": "   Counties",
+     "label": "Counties",
      "value": 20362100000,
-     "sub": true
+     "group": "By type of government"
     },
     {
-     "label": "   Other special districts and authorities",
+     "label": "Other special districts and authorities",
      "value": 19039300000,
-     "sub": true
+     "group": "By type of government"
     },
     {
-     "label": "   Community and junior college districts",
+     "label": "Community and junior college districts",
      "value": 6498200000,
-     "sub": true
+     "group": "By type of government"
     },
     {
-     "label": "   Health and hospital districts",
+     "label": "Health and hospital districts",
      "value": 5423100000,
-     "sub": true
+     "group": "By type of government"
     }
    ],
    "history": [
