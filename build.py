@@ -241,7 +241,11 @@ ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="k">US n
 <section><div class="sh"><h2>Latest official figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
 {''.join(row(s_) for s_ in ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "spending", "revenue", "gdp"])}</table>
 <noscript><p>Turn on JavaScript to watch these figures tick in real time.</p></noscript></section></div><!--/SSR-->""")
-links = (f"""<!--LINKS--><div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
+import places_build
+PLACES_LIVE = places_build.load(R) if os.path.isdir(f"{R}/places") else []
+links = (f"""<!--LINKS-->""" + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
+         f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> (state + local)</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
+         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
 <div class="sh"><h2>Popular counters</h2></div><ul>{''.join(f'<li><a href="t/{k}.html">{html.escape(label(k, ALL[k]))}</a></li>' for k in KEY_TICKERS if k in ALL)}</ul><!--/LINKS-->""")
 if "<!--INTRO-->" in idx: idx = re.sub(r"<!--INTRO-->.*?<!--/INTRO-->", lambda m: intro, idx, flags=re.S)
 else: idx = idx.replace('<main id="app">', f'<section class="intro" id="intro">{intro}</section>\n<main id="app">', 1)
@@ -249,6 +253,10 @@ if "<!--SSR-->" in idx: idx = re.sub(r"<!--SSR-->.*?<!--/SSR-->", lambda m: ssr,
 else: idx = idx.replace('<main id="app"></main>', f'<main id="app">{ssr}</main>', 1)
 if "<!--LINKS-->" in idx: idx = re.sub(r"<!--LINKS-->.*?<!--/LINKS-->", lambda m: links, idx, flags=re.S)
 else: idx = idx.replace('<dialog id="dlg"></dialog>', f'<dialog id="dlg"></dialog>\n<section class="answers" id="answers">{links}</section>', 1)
+PLNAV = ("<!--PLNAV-->" + ('<nav class="plnav"><a href="./" class="on">United States</a>' + "".join(f'<a href="{d}/">{lab}</a>' for k, d, lab, _ in places_build.SECTIONS
+         if any(p["kind"] == k for p in PLACES_LIVE)) + "</nav>" if PLACES_LIVE else "") + "<!--/PLNAV-->")
+if "<!--PLNAV-->" in idx: idx = re.sub(r"<!--PLNAV-->.*?<!--/PLNAV-->", lambda m: PLNAV, idx, flags=re.S)
+else: idx = idx.replace('<span class="live">', PLNAV + '<span class="live">', 1)
 idx = with_analytics(idx)
 open(f"{R}/index.html", "w").write(idx)
 if os.path.exists(f"{R}/404.html"):
@@ -644,9 +652,14 @@ from Treasury's total (it includes some agency debt and nets out unamortized dis
                  f"{tril(LIM or 0, 3)} debt limit explained." if not first_hit else f"US national debt first closed above $41 trillion on {fdate(first_hit[0])}, per Treasury's Debt to the Penny."),
                 "When will US debt hit $41 trillion?", body)
 
+# ---------------------------------------------------------------- place pages: /states/<slug>/, /countries/<slug>/ from places/*.json
+import places_build
+PLACE_URLS = places_build.build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, STAMP, NOW)
+
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()
 urls = ([(f"{SITE}/", "1.0", "hourly")] + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
+        [(u, "0.8", "weekly") for u in PLACE_URLS] +
         [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None])
 open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     "".join(f"<url><loc>{u}</loc><lastmod>{lm}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")

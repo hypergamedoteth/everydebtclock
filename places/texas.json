@@ -1,0 +1,166 @@
+{
+ "_doc": "One file per place. build.py renders /states/<slug>/ (kind=state) or /countries/<slug>/ (kind=country) from this file. Every number must be an official published figure with its source; amounts in US dollars.",
+ "slug": "texas",
+ "kind": "state",
+ "name": "Texas",
+ "demonym": "Texan",
+ "status": "live",
+ "publisher": "Texas Bond Review Board",
+ "cadence": "Annual. State report for the fiscal year ending Aug 31 published in December (FY2025: Dec 2025); local report in January (FY2025: Jan 2026).",
+ "next_update": "The next official figures, for the fiscal year ending Aug 31, 2026, are expected around December 2026 (state) and January 2027 (local), based on last year's release dates.",
+ "fiscal_year_end_note": "Texas state and local fiscal years in these reports end August 31.",
+ "population": {
+  "value": 31709821,
+  "prior_value": 31318578,
+  "as_of": "2025-07-01",
+  "prior_as_of": "2024-07-01",
+  "source_name": "Census Bureau, Vintage 2025 state population estimates (NST-EST2025)",
+  "source_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv"
+ },
+ "components": [
+  {
+   "key": "state",
+   "label": "State government debt",
+   "short": "State debt",
+   "value": 77051105000,
+   "as_of": "2025-08-31",
+   "prior_value": 73032942000,
+   "prior_as_of": "2024-08-31",
+   "source_name": "Texas Bond Review Board, Annual Report 2025 (Dec 2025), Table 2.3 State of Texas Debt Outstanding",
+   "source_url": "https://www.brb.texas.gov/wp-content/uploads/2026/01/AR2025.pdf",
+   "source_locator": "Table 2.3, printed page 17 (PDF page 30)",
+   "includes": "All state debt the Bond Review Board tracks, including $13.10 billion of conduit, component and related-organization debt that is not a legal liability of the state (it is repaid by third parties).",
+   "breakdown": [
+    {
+     "label": "General obligation (full faith and credit of the state)",
+     "value": 16213495000
+    },
+    {
+     "label": "   of which repaid from general revenue (not self-supporting)",
+     "value": 5884180000,
+     "sub": true
+    },
+    {
+     "label": "Non-general-obligation revenue debt (colleges, water, highways, housing, etc.)",
+     "value": 47739659000
+    },
+    {
+     "label": "   of which repaid from general revenue (not self-supporting)",
+     "value": 792390000,
+     "sub": true
+    },
+    {
+     "label": "Conduit, component and related organizations (not a legal liability of the state)",
+     "value": 13097950000
+    }
+   ],
+   "history": [
+    [
+     "2021-08-31",
+     63214159000
+    ],
+    [
+     "2022-08-31",
+     64403305000
+    ],
+    [
+     "2023-08-31",
+     70939523000
+    ],
+    [
+     "2024-08-31",
+     73032942000
+    ],
+    [
+     "2025-08-31",
+     77051105000
+    ]
+   ]
+  },
+  {
+   "key": "local",
+   "label": "Local government debt in Texas",
+   "short": "Local debt",
+   "value": 368885900000,
+   "as_of": "2025-08-31",
+   "prior_value": 333260400000,
+   "prior_as_of": "2024-08-31",
+   "source_name": "Texas Bond Review Board, 2025 Local Government Annual Report (Jan 2026), Tables 1.1 and 1.3",
+   "source_url": "https://www.brb.texas.gov/wp-content/uploads/2026/02/2025LocalARFinal.pdf",
+   "source_locator": "Table 1.1, printed page 3 (PDF page 11); Table 1.3 for prior years",
+   "includes": "Debt of school districts, cities, water districts, counties, community colleges, hospital districts and other special districts, as reported to the Bond Review Board. Excludes local conduit debt and debt that is not a public security (for example many private loans). FY2025 amounts do not include cash defeasances.",
+   "breakdown": [
+    {
+     "label": "Tax-supported (general obligation, backed by property taxes)",
+     "value": 257022700000
+    },
+    {
+     "label": "Revenue debt (water, sewer, electric and other project revenue)",
+     "value": 111863300000
+    },
+    {
+     "label": "   School districts",
+     "value": 148382100000,
+     "sub": true
+    },
+    {
+     "label": "   Cities, towns, villages",
+     "value": 113373900000,
+     "sub": true
+    },
+    {
+     "label": "   Water districts and authorities",
+     "value": 55807200000,
+     "sub": true
+    },
+    {
+     "label": "   Counties",
+     "value": 20362100000,
+     "sub": true
+    },
+    {
+     "label": "   Other special districts and authorities",
+     "value": 19039300000,
+     "sub": true
+    },
+    {
+     "label": "   Community and junior college districts",
+     "value": 6498200000,
+     "sub": true
+    },
+    {
+     "label": "   Health and hospital districts",
+     "value": 5423100000,
+     "sub": true
+    }
+   ],
+   "history": [
+    [
+     "2021-08-31",
+     264526500000
+    ],
+    [
+     "2022-08-31",
+     281875100000
+    ],
+    [
+     "2023-08-31",
+     309711400000
+    ],
+    [
+     "2024-08-31",
+     333260400000
+    ],
+    [
+     "2025-08-31",
+     368885900000
+    ]
+   ]
+  }
+ ],
+ "notes": [
+  "The local report's summary bullet says $368.30 billion ($256.64B tax-supported, $111.66B revenue), but its own Tables 1.1 and 1.3 and its Chapter 1 text say $368.89 billion ($257.02B and $111.86B). We use the table figure.",
+  "State and local totals come from separate Bond Review Board reports and are added as published; the board does not publish a combined total for the same date.",
+  "Not included: unfunded pension and retiree-health liabilities, and Texas's share of the federal debt."
+ ]
+}

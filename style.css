@@ -9,6 +9,7 @@ a{color:var(--blue);text-decoration:none}
 header.top{position:sticky;top:0;z-index:20;backdrop-filter:blur(10px);background:rgba(7,9,13,.82);border-bottom:1px solid var(--line)}
 .topin{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
 .brand{font-weight:800;letter-spacing:.06em;font-size:14px}.brand b{color:var(--red)}
+nav.plnav{display:flex;gap:4px;margin-left:8px}nav.plnav a{font-size:12px;color:var(--mut);border-radius:999px;padding:4px 10px}nav.plnav a.on{color:var(--txt);background:var(--panel);border:1px solid var(--line)}nav.plnav a:hover{color:var(--txt)}
 .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mut);margin-left:auto}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(56,211,159,.6);animation:p 2s infinite}
 @keyframes p{0%{box-shadow:0 0 0 0 rgba(56,211,159,.6)}70%{box-shadow:0 0 0 8px rgba(56,211,159,0)}100%{box-shadow:0 0 0 0 rgba(56,211,159,0)}}
