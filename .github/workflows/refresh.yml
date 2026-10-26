@@ -39,7 +39,10 @@ jobs:
 
       - name: Fetch official data (skipped on plain pushes)
         if: github.event_name != 'push'
-        run: python3 pipeline/fetch.py
+        run: |
+          python3 pipeline/fetch.py
+          # Canada: re-base places/canada.json to the Bank of Canada's latest month-end figure (Valet API, keyless). Never fails the run.
+          python3 pipeline/fetch_canada.py || echo "canada fetch skipped"
 
       - name: Build site
         env:

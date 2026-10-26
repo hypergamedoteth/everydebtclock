@@ -1,0 +1,175 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Canadian dollars. The debt component, history, breakdown, par fact and US$ note are refreshed by pipeline/fetch_canada.py from the Bank of Canada Valet API; edit wording here, not numbers.",
+ "slug": "canada",
+ "kind": "country",
+ "country": "CA",
+ "name": "Canada",
+ "demonym": "Canadian",
+ "status": "live",
+ "publisher": "Bank of Canada",
+ "currency": {
+  "code": "CAD",
+  "symbol": "C$"
+ },
+ "frequency": "monthly",
+ "title": "Canada Debt Clock: Live Federal Debt, From Official Data",
+ "headline": "federal debt",
+ "headline_long": "Government of Canada debt securities outstanding",
+ "link_label": "federal debt, C$",
+ "subject": "The Government of Canada",
+ "hist_label": "Securities outstanding",
+ "sum_note": "Government of Canada direct securities outstanding (treasury bills, marketable bonds including inflation compensation on Real Return Bonds, Canada Bills and retail debt), month-end, from the Bank of Canada. The closest Canadian measure to the US Total Public Debt Outstanding.",
+ "scope_note": "This is the Government of Canada's own borrowing in securities, the closest Canadian match to the US national debt clock's Total Public Debt Outstanding: everything it has issued and not yet repaid, including securities held by the Bank of Canada. Provincial and municipal debt is not included. Amounts are in Canadian dollars.",
+ "trend_why": "We use 12 months rather than the last month because month-to-month changes swing by tens of billions with bond maturities and treasury-bill rollovers.",
+ "legend": "Canada's federal securities are reported monthly, at month-end. Borrowing happens in lumps at bond auctions and maturities, so the live number is a straight-line projection between official month-end figures, shown here next to them.",
+ "cadence": "Monthly. The Bank of Canada publishes each month-end figure in the first days of the following month (series V42141673).",
+ "next_update": "The October 2026 month-end figure is expected in early November 2026; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 41798407,
+  "as_of": "2026-07-01",
+  "source_name": "Statistics Canada, The Daily (Sep 23, 2026), Canada's population estimates, second quarter 2026 (Table 17-10-0009-01, preliminary)",
+  "source_url": "https://www150.statcan.gc.ca/n1/daily-quotidien/260923/dq260923b-eng.htm",
+  "publisher_short": "Statistics Canada",
+  "tag": "StatCan",
+  "possessive": "Statistics Canada's",
+  "method_short": "Statistics Canada preliminary quarterly estimate"
+ },
+ "components": [
+  {
+   "key": "securities",
+   "label": "Government of Canada securities outstanding",
+   "short": "Federal securities",
+   "value": 1649639000000,
+   "as_of": "2026-09-30",
+   "prior_value": 1535818000000,
+   "prior_as_of": "2025-09-30",
+   "source_name": "Bank of Canada, Government of Canada direct securities and loans: Distribution of holdings (month-end), Total securities outstanding (inflation adjusted), series V42141673",
+   "source_url": "https://www.bankofcanada.ca/?p=194263",
+   "source_locator": "Series V42141673; machine-readable: https://www.bankofcanada.ca/valet/observations/V42141673/json",
+   "includes": "Treasury bills, marketable bonds and notes (with the inflation adjustment on Real Return Bonds), Canada Bills issued in US dollars and retail debt, held by the general public, the Bank of Canada and Government of Canada accounts. Like the US figure, it counts securities the central bank holds.",
+   "facts": [
+    {
+     "key": "par",
+     "label": "Same securities at par value",
+     "value": 1623188000000,
+     "kind": "usd",
+     "as_of": "2026-09-30",
+     "source_locator": "Series V37340",
+     "note": "The same securities at face value, without the inflation adjustment on Real Return Bonds (Bank of Canada series V37340); 2025-09-30: C$1,511.6 billion."
+    },
+    {
+     "label": "Federal debt (accumulated deficit), Mar 31, 2026",
+     "value": 1322004000000,
+     "kind": "usd",
+     "as_of": "2026-03-31",
+     "note": "Total liabilities minus total assets (C$1,266,484 million a year earlier). A different, accounting measure published once a year in the fall in the Fiscal Monitor (preliminary, unaudited); the same table shows total unmatured debt of C$1,591,772 million and net debt of C$1,467,135 million.",
+     "source_name": "Department of Finance Canada, The Fiscal Monitor, March 2026, Table 7",
+     "source_url": "https://www.canada.ca/en/department-finance/services/publications/fiscal-monitor/2026/03.html",
+     "source_locator": "Table 7, Condensed statement of assets and liabilities"
+    }
+   ],
+   "history": [
+    [
+     "2025-09-30",
+     1535818000000
+    ],
+    [
+     "2025-10-31",
+     1553597000000
+    ],
+    [
+     "2025-11-30",
+     1558827000000
+    ],
+    [
+     "2025-12-31",
+     1556306000000
+    ],
+    [
+     "2026-01-31",
+     1572717000000
+    ],
+    [
+     "2026-02-28",
+     1579674000000
+    ],
+    [
+     "2026-03-31",
+     1584195000000
+    ],
+    [
+     "2026-04-30",
+     1596920000000
+    ],
+    [
+     "2026-05-31",
+     1608107000000
+    ],
+    [
+     "2026-06-30",
+     1619274000000
+    ],
+    [
+     "2026-07-31",
+     1645153000000
+    ],
+    [
+     "2026-08-31",
+     1648194000000
+    ],
+    [
+     "2026-09-30",
+     1649639000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Bank of Canada (inflation adjusted)",
+     "value": 150237000000,
+     "group": "Holders"
+    },
+    {
+     "label": "General public: treasury bills",
+     "value": 305318000000,
+     "group": "Holders"
+    },
+    {
+     "label": "General public: Canada Bills issued in US dollars",
+     "value": 2301000000,
+     "group": "Holders"
+    },
+    {
+     "label": "General public: marketable bonds and notes (inflation adjusted)",
+     "value": 1191429000000,
+     "group": "Holders"
+    },
+    {
+     "label": "General public: retail debt",
+     "value": 354000000,
+     "group": "Holders"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Bank of Canada Valet API, USD/CAD daily exchange rate (FXUSDCAD)",
+   "url": "https://www.bankofcanada.ca/valet/observations/FXUSDCAD/json"
+  }
+ ],
+ "notes": [
+  "Why this measure: the US clock ticks Treasury's Total Public Debt Outstanding, the face value of all marketable and non-marketable Treasury securities including those held by the Federal Reserve and by government trust funds, with inflation compensation on TIPS. The Bank of Canada's total securities outstanding (inflation adjusted) is the Canadian series built the same way and published monthly.",
+  "Canada's federal debt (accumulated deficit) is a different measure: liabilities minus assets, including pensions and accounts payable. It is shown as a separate figure, not added to the clock.",
+  "Not included: provincial, territorial and municipal debt; Crown corporation debt; pension and other liabilities. The US-dollar figure converts the official month-end total at the Bank of Canada's latest daily rate and is for comparison only."
+ ],
+ "hero_extra": [
+  {
+   "label": "Official figure in US$ (BoC rate 2026-10-19: 1.4097)",
+   "value": "US$1.170 trillion"
+  }
+ ],
+ "fx_note": {
+  "date": "2026-10-19",
+  "usdcad": 1.4097
+ }
+}
