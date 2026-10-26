@@ -705,8 +705,11 @@ AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in (
 _vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
 _pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html")] + _glob.glob(f"{R}/t/*.html")
           + [f for d in ["states", "countries"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
+# Every page gets the homepage's inline icon, so browsers never fall back to requesting /favicon.ico (a 404).
+_icon = (re.search(r'<link rel="icon"[^>]*>', open(f"{R}/index.html").read()) or [None])[0]
 for f in _pages:
     if not os.path.exists(f): continue
     s_ = open(f).read(); n_ = _vre.sub(lambda m: f'{m.group(1)}{m.group(2)}{m.group(3)}?v={AV[m.group(3)]}"', s_)
+    if _icon and 'rel="icon"' not in n_ and "</head>" in n_: n_ = n_.replace("</head>", _icon + "</head>", 1)
     if n_ != s_: open(f, "w").write(n_)
 print("asset versions:", AV)
