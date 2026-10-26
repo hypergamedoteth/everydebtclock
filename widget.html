@@ -9,7 +9,7 @@ body{margin:0;background:#0e131b;color:#e8edf5;font-family:-apple-system,Segoe U
 <script>(async()=>{const slug=new URLSearchParams(location.search).get('t')||'debt_total';
 const D=window.DEBTCLOCK_DATA||await (await fetch('data/data.json',{cache:'no-store'})).json(),C=DC(D),i=C.info(slug);
 if(!i||i.status!=='ok'){document.getElementById('v').textContent='source unavailable';return}
-document.getElementById('l').textContent=i.label+' · live';
-document.getElementById('s').innerHTML=(i.derived?'Live calculation from official tickers':`${i.fixed?'Fixed':'Projected from'} official ${i.as_of} · <a target="_blank" href="${i.source}">${i.source_name}</a>`)+` · <a target="_blank" href="index.html#t=${slug}">Every Debt Clock</a>`;
+document.getElementById('l').textContent=i.label+(i.held_at_limit?' · held at the debt limit':' · live');
+document.getElementById('s').innerHTML=(i.derived?'Live calculation from official tickers':`${i.fixed?'Fixed':'Projected from'} official ${i.as_of} · <a target="_blank" rel="nofollow noopener" href="${i.source}">${i.source_name}</a>`)+` · <a target="_blank" rel="nofollow noopener" href="index.html?ref=embed#t=${slug}">Every Debt Clock</a>`;
 (function fr(){const t=Date.now()/1000,v=C.get(slug,t);document.getElementById('v').textContent=C.fmt(i,v);
 if(i.kind==='usd'&&slug!=='debt_per_household')document.getElementById('p').textContent=`${C.ppf(v/C.pop(t))} per person · ${C.ppf(v/C.tax)} per tax return filed`;requestAnimationFrame(fr)})()})()</script></body></html>
