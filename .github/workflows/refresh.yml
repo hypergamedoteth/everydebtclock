@@ -10,6 +10,10 @@ on:
     # Treasury has a newer record_date than the committed data; otherwise it ends green with no commit or deploy.
     - cron: "*/15 19-20 * * 1-5"
     - cron: "0 21 * * 1-5"
+    # Backup checks at 3:30 PM CT, in case GitHub starts or skips the checks above late: 20:30 UTC = 3:30 PM CDT (until Nov 1, 2026),
+    # 21:30 UTC = 3:30 PM CST (after). Gated like the other checks: no new Treasury record means no fetch, commit or deploy.
+    - cron: "30 20 * * 1-5"
+    - cron: "30 21 * * 1-5"
     # 21:45 UTC weekdays = 4:45 PM CDT / 3:45 PM CST: full end-of-day refresh (also picks up late DTS tables). Always runs.
     # Note this lands AFTER a 3:45 PM CT post while CDT is in effect; the checks above are what make the post's data current.
     - cron: "45 21 * * 1-5"

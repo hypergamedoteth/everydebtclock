@@ -753,7 +753,9 @@ def project(x, t):
     for s0, s1, a, *_ in x.get("steps") or []:
         v += a * min(1.0, max(0.0, (t - s0) / (s1 - s0)))
     return v
-THR = {"debt_intragov": 0.5, "revenue": 3.0, "spending": 3.0, "interest_cash": 10.0}
+# Deficit is revenue minus spending, two ticking terms that are each re-based from the daily cash statement, so it swings
+# ~3x as much in percent as either alone (observed -4.9% to +6.8% day to day with the shown figure correct): 10%.
+THR = {"debt_intragov": 0.5, "revenue": 3.0, "spending": 3.0, "interest_cash": 10.0, "deficit": 10.0}
 prev_path = os.path.join(DATA, "data.json")
 if os.path.exists(prev_path):
     try:
@@ -783,15 +785,22 @@ if os.path.exists(prev_path):
     except Exception as e:
         errors["validation"] = str(e)
 
-# write log (append)
+# write log (append). Columns end with threshold_pct, the threshold the flag was judged against.
 logp = os.path.join(DATA, "validation_log.csv")
+LOG_FIELDS = ["run_iso", "ticker", "mode", "from", "to", "projected", "official", "error_pct", "flag", "threshold_pct"]
+if os.path.exists(logp):  # one-time migration: add the threshold_pct column to an older log (old rows left blank)
+    with open(logp, newline="") as f: old_rows = list(csv.reader(f))
+    if old_rows and "threshold_pct" not in old_rows[0]:
+        with open(logp, "w", newline="") as f:
+            w0 = csv.writer(f); w0.writerow(old_rows[0] + ["threshold_pct"])
+            for r in old_rows[1:]: w0.writerow(r + [""])
 new = not os.path.exists(logp)
 with open(logp, "a", newline="") as f:
-    w = csv.DictWriter(f, fieldnames=["run_iso", "ticker", "mode", "from", "to", "projected", "official", "error_pct", "flag"])
+    w = csv.DictWriter(f, fieldnames=LOG_FIELDS)
     if new: w.writeheader()
     for r in validation_rows:
         thr = r.pop("thr", None) or (5.0 if r["mode"] == "dts_ratio_backtest" else THR.get(r["ticker"], 0.25 if r["ticker"].startswith("debt") else 5.0))
-        w.writerow({"run_iso": META["generated_iso"], **r, "flag": (not r["mode"].startswith("method_switch")) and r["error_pct"] is not None and abs(r["error_pct"]) > thr})
+        w.writerow({"run_iso": META["generated_iso"], **r, "flag": (not r["mode"].startswith("method_switch")) and r["error_pct"] is not None and abs(r["error_pct"]) > thr, "threshold_pct": thr})
 
 flags = [s for s, t in T.items() if t.get("validation", {}).get("flag")]
 META.update({"errors": errors, "flags": flags, "denominators": {"population": "population", "tax_returns": "tax_returns"}})
