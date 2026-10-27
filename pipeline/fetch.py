@@ -643,7 +643,7 @@ H6_URL = "https://www.federalreserve.gov/releases/h6/current/default.htm"
 def src_m2():
     txt = get("https://www.federalreserve.gov/datadownload/Output.aspx?rel=H6&series=798e2796917702a5f8423426ba7e6b42&lastobs=8&from=&to=&filetype=csv&label=include&layout=seriescolumn")
     r = list(csv.reader(io.StringIO(txt))); i = r[0].index("M2; Seasonally adjusted")
-    return [[row[0], float(row[i]) * 1e9] for row in r if re.match(r"^\d{4}-\d\d$", row[0] or "") and row[i] not in ("", "ND", "NA")]
+    return [[row[0], float(row[i]) * 1e9] for row in r if row and len(row) > i and re.match(r"^\d{4}-\d\d$", row[0] or "") and row[i] not in ("", "ND", "NA")]
 import re
 m2, m2_stale = cached("fed_h6_m2", src_m2)
 if m2:
@@ -774,7 +774,8 @@ if os.path.exists(prev_path):
                         or (p.get("anchor") is not None and p.get("anchor") != n.get("anchor")))
             validation_rows.append({"ticker": slug, "from": p["as_of"], "to": n["as_of"], "projected": round(proj, 2),
                                     "official": n["base"], "error_pct": round(err, 4),
-                                    "mode": ("method_switch_" + str(p.get("basis") or "mts") + "_to_" + str(n.get("basis"))) if switched else ("daily_vs_dts" if n.get("basis") == "dts" else "daily")})
+                                    "mode": ("method_switch_" + str(p.get("basis") or "mts") + "_to_" + str(n.get("basis"))) if switched else ("daily_vs_dts" if n.get("basis") == "dts" else "daily"),
+                                    "thr": THR.get(slug, 0.25 if n["group"] == "debt" else 3.0 if n.get("basis") == "dts" else 5.0)})
             if switched: continue
             thr = THR.get(slug, 0.25 if n["group"] == "debt" else 3.0 if n.get("basis") == "dts" else 5.0)
             n.setdefault("validation", {}).update({"last_error_pct": round(err, 4), "threshold_pct": thr, "flag": abs(err) > thr,
@@ -789,7 +790,7 @@ with open(logp, "a", newline="") as f:
     w = csv.DictWriter(f, fieldnames=["run_iso", "ticker", "mode", "from", "to", "projected", "official", "error_pct", "flag"])
     if new: w.writeheader()
     for r in validation_rows:
-        thr = 5.0 if r["mode"] == "dts_ratio_backtest" else THR.get(r["ticker"], 0.25 if r["ticker"].startswith("debt") else 5.0)
+        thr = r.pop("thr", None) or (5.0 if r["mode"] == "dts_ratio_backtest" else THR.get(r["ticker"], 0.25 if r["ticker"].startswith("debt") else 5.0))
         w.writerow({"run_iso": META["generated_iso"], **r, "flag": (not r["mode"].startswith("method_switch")) and r["error_pct"] is not None and abs(r["error_pct"]) > thr})
 
 flags = [s for s, t in T.items() if t.get("validation", {}).get("flag")]
