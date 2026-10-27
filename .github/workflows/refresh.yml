@@ -111,7 +111,7 @@ jobs:
         run: |
           mkdir -p _site
           cp -r index.html 404.html privacy.html CNAME robots.txt sitemap.xml style.css app.js core.js widget.html \
-                apple-touch-icon.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person national-debt-by-year when-will-debt-hit-41-trillion states countries _site/
+                apple-touch-icon.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person national-debt-by-year when-will-debt-hit-41-trillion methodology states countries _site/
           rm -f _site/data/validation_log.csv
 
       - uses: actions/upload-pages-artifact@v3

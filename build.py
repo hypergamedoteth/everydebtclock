@@ -209,7 +209,8 @@ idx = idx.replace('<meta property="og:title" content="US Debt Clock — live & v
 idx = re.sub(r'<script type="application/ld\+json">\{"@context":"https://schema.org","@type":"Dataset","name":"Every Debt Clock: US live tickers".*?</script>\n?', "", idx, flags=re.S)
 
 ANSWERS = [("how-much-is-the-national-debt", "How much is the national debt?"), ("national-debt-per-person", "National debt per person"),
-           ("national-debt-by-year", "US national debt by year"), ("when-will-debt-hit-41-trillion", "When will US debt hit $41 trillion?")]
+           ("national-debt-by-year", "US national debt by year"), ("when-will-debt-hit-41-trillion", "When will US debt hit $41 trillion?"),
+           ("methodology", "Methodology and accuracy")]
 KEY_TICKERS = ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "interest_annual", "debt_per_household", "debt_gdp_now"]
 sl_, lim_ = T.get("debt_subject_limit") or {}, T.get("debt_limit") or {}
 rate_day = (T["debt_total"].get("rate_trend", T["debt_total"]["rate"])) * 86400
@@ -366,7 +367,7 @@ for slug, i in ALL.items():
 <p><b>* Per person (projected population)</b> divides by the US population projected to now: the official Census Vintage 2025 estimate for July 1, 2025 ({POP_OFF:,.0f}), projected forward at Census's stated growth rate ({POP:,.0f} at build time).{pp_off} <b>Per tax return filed</b> divides by {TAX:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2); a joint return counts once and returns with zero tax liability are included.</p>
 <a class="cta" href="../index.html#t={slug}">Open the full live clock →</a>
 <div class="rel"><b>Related:</b><br>{''.join(f'<a href="{s}.html">{html.escape(ALL[s].get("label", s))}</a>' for s in rel)}</div>
-<footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser. · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser. · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main><script>window.DEBTCLOCK_DATA={data};</script><script src="../core.js"></script>
 <script>(function(){{const C=DC(window.DEBTCLOCK_DATA),i=C.info({json.dumps(slug)}),v=document.getElementById('v'),p1=document.getElementById('p1'),p2=document.getElementById('p2');
 (function f(){{const t=Date.now()/1000,x=C.get({json.dumps(slug)},t);v.textContent=C.fmt(i,x);if(p1){{p1.textContent=C.ppf(x/C.pop(t));p2.textContent=C.ppf(x/C.tax)}}requestAnimationFrame(f)}})()}})()</script>
@@ -468,7 +469,7 @@ API = build_api()
 ANS_CSS = """table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0 14px}th,td{border-bottom:1px solid #1c2533;padding:6px 8px;text-align:left;vertical-align:top}
 th{color:#8a97ab;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em}td.num{font-family:ui-monospace,Menlo,monospace;text-align:right;white-space:nowrap}
 h2{font-size:17px;margin:22px 0 6px}.k{color:#8a97ab;font-size:13px;margin:0}details summary{cursor:pointer;color:#5aa9ff;margin:8px 0}
-.note{border:1px solid #5a3a12;background:#20170a;color:#ffb547;border-radius:10px;padding:10px 12px;font-size:13.5px}"""
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}code{overflow-wrap:anywhere}.note{border:1px solid #5a3a12;background:#20170a;color:#ffb547;border-radius:10px;padding:10px 12px;font-size:13.5px}"""
 def src_links(items):
     return "<p><b>Sources.</b> " + " · ".join(f'<a href="{html.escape(u)}" rel="noopener">{html.escape(n)}</a>' for n, u in items) + "</p>"
 SRC_DTP = ("Treasury, Debt to the Penny", DTP_URL)
@@ -481,6 +482,7 @@ held_note = (f'<p class="note">At the debt limit: debt subject to the limit was 
              'and our live clock holds at the official figure.</p>') if DLS.get("at_limit") else ""
 def answer_page(slug, title, desc, h1, body, ld="", og_img="og/debt_total.png"):
     url = f"{SITE}/{slug}/"
+    body = body.replace("<table", '<div class="tw"><table').replace("</table>", "</table></div>")  # wide tables scroll inside the page on phones
     more = "".join(f'<a href="../{a}/">{html.escape(t_)}</a>' for a, t_ in ANSWERS if a != slug)
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)}</title>
@@ -497,7 +499,7 @@ def answer_page(slug, title, desc, h1, body, ld="", og_img="og/debt_total.png"):
 {held_note}{body}
 <a class="cta" href="../">Open the live national debt clock →</a>
 <div class="rel"><b>More answers:</b><br>{more}<a href="../t/debt_total.html">US national debt, live</a></div>
-<footer>Every figure on this page is an official published number unless it is labelled "projected". Page built {STAMP} from data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT; it is rebuilt after every Treasury update. · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer>Every figure on this page is an official published number unless it is labelled "projected". Page built {STAMP} from data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT; it is rebuilt after every Treasury update. · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main></body></html>"""
     os.makedirs(f"{R}/{slug}", exist_ok=True)
     open(f"{R}/{slug}/index.html", "w").write(with_analytics(page))
@@ -676,6 +678,75 @@ from Treasury's total (it includes some agency debt and nets out unamortized dis
                 (f"Projected date the US national debt passes $41 trillion, from Treasury's {fdate(OFF_D)} close of {tril(OFF_V)} and its 90-day trend, with the "
                  f"{tril(LIM or 0, 3)} debt limit explained." if not first_hit else f"US national debt first closed above $41 trillion on {fdate(first_hit[0])}, per Treasury's Debt to the Penny."),
                 "When will US debt hit $41 trillion?", body)
+
+# ---------------------------------------------------------------- 5) Methodology and accuracy (/methodology/)
+# Dated snapshot of two other debt clocks, read in a browser on Oct 27, 2026 (values verified by hand that day; not updated automatically).
+# Compared with Treasury's latest published record at that moment (Oct 26, 2026 close, $40,528,358,939,415.85).
+SNAP = {"when": "Oct 27, 2026, 5:04 PM CT", "treasury_date": "2026-10-26", "treasury": 40528358939415.85,
+        "rows": [("Every Debt Clock (this site), live projection", 40533338546720.16, "A projection from Treasury's Oct 26 close at the 90-day trend; calculated for 5:04:55 PM CT."),
+                 ("us-debt-clock.com", 40372855520155, 'Read on the page at 5:04 PM CT. The page labels its latest Treasury record "August 20, 2026".'),
+                 ("usdebtclock.org", 40455752046870, "Ticking counter read at 5:04 PM CT. The site does not say which Treasury date it starts from.")]}
+if OFF_V:
+    import csv as _csv
+    bt_rows = []
+    try:
+        _all = [r for r in _csv.DictReader(open(f"{R}/data/validation_log.csv")) if r["ticker"] == "debt_total" and r["mode"] == "backtest" and r.get("error_pct") not in (None, "")]
+        _last = max(r["run_iso"] for r in _all); bt_rows = sorted((r for r in _all if r["run_iso"] == _last), key=lambda r: r["to"], reverse=True)
+    except Exception: bt_rows = []
+    bt_html = ""
+    if bt_rows:
+        errs = [float(r["error_pct"]) for r in bt_rows]
+        bt_html = (f"<p>Each row projects the debt from the previous business day's Treasury close with the 90-day trend, then compares it with the actual next close. "
+                   f"Over the last {len(errs)} business days the average absolute error was <b>{sum(abs(e) for e in errs)/len(errs):.3f}%</b> and the largest was <b>{max(abs(e) for e in errs):.3f}%</b> "
+                   f"(about {bil(max(abs(e) for e in errs) / 100 * OFF_V)} at today's level).</p>"
+                   '<table><tr><th>Projected for</th><th>Projection from prior close</th><th>Treasury actual</th><th>Difference</th></tr>'
+                   + "".join(f'<tr><td>{fdate(r["to"])}</td><td class="num">{usd0(float(r["projected"]))}</td><td class="num">{usd0(float(r["official"]))}</td><td class="num">{float(r["error_pct"]):+.3f}%</td></tr>' for r in bt_rows[:10]) + "</table>")
+    td_ = T["debt_total"]; fd_ = M.get("debt_fetched_epoch")
+    snap_rows = "".join(f'<tr><td>{html.escape(n)}</td><td class="num">{usd0(v)}</td><td class="num">{"+" if v - SNAP["treasury"] >= 0 else "−"}{bil(abs(v - SNAP["treasury"]))} ({(v - SNAP["treasury"]) / SNAP["treasury"] * 100:+.2f}%)</td><td>{html.escape(note)}</td></tr>' for n, v, note in SNAP["rows"])
+    body = f"""<p class="k">Where every number comes from, how often it changes, and how close it is to Treasury</p>
+<p><b>Short version.</b> The national debt figure on this site starts from Treasury's official <i>Debt to the Penny</i> number for the latest business day, then ticks forward at the recent official pace until Treasury publishes the next day. Every other figure follows the same pattern from its own official source. Nothing is typed in by hand, and anything projected is labelled as a projection.</p>
+<h2>Where each number comes from</h2>
+<table><tr><th>Figure</th><th>Official source</th><th>How it is used</th></tr>
+<tr><td>National debt (total, public, intragovernmental)</td><td><a href="{DTP_URL}" rel="noopener">Treasury, Debt to the Penny</a></td><td>Latest close of business is the starting point; ticks at the 90-day trend until the next close.</td></tr>
+<tr><td>Debt subject to the limit, statutory limit</td><td><a href="{SRC_DSL[1]}" rel="noopener">Treasury, Daily Treasury Statement, Table III-C</a></td><td>Same method; headroom is the limit minus debt subject to the limit.</td></tr>
+<tr><td>Federal spending, revenue, deficit (fiscal year to date)</td><td>Treasury Monthly Treasury Statement (MTS) and Daily Treasury Statement (DTS)</td><td>Anchored to the latest MTS; days after it are added from DTS cash figures converted to budget basis with last year's MTS÷DTS ratio. Revenue is within roughly ±4% of the official total on that basis, which is why those tiles say so.</td></tr>
+<tr><td>Interest on the debt</td><td>Treasury, Average Interest Rates on Treasury Securities, and the MTS/DTS interest lines</td><td>Annual interest = live debt × the average rate on interest-bearing debt. It is a calculation, labelled as such.</td></tr>
+<tr><td>Per person</td><td><a href="{SRC_POP[1]}" rel="noopener">Census Bureau, Vintage 2025 population estimates</a></td><td>{POP_OFF:,.0f} residents on {fdate(POP_OFF_DATE)}, grown at the rate Census states for its population clock. Updated once a year when Census publishes a new vintage.</td></tr>
+<tr><td>Per household</td><td><a href="{SRC_HH[1]}" rel="noopener">Census Bureau, CPS ASEC 2025, Table HH-1</a></td><td>{HH:,.0f} households, a fixed constant until the next release.</td></tr>
+<tr><td>Per tax return filed</td><td><a href="{SRC_IRS[1]}" rel="noopener">IRS Data Book FY2025, Table 1-2</a></td><td>{TAX:,.0f} individual returns filed in FY2025, fixed. It includes zero-liability returns, and a joint return counts once.</td></tr>
+<tr><td>GDP, debt-to-GDP</td><td>Bureau of Economic Analysis, NIPA Table 1.1.5 (read through the DBnomics mirror)</td><td>Latest quarter, ticking at the four-quarter trend.</td></tr>
+<tr><td>Federal Reserve holdings, M2</td><td>New York Fed SOMA; Federal Reserve H.6</td><td>Latest published value, ticking at the recent trend.</td></tr>
+<tr><td>State debt clocks</td><td>Census Bureau, Annual Survey of State and Local Government Finances</td><td>Annual and about two years old when published; see each <a href="../states/">state page</a> for its method.</td></tr></table>
+<h2>Record dates and when Treasury publishes</h2>
+<p>Debt to the Penny gives the debt at the <i>close of business</i> on each business day. Each record is published on the next business day, usually in the afternoon (around 3 PM Central in recent weeks): Monday's record appears Tuesday, and Friday's appears Monday. Weekends and federal holidays have no record of their own. The latest record Treasury had published when this page was built is <b>{fdate(OFF_D)}: {usd2(OFF_V)}</b>. Daily changes are lumpy: the debt steps up on days when auctions settle and moves down when securities held by trust funds mature.</p>
+<h2>How the live ticker works</h2>
+<p>For every ticking figure: <code>value(now) = base + rate × (now − t0)</code>. The base is the latest official figure, t0 is the end of its record date (11:59:59 PM Eastern), and the rate is a least-squares fit to the last 90 days of Treasury's daily records (currently {bil(rate_day)} a day for the national debt). The browser recomputes this every animation frame, so the digits move smoothly between official releases. When Treasury publishes a new record the base and t0 reset to it, so a projection error never accumulates for more than about a day. If the debt reaches the statutory limit, the clock stops projecting growth and holds at the official figure. Every ticker has a "Show the math" panel with its base, t0, rate and sources.</p>
+<h2>Update cadence</h2><ul>
+<li>Every day at 6:30 AM Central (5:30 AM in winter): full recalibration from Census, BEA, the Monthly Treasury Statement, OMB and the other sources.</li>
+<li>Weekdays, every 15 minutes from 2:00 to 4:00 PM Central, plus a backup check at 3:30 PM Central: the site fetches and republishes only when Treasury has posted a newer Debt to the Penny record, so the new figure reaches the site soon after Treasury publishes it.</li>
+<li>Weekdays at 4:45 PM Central (3:45 PM in winter): a full end-of-day refresh.</li>
+<li>The schedule runs on GitHub Actions, which can start scheduled jobs a few minutes late. This page and the other pages are rebuilt on every refresh. This one was built {STAMP} from data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT.</li></ul>
+<h2>Accuracy</h2>
+<p><b>The official figure.</b> On the record date our starting figure is Treasury's number to the penny: the latest record is {fdate(OFF_D)}, {usd2(OFF_V)}, and the clock's base is {usd2(td_.get("base"))}. The live figure between records is a projection and is labelled one. It will differ slightly from the next Treasury figure; the table shows by how much.</p>
+{bt_html}
+<p>Each day's check against Treasury is stored in a public log (<code>data/validation_log.csv</code> in the <a href="https://github.com/hypergamedoteth/everydebtclock" rel="noopener">repository</a>) with the threshold it was judged against. If a check exceeds its threshold, the clock shows a warning badge and the site's automated run is marked failed. Thresholds: 0.25% for the national debt, 0.5% for intragovernmental debt, 3% for revenue and spending, 10% for the fiscal-year-to-date deficit (a difference of two re-based figures, so it moves more day to day), 5% for most monthly figures.</p>
+<h3>How other debt clocks compared on {SNAP["when"]}</h3>
+<p>For context, this is what two other US debt clocks showed when we read them on {SNAP["when"]}, against the latest record Treasury had published at that moment ({fdate(SNAP["treasury_date"])}: {usd0(SNAP["treasury"])}). Treasury had not yet published October 27's close, so each figure is compared with the latest published record. This is a one-time dated snapshot of what those pages displayed, not a live comparison, and those sites may have changed since.</p>
+<table><tr><th>Site</th><th>Figure shown</th><th>Versus Treasury's {fdate(SNAP["treasury_date"])} record</th><th>Note</th></tr>{snap_rows}</table>
+<p>We are an independent site and are not affiliated with any of the sites listed or with the U.S. government.</p>
+<h2>What this page does not claim</h2>
+<ul><li>Projected figures are estimates between official releases. Fiscal-year-to-date revenue, spending and the deficit are estimates on a budget basis until the next MTS; state and local clocks are straight-line projections from annual Census data that is about two years old.</li>
+<li>Per-person and per-household figures divide by population or household counts that Census publishes once a year, so they use different dates than the debt figure.</li>
+<li>Nothing here is financial advice.</li></ul>
+{src_links([SRC_DTP, SRC_DSL, SRC_POP, SRC_HH, SRC_IRS, ("Census, State and Local Government Finances", "https://www.census.gov/data/datasets/2024/econ/local/public-use-datasets.html")])}"""
+    _ld = {"@context": "https://schema.org", "@type": "TechArticle", "headline": "Every Debt Clock methodology and accuracy", "url": f"{SITE}/methodology/",
+           "description": "Where each number on Every Debt Clock comes from, how the live ticker is calculated, how often it updates, and how it compares with Treasury.",
+           "dateModified": M["generated_iso"], "inLanguage": "en", "isAccessibleForFree": True,
+           "author": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"}, "publisher": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"},
+           "about": {"@type": "Thing", "name": "US national debt"}}
+    answer_page("methodology", "Methodology and Accuracy: Where Every Number Comes From | Every Debt Clock",
+                f"How Every Debt Clock calculates the US national debt: Treasury Debt to the Penny, record dates, the live ticker, update times, and a dated check against Treasury's {fdate(OFF_D)} figure.",
+                "Methodology and accuracy", body, ld='<script type="application/ld+json">' + json.dumps(_ld).replace("</", "<\\/") + "</script>", og_img="og/home.png")
 
 # ---------------------------------------------------------------- place pages: /states/<slug>/, /countries/<slug>/ from places/*.json
 import places_build
