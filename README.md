@@ -94,3 +94,8 @@ Static files only: Cloudflare Pages or GitHub Pages (free), Cloudflare CDN in fr
 - Repo: https://github.com/hypergamedoteth/everydebtclock (public), branch `main`.
 - GitHub Pages, source = GitHub Actions (`.github/workflows/refresh.yml`), custom domain `everydebtclock.com` (`CNAME`).
 - Workflow runs at 11:30 UTC daily and 21:45 UTC weekdays, plus on push and manual dispatch.
+
+## State pages (all 50) and the weekly audit
+`places/<slug>.json` holds one page of data per state; `pipeline/census_state.py` writes it from the Census Bureau's Annual Survey of State and Local Government Finances (table GS00LOCALFIN, item LF0231 debt outstanding, split into long-term LF0233 and short-term LF0232) and Census Vintage 2025 population. With no arguments it generates only states that have no file yet; pass slugs to regenerate. Anything Census does not publish for a state is left out, not filled in (e.g. a missing short-term row has no tile).
+**Trend rule.** A state's clock ticks forward only when Census's latest one-year change is both larger than about two standard errors of its own estimate and no more than 10% of the prior level. Otherwise the page sets `"hold_trend": true` and shows the official figure fixed, with a note saying why.
+`pipeline/audit_places.py` re-downloads the same Census sources and compares every stored figure (headline, prior year, full history, long/short-term parts, population), checks internal consistency, and with `--site DIR` checks each built page exists and is in the sitemap. Exit 1 on drift, a failed check or a newer Census survey year. `.github/workflows/audit-places.yml` runs it weekly, read-only.

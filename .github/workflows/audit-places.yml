@@ -1,0 +1,29 @@
+name: Audit state pages against official sources
+
+# Read-only weekly self-audit. Re-downloads the Census tables and population file that every /states/ page cites and compares each stored figure.
+# Never commits, builds a deploy artifact or touches the live site. A red run (GitHub emails the owner) means DRIFT in a published figure,
+# a failed internal check, or a newer Census survey year than the pages use. Mondays 12:00 UTC = 7:00 AM CDT / 6:00 AM CST.
+on:
+  schedule:
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+  pull_request:
+    paths: ["places/**", "pipeline/audit_places.py", "pipeline/census_state.py"]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Audit every state page against Census
+        run: python3 pipeline/audit_places.py --report audit-report.md
+      - name: Show report
+        if: always()
+        run: cat audit-report.md >> "$GITHUB_STEP_SUMMARY" || true
