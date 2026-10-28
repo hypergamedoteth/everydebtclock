@@ -205,12 +205,13 @@
  ],
  "notes": [
   "Census publishes New York's state + local total as $332.65 billion for 2024 (coefficient of variation 0.30%) and $332.29 billion for 2023. State + local here is exactly Census's state figure plus its local figure.",
-  "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the live clock projects from June 30, 2024. The state's own report (New York State Comptroller, Basic Financial Statements FY2026) is fresher but narrower; it is shown separately and never added. Census does not publish a reconciliation to state reports, so we do not itemize the gap.",
-  "The 2023→2024 change (+$0.36 billion) is smaller than about two standard errors of the Census estimate (about $2.0 billion at a 0.30% coefficient of variation), so the direction of the projected trend is uncertain.",
+  "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the page shows the official figure as of June 30, 2024. The state's own report (New York State Comptroller, Basic Financial Statements FY2026) is fresher but narrower; it is shown separately and never added. Census does not publish a reconciliation to state reports, so we do not itemize the gap.",
+  "The 2023→2024 change (+$0.36 billion) is smaller than about two standard errors of the Census estimate (about $2.0 billion at a 0.30% coefficient of variation), so Census's data does not show which way the debt is moving. This page therefore shows the official figure as published and does not tick it forward.",
   "About the state's own figure: We count principal outstanding ($60,120 million). Table 5's published total of $66,133 million also includes $6,013 million of unamortized bond premiums.",
   "About the state's own figure: The Comptroller reports $46.2 billion of debt outstanding for local governments outside New York City for local fiscal years ending in 2024; it is a different date and scope, so it is not added here.",
   "About the state's own figure: Not included: New York City's debt; other local government debt; public authorities' own (non-State-supported) debt such as the MTA's; collateralized borrowings ($2.1 billion); unfunded pension and retiree-health liabilities; and New York's share of the federal debt.",
   "Not included: unfunded pension and retiree-health liabilities, and the state's share of the federal debt."
  ],
- "legend": "New York state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection from the latest Census year, shown here next to the official totals."
+ "legend": "New York state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the page shows the latest official figure without ticking it forward, because Census's own sampling error is larger than the change it measured.",
+ "hold_trend": true
 }
