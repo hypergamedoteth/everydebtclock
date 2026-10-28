@@ -72,7 +72,7 @@ def calc(p):
     cs = p["components"]
     total = sum(c["value"] for c in cs)
     rates = [comp_rate(c) for c in cs]
-    rate = sum(rates) if all(r is not None for r in rates) else None
+    rate = sum(rates) if all(r is not None for r in rates) and not p.get("hold_trend") else None  # hold_trend: official figure shown fixed (change within sampling error)
     return {"total": total, "t0": max(_eod(c["as_of"]) for c in cs), "rate": rate, "rates": rates,
             "as_of": max(c["as_of"] for c in cs), "same_date": len({c["as_of"] for c in cs}) == 1}
 
