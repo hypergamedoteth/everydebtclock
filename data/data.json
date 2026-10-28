@@ -1,8 +1,8 @@
 {
  "meta": {
-  "generated_epoch": 1793207720.525544,
-  "generated_iso": "2026-10-28T13:15:20.525544-04:00",
-  "debt_fetched_epoch": 1793207720.525544,
+  "generated_epoch": 1793219381.1324294,
+  "generated_iso": "2026-10-28T16:29:41.132429-04:00",
+  "debt_fetched_epoch": 1793219381.1324294,
   "fy": 2027,
   "fy_start_epoch": 1790827200.0,
   "fy_end_epoch": 1822363200.0,
@@ -22,9 +22,18 @@
     "backtest_err_pct": 1.033
    }
   },
-  "dts_latest": "2026-10-26",
+  "dts_latest": "2026-10-27",
   "mts_latest": "2026-09-30",
   "recent_closes": [
+   {
+    "date": "2026-10-27",
+    "total": 40582274254843.57,
+    "public": 32677379585770.57,
+    "intragov": 7904894669073.0,
+    "d_total": 53915315427.71875,
+    "d_public": 42084771476.08984,
+    "d_intragov": 11830543951.629883
+   },
    {
     "date": "2026-10-26",
     "total": 40528358939415.85,
@@ -105,18 +114,13 @@
     "d_total": -14649410494.648438,
     "d_public": 71007109.859375,
     "d_intragov": -14720417604.510742
-   },
-   {
-    "date": "2026-10-13",
-    "total": 40343879238035.67,
-    "public": 32483641012611.98,
-    "intragov": 7860238225423.69,
-    "d_total": 42398706136.02344,
-    "d_public": 35808367688.109375,
-    "d_intragov": 6590338447.910156
    }
   ],
   "debt_closes": [
+   [
+    "2026-10-27",
+    40582274254843.57
+   ],
    [
     "2026-10-26",
     40528358939415.85
@@ -292,23 +296,19 @@
    [
     "2026-08-24",
     40035385103646.14
-   ],
-   [
-    "2026-08-21",
-    40032876505819.31
    ]
   ],
   "debt_closes_stale": false,
   "debt_limit_status": {
    "at_limit": false,
    "limit": 41103996000000.0,
-   "subject_to_limit": 40331241000000.0,
-   "headroom": 772755000000.0,
-   "as_of": "2026-10-26",
-   "last5_range": 115276000000.0,
+   "subject_to_limit": 40383788000000.0,
+   "headroom": 720208000000.0,
+   "as_of": "2026-10-27",
+   "last5_range": 167823000000.0,
    "margin": 25000000000.0,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit",
-   "freeze_t": 1803514767.3204591
+   "freeze_t": 1802657911.805365
   },
   "debt_by_fy": [
    [
@@ -1565,7 +1565,7 @@
    "kind": "count",
    "base": 134790000,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "2025",
    "source": "https://www2.census.gov/programs-surveys/demo/tables/families/time-series/households/hh1.xls",
    "source_name": "Census CPS ASEC 2025, Table HH-1",
@@ -1588,7 +1588,7 @@
    "kind": "count",
    "base": 162754810,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY2025",
    "source": "https://www.irs.gov/statistics/soi-tax-stats-numbers-of-returns-filed-by-type-of-return-irs-data-book-table-1-2",
    "source_name": "IRS Data Book FY2025, Table 1-2",
@@ -1609,148 +1609,148 @@
    "label": "US national debt",
    "group": "debt",
    "kind": "usd",
-   "base": 40528358939415.85,
-   "t0": 1793073599.0,
-   "rate": 76496.36389817404,
-   "as_of": "2026-10-26",
+   "base": 40582274254843.57,
+   "t0": 1793159999.0,
+   "rate": 78259.8118447599,
+   "as_of": "2026-10-27",
    "source": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
    "source_name": "Treasury, Debt to the Penny",
-   "method": "Starts at Treasury's official figure for 2026-10-26 (close of business). Rate: 90-day least-squares trend (63 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day. Backtested against the next Treasury close over the last 20 business days: average error 0.066%.",
+   "method": "Starts at Treasury's official figure for 2026-10-27 (close of business). Rate: 90-day least-squares trend (63 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day. Backtested against the next Treasury close over the last 20 business days: average error 0.069%.",
    "stale": false,
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-07-28 to 2026-10-26)",
+    "window": "trailing 90 days (2026-07-29 to 2026-10-27)",
     "n": 63,
-    "slope": 76496.36389817402,
+    "slope": 78259.8118447599,
     "first": [
-     "2026-07-28",
-     39797152899275.21
+     "2026-07-29",
+     39799618642771.12
     ],
     "last": [
-     "2026-10-26",
-     40528358939415.85
+     "2026-10-27",
+     40582274254843.57
     ],
     "context_1y": {
      "from": [
-      "2025-10-24",
-      38009025959457.4
+      "2025-10-27",
+      38042191742752.61
      ],
      "to": [
-      "2026-10-26",
-      40528358939415.85
+      "2026-10-27",
+      40582274254843.57
      ],
-     "rate": 79452.17037410602
+     "rate": 80545.48808000257
     }
    },
    "status": "ok",
    "slug": "debt_total",
    "validation": {
-    "last_error_pct": -0.1122,
-    "mean_abs_error_pct": 0.0656,
+    "last_error_pct": -0.1166,
+    "mean_abs_error_pct": 0.0685,
     "n": 20,
-    "against": "Debt to the Penny (next business day)",
+    "against": "Treasury, Debt to the Penny",
     "threshold_pct": 0.25,
     "flag": false
    },
-   "freeze_t": 1803514767.3204591
+   "freeze_t": 1802657911.805365
   },
   "debt_public": {
    "label": "Debt held by the public",
    "group": "debt",
    "kind": "usd",
-   "base": 32635294814294.48,
-   "t0": 1793073599.0,
-   "rate": 62978.99415860352,
-   "as_of": "2026-10-26",
+   "base": 32677379585770.57,
+   "t0": 1793159999.0,
+   "rate": 62618.02993796537,
+   "as_of": "2026-10-27",
    "source": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
    "source_name": "Treasury, Debt to the Penny",
-   "method": "Starts at Treasury's official figure for 2026-10-26 (close of business). Rate: 90-day least-squares trend (63 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
+   "method": "Starts at Treasury's official figure for 2026-10-27 (close of business). Rate: 90-day least-squares trend (63 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
    "stale": false,
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-07-28 to 2026-10-26)",
+    "window": "trailing 90 days (2026-07-29 to 2026-10-27)",
     "n": 63,
-    "slope": 62978.99415860352,
+    "slope": 62618.02993796537,
     "first": [
-     "2026-07-28",
-     31995278756120.16
+     "2026-07-29",
+     31994676087491.92
     ],
     "last": [
-     "2026-10-26",
-     32635294814294.48
+     "2026-10-27",
+     32677379585770.57
     ],
     "context_1y": {
      "from": [
-      "2025-10-24",
-      30462318457750.69
+      "2025-10-27",
+      30463894199662.03
      ],
      "to": [
-      "2026-10-26",
-      32635294814294.48
+      "2026-10-27",
+      32677379585770.57
      ],
-     "rate": 68529.12619032538
+     "rate": 70189.16115260462
     }
    },
    "status": "ok",
    "slug": "debt_public",
    "validation": {
-    "last_error_pct": -0.0243,
-    "mean_abs_error_pct": 0.0536,
+    "last_error_pct": -0.1121,
+    "mean_abs_error_pct": 0.0547,
     "n": 20,
-    "against": "Debt to the Penny (next business day)",
+    "against": "Treasury, Debt to the Penny",
     "threshold_pct": 0.25,
     "flag": false
    },
-   "freeze_t": 1803514767.3204591
+   "freeze_t": 1802657911.805365
   },
   "debt_intragov": {
    "label": "Intragovernmental debt",
    "group": "debt",
    "kind": "usd",
-   "base": 7893064125121.37,
-   "t0": 1793073599.0,
-   "rate": 13517.369739570511,
-   "as_of": "2026-10-26",
+   "base": 7904894669073.0,
+   "t0": 1793159999.0,
+   "rate": 15641.781906794526,
+   "as_of": "2026-10-27",
    "source": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
    "source_name": "Treasury, Debt to the Penny",
-   "method": "Starts at Treasury's official figure for 2026-10-26 (close of business). Rate: 90-day least-squares trend (63 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
+   "method": "Starts at Treasury's official figure for 2026-10-27 (close of business). Rate: 90-day least-squares trend (63 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
    "stale": false,
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-07-28 to 2026-10-26)",
+    "window": "trailing 90 days (2026-07-29 to 2026-10-27)",
     "n": 63,
-    "slope": 13517.369739570511,
+    "slope": 15641.781906794526,
     "first": [
-     "2026-07-28",
-     7801874143155.05
+     "2026-07-29",
+     7804942555279.2
     ],
     "last": [
-     "2026-10-26",
-     7893064125121.37
+     "2026-10-27",
+     7904894669073.0
     ],
     "context_1y": {
      "from": [
-      "2025-10-24",
-      7546707501706.71
+      "2025-10-27",
+      7578297543090.58
      ],
      "to": [
-      "2026-10-26",
-      7893064125121.37
+      "2026-10-27",
+      7904894669073.0
      ],
-     "rate": 10923.044183780532
+     "rate": 10356.326927397891
     }
    },
    "status": "ok",
    "slug": "debt_intragov",
    "validation": {
-    "last_error_pct": -0.4757,
-    "mean_abs_error_pct": 0.1842,
+    "last_error_pct": -0.1349,
+    "mean_abs_error_pct": 0.1873,
     "n": 20,
-    "against": "Debt to the Penny (next business day)",
+    "against": "Treasury, Debt to the Penny",
     "threshold_pct": 0.5,
     "flag": false
    },
-   "freeze_t": 1803514767.3204591
+   "freeze_t": 1802657911.805365
   },
   "gdp": {
    "calc": {
@@ -1804,16 +1804,16 @@
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 325469355738.35474,
-   "t0": 1793073599.0,
-   "rate": 80638.23050561197,
-   "as_of": "2026-10-26",
+   "base": 331809951370.0841,
+   "t0": 1793159999.0,
+   "rate": 181898.88477438223,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 5403326758960.81,
    "ttm": 5403207188116.35,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
    "source_name": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement",
-   "method": "FY2027 to date, budget basis, re-based every business day: DTS FYTD cash through 2026-10-26 ($395.1B) \u00d7 0.8238 budget-to-cash ratio from FY2026. Ticks toward the projected close for 2026-10-27: expected cash $8.5B \u00d7 0.8238 (non-customs receipts from the same weekdays a year earlier, scaled by the trailing-year growth, plus customs duties from the same business day last month, since tariffs arrive in one monthly lump). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $5,403.3B. Resets to $0 every Oct 1.",
+   "method": "FY2027 to date, budget basis, re-based every business day: DTS FYTD cash through 2026-10-27 ($402.8B) \u00d7 0.8238 budget-to-cash ratio from FY2026. Ticks toward the projected close for 2026-10-28: expected cash $19.1B \u00d7 0.8238 (non-customs receipts from the same weekdays a year earlier, scaled by the trailing-year growth, plus customs duties from the same business day last month, since tariffs arrive in one monthly lump). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $5,403.3B. Resets to $0 every Oct 1.",
    "stale": false,
    "basis": "dts",
    "calc": {
@@ -1826,46 +1826,52 @@
      6559227000000.0
     ],
     "cash_from": [
-     "2026-07-28",
-     5440521000000.0
+     "2026-07-29",
+     5460278000000.0
     ],
     "cash_to": [
-     "2026-10-26",
-     395095000000.0
+     "2026-10-27",
+     402792000000.0
     ],
-    "cash_flow_90d": 1513801000000.0,
+    "cash_flow_90d": 1501741000000.0,
     "seconds": 7776000.0,
     "base_parts": {
-     "dts_cash_latest": 395095000000.0
+     "dts_cash_latest": 402792000000.0
     },
-    "next_bday": "2026-10-27",
-    "cash_flow_next": 8457580908.183569,
+    "next_bday": "2026-10-28",
+    "cash_flow_next": 19078103840.344467,
     "seconds_next": 86400.0,
     "pace_parts": {
-     "non_customs_same_window_last_year": 8059580908.183569,
-     "growth": 1.0508,
-     "customs_same_bday_last_month": 398000000.0
+     "non_customs_same_window_last_year": 18705103840.344467,
+     "growth": 1.0407,
+     "customs_same_bday_last_month": 373000000.0
     }
    },
    "anchor": "dts",
    "status": "ok",
-   "slug": "revenue"
+   "slug": "revenue",
+   "validation": {
+    "last_error_pct": 0.1888,
+    "threshold_pct": 3.0,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement"
+   }
   },
   "spending": {
    "label": "Federal spending",
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 486323717664.99207,
-   "t0": 1793073599.0,
-   "rate": 136736.5850805106,
-   "as_of": "2026-10-26",
+   "base": 499765122993.61914,
+   "t0": 1793159999.0,
+   "rate": 203303.5488755394,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 7395799983313.23,
    "ttm": 7395735355671.811,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
    "source_name": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement",
-   "method": "FY2027 to date, budget basis, re-based every business day: DTS FYTD cash through 2026-10-26 ($542.1B) \u00d7 0.8972 budget-to-cash ratio from FY2026. Ticks toward the projected close for 2026-10-27: expected cash $13.2B \u00d7 0.8972 (outlays on the same weekdays a year earlier, scaled by the trailing-year growth). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $7,395.8B. Resets to $0 every Oct 1.",
+   "method": "FY2027 to date, budget basis, re-based every business day: DTS FYTD cash through 2026-10-27 ($557.0B) \u00d7 0.8972 budget-to-cash ratio from FY2026. Ticks toward the projected close for 2026-10-28: expected cash $19.6B \u00d7 0.8972 (outlays on the same weekdays a year earlier, scaled by the trailing-year growth). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $7,395.8B. Resets to $0 every Oct 1.",
    "stale": false,
    "basis": "dts",
    "calc": {
@@ -1878,39 +1884,45 @@
      8243474000000.0
     ],
     "cash_from": [
-     "2026-07-28",
-     6761376000000.0
+     "2026-07-29",
+     6776605000000.0
     ],
     "cash_to": [
-     "2026-10-26",
-     542064000000.0
+     "2026-10-27",
+     557046000000.0
     ],
-    "cash_flow_90d": 2024162000000.0,
+    "cash_flow_90d": 2023915000000.0,
     "seconds": 7776000.0,
     "base_parts": {
-     "dts_cash_latest": 542064000000.0
+     "dts_cash_latest": 557046000000.0
     },
-    "next_bday": "2026-10-27",
-    "cash_flow_next": 13168114285.658794,
+    "next_bday": "2026-10-28",
+    "cash_flow_next": 19578698449.26161,
     "seconds_next": 86400.0,
     "pace_parts": {
-     "same_window_last_year": 13168114285.658794,
-     "growth": 1.074
+     "same_window_last_year": 19578698449.26161,
+     "growth": 1.0729
     }
    },
    "anchor": "dts",
    "status": "ok",
-   "slug": "spending"
+   "slug": "spending",
+   "validation": {
+    "last_error_pct": -0.3256,
+    "threshold_pct": 3.0,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement"
+   }
   },
   "rev_individual": {
    "label": "Individual income taxes",
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "base": 171404087169.1973,
-   "t0": 1793073599.0,
-   "rate": 42467.04658076946,
-   "as_of": "2026-10-26",
+   "base": 174743277133.4877,
+   "t0": 1793159999.0,
+   "rate": 95794.61707268133,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 2845526866159.55,
    "share": 0.5266366376654805,
@@ -1938,10 +1950,10 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "base": 109135826987.0623,
-   "t0": 1793073599.0,
-   "rate": 27039.473356988077,
-   "as_of": "2026-10-26",
+   "base": 111261944655.77342,
+   "t0": 1793159999.0,
+   "rate": 60994.02253352343,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 1811794721160.9202,
    "share": 0.3353182874605152,
@@ -1973,10 +1985,10 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "base": 22975019982.53104,
-   "t0": 1793073599.0,
-   "rate": 5692.286922126515,
-   "as_of": "2026-10-26",
+   "base": 23422605319.742447,
+   "t0": 1793159999.0,
+   "rate": 12840.31949186378,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 381414689057.62,
    "share": 0.0705904244976006,
@@ -2004,10 +2016,10 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "base": 10434053136.748268,
-   "t0": 1793073599.0,
-   "rate": 2585.13917551519,
-   "as_of": "2026-10-26",
+   "base": 10637323000.94182,
+   "t0": 1793159999.0,
+   "rate": 5831.401930131061,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 173218614643.4,
    "share": 0.03205848093771451,
@@ -2035,10 +2047,10 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "base": 6384725525.655065,
-   "t0": 1793073599.0,
-   "rate": 1581.8784766536626,
-   "as_of": "2026-10-26",
+   "base": 6509108857.185372,
+   "t0": 1793159999.0,
+   "rate": 3568.306607768069,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 105995126578.38,
    "share": 0.0196169790276285,
@@ -2066,10 +2078,10 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "base": 2332359402.456633,
-   "t0": 1793073599.0,
-   "rate": 577.8649565657572,
-   "as_of": "2026-10-26",
+   "base": 2377797006.882679,
+   "t0": 1793159999.0,
+   "rate": 1303.51311642674,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 38720146356.13,
    "share": 0.007166141332001837,
@@ -2097,10 +2109,10 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "base": 2803283534.7041326,
-   "t0": 1793073599.0,
-   "rate": 694.5410369933011,
-   "as_of": "2026-10-26",
+   "base": 2857895396.070684,
+   "t0": 1793159999.0,
+   "rate": 1566.7040219878352,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 46656595004.81,
    "share": 0.008613049079058908,
@@ -2128,10 +2140,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 109623844111.28844,
-   "t0": 1793073599.0,
-   "rate": 30822.24769778043,
-   "as_of": "2026-10-26",
+   "base": 112653715920.66025,
+   "t0": 1793159999.0,
+   "rate": 45827.32805262103,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 1667097265194.46,
    "share": 0.2254133206532273,
@@ -2159,10 +2171,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 70533009643.22548,
-   "t0": 1793073599.0,
-   "rate": 19831.323301219345,
-   "as_of": "2026-10-26",
+   "base": 72482457587.51767,
+   "t0": 1793159999.0,
+   "rate": 29485.732758808892,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 1072626018868.53,
    "share": 0.1450330450299212,
@@ -2190,10 +2202,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 67439865371.38639,
-   "t0": 1793073599.0,
-   "rate": 18961.64335444782,
-   "as_of": "2026-10-26",
+   "base": 69303822511.12286,
+   "t0": 1793159999.0,
+   "rate": 28192.66975405098,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 1025587234576.31,
    "share": 0.13867278712045641,
@@ -2221,10 +2233,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 63468007743.55207,
-   "t0": 1793073599.0,
-   "rate": 17844.90109259877,
-   "as_of": "2026-10-26",
+   "base": 65222187493.57033,
+   "t0": 1793159999.0,
+   "rate": 26532.268005100403,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 965160356821.48,
    "share": 0.13050568055426923,
@@ -2252,10 +2264,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 69160536070.45901,
-   "t0": 1793073599.0,
-   "rate": 19445.433527316498,
-   "as_of": "2026-10-26",
+   "base": 71072050488.32777,
+   "t0": 1793159999.0,
+   "rate": 28911.981699697426,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 1051753969311.11,
    "share": 0.14221090511999415,
@@ -2283,10 +2295,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 45650338689.773735,
-   "t0": 1793073599.0,
-   "rate": 12835.218998116541,
-   "as_of": "2026-10-26",
+   "base": 46912059398.49114,
+   "t0": 1793159999.0,
+   "rate": 19083.74098545312,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 694224470394.36,
    "share": 0.09386821376707014,
@@ -2314,10 +2326,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 27368296653.203796,
-   "t0": 1793073599.0,
-   "rate": 7694.972068804859,
-   "as_of": "2026-10-26",
+   "base": 28124723607.324158,
+   "t0": 1793159999.0,
+   "rate": 11441.086737430589,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 416204104589.87,
    "share": 0.05627588303652643,
@@ -2345,10 +2357,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 7072291774.244314,
-   "t0": 1793073599.0,
-   "rate": 1988.4718568657322,
-   "as_of": "2026-10-26",
+   "base": 7267761451.92394,
+   "t0": 1793159999.0,
+   "rate": 2956.512224595242,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 107551403356.47,
    "share": 0.014542354233103882,
@@ -2376,10 +2388,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 9394392165.55732,
-   "t0": 1793073599.0,
-   "rate": 2641.3622387018518,
-   "as_of": "2026-10-26",
+   "base": 9654041918.030054,
+   "t0": 1793159999.0,
+   "rate": 3927.24680580359,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 142864249326.25,
    "share": 0.019317158148615572,
@@ -2407,10 +2419,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 3455737114.5151134,
-   "t0": 1793073599.0,
-   "rate": 971.6278988891038,
-   "as_of": "2026-10-26",
+   "base": 3551249551.145595,
+   "t0": 1793159999.0,
+   "rate": 1444.6418997105243,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 52566167744.02,
    "share": 0.007105837097781904,
@@ -2438,10 +2450,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 3157309556.556636,
-   "t0": 1793073599.0,
-   "rate": 887.7208968512803,
-   "as_of": "2026-10-26",
+   "base": 3244573812.7631564,
+   "t0": 1793159999.0,
+   "rate": 1319.886763550348,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 48014568338.42,
    "share": 0.006492197361288419,
@@ -2469,10 +2481,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 7218437365.264005,
-   "t0": 1793073599.0,
-   "rate": 2029.5626947474477,
-   "as_of": "2026-10-26",
+   "base": 7417946332.113648,
+   "t0": 1793159999.0,
+   "rate": 3017.6071624474885,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 109915442478.9,
    "share": 0.014842865159696945,
@@ -2500,10 +2512,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 2622188705.8725386,
-   "t0": 1793073599.0,
-   "rate": 737.2643283761943,
-   "as_of": "2026-10-26",
+   "base": 2694662862.4138,
+   "t0": 1793159999.0,
+   "rate": 1096.1839827283013,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 39876759073.93,
    "share": 0.005391858572028054,
@@ -2531,10 +2543,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 3754620274.9481983,
-   "t0": 1793073599.0,
-   "rate": 1055.6629998130584,
-   "as_of": "2026-10-26",
+   "base": 3858393484.309591,
+   "t0": 1793159999.0,
+   "rate": 1569.5874966617325,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 57098136028.25,
    "share": 0.007720413663917987,
@@ -2562,10 +2574,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 4105196684.8254356,
-   "t0": 1793073599.0,
-   "rate": 1154.232366996216,
-   "as_of": "2026-10-26",
+   "base": 4218659406.4451237,
+   "t0": 1793159999.0,
+   "rate": 1716.1430227263393,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 62429584486.16,
    "share": 0.008441284139987869,
@@ -2593,10 +2605,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 2132603923.5986626,
-   "t0": 1793073599.0,
-   "rate": 599.6108502424585,
-   "as_of": "2026-10-26",
+   "base": 2191546542.88966,
+   "t0": 1793159999.0,
+   "rate": 891.5171731603127,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 32343463387.61,
    "share": 0.004385153029011272,
@@ -2624,10 +2636,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": 1378997303.5460296,
-   "t0": 1793073599.0,
-   "rate": 387.72401031036486,
-   "as_of": "2026-10-26",
+   "base": 1417111138.0779788,
+   "t0": 1793159999.0,
+   "rate": 576.47825001583,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 20970860009.28,
    "share": 0.002835554289161695,
@@ -2655,10 +2667,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": -1018336454.3430749,
-   "t0": 1793073599.0,
-   "rate": -286.3192646626924,
-   "as_of": "2026-10-26",
+   "base": -1046482054.7868748,
+   "t0": 1793159999.0,
+   "rate": -425.7070087210841,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": -15465292145.92,
    "share": -0.0020939477499317934,
@@ -2686,10 +2698,10 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "base": -10193619032.48208,
-   "t0": 1793073599.0,
-   "rate": -2866.075836904702,
-   "as_of": "2026-10-26",
+   "base": -10475358458.720766,
+   "t0": 1793159999.0,
+   "rate": -4261.356890301693,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": -155018778526.26,
    "share": -0.02096056322612675,
@@ -2717,10 +2729,10 @@
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 160854361926.63733,
-   "t0": 1793073599.0,
-   "rate": 56098.35457489862,
-   "as_of": "2026-10-26",
+   "base": 167955171623.53503,
+   "t0": 1793159999.0,
+   "rate": 21404.664101157163,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 1992473224352.421,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
@@ -2737,16 +2749,22 @@
     ]
    },
    "status": "ok",
-   "slug": "deficit"
+   "slug": "deficit",
+   "validation": {
+    "last_error_pct": -1.342,
+    "threshold_pct": 10.0,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement"
+   }
   },
   "interest_cash": {
    "label": "Interest paid to bondholders (cash)",
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 11520000000.0,
-   "t0": 1793073599.0,
-   "as_of": "2026-10-26",
+   "base": 11522000000.0,
+   "t0": 1793159999.0,
+   "as_of": "2026-10-27",
    "fy": 2027,
    "prev_fy_total": 709302000000.0,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
@@ -2797,11 +2815,11 @@
      "2027-02-01"
     ]
    ],
-   "method": "Cash interest paid on Treasury securities FY2027 to date, official through 2026-10-26 and re-based every business day. Treasury pays coupons in lumps on the 15th and at month-end (next business day if that is a holiday or weekend), so the projection follows that calendar: each upcoming payment is estimated from the payment for the same coupon date six months earlier (notes and bonds pay every six months), adjusted for half of its six-month growth; other business days add the median ordinary day ($5.0M). Next projected payment: $31.5B on 2026-11-02. Projected amounts are estimates until Treasury's statement for that day is published.",
+   "method": "Cash interest paid on Treasury securities FY2027 to date, official through 2026-10-27 and re-based every business day. Treasury pays coupons in lumps on the 15th and at month-end (next business day if that is a holiday or weekend), so the projection follows that calendar: each upcoming payment is estimated from the payment for the same coupon date six months earlier (notes and bonds pay every six months), adjusted for half of its six-month growth; other business days add the median ordinary day ($5.0M). Next projected payment: $31.5B on 2026-11-02. Projected amounts are estimates until Treasury's statement for that day is published.",
    "calc": {
     "type": "coupon_calendar",
     "drip_per_bday": 5000000.0,
-    "next_bday": "2026-10-27",
+    "next_bday": "2026-10-28",
     "seconds_next": 86400.0,
     "coupons": [
      [
@@ -2854,10 +2872,16 @@
       31557637106.506226
      ]
     ],
-    "flow_90d": 183823000000.0
+    "flow_90d": 183805000000.0
    },
    "status": "ok",
-   "slug": "interest_cash"
+   "slug": "interest_cash",
+   "validation": {
+    "last_error_pct": 0.026,
+    "threshold_pct": 10.0,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement (Interest on Treasury Securities)"
+   }
   },
   "interest_gross": {
    "label": "Gross interest expense on Treasury debt",
@@ -2938,7 +2962,7 @@
    "kind": "pct",
    "base": 3.518,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "2026-09-30",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -2962,7 +2986,7 @@
    "kind": "pct",
    "base": 3.531,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "2026-09-30",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -2983,32 +3007,38 @@
   "debt_subject_limit": {
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-07-28 to 2026-10-26)",
+    "window": "trailing 90 days (2026-07-29 to 2026-10-27)",
     "n": 63,
-    "slope": 74010.39579888893,
+    "slope": 75828.02819511801,
     "first": [
-     "2026-07-28",
-     39620156000000.0
+     "2026-07-29",
+     39623340000000.0
     ],
     "last": [
-     "2026-10-26",
-     40331241000000.0
+     "2026-10-27",
+     40383788000000.0
     ]
    },
    "label": "Debt subject to the limit",
    "group": "debt",
    "kind": "usd",
-   "base": 40331241000000.0,
-   "t0": 1793073599.0,
-   "rate": 74010.39579888893,
-   "as_of": "2026-10-26",
+   "base": 40383788000000.0,
+   "t0": 1793159999.0,
+   "rate": 75828.02819511801,
+   "as_of": "2026-10-27",
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit",
    "source_name": "Treasury Daily Treasury Statement, Table III-C",
-   "method": "Total debt minus debt not subject to limit (unamortized discount, FFB, other). Official close 2026-10-26; ticks at the 90-day trend (63 records).",
+   "method": "Total debt minus debt not subject to limit (unamortized discount, FFB, other). Official close 2026-10-27; ticks at the 90-day trend (63 records).",
    "stale": false,
    "status": "ok",
    "slug": "debt_subject_limit",
-   "freeze_t": 1803514767.3204591
+   "freeze_t": 1802657911.805365,
+   "validation": {
+    "last_error_pct": -0.1143,
+    "threshold_pct": 0.25,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement, Table III-C"
+   }
   },
   "debt_limit": {
    "label": "Statutory debt limit",
@@ -3016,8 +3046,8 @@
    "kind": "usd",
    "base": 41103996000000.0,
    "rate": 0,
-   "t0": 1793073599.0,
-   "as_of": "2026-10-26",
+   "t0": 1793159999.0,
+   "as_of": "2026-10-27",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit",
    "source_name": "Treasury Daily Treasury Statement, Table III-C",
@@ -3028,7 +3058,7 @@
    "calc": {
     "type": "fixed",
     "base_src": [
-     "2026-10-26",
+     "2026-10-27",
      41103996000000.0,
      "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit"
     ]
@@ -3676,7 +3706,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3700,7 +3730,7 @@
    "kind": "pct",
    "base": -0.1,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3724,7 +3754,7 @@
    "kind": "pct",
    "base": 32.6,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3748,7 +3778,7 @@
    "kind": "pct",
    "base": 2.6,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3772,7 +3802,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3796,7 +3826,7 @@
    "kind": "pct",
    "base": 3.7,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3820,7 +3850,7 @@
    "kind": "pct",
    "base": 55.6,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3844,7 +3874,7 @@
    "kind": "pct",
    "base": -2.3,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3868,7 +3898,7 @@
    "kind": "pct",
    "base": 90.9,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3892,7 +3922,7 @@
    "kind": "pct",
    "base": 8.7,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3916,7 +3946,7 @@
    "kind": "pct",
    "base": 126.1,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -3940,7 +3970,7 @@
    "kind": "pct",
    "base": 14.5,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -3964,7 +3994,7 @@
    "kind": "pct",
    "base": 123.3,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
@@ -3988,7 +4018,7 @@
    "kind": "pct",
    "base": 5.9,
    "rate": 0,
-   "t0": 1793207720.525544,
+   "t0": 1793219381.1324294,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
