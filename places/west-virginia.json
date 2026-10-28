@@ -159,7 +159,6 @@
  "notes": [
   "Census publishes West Virginia's state + local total as $18.80 billion for 2024 (coefficient of variation 0.18%) and $23.84 billion for 2023. State + local here is exactly Census's state figure plus its local figure.",
   "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the page shows the official figure as of June 30, 2024. West Virginia's own audited report is fresher but is not used here: it covers a narrower scope and would not be comparable with the other states.",
-  "The 2023→2024 change ($-5.04 billion) is smaller than about two standard errors of the Census estimate (about $0.1 billion at a 0.18% coefficient of variation), so Census's data does not show which way the debt is moving. This page therefore shows the official figure as published and does not tick it forward.",
   "The 2023→2024 change ($-5.04 billion, -21%) is larger than 10% of the 2023 level in one year. A move that size is more likely a one-off (a large bond issue or payoff, a reclassification, or Census sampling) than a trend, so this page shows the official figure as published and does not extend it forward.",
   "Not included: unfunded pension and retiree-health liabilities, and the state's share of the federal debt."
  ],

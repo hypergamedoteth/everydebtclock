@@ -100,9 +100,9 @@ def main(slugs):
         hold = abs(ch) < 2 * se or big  # change is within Census's own sampling error: a straight-line projection would be noise, so the page shows the official figure fixed
         notes = [f"Census publishes {name}'s state + local total as ${sl[last][0]/1e9:,.2f} billion for {last} (coefficient of variation {sl[last][1]}%) and ${sl[prev][0]/1e9:,.2f} billion for {prev}. State + local here is exactly Census's state figure plus its local figure.",
                  f"Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the {"page shows the official figure as of" if hold else "live clock projects from"} June 30, {last}. {name}'s own audited report is fresher but is not used here: it covers a narrower scope and would not be comparable with the other states."]
-        if hold:
+        if abs(ch) < 2 * se:
             notes.append(f"The {prev}→{last} change (${ch/1e9:+,.2f} billion) is smaller than about two standard errors of the Census estimate (about ${2*se/1e9:,.1f} billion at a {sl[last][1]}% coefficient of variation), so Census's data does not show which way the debt is moving. This page therefore shows the official figure as published and does not tick it forward.")
-        if big and not abs(ch) < 2 * se:
+        elif big:
             notes.append(f"The {prev}→{last} change (${ch/1e9:+,.2f} billion, {ch / sl[prev][0]:+.0%}) is larger than 10% of the {prev} level in one year. A move that size is more likely a one-off (a large bond issue or payoff, a reclassification, or Census sampling) than a trend, so this page shows the official figure as published and does not extend it forward.")
         if float(out["Local"][last][1]) > 10:
             notes.append(f"Caution: Census's own sampling error on {name}'s local debt for {last} is large (coefficient of variation {out['Local'][last][1]}%), so the local figure, and therefore the total, can be far from the true amount. The figures are shown exactly as Census published them.")
