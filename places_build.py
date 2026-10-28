@@ -71,7 +71,7 @@ def calc(p):
     """Totals and the labelled trend. The trend is None unless every component has a prior official figure."""
     cs = p["components"]
     total = sum(c["value"] for c in cs)
-    rates = [comp_rate(c) for c in cs]
+    rates = [None if p.get("hold_trend") else comp_rate(c) for c in cs]  # hold_trend: components are shown fixed too, so they always sum to the headline
     rate = sum(rates) if all(r is not None for r in rates) and not p.get("hold_trend") else None  # hold_trend: official figure shown fixed (change within sampling error)
     return {"total": total, "t0": max(_eod(c["as_of"]) for c in cs), "rate": rate, "rates": rates,
             "as_of": max(c["as_of"] for c in cs), "same_date": len({c["as_of"] for c in cs}) == 1}
