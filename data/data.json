@@ -1,8 +1,8 @@
 {
  "meta": {
-  "generated_epoch": 1793219381.1324294,
-  "generated_iso": "2026-10-28T16:29:41.132429-04:00",
-  "debt_fetched_epoch": 1793219381.1324294,
+  "generated_epoch": 1793236463.5482554,
+  "generated_iso": "2026-10-28T21:14:23.548255-04:00",
+  "debt_fetched_epoch": 1793236463.5482554,
   "fy": 2027,
   "fy_start_epoch": 1790827200.0,
   "fy_end_epoch": 1822363200.0,
@@ -1565,7 +1565,7 @@
    "kind": "count",
    "base": 134790000,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "2025",
    "source": "https://www2.census.gov/programs-surveys/demo/tables/families/time-series/households/hh1.xls",
    "source_name": "Census CPS ASEC 2025, Table HH-1",
@@ -1588,7 +1588,7 @@
    "kind": "count",
    "base": 162754810,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY2025",
    "source": "https://www.irs.gov/statistics/soi-tax-stats-numbers-of-returns-filed-by-type-of-return-irs-data-book-table-1-2",
    "source_name": "IRS Data Book FY2025, Table 1-2",
@@ -1648,7 +1648,7 @@
     "last_error_pct": -0.1166,
     "mean_abs_error_pct": 0.0685,
     "n": 20,
-    "against": "Treasury, Debt to the Penny",
+    "against": "Debt to the Penny (next business day)",
     "threshold_pct": 0.25,
     "flag": false
    },
@@ -1697,7 +1697,7 @@
     "last_error_pct": -0.1121,
     "mean_abs_error_pct": 0.0547,
     "n": 20,
-    "against": "Treasury, Debt to the Penny",
+    "against": "Debt to the Penny (next business day)",
     "threshold_pct": 0.25,
     "flag": false
    },
@@ -1746,7 +1746,7 @@
     "last_error_pct": -0.1349,
     "mean_abs_error_pct": 0.1873,
     "n": 20,
-    "against": "Treasury, Debt to the Penny",
+    "against": "Debt to the Penny (next business day)",
     "threshold_pct": 0.5,
     "flag": false
    },
@@ -1849,13 +1849,7 @@
    },
    "anchor": "dts",
    "status": "ok",
-   "slug": "revenue",
-   "validation": {
-    "last_error_pct": 0.1888,
-    "threshold_pct": 3.0,
-    "flag": false,
-    "against": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement"
-   }
+   "slug": "revenue"
   },
   "spending": {
    "label": "Federal spending",
@@ -1906,13 +1900,7 @@
    },
    "anchor": "dts",
    "status": "ok",
-   "slug": "spending",
-   "validation": {
-    "last_error_pct": -0.3256,
-    "threshold_pct": 3.0,
-    "flag": false,
-    "against": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement"
-   }
+   "slug": "spending"
   },
   "rev_individual": {
    "label": "Individual income taxes",
@@ -2749,13 +2737,7 @@
     ]
    },
    "status": "ok",
-   "slug": "deficit",
-   "validation": {
-    "last_error_pct": -1.342,
-    "threshold_pct": 10.0,
-    "flag": false,
-    "against": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement"
-   }
+   "slug": "deficit"
   },
   "interest_cash": {
    "label": "Interest paid to bondholders (cash)",
@@ -2875,13 +2857,7 @@
     "flow_90d": 183805000000.0
    },
    "status": "ok",
-   "slug": "interest_cash",
-   "validation": {
-    "last_error_pct": 0.026,
-    "threshold_pct": 10.0,
-    "flag": false,
-    "against": "Treasury Daily Treasury Statement (Interest on Treasury Securities)"
-   }
+   "slug": "interest_cash"
   },
   "interest_gross": {
    "label": "Gross interest expense on Treasury debt",
@@ -2962,7 +2938,7 @@
    "kind": "pct",
    "base": 3.518,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "2026-09-30",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -2986,7 +2962,7 @@
    "kind": "pct",
    "base": 3.531,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "2026-09-30",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -3032,13 +3008,7 @@
    "stale": false,
    "status": "ok",
    "slug": "debt_subject_limit",
-   "freeze_t": 1802657911.805365,
-   "validation": {
-    "last_error_pct": -0.1143,
-    "threshold_pct": 0.25,
-    "flag": false,
-    "against": "Treasury Daily Treasury Statement, Table III-C"
-   }
+   "freeze_t": 1802657911.805365
   },
   "debt_limit": {
    "label": "Statutory debt limit",
@@ -3706,7 +3676,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3730,7 +3700,7 @@
    "kind": "pct",
    "base": -0.1,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3754,7 +3724,7 @@
    "kind": "pct",
    "base": 32.6,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3778,7 +3748,7 @@
    "kind": "pct",
    "base": 2.6,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3802,7 +3772,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3826,7 +3796,7 @@
    "kind": "pct",
    "base": 3.7,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3850,7 +3820,7 @@
    "kind": "pct",
    "base": 55.6,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3874,7 +3844,7 @@
    "kind": "pct",
    "base": -2.3,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3898,7 +3868,7 @@
    "kind": "pct",
    "base": 90.9,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3922,7 +3892,7 @@
    "kind": "pct",
    "base": 8.7,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3946,7 +3916,7 @@
    "kind": "pct",
    "base": 126.1,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -3970,7 +3940,7 @@
    "kind": "pct",
    "base": 14.5,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -3994,7 +3964,7 @@
    "kind": "pct",
    "base": 123.3,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
@@ -4018,7 +3988,7 @@
    "kind": "pct",
    "base": 5.9,
    "rate": 0,
-   "t0": 1793219381.1324294,
+   "t0": 1793236463.5482554,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
