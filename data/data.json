@@ -1,8 +1,8 @@
 {
  "meta": {
-  "generated_epoch": 1793396484.61449,
-  "generated_iso": "2026-10-30T17:41:24.614490-04:00",
-  "debt_fetched_epoch": 1793396484.61449,
+  "generated_epoch": 1793397303.1988628,
+  "generated_iso": "2026-10-30T17:55:03.198863-04:00",
+  "debt_fetched_epoch": 1793397303.1988628,
   "fy": 2027,
   "fy_start_epoch": 1790827200.0,
   "fy_end_epoch": 1822363200.0,
@@ -1521,11 +1521,7 @@
    "other_financing": 61551881267.57129
   },
   "errors": {},
-  "flags": [
-   "tf_medicare",
-   "tf_hi",
-   "tf_smi"
-  ],
+  "flags": [],
   "denominators": {
    "population": "population",
    "tax_returns": "tax_returns"
@@ -1569,7 +1565,7 @@
    "kind": "count",
    "base": 134790000,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "2025",
    "source": "https://www2.census.gov/programs-surveys/demo/tables/families/time-series/households/hh1.xls",
    "source_name": "Census CPS ASEC 2025, Table HH-1",
@@ -1592,7 +1588,7 @@
    "kind": "count",
    "base": 162754810,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY2025",
    "source": "https://www.irs.gov/statistics/soi-tax-stats-numbers-of-returns-filed-by-type-of-return-irs-data-book-table-1-2",
    "source_name": "IRS Data Book FY2025, Table 1-2",
@@ -2942,7 +2938,7 @@
    "kind": "pct",
    "base": 3.518,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "2026-09-30",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -2966,7 +2962,7 @@
    "kind": "pct",
    "base": 3.531,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "2026-09-30",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -3257,13 +3253,7 @@
    "method": "Par value of Treasury securities held by the fund(s) at month-end 2026-10-30. Ticks at the 12-month trend; a falling number means the fund is being drawn down.",
    "stale": false,
    "status": "ok",
-   "slug": "tf_socsec",
-   "validation": {
-    "last_error_pct": 0.6983,
-    "threshold_pct": 5.0,
-    "flag": false,
-    "against": "Treasury, Federal Investments Program: Principal Outstanding"
-   }
+   "slug": "tf_socsec"
   },
   "tf_medicare": {
    "calc": {
@@ -3343,16 +3333,10 @@
    "as_of": "2026-10-30",
    "source": "https://fiscaldata.treasury.gov/datasets/federal-investments-program-principal-outstanding/",
    "source_name": "Treasury, Federal Investments Program: Principal Outstanding",
-   "method": "Par value of Treasury securities held by the fund(s) at month-end 2026-10-30. Ticks at the 12-month trend; a falling number means the fund is being drawn down.",
+   "method": "Par value of Treasury securities held by the fund(s) at month-end 2026-10-30. Ticks at the 12-month trend; a falling number means the fund is being drawn down. Medicare HI/SMI dip at month-ends before a weekend 1st (next month's Medicare payments go out early).",
    "stale": false,
    "status": "ok",
-   "slug": "tf_medicare",
-   "validation": {
-    "last_error_pct": 16.8905,
-    "threshold_pct": 5.0,
-    "flag": true,
-    "against": "Treasury, Federal Investments Program: Principal Outstanding"
-   }
+   "slug": "tf_medicare"
   },
   "tf_oasi": {
    "calc": {
@@ -3435,13 +3419,7 @@
    "method": "Par value of Treasury securities held by the fund(s) at month-end 2026-10-30. Ticks at the 12-month trend; a falling number means the fund is being drawn down.",
    "stale": false,
    "status": "ok",
-   "slug": "tf_oasi",
-   "validation": {
-    "last_error_pct": 0.6169,
-    "threshold_pct": 5.0,
-    "flag": false,
-    "against": "Treasury, Federal Investments Program: Principal Outstanding"
-   }
+   "slug": "tf_oasi"
   },
   "tf_di": {
    "calc": {
@@ -3524,13 +3502,7 @@
    "method": "Par value of Treasury securities held by the fund(s) at month-end 2026-10-30. Ticks at the 12-month trend; a falling number means the fund is being drawn down.",
    "stale": false,
    "status": "ok",
-   "slug": "tf_di",
-   "validation": {
-    "last_error_pct": 1.3689,
-    "threshold_pct": 5.0,
-    "flag": false,
-    "against": "Treasury, Federal Investments Program: Principal Outstanding"
-   }
+   "slug": "tf_di"
   },
   "tf_hi": {
    "calc": {
@@ -3610,16 +3582,10 @@
    "as_of": "2026-10-30",
    "source": "https://fiscaldata.treasury.gov/datasets/federal-investments-program-principal-outstanding/",
    "source_name": "Treasury, Federal Investments Program: Principal Outstanding",
-   "method": "Par value of Treasury securities held by the fund(s) at month-end 2026-10-30. Ticks at the 12-month trend; a falling number means the fund is being drawn down.",
+   "method": "Par value of Treasury securities held by the fund(s) at month-end 2026-10-30. Ticks at the 12-month trend; a falling number means the fund is being drawn down. Medicare HI/SMI dip at month-ends before a weekend 1st (next month's Medicare payments go out early).",
    "stale": false,
    "status": "ok",
-   "slug": "tf_hi",
-   "validation": {
-    "last_error_pct": 9.9964,
-    "threshold_pct": 5.0,
-    "flag": true,
-    "against": "Treasury, Federal Investments Program: Principal Outstanding"
-   }
+   "slug": "tf_hi"
   },
   "tf_smi": {
    "calc": {
@@ -3699,16 +3665,10 @@
    "as_of": "2026-10-30",
    "source": "https://fiscaldata.treasury.gov/datasets/federal-investments-program-principal-outstanding/",
    "source_name": "Treasury, Federal Investments Program: Principal Outstanding",
-   "method": "Par value of Treasury securities held by the fund(s) at month-end 2026-10-30. Ticks at the 12-month trend; a falling number means the fund is being drawn down.",
+   "method": "Par value of Treasury securities held by the fund(s) at month-end 2026-10-30. Ticks at the 12-month trend; a falling number means the fund is being drawn down. Medicare HI/SMI dip at month-ends before a weekend 1st (next month's Medicare payments go out early).",
    "stale": false,
    "status": "ok",
-   "slug": "tf_smi",
-   "validation": {
-    "last_error_pct": 28.9047,
-    "threshold_pct": 5.0,
-    "flag": true,
-    "against": "Treasury, Federal Investments Program: Principal Outstanding"
-   }
+   "slug": "tf_smi"
   },
   "hist_debt_gdp_1960": {
    "label": "Debt-to-GDP, FY1960",
@@ -3716,7 +3676,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3740,7 +3700,7 @@
    "kind": "pct",
    "base": -0.1,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3764,7 +3724,7 @@
    "kind": "pct",
    "base": 32.6,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3788,7 +3748,7 @@
    "kind": "pct",
    "base": 2.6,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3812,7 +3772,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3836,7 +3796,7 @@
    "kind": "pct",
    "base": 3.7,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3860,7 +3820,7 @@
    "kind": "pct",
    "base": 55.6,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3884,7 +3844,7 @@
    "kind": "pct",
    "base": -2.3,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3908,7 +3868,7 @@
    "kind": "pct",
    "base": 90.9,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3932,7 +3892,7 @@
    "kind": "pct",
    "base": 8.7,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3956,7 +3916,7 @@
    "kind": "pct",
    "base": 126.1,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -3980,7 +3940,7 @@
    "kind": "pct",
    "base": 14.5,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -4004,7 +3964,7 @@
    "kind": "pct",
    "base": 123.3,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
@@ -4028,7 +3988,7 @@
    "kind": "pct",
    "base": 5.9,
    "rate": 0,
-   "t0": 1793396484.61449,
+   "t0": 1793397303.1988628,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
