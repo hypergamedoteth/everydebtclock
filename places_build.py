@@ -46,21 +46,24 @@ def texts(p):
     t = {"head": p.get("headline", "state + local debt"), "head_long": p.get("headline_long", "state and local government debt"),
          "subject": p.get("subject", f"{name} state and local governments"),
          "sum_note": p.get("sum_note", "Sum of the official state and local totals below." if len(p["components"]) > 1 else p["components"][0].get("includes", "")),
-         "freq": freq, "once": "once a month" if freq == "monthly" else "once a year",
-         "period": p.get("trend_period", "12 months" if freq == "monthly" else "year"),
-         "pace": p.get("trend_pace", "the past 12 months' pace" if freq == "monthly" else "last year's pace"),
+         "freq": freq, "periodic": freq in ("monthly", "quarterly"), "once": {"monthly": "once a month", "quarterly": "once a quarter"}.get(freq, "once a year"),
+         "end": {"monthly": "month-end", "quarterly": "quarter-end"}.get(freq, "fiscal year-end"), "unit": {"monthly": "month", "quarterly": "quarter"}.get(freq, "year"),
+         "period": p.get("trend_period", "12 months" if freq in ("monthly", "quarterly") else "year"),
+         "pace": p.get("trend_pace", "the past 12 months' pace" if freq in ("monthly", "quarterly") else "last year's pace"),
          "pop_pub": p["population"].get("publisher_short", "Census Bureau"), "pop_tag": p["population"].get("tag", "Census"),
-         "report": "monthly figures" if freq == "monthly" else "annual reports"}
+         "report": {"monthly": "monthly figures", "quarterly": "quarterly figures"}.get(freq, "annual reports")}
     t["pop_pos"] = p["population"].get("possessive", f"the {t['pop_pub']}'s")
     t["Head"] = p.get("hist_label", "State + local" if "headline" not in p else t["head"][0].upper() + t["head"][1:])
-    t["rate_phrase"] = "last year's official change per second" if freq != "monthly" else "the official change per second over the past 12 months"
+    t["rate_phrase"] = "last year's official change per second" if freq not in ("monthly", "quarterly") else "the official change per second over the past 12 months"
     t["pop_tag2"] = p["population"].get("tag", "Census")
-    t["after"] = ", after the fiscal year ends" if freq != "monthly" else ", a few business days after each month-end"
+    t["after"] = p.get("after_text") or (", after the fiscal year ends" if freq not in ("monthly", "quarterly") else ", a few business days after each month-end")
+    t["noun"] = p["population"].get("noun", "residents")
+    t["noun_full"] = p["population"].get("noun_full", f"{name} {t['noun']}")
     return t
 
 def _when(p, d_):
     """How a figure date is labelled: FY2025 (annual, fiscal year-end) or Sep 2026 (monthly, month-end)."""
-    return _d(d_).strftime("%b %Y") if p.get("frequency") == "monthly" else f"FY{_d(d_).year}"
+    return _d(d_).strftime("%b %Y") if p.get("frequency") in ("monthly", "quarterly") else f"FY{_d(d_).year}"
 
 def comp_rate(c):
     if c.get("prior_value") and c.get("prior_as_of"):
@@ -169,7 +172,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     days = (_d(c["as_of"]) - _d(cs[0]["prior_as_of"])).days if rate else None
     up_ = (rate or 0) >= 0
     title = p.get("title", f"{name} Debt Clock: Live State and Local Debt, From Official Data")
-    desc = (f"{name} {T['head_long']}: {_b(c['total'])} {'at month-end' if T['freq'] == 'monthly' else 'at fiscal year-end'} {as_of}"
+    desc = (f"{name} {T['head_long']}: {_b(c['total'])} at {T['end']} {as_of}"
             + (" (" + " + ".join(f"{x['short'].lower()} {_b(x['value'])}" for x in cs) + ")" if len(cs) > 1 else "")
             + f", {_usd0(pp_off)} per {dem}. Live clock projected from the official {T['freq']} figures, with sources and the math.")
     img = f"og/places/{p['slug']}.png"
@@ -212,9 +215,9 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
              + "".join(f'<span>·</span><a href="../../{dict((k, d) for k, d, _, _ in SECTIONS)[o["kind"]]}/{o["slug"]}/">{E(o["name"])}</a>' for o in sorted(others, key=lambda x: x["name"])[:8]) + '</div>')
     intro = (f'<section class="intro" id="intro">{crumb}<h1>{E(name)} Debt Clock</h1>'
              f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
-             + (f'on <b>{as_of}</b>' if T["freq"] == "monthly" else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to the '
+             + (f'on <b>{as_of}</b>' if T["periodic"] else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to the '
              + " and the ".join(f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
-             + (f': {parts}' if len(cs) > 1 else '') + f'. {E(p.get("scope_note", ""))}{" " if p.get("scope_note") else ""}That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by {E(T["pop_pos"])} estimate of {pop["value"]:,} {E(name)} residents on {_fd(pop["as_of"])}. {proj_txt}</p></section>')
+             + (f': {parts}' if len(cs) > 1 else '') + f'. {E(p.get("scope_note", ""))}{" " if p.get("scope_note") else ""}That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by {E(T["pop_pos"])} estimate of {pop["value"]:,} {E(T['noun_full'])} on {_fd(pop["as_of"])}. {proj_txt}</p></section>')
 
     # ---- hero (same block and labels as the US hero)
     hero_d = dlg(f'{name} {T["head"]}', T["sum_note"], pub, cs[0]['source_url'], cs[0].get("source_locator", "") if len(cs) == 1 else "", base=c['total'], r=rate, official=f"{_usd0(c['total'])} official, {as_of}")
@@ -244,7 +247,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         for i, d_ in enumerate(ds):
             tot = sum(H[d_]); prev = ds[i + 1] if i + 1 < len(ds) else None
             cards += (f'<div class="wcc"><div class="d">{_when(p, d_)} · {_fd(d_)}</div><div class="v num">{_short(tot)}</div>'
-                      + (f'<div class="x">{"change" if T["freq"] == "monthly" else "year"} {dl(tot - sum(H[prev]))}</div>' + ("".join(f'<div class="x">{E(x["short"].split()[0].lower())} {dl(H[d_][k] - H[prev][k])}</div>' for k, x in enumerate(cs)) if len(cs) > 1 else "") if prev else f'<div class="x">earliest {"month" if T["freq"] == "monthly" else "year"} shown</div>')
+                      + (f'<div class="x">{"change" if T["periodic"] else "year"} {dl(tot - sum(H[prev]))}</div>' + ("".join(f'<div class="x">{E(x["short"].split()[0].lower())} {dl(H[d_][k] - H[prev][k])}</div>' for k, x in enumerate(cs)) if len(cs) > 1 else "") if prev else f'<div class="x">earliest {T["unit"]} shown</div>')
                       + (f'<div class="x">per {E(dem)} <b>{_usd0(tot / pop["value"])}</b></div>' if d_ == pop.get("debt_match_date", c["as_of"]) else "") + "</div>")
         now_card = (f'<div class="wcc now"><div class="d">NOW · projected</div><div class="v num" id="wcn">{_short(proj)}</div>'
                     f'<div class="x">vs last official <span class="num" id="wcd">{_sg(proj - c["total"])}{_short(abs(proj - c["total"]))}</span></div>'
@@ -279,7 +282,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         tiles.append(tile_html("per_day", "Projected " + ("growth" if up_ else "decline") + " per day", _sg(rate) + _usd0(abs(rate) * 86400), ACC[3], proj_badge, f"{_sg(rate)}{_usd2(abs(rate))}/sec",
                                pp=[(f"Per {T['period']} (official)", _sg(yr_change) + _short(abs(yr_change)), None), (f"Per {dem} per {T['period']}", _sg(yr_change) + _usd2(abs(yr_change) / pop["value"]), None)],
                                dlg=dlg("Projected " + ("growth" if up_ else "decline") + " per day", f"Latest official {T['period']}'s change ÷ {days} days. This is the rate the clock ticks at; it is not an official daily figure.", pub, cs[0]["source_url"])))
-    debt_sec = (f'<section id="debt"><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>{E(name)} government debt</h2>'
+    debt_sec = (f'<section id="debt"><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>{E(p.get('debt_heading', name + ' government debt'))}</h2>'
                 f'<span class="h2n">{E(pub)} · official as of {as_of} · {("projected at " + T["pace"].replace("'", "&#39;") + " between " + T["report"]) if rate else "fixed until the next report"}</span></div>'
                 f'<div class="grid">{"".join(tiles)}</div></section>')
 
@@ -304,9 +307,9 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     pt = [tile_html("pp_total", f"Debt per {dem}", _usd2(proj / pop["value"]), "var(--teal)", proj_badge if rate else fix_badge(c["as_of"]),
                     (f"{_sg(rate)}{_usd2(abs(rate) * 86400 / pop['value'])}/day" if rate else "fixed"), pp=[("Official basis", _usd2(pp_off), None), ("Population", f"{pop['value']:,}", None)],
                     tick=(c["total"] / pop["value"], rate / pop["value"], t0) if rate else None,
-                    dlg=dlg(f"Debt per {dem}", f"Live total ÷ {pop['value']:,} residents ({T['pop_tag']} estimate for {_fd(pop['as_of'])}, not projected). Official basis: {as_of} total ÷ the same population.", pop["source_name"], pop["source_url"]))]
+                    dlg=dlg(f"Debt per {dem}", f"Live total ÷ {pop['value']:,} {T['noun']} ({T['pop_tag']} estimate for {_fd(pop['as_of'])}, not projected). Official basis: {as_of} total ÷ the same population.", pop["source_name"], pop["source_url"]))]
     pt += [tile_html(f"pp_{x['key']}", f"{x['short']} per {dem}", _usd2(x["value"] / pop["value"]), "var(--teal)", fix_badge(x["as_of"]), "official basis",
-                     dlg=dlg(f"{x['short']} per {dem}", f"Official {x['short'].lower()} ({_usd0(x['value'])}) ÷ {pop['value']:,} residents.", x["source_name"], x["source_url"])) for x in (cs if len(cs) > 1 else [])]
+                     dlg=dlg(f"{x['short']} per {dem}", f"Official {x['short'].lower()} ({_usd0(x['value'])}) ÷ {pop['value']:,} {T['noun']}.", x["source_name"], x["source_url"])) for x in (cs if len(cs) > 1 else [])]
     pt.append(tile_html("population", f"{name} population", f"{pop['value']:,}", "var(--teal)", fix_badge(pop["as_of"]),
                         (f"{_sg(pop['value'] - pop['prior_value'])}{abs(pop['value'] - pop['prior_value']):,} in the prior year" if pop.get("prior_value") else "fixed"),
                         dlg=dlg(f"{name} population", f"{pop.get('method_short', 'Census Bureau Vintage estimate')} for {_fd(pop['as_of'])}. Used as-is (not projected) for every per-{dem} figure.", pop["source_name"], pop["source_url"])))
@@ -329,7 +332,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
             ch = sum(HV[d_]) - sum(HV[prev]) if prev else None
             rows += (f"<tr><td>{_fd(d_)}</td>" + "".join(f'<td class="num">{_usd0(v)}</td>' for v in HV[d_]) + f'<td class="num">{_usd0(sum(HV[d_]))}</td>'
                      f'<td class="num">{"—" if ch is None else ("+" if ch >= 0 else "−") + _short(abs(ch))}</td></tr>')
-        det_hist = (f'<h3>{"By month" if T["freq"] == "monthly" else "By year"} (official)</h3><table class="v"><tr><th>{"Month-end" if T["freq"] == "monthly" else "Fiscal year-end"}</th>' + "".join(f"<th>{E(x['short'])}</th>" for x in cs)
+        det_hist = (f'<h3>{"By " + T["unit"]} (official)</h3><table class="v"><tr><th>{T["end"].capitalize()}</th>' + "".join(f"<th>{E(x['short'])}</th>" for x in cs)
                     + f"<th>Combined</th><th>Change</th></tr>{rows}</table>")
 
     # ---- Details: the long tables, below the fold (like the US detail sections)
@@ -339,7 +342,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
             if b.get("group") and b["group"] != g:
                 g = b["group"]; rows += f'<tr><th colspan="2">{E(g)}</th></tr>'
             rows += f'<tr{" class=sub" if b.get("sub") else ""}><td>{E(b["label"].strip())}</td><td class="num">{_usd0(b["value"])}</td></tr>'
-        return (f'<h3>{E(x["label"])}: {_usd0(x["value"])}</h3><p class="dnote">Official, {"month-end" if T["freq"] == "monthly" else "fiscal year-end"} {_fd(x["as_of"])} · <a href="{E(x["source_url"])}" rel="noopener">{E(x["source_name"])}</a>'
+        return (f'<h3>{E(x["label"])}: {_usd0(x["value"])}</h3><p class="dnote">Official, {T["end"]} {_fd(x["as_of"])} · <a href="{E(x["source_url"])}" rel="noopener">{E(x["source_name"])}</a>'
                 f'{" (" + E(x.get("source_locator", "")) + ")" if x.get("source_locator") else ""}</p>'
                 f'<table class="v"><tr><th>Part</th><th>Amount</th></tr>{rows}<tr><td><b>Total</b></td><td class="num"><b>{_usd0(x["value"])}</b></td></tr></table><p class="dnote">{E(x.get("includes", ""))}</p>')
     details = (f'<section id="details"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>Details</h2><span class="h2n">Full official tables</span></div>'
@@ -357,7 +360,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     else:
         meth = "<p><b>Why this number doesn't tick.</b> Only one official year is available, so there is no defensible trend to project. The figure shown is the official total.</p>"
     meth += (f'<p><b>How often it\'s published.</b> {E(p.get("cadence", ""))} {E(p.get("next_update", ""))}</p>'
-             f'<p><b>Per {E(dem)}</b> divides by {E(T["pop_pos"])} estimate of {pop["value"]:,} residents on {_fd(pop["as_of"])}. It is not projected forward, so the live per-{E(dem)} figure {"rises" if (rate or 0) >= 0 else "falls"} only with the debt.</p>'
+             f'<p><b>Per {E(dem)}</b> divides by {E(T["pop_pos"])} estimate of {pop["value"]:,} {T["noun"]} on {_fd(pop["as_of"])}. It is not projected forward, so the live per-{E(dem)} figure {"rises" if (rate or 0) >= 0 else "falls"} only with the debt.</p>'
              + "".join(f"<p><b>Note.</b> {E(n)}</p>" for n in p.get("notes", []) + [p.get("fiscal_year_end_note", "")] if n)
              + "<p><b>Note.</b> Figures from source tables may not add exactly because of rounding in the source.</p>"
              + "<p><b>Sources:</b> " + " · ".join(f'<a href="{E(u)}" target="_blank" rel="noopener">{E(n)}</a>' for n, u in src_list) + "</p>"

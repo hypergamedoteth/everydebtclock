@@ -1,0 +1,174 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Singapore dollars. The debt component, history, breakdown and the spending / non-spending facts are refreshed by pipeline/fetch_singapore.py from SingStat Table Builder table M130181 (Accountant-General's Department and MAS data); edit wording here, not numbers.",
+ "slug": "singapore",
+ "kind": "country",
+ "country": "SG",
+ "name": "Singapore",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "SingStat (Accountant-General's Department and MAS data)",
+ "currency": {
+  "code": "SGD",
+  "symbol": "S$"
+ },
+ "frequency": "quarterly",
+ "title": "Singapore Debt Clock: Live Government Debt, Official Data",
+ "headline": "government debt",
+ "headline_long": "Total Government Debt",
+ "link_label": "government debt, S$",
+ "subject": "The Singapore Government",
+ "hist_label": "Total Government Debt",
+ "sum_note": "Singapore Total Government Debt (domestic and external, quarter-end), as published by SingStat from Accountant-General's Department and Monetary Authority of Singapore data. The closest Singapore measure to the US Total Public Debt Outstanding.",
+ "scope_note": "This is Total Government Debt as SingStat, the Accountant-General's Department and MAS publish it: everything the Government has issued and not yet repaid, including securities held by the CPF Board and by MAS. That makes it the closest Singapore match to the US national debt clock's Total Public Debt Outstanding. The Ministry of Finance says most of it was not issued to fund government spending. Under the Government Securities (Debt Market and Investment) Act the proceeds are invested and cannot be spent: Special Singapore Government Securities for the CPF Board, securities that develop the bond market, savings bonds, and securities issued to MAS to transfer reserves. Only the infrastructure securities, a small part of the total, fund spending. The Ministry also says the Government has no net debt: its financial assets are well in excess of its debt. Amounts are in Singapore dollars.",
+ "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with bond maturities, Treasury-bill rollovers and CPF-related issuance.",
+ "legend": "Singapore's government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
+ "cadence": "Quarterly. SingStat publishes each quarter-end figure (Table Builder table M130181, Accountant-General's Department and MAS data) about six weeks after the quarter ends.",
+ "after_text": ", about six weeks after each quarter-end",
+ "next_update": "The Q3 2026 quarter-end figure is expected roughly six weeks after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 6208523,
+  "noun": "people",
+  "as_of": "2026-06-30",
+  "source_name": "Singapore Department of Statistics, Population Trends 2026, total population at June 2026 (residents plus non-residents)",
+  "source_url": "https://www.singstat.gov.sg/publication-resources/population-trends-2026",
+  "publisher_short": "SingStat",
+  "tag": "SingStat",
+  "possessive": "SingStat's",
+  "method_short": "SingStat mid-year estimate of the total population (residents and non-residents)",
+  "noun_full": "people in Singapore"
+ },
+ "components": [
+  {
+   "key": "govdebt",
+   "label": "Singapore Total Government Debt",
+   "short": "Government debt",
+   "value": 1326895100000,
+   "as_of": "2026-06-30",
+   "prior_value": 1286049400000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "SingStat Table Builder, Government Debt (End Of Period), Quarterly, table M130181, Total Government Debt (source: Accountant-General's Department and Monetary Authority of Singapore)",
+   "source_url": "https://tablebuilder.singstat.gov.sg/table/TS/M130181",
+   "source_locator": "Table M130181, series 1 Total Government Debt; machine-readable: https://tablebuilder.singstat.gov.sg/api/table/tabledata/M130181",
+   "includes": "Domestic debt (publicly held securities, Special Singapore Government Securities and advance deposits, Reserves Management Government Securities) and external debt (zero in the latest quarters). Like the US figure, it counts securities held by government-linked bodies (the CPF Board) and by the central bank (MAS). Debt guarantees are not included.",
+   "facts": [
+    {
+     "key": "nonspend",
+     "label": "Issued for non-spending purposes",
+     "value": 1305795000000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "Issued under the Government Securities (Debt Market and Investment) Act. The proceeds are invested and cannot be spent. A year earlier (2025-06-30) it was S$1,269.0 billion; it is now 98.4% of the total.",
+     "source_name": "SingStat Table Builder, table M130181, series 1.1.4",
+     "source_url": "https://tablebuilder.singstat.gov.sg/table/TS/M130181",
+     "source_locator": "Series 1.1.4 Issued For Non-Spending Purposes"
+    },
+    {
+     "key": "spend",
+     "label": "Issued for spending purposes (infrastructure)",
+     "value": 21100000000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "Issued under the Significant Infrastructure Government Loan Act; the proceeds can only be spent on qualifying nationally significant infrastructure. A year earlier (2025-06-30) it was S$17.0 billion; it is now 1.6% of the total.",
+     "source_name": "SingStat Table Builder, table M130181, series 1.1.5",
+     "source_url": "https://tablebuilder.singstat.gov.sg/table/TS/M130181",
+     "source_locator": "Series 1.1.5 Issued For Spending Purposes"
+    }
+   ],
+   "history": [
+    [
+     "2024-06-30",
+     1215148400000
+    ],
+    [
+     "2024-09-30",
+     1235075700000
+    ],
+    [
+     "2024-12-31",
+     1265765500000
+    ],
+    [
+     "2025-03-31",
+     1284861900000
+    ],
+    [
+     "2025-06-30",
+     1286049400000
+    ],
+    [
+     "2025-09-30",
+     1303760200000
+    ],
+    [
+     "2025-12-31",
+     1311126100000
+    ],
+    [
+     "2026-03-31",
+     1333728900000
+    ],
+    [
+     "2026-06-30",
+     1326895100000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Singapore Government Securities (Market Development)",
+     "value": 160900000000,
+     "group": "Not spent: publicly held"
+    },
+    {
+     "label": "Treasury Bills and Cash Management Treasury Bills",
+     "value": 130600000000,
+     "group": "Not spent: publicly held"
+    },
+    {
+     "label": "Singapore Savings Bonds",
+     "value": 19605700000,
+     "group": "Not spent: publicly held"
+    },
+    {
+     "label": "Special Singapore Government Securities (mainly CPF) and advance deposits",
+     "value": 777999500000,
+     "group": "Not spent: held by CPF Board and MAS"
+    },
+    {
+     "label": "Reserves Management Government Securities (MAS)",
+     "value": 216689900000,
+     "group": "Not spent: held by CPF Board and MAS"
+    },
+    {
+     "label": "Singapore Government Securities (Infrastructure)",
+     "value": 7600000000,
+     "group": "Issued to fund infrastructure spending"
+    },
+    {
+     "label": "Green Singapore Government Securities (Infrastructure)",
+     "value": 13500000000,
+     "group": "Issued to fund infrastructure spending"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Ministry of Finance Singapore, Our assets and liabilities (Government debt, borrowing types, net asset position)",
+   "url": "https://www.mof.gov.sg/policies/reserves/our-assets-and-liabilities/"
+  },
+  {
+   "name": "Accountant-General's Department, Overview of Singapore Government Borrowings",
+   "url": "https://www.agd.gov.sg/files/overview_of_singapore_government_borrowings_2025.pdf"
+  },
+  {
+   "name": "data.gov.sg, Government Debt (End Of Period), Quarterly",
+   "url": "https://data.gov.sg/datasets/d_3e7180df0c6ac5684f5c3e52f66858e5/view"
+  }
+ ],
+ "notes": [
+  "Why this measure: the US clock ticks Treasury's Total Public Debt Outstanding, the face value of everything Treasury has issued and not repaid, including securities held by government trust funds and the Federal Reserve. SingStat's Total Government Debt is the Singapore equivalent: all government securities outstanding, including those held by the CPF Board and MAS.",
+  "Why most of it is not spent: the Singapore Government does not borrow for recurrent spending. Special Singapore Government Securities are issued to the CPF Board, which invests members' CPF savings in them at the CPF interest rates; securities issued to develop the bond market, Singapore Savings Bonds and Reserves Management Government Securities likewise raise money that is invested, not spent. Only the Significant Infrastructure Government Loan Act securities fund spending.",
+  "Net position: the Ministry of Finance states that the Government has a balance sheet with no net debt, with financial assets well in excess of its debt, and that the investment returns on those net assets support the budget through the Net Investment Returns Contribution. This page counts gross debt only and does not value the assets. Gross debt alone, as the Ministry itself notes, does not show Singapore's asset position.",
+  "Population: debt per person divides by the total population (residents and non-residents), not only citizens or residents."
+ ]
+}

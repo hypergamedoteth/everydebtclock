@@ -1,0 +1,147 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Mexican pesos. The debt component, history, breakdown and the Banco de México consolidated fact are refreshed by pipeline/fetch_mexico.py from Banco de México SIE table CG7; edit wording here, not numbers.",
+ "slug": "mexico",
+ "kind": "country",
+ "country": "MX",
+ "name": "Mexico",
+ "demonym": "Mexican",
+ "status": "live",
+ "publisher": "Banco de México",
+ "currency": {
+  "code": "MXN",
+  "symbol": "MX$"
+ },
+ "frequency": "monthly",
+ "title": "Mexico Debt Clock: Live Public Sector Net Debt, Official Data",
+ "headline": "public sector net debt",
+ "headline_long": "public sector net debt",
+ "link_label": "public sector net debt, MX$",
+ "subject": "Mexico's broad public sector (the federal government, state-owned companies and official development lenders)",
+ "hist_label": "Public sector net debt",
+ "sum_note": "Net total debt of Mexico's broad economic public sector (Deuda Total Neta del Sector Público Económico Amplio), month-end, from Banco de México. A net measure that is wider than the federal government alone; not the same as the US Total Public Debt Outstanding.",
+ "scope_note": "This is not the same measure as the US national debt clock's Total Public Debt Outstanding. It is Banco de México's net debt of the broad public sector: the liabilities of the federal government, the state-owned companies and the official development banks, minus the deposits and liquid assets they hold. Because it is net and covers more than the federal government, it is not the federal government's gross debt, and it is not the Finance Ministry's (SHCP) own broader SHRFSP measure, which is larger. Amounts are in Mexican pesos.",
+ "trend_why": "We use 12 months rather than the last month because month-to-month changes swing with peso exchange-rate moves on the foreign-currency part of the debt and with bond maturities.",
+ "legend": "Mexico's public sector net debt is reported monthly, at month-end, and the latest months are preliminary. Borrowing happens in lumps and the foreign-currency part moves with the exchange rate, so the live number is a straight-line projection between official month-end figures, shown here next to them.",
+ "cadence": "Monthly. Banco de México publishes each month-end balance (table CG7, series SG193) within about two months; the latest three months are preliminary and are revised.",
+ "next_update": "The September 2026 month-end figure is expected from Banco de México within about two months of the month-end; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 134407258,
+  "noun": "people",
+  "noun_full": "people in Mexico",
+  "as_of": "2026-07-01",
+  "source_name": "CONAPO, Proyecciones de la Población de México y de las Entidades Federativas 2020-2070, population at mid-year 2026 (indicators file, national total)",
+  "source_url": "https://www.datos.gob.mx/dataset/proyecciones-de-poblacion",
+  "publisher_short": "CONAPO",
+  "tag": "CONAPO",
+  "possessive": "CONAPO's",
+  "method_short": "CONAPO mid-year population projection"
+ },
+ "components": [
+  {
+   "key": "netdebt",
+   "label": "Mexico public sector net debt",
+   "short": "Net debt",
+   "value": 18471420000000,
+   "as_of": "2026-08-31",
+   "prior_value": 17100440000000,
+   "prior_as_of": "2025-08-31",
+   "source_name": "Banco de México, SIE table CG7, Deuda Total Neta del Sector Público Económico Amplio, saldos al final del periodo (series SG193)",
+   "source_url": "https://www.banxico.org.mx/SieInternet/consultarDirectorioInternetAction.do?accion=consultarCuadro&idCuadro=CG7",
+   "source_locator": "Table CG7, series SG193 (monthly, thousand million pesos); also machine-readable through the SIE CSV export of the same table",
+   "includes": "Net liabilities of the federal government, the parastatal sector (state-owned companies) and the official financial intermediaries (development banks and development trusts), after deducting the deposits and liquid assets of the public sector. Banco de México defines it in net terms. It excludes the central bank's own balance sheet.",
+   "facts": [
+    {
+     "key": "consol",
+     "label": "Net debt consolidated with Banco de México",
+     "value": 18059300000000,
+     "kind": "usd",
+     "as_of": "2026-08-31",
+     "note": "Banco de México's second published measure: the same public sector consolidated with the central bank, which adds the central bank's assets and liabilities with the private sector, commercial banks and the rest of the world. Shown for comparison, not added to the clock. A year earlier (2025-08-31) it was MX$16.59 trillion.",
+     "source_name": "Banco de México, SIE table CG7, series SG199",
+     "source_url": "https://www.banxico.org.mx/SieInternet/consultarDirectorioInternetAction.do?accion=consultarCuadro&idCuadro=CG7",
+     "source_locator": "Table CG7, series SG199"
+    }
+   ],
+   "history": [
+    [
+     "2025-08-31",
+     17100440000000
+    ],
+    [
+     "2025-09-30",
+     17338430000000
+    ],
+    [
+     "2025-10-31",
+     17525520000000
+    ],
+    [
+     "2025-11-30",
+     17800570000000
+    ],
+    [
+     "2025-12-31",
+     17620760000000
+    ],
+    [
+     "2026-01-31",
+     17874700000000
+    ],
+    [
+     "2026-02-28",
+     17944290000000
+    ],
+    [
+     "2026-03-31",
+     17532360000000
+    ],
+    [
+     "2026-04-30",
+     17763530000000
+    ],
+    [
+     "2026-05-31",
+     18032030000000
+    ],
+    [
+     "2026-06-30",
+     17962640000000
+    ],
+    [
+     "2026-07-31",
+     18336700000000
+    ],
+    [
+     "2026-08-31",
+     18471420000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Internal net debt",
+     "value": 14371390000000,
+     "group": "Net debt by type"
+    },
+    {
+     "label": "External net debt",
+     "value": 4100040000000,
+     "group": "Net debt by type"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Secretaría de Hacienda y Crédito Público, Informes sobre la situación económica, las finanzas públicas y la deuda pública (the Finance Ministry's own debt measures)",
+   "url": "https://www.finanzaspublicas.hacienda.gob.mx/es/Finanzas_Publicas/Informes_al_Congreso_de_la_Union"
+  }
+ ],
+ "notes": [
+  "Why this measure: the closest Mexican match to the US Total Public Debt Outstanding would be the gross debt of the federal government, which the Finance Ministry (SHCP) publishes in its quarterly reports to Congress. This page uses Banco de México's monthly series instead, because it is the official monthly figure that is machine-readable, and it says so: it is net, and broader than the federal government.",
+  "Net, not gross: Banco de México defines these balances as gross debt minus the deposits and liquid assets of the public sector. The US clock is gross. The two cannot be compared one for one.",
+  "The Finance Ministry's other measures, for example the Historical Balance of the Public Sector's Financial Requirements (SHRFSP) and federal government debt, use different scopes and are published quarterly and monthly in SHCP reports; they differ from this series.",
+  "Population: debt per person divides by CONAPO's projection of the population at mid-year 2026 (1 July), which is a projection and not a count; it is not projected forward."
+ ],
+ "after_text": ", within about two months of each month-end",
+ "debt_heading": "Mexico public sector net debt"
+}
