@@ -42,7 +42,7 @@ def parse_pdf(raw):
     with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
         f.write(raw); f.flush()
         lines = subprocess.run(["pdftotext", "-layout", f.name, "-"], capture_output=True, text=True, timeout=90, check=True).stdout.splitlines()
-    idx = [i for i, l in enumerate(lines) if "Table 4.1: Total Liabilities" in l and "....." not in l]
+    idx = [i for i, l in enumerate(lines) if re.search(r"Table\s*4\.1\s*:?\s*Total Liabilities", l) and "....." not in l]
     if not idx: raise RuntimeError("Table 4.1 not found")
     t = lines[idx[-1]:idx[-1] + 70]
     def row(pat):
@@ -61,11 +61,14 @@ def rebase(p):
     if not files: raise RuntimeError("no quarterly reports found")
     data = {}
     for key in sorted(files, reverse=True)[:6]:
-        r = parse_pdf(get(files[key]))
+        try: r = parse_pdf(get(files[key]))
+        except Exception as e:
+            print(f"india: report {key} skipped: {e}"); continue
         for lbl, (cur, prv) in r.items():
             data.setdefault(key, {})[lbl] = cur
             pk = prev_q(*key)
             data.setdefault(pk, {}).setdefault(lbl, prv)       # newest report wins: only fills if absent
+    if not data: raise RuntimeError("no report could be read")
     ks = sorted(data)
     run = [ks[-1]]
     for k in reversed(ks[:-1]):

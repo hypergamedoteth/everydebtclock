@@ -7,6 +7,14 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           sudo apt-get install -y poppler-utils >/dev/null 2>&1
+          python3 - <<'PY2'
+          import sys; sys.path.insert(0,'pipeline'); import fetch_india as f, subprocess, tempfile, re
+          fs=f.listing(); print('KEYS',sorted(fs))
+          for k in sorted(fs,reverse=True)[:6]:
+              raw=f.get(fs[k]); open('/tmp/x.pdf','wb').write(raw)
+              L=subprocess.run(['pdftotext','-layout','/tmp/x.pdf','-'],capture_output=True,text=True).stdout.splitlines()
+              print('DBG',k,len(raw),len(L),[l.strip()[:70] for l in L if 'Table 4' in l][:4])
+          PY2
           cp places/india.json /tmp/india0.json; cp places/russia.json /tmp/russia0.json
           python3 pipeline/fetch_india.py; python3 pipeline/fetch_russia.py
           echo "== second run"; python3 pipeline/fetch_india.py; python3 pipeline/fetch_russia.py
