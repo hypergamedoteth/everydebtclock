@@ -1,0 +1,101 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Saudi riyals. The debt component, history and facts are refreshed by pipeline/fetch_saudi_arabia.py from the NDMC Reports & Statistics page; edit wording here, not numbers.",
+ "slug": "saudi-arabia",
+ "kind": "country",
+ "country": "SA",
+ "iso3": "SAU",
+ "name": "Saudi Arabia",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "National Debt Management Center (NDMC), Ministry of Finance, Saudi Arabia",
+ "currency": {
+  "code": "SAR",
+  "symbol": "SAR "
+ },
+ "frequency": "quarterly",
+ "title": "Saudi Arabia Debt Clock: Live Government Direct Debt, Official Data",
+ "headline": "government direct debt",
+ "headline_long": "total outstanding direct government debt",
+ "link_label": "government direct debt, SAR",
+ "subject": "The Government of Saudi Arabia",
+ "hist_label": "Government Direct Debt",
+ "sum_note": "Saudi Arabia's total outstanding direct government debt (domestic and external), quarter-end, from the National Debt Management Center. Gross, central government.",
+ "scope_note": "This is the \"total outstanding direct indebtedness\" of the Kingdom that the National Debt Management Center (NDMC) of the Ministry of Finance states for each period: the government's own borrowing, domestic and external, in Saudi riyals and before subtracting any government deposits or other assets. It is the Center's figure and is not adjusted here. Debt of government-related entities, public funds and the state oil company is not in it.",
+ "trend_why": "We use the change since the 2025 year-end position, the earliest one the NDMC page lets us use as a base, rather than the last quarter alone, because the quarterly change swings with the issuance calendar.",
+ "legend": "Saudi Arabia's direct debt is reported at period-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Quarterly. The NDMC adds each period-end position to its Reports & Statistics page after the quarter ends.",
+ "after_text": ", after each quarter-end",
+ "next_update": "The National Debt Management Center adds each quarter-end position to its Reports & Statistics page after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 35300000,
+  "noun": "people",
+  "as_of": "2024-07-01",
+  "source_name": "General Authority for Statistics (GASTAT), Population Estimates 2024, mid-2024 total population (35.3 million)",
+  "source_url": "https://www.stats.gov.sa/ar/w/population-estimates-statistics",
+  "publisher_short": "GASTAT",
+  "tag": "GASTAT",
+  "possessive": "GASTAT's",
+  "method_short": "GASTAT mid-2024 population estimate (35.3 million, rounded in the publication)",
+  "noun_full": "people in Saudi Arabia"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Saudi Arabia total outstanding direct government debt",
+   "short": "Government direct debt",
+   "value": 1685000000000,
+   "as_of": "2026-06-30",
+   "prior_value": 1519000000000,
+   "prior_as_of": "2025-12-31",
+   "source_name": "National Debt Management Center, Reports & Statistics",
+   "source_url": "https://www.ndmc.gov.sa/en/reports-and-statistics",
+   "source_locator": "Reports & Statistics page text \"As at end of <month> <year>, Saudi Arabia's total outstanding direct indebtedness amounted to SAR X billion\"",
+   "includes": "Direct government borrowing, domestic and external, in riyals, gross. Excludes government-related entities and public funds.",
+   "facts": [],
+   "history": [
+    [
+     "2025-12-31",
+     1519000000000
+    ],
+    [
+     "2026-03-31",
+     1667200000000
+    ],
+    [
+     "2026-06-30",
+     1685000000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Domestic debt",
+     "value": 1060100000000,
+     "group": "Domestic"
+    },
+    {
+     "label": "External debt",
+     "value": 624900000000,
+     "group": "External"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Ministry of Finance, Budget performance reports",
+   "url": "https://www.mof.gov.sa/en/budget-performance-reports"
+  },
+  {
+   "name": "Saudi Central Bank (SAMA), Statistics",
+   "url": "https://www.sama.gov.sa/en-US/EconomicReports/Pages/MonthlyStatistics.aspx"
+  }
+ ],
+ "notes": [
+  "Why the NDMC: it is the Ministry of Finance's debt manager and states the figure itself, with the date. The fetcher reads every period it states and keeps them as its history.",
+  "Gross: the figure is the total owed; the government's deposits at the central bank are not subtracted.",
+  "Currency: Saudi riyals. The riyal is pegged to the US dollar at 3.75 riyals per dollar, which the World Debt Clock uses for conversion."
+ ],
+ "world_measure": "Central government, gross",
+ "trend_pace": "the past six months' pace",
+ "trend_period": "six months"
+}

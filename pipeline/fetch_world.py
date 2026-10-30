@@ -2,6 +2,7 @@
 """Inputs for the World Debt Clock (/world/): daily exchange rates and the IMF GDP weights.
   data/world_fx.json   ECB euro foreign exchange reference rates (daily, keyless XML), and the Bank of Russia official
                        USD/RUB rate (neither the ECB nor the Fed H.10 publishes a rouble rate any more)
+                       and the Federal Reserve Board H.10 weekly release, for currencies the ECB does not publish (Taiwan dollar)
   data/world_gdp.json  IMF World Economic Outlook NGDPD (GDP, current US dollars, billions) for the current calendar year,
                        every country plus the world aggregate: https://www.imf.org/external/datamapper/api/v1/NGDPD
 
@@ -17,6 +18,8 @@ GDP = os.path.join(ROOT, "data", "world_gdp.json")
 ECB = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
 CBR = "https://www.cbr.ru/scripts/XML_daily.asp"
 IMF = "https://www.imf.org/external/datamapper/api/v1/NGDPD"
+H10 = "https://www.federalreserve.gov/releases/h10/current/"
+H10_ROWS = {"TWD": "TAIWAN DOLLAR"}      # H.10 row label per currency code we use (units of currency per US dollar)
 UA = {"User-Agent": "Mozilla/5.0 (compatible; everydebtclock.com data refresh)", "Accept": "*/*"}
 
 def get(url, tries=3):
@@ -54,6 +57,29 @@ def cbr():
     if not (value > 0 and nominal > 0): raise RuntimeError("CBR: unreadable USD rate")
     return {"date": date, "rub_per_usd": value / nominal, "source": "Bank of Russia, official exchange rate of the rouble to the US dollar", "source_url": "https://www.cbr.ru/eng/currency_base/daily/", "feed": CBR}
 
+def fed():
+    """Federal Reserve Board H.10 (weekly; daily noon buying rates in New York, currency units per US dollar). Latest non-ND value in each row."""
+    t = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", get(H10).decode("utf-8", "replace")))
+    rel = re.search(r"Release Date:\s*([A-Za-z]+)\s+(\d{1,2}),\s*(\d{4})", t)
+    hdr = re.search(r"COUNTRY CURRENCY((?:\s+[A-Z][a-z]{2}\.\s+\d{1,2}){3,7})", t)
+    if not rel or not hdr: raise RuntimeError("Fed H.10: layout changed")
+    rm = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].index(rel.group(1)) + 1
+    mons = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    cols = []
+    for mm, dd in re.findall(r"([A-Z][a-z]{2})\.\s+(\d{1,2})", hdr.group(1)):
+        mi = mons.index(mm) + 1; y = int(rel.group(3)) - (1 if mi > rm else 0)
+        cols.append(dt.date(y, mi, int(dd)).isoformat())
+    out, dates = {}, {}
+    for code, label in H10_ROWS.items():
+        m = re.search(re.escape(label) + r"((?:\s+(?:[\d.]+|ND)){%d})" % len(cols), t)
+        if not m: raise RuntimeError(f"Fed H.10: no row for {label}")
+        vals = m.group(1).split()
+        pairs = [(c, float(v)) for c, v in zip(cols, vals) if v != "ND"]
+        if not pairs or not pairs[-1][1] > 0: raise RuntimeError(f"Fed H.10: no rate for {label}")
+        dates[code], out[code] = pairs[-1]
+    date = max(dates.values())
+    return {"date": date, "per_usd": out, "dates": dates, "source": "Federal Reserve Board, H.10 Foreign Exchange Rates (weekly release; noon buying rates in New York)", "source_url": H10, "feed": H10}
+
 def imf(year):
     vals = json.loads(get(IMF))["values"]["NGDPD"]
     y = str(year)
@@ -69,7 +95,7 @@ def newer_or_same(new, old, key="date"): return not old.get(key) or new[key] >= 
 
 def main():
     fx = load(FX); changed = False
-    for name, fn in (("ecb", ecb), ("cbr", cbr)):
+    for name, fn in (("ecb", ecb), ("cbr", cbr), ("fed", fed)):
         try:
             new = fn(); old = fx.get(name, {})
             if not newer_or_same(new, old): raise RuntimeError(f"{name} date {new['date']} older than stored {old['date']}")
@@ -79,6 +105,9 @@ def main():
             if name == "cbr" and old.get("rub_per_usd") and old["date"] != new["date"]:
                 jump = abs(new["rub_per_usd"] / old["rub_per_usd"] - 1)
                 if jump > 0.5: raise RuntimeError(f"RUB/USD moved {jump:.0%} in one fetch; not trusted")
+            if name == "fed" and old.get("per_usd") and old["date"] != new["date"]:
+                jump = max(abs(new["per_usd"][k] / old["per_usd"][k] - 1) for k in new["per_usd"] if k in old["per_usd"])
+                if jump > 0.25: raise RuntimeError(f"H.10 rate moved {jump:.0%} in one fetch; not trusted")
             if new != old: fx[name] = new; changed = True; print(f"world fx {name}: {new['date']}")
             else: print(f"world fx {name}: unchanged")
         except Exception as e:

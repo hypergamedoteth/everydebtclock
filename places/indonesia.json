@@ -1,0 +1,111 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Indonesian rupiah. The debt component, history and facts are refreshed by pipeline/fetch_indonesia.py from the DJPPR home page data; edit wording here, not numbers.",
+ "slug": "indonesia",
+ "kind": "country",
+ "country": "ID",
+ "iso3": "IDN",
+ "name": "Indonesia",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Directorate General of Budget Financing and Risk Management (DJPPR), Ministry of Finance, Indonesia",
+ "currency": {
+  "code": "IDR",
+  "symbol": "Rp"
+ },
+ "frequency": "quarterly",
+ "title": "Indonesia Debt Clock: Live Central Government Debt, Official Data",
+ "headline": "central government debt",
+ "headline_long": "central government debt",
+ "link_label": "central government debt, Rp",
+ "subject": "The central government of Indonesia",
+ "hist_label": "Central Government Debt",
+ "sum_note": "Indonesia's central government debt position (government securities and loans), from the Ministry of Finance's debt directorate (DJPPR), quarter-end. Gross, central government only.",
+ "scope_note": "This is the central government debt position the Ministry of Finance's Directorate General of Budget Financing and Risk Management (DJPPR) shows on its home page: tradable government securities (SBN) plus loans, in rupiah. The Ministry reports it as a ratio to GDP too and the figure is not reduced by any government assets. Regional governments and state-owned enterprises are not in it. The page lists only the latest position, so earlier official positions are kept in this page's history as they were published.",
+ "trend_why": "We use the change over the closest published position to twelve months earlier rather than the last quarter because the quarterly change swings with issuance.",
+ "legend": "Indonesia's central government debt is reported at quarter-end (and in the monthly APBN KiTa report). Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Quarterly. DJPPR updates its home page with the latest debt position within about six weeks of the quarter-end.",
+ "after_text": ", about six weeks after each quarter-end",
+ "next_update": "DJPPR updates this position after each quarter-end, usually within about six weeks; this page picks it up automatically on the next daily build after it appears.",
+ "population": {
+  "value": 284438800,
+  "noun": "people",
+  "as_of": "2025-07-01",
+  "source_name": "Statistics Indonesia (BPS), mid-year population estimate 2025",
+  "source_url": "https://www.bps.go.id/id/statistics-table/2/MTk3NSMy/jumlah-penduduk-pertengahan-tahun---ribu-jiwa-2025.html",
+  "publisher_short": "BPS",
+  "tag": "BPS",
+  "possessive": "BPS's",
+  "method_short": "BPS mid-year population estimate for 2025",
+  "noun_full": "people in Indonesia"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Indonesia central government debt",
+   "short": "Central government debt",
+   "value": 10293690000000000,
+   "as_of": "2026-06-30",
+   "prior_value": 9138050000000000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "DJPPR, Ministry of Finance, \"Posisi Utang Pemerintah\" (central government debt position), IDR trillion",
+   "source_url": "https://djppr.kemenkeu.go.id/",
+   "source_locator": "home page panel \"Posisi Utang Pemerintah\" (machine-readable: https://api-djppr.kemenkeu.go.id/web/api/v1/page?url=beranda)",
+   "includes": "Government securities (SBN) plus loans of the central government, gross, in rupiah. Excludes regional governments and state-owned enterprises.",
+   "facts": [
+    {
+     "key": "pctgdp",
+     "label": "Central government debt, % of GDP",
+     "value": 41.26,
+     "kind": "pct",
+     "as_of": "2026-06-30",
+     "note": "The ratio the Ministry shows next to the same debt position (\"Debt to GDP\") on its home page.",
+     "source_name": "DJPPR, Ministry of Finance, Posisi Utang Pemerintah",
+     "source_url": "https://djppr.kemenkeu.go.id/",
+     "source_locator": "home page, \"Debt to GDP\""
+    }
+   ],
+   "history": [
+    [
+     "2025-06-30",
+     9138050000000000
+    ],
+    [
+     "2026-06-30",
+     10293690000000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Government securities (SBN)",
+     "value": 8966790000000000,
+     "group": "Securities"
+    },
+    {
+     "label": "Loans (Pinjaman)",
+     "value": 1326900000000000,
+     "group": "Loans"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "DJPPR, Ministry of Finance, Debt portfolio",
+   "url": "https://djppr.kemenkeu.go.id/"
+  },
+  {
+   "name": "Bank Indonesia, Statistics",
+   "url": "https://www.bi.go.id/en/statistik/default.aspx"
+  },
+  {
+   "name": "Ministry of Finance, APBN KiTa monthly report",
+   "url": "https://www.kemenkeu.go.id/apbnkita"
+  }
+ ],
+ "notes": [
+  "Why DJPPR: it is the directorate that manages Indonesia's government debt and publishes the position itself. The fetcher reads the figures from the site's own page data and checks that securities plus loans add up to the total.",
+  "History: the home page shows only the latest position, so the earlier positions on this page are those DJPPR published for earlier quarters, kept as published. The quarterly series builds up from them.",
+  "Currency: Indonesian rupiah. The World Debt Clock converts it to US dollars at the ECB's daily reference rate for IDR."
+ ],
+ "world_measure": "Central government, gross"
+}

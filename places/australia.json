@@ -1,0 +1,161 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Australian dollars. The debt component, history and facts are refreshed by pipeline/fetch_australia.py from the AOFM Data Hub workbook; edit wording here, not numbers.",
+ "slug": "australia",
+ "kind": "country",
+ "country": "AU",
+ "iso3": "AUS",
+ "name": "Australia",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Australian Office of Financial Management (AOFM)",
+ "currency": {
+  "code": "AUD",
+  "symbol": "A$"
+ },
+ "frequency": "monthly",
+ "title": "Australia Debt Clock: Live Government Securities on Issue, Official",
+ "headline": "Commonwealth government securities on issue",
+ "headline_long": "Australian Government Securities on issue",
+ "link_label": "Commonwealth government securities on issue, A$",
+ "subject": "The Australian Government (Commonwealth)",
+ "hist_label": "Australian Government Securities on Issue",
+ "sum_note": "Australian Government Securities (Treasury Bonds, Treasury Indexed Bonds and Treasury Notes) on issue, face value, month-end, from the AOFM. The closest Australian measure to the US Total Public Debt Outstanding: Commonwealth only, gross, securities only.",
+ "scope_note": "This is the amount of Australian Government Securities on issue as the AOFM, the Commonwealth's debt manager, reports it: Treasury Bonds, Treasury Indexed Bonds (capital-indexed) and Treasury Notes, at face value in Australian dollars, month-end. The Commonwealth's other liabilities, such as its other borrowings and unfunded superannuation liabilities, and all state and territory debt are not in it, and the figure is not reduced by the government's financial assets. The Department of Finance's own balance sheet measure of Commonwealth borrowings differs because it is on an accounting (market and amortised value) basis.",
+ "trend_why": "We use the latest twelve months rather than the last month because changes between single reporting dates swing with the issuance calendar and short-term borrowing.",
+ "legend": "Australia's Commonwealth securities on issue are reported monthly, at month-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official month-end figures, shown here next to them.",
+ "cadence": "Monthly. The AOFM updates its Data Hub with each month-end portfolio in the days after the month ends.",
+ "after_text": ", within a few days after each month-end",
+ "next_update": "The October 2026 month-end figure is expected on the AOFM Data Hub in the following weeks; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 27921150,
+  "noun": "people",
+  "as_of": "2026-03-31",
+  "source_name": "Australian Bureau of Statistics, National, state and territory population, estimated resident population at 31 March 2026",
+  "source_url": "https://www.abs.gov.au/statistics/people/population/national-state-and-territory-population/latest-release",
+  "publisher_short": "ABS",
+  "tag": "ABS",
+  "possessive": "the ABS's",
+  "method_short": "ABS estimated resident population at 31 March 2026",
+  "noun_full": "people in Australia"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Australian Government Securities on issue",
+   "short": "Securities on issue",
+   "value": 981441608000,
+   "as_of": "2026-09-30",
+   "prior_value": 960241680000,
+   "prior_as_of": "2025-09-30",
+   "source_name": "AOFM Data Hub, Portfolio Aggregate (dealt), sheet FaceValue, Total AUD Main Funding Instruments, A$",
+   "source_url": "https://www.aofm.gov.au/data-hub",
+   "source_locator": "AOFM Data Hub workbook portfolio_aggregate_-_dealt (xlsx), sheet FaceValue, column Total AUD Main Funding Instruments",
+   "includes": "Treasury Bonds, Treasury Indexed Bonds (capital-indexed) and Treasury Notes on issue at face value. Excludes the Commonwealth's other liabilities and all state and territory debt.",
+   "facts": [
+    {
+     "key": "fy",
+     "label": "Treasury Bonds and Indexed Bonds on issue at the last completed financial year-end",
+     "value": 895600000000,
+     "kind": "usd",
+     "as_of": "2025-06-30",
+     "note": "From the AOFM's separate annual series, which counts Treasury Bonds and Treasury Indexed Bonds only (no Treasury Notes). The fetcher checks that the monthly workbook agrees with it for every completed financial year.",
+     "source_name": "AOFM, Australian Government Securities on issue (annual series)",
+     "source_url": "https://www.aofm.gov.au/data-hub",
+     "source_locator": "stock_ags.csv, latest financial year"
+    }
+   ],
+   "history": [
+    [
+     "2025-09-30",
+     960241680000
+    ],
+    [
+     "2025-10-31",
+     970891680000
+    ],
+    [
+     "2025-11-30",
+     951941680000
+    ],
+    [
+     "2025-12-31",
+     962391680000
+    ],
+    [
+     "2026-01-31",
+     988391680000
+    ],
+    [
+     "2026-02-28",
+     992691680000
+    ],
+    [
+     "2026-03-31",
+     994991680000
+    ],
+    [
+     "2026-04-30",
+     965591680000
+    ],
+    [
+     "2026-05-31",
+     972191620000
+    ],
+    [
+     "2026-06-30",
+     971441620000
+    ],
+    [
+     "2026-07-31",
+     978641620000
+    ],
+    [
+     "2026-08-31",
+     1002841620000
+    ],
+    [
+     "2026-09-30",
+     981441608000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Treasury Bonds",
+     "value": 891949274000,
+     "group": "Bonds"
+    },
+    {
+     "label": "Treasury Indexed Bonds (capital indexed)",
+     "value": 41492334000,
+     "group": "Bonds"
+    },
+    {
+     "label": "Treasury Notes",
+     "value": 48000000000,
+     "group": "Notes"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Australian Office of Financial Management, Data Hub",
+   "url": "https://www.aofm.gov.au/data-hub"
+  },
+  {
+   "name": "Department of Finance, Commonwealth borrowings and government finance statistics",
+   "url": "https://www.finance.gov.au/"
+  },
+  {
+   "name": "Reserve Bank of Australia, Statistical tables",
+   "url": "https://www.rba.gov.au/statistics/tables/"
+  }
+ ],
+ "notes": [
+  "Why the AOFM: it issues and manages the Commonwealth's debt, and its Data Hub is the official, machine-readable monthly record. The fetcher checks that the three instruments add up to the total and that the bonds agree with the AOFM's separate annual series for every completed financial year.",
+  "What is not in it: only Commonwealth securities. State and territory government debt (large in New South Wales and Victoria) is not included, and neither are the Commonwealth's non-securities liabilities, so this is not Australia's total public debt.",
+  "Face value: indexed bonds are at face value; other measures such as market value or the accounting value on the government's balance sheet are lower or higher and are not used.",
+  "Currency: Australian dollars. The World Debt Clock converts them to US dollars at the ECB's daily reference rate for AUD."
+ ],
+ "world_measure": "Central government, gross (securities, face value)"
+}

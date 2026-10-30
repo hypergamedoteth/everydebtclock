@@ -1,0 +1,166 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in South Korean won. The debt component, history and facts are refreshed by pipeline/fetch_korea.py from the Ministry's Monthly Fiscal Trends PDF (needs pypdf); edit wording here, not numbers.",
+ "slug": "south-korea",
+ "kind": "country",
+ "country": "KR",
+ "iso3": "KOR",
+ "name": "South Korea",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Ministry of Planning and Budget (기획예산처), Republic of Korea",
+ "currency": {
+  "code": "KRW",
+  "symbol": "₩"
+ },
+ "frequency": "monthly",
+ "title": "South Korea Debt Clock: Live Central Government Debt, Official Data",
+ "headline": "central government debt",
+ "headline_long": "central government debt",
+ "link_label": "central government debt, ₩",
+ "subject": "The central government of South Korea",
+ "hist_label": "Central Government Debt",
+ "sum_note": "South Korea's central government debt (중앙정부 채무), month-end, from the Ministry of Planning and Budget's Monthly Fiscal Trends. Cash basis, gross: government bonds, borrowings and Treasury obligations. Central government only.",
+ "scope_note": "This is the central government debt (중앙정부 채무) in the Ministry's Monthly Fiscal Trends report: government bonds (Treasury bonds, national housing bonds and foreign exchange stabilisation bonds), borrowings and Treasury obligations, on a cash basis, at face value, in Korean won and before subtracting any assets. It is the series from which the Ministry builds the national debt (국가채무, D1) figure, which adds local government debt and is published for year-ends; that annual figure is shown as a fact. Debt of public corporations and unfunded pension liabilities are not included. Year-end figures and the current year's month-end figures are published in the same table.",
+ "trend_why": "The Monthly Fiscal Trends table carries year-end rows and the current year's month-end rows only, so the trend is the official change from the closest earlier year-end or month-end in the table, and the page says which dates it compares. As the history builds, it moves to a twelve-month window.",
+ "legend": "South Korea's central government debt is reported monthly, at month-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Monthly. The Ministry publishes the Monthly Fiscal Trends about six weeks after the month ends.",
+ "after_text": ", about six weeks after each month-end",
+ "next_update": "The September 2026 month-end figure is expected in the Ministry's Monthly Fiscal Trends about six weeks after the month ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 51820000,
+  "noun": "people",
+  "as_of": "2025-11-01",
+  "source_name": "Statistics Korea (Ministry of Data and Statistics), 2025 Population and Housing Census (register-based), total population at 1 November 2025 (51.82 million, including foreign residents)",
+  "source_url": "https://www.census.go.kr/",
+  "publisher_short": "Statistics Korea",
+  "tag": "Statistics Korea",
+  "possessive": "Statistics Korea's",
+  "method_short": "the 2025 register-based census total of 51.82 million, rounded to ten thousand as published, including foreign residents",
+  "noun_full": "people in South Korea"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "South Korea central government debt",
+   "short": "Central government debt",
+   "value": 1372100000000000,
+   "as_of": "2026-08-31",
+   "prior_value": 1268100000000000,
+   "prior_as_of": "2025-12-31",
+   "source_name": "Ministry of Planning and Budget, Monthly Fiscal Trends (월간 재정동향), section 5 \"국가채무(중앙정부)\", KRW trillion",
+   "source_url": "https://www.mpb.go.kr/web/main/bbs/b_0005/list",
+   "source_locator": "Monthly Fiscal Trends PDF, section 5 table 국가채무(중앙정부), column 중앙정부 채무",
+   "includes": "Central government debt on a cash basis at face value: government bonds (Treasury bonds, housing bonds, foreign exchange stabilisation bonds), borrowings and Treasury obligations. Excludes local governments and public corporations.",
+   "facts": [
+    {
+     "key": "pctgdp",
+     "label": "Central government debt, % of GDP (latest year-end)",
+     "value": 47.4,
+     "kind": "pct",
+     "as_of": "2025-12-31",
+     "note": "The same table's ratio to GDP at the latest year-end.",
+     "source_name": "Ministry of Planning and Budget, Monthly Fiscal Trends",
+     "source_url": "https://www.mpb.go.kr/web/main/bbs/b_0005/list",
+     "source_locator": "section 5 table, GDP 대비 (%)"
+    },
+    {
+     "key": "d1",
+     "label": "National debt (국가채무, D1) at the latest year-end",
+     "value": 1305200000000000,
+     "kind": "usd",
+     "as_of": "2025-12-31",
+     "note": "The Ministry's headline national debt: central government debt plus local government debt, cash basis. Published for year-ends in the same report. The same year it was 48.8% of GDP.",
+     "source_name": "Ministry of Planning and Budget, Monthly Fiscal Trends",
+     "source_url": "https://www.mpb.go.kr/web/main/bbs/b_0005/list",
+     "source_locator": "section on 국가채무(D1)"
+    }
+   ],
+   "history": [
+    [
+     "2025-12-31",
+     1268100000000000
+    ],
+    [
+     "2026-01-31",
+     1286000000000000
+    ],
+    [
+     "2026-02-28",
+     1312500000000000
+    ],
+    [
+     "2026-03-31",
+     1303500000000000
+    ],
+    [
+     "2026-04-30",
+     1321700000000000
+    ],
+    [
+     "2026-05-31",
+     1345200000000000
+    ],
+    [
+     "2026-06-30",
+     1338500000000000
+    ],
+    [
+     "2026-07-31",
+     1354200000000000
+    ],
+    [
+     "2026-08-31",
+     1372100000000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Treasury bonds (국고채권)",
+     "value": 1263500000000000,
+     "group": "Government bonds"
+    },
+    {
+     "label": "National housing bonds (국민주택채권)",
+     "value": 72800000000000,
+     "group": "Government bonds"
+    },
+    {
+     "label": "Foreign exchange stabilisation bonds (외평채권)",
+     "value": 34200000000000,
+     "group": "Government bonds"
+    },
+    {
+     "label": "Borrowings (차입금)",
+     "value": 1500000000000,
+     "group": "Borrowings and obligations"
+    },
+    {
+     "label": "Treasury obligations (국고채무부담행위)",
+     "value": 100000000000,
+     "group": "Borrowings and obligations"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Ministry of Planning and Budget, Monthly Fiscal Trends",
+   "url": "https://www.mpb.go.kr/web/main/bbs/b_0005/list"
+  },
+  {
+   "name": "Bank of Korea, Economic Statistics System (ECOS)",
+   "url": "https://ecos.bok.or.kr/"
+  },
+  {
+   "name": "e-Country Indicators (e-나라지표), national debt",
+   "url": "https://www.index.go.kr/"
+  }
+ ],
+ "notes": [
+  "Why this table: it is the Ministry's own monthly statement, the one the national press quotes, and the fetcher checks that bonds, borrowings and Treasury obligations add up to the debt in every row it reads.",
+  "Central versus national debt: the headline is central government debt. The Ministry's national debt (D1), which adds local governments, is larger and is published annually; the IMF's general government gross debt is wider again (it includes social security funds and non-financial public bodies). They are shown or described as different measures, not mixed.",
+  "Currency: Korean won. The World Debt Clock converts it to US dollars at the ECB's daily reference rate for KRW.",
+  "Language: the report is published in Korean; the page translates its labels and keeps the Korean terms next to them."
+ ],
+ "world_measure": "Central government, gross"
+}

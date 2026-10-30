@@ -1,0 +1,148 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in New Taiwan dollars. The debt component, history and facts are refreshed by pipeline/fetch_taiwan.py from the NTA open dataset D3-12F; edit wording here, not numbers.",
+ "slug": "taiwan",
+ "kind": "country",
+ "country": "TW",
+ "iso3": "TWN",
+ "name": "Taiwan",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "National Treasury Administration, Ministry of Finance, Taiwan",
+ "currency": {
+  "code": "TWD",
+  "symbol": "NT$"
+ },
+ "frequency": "weekly",
+ "title": "Taiwan Debt Clock: Live Central Government Debt, Official Data",
+ "headline": "central government debt",
+ "headline_long": "central government debt outstanding",
+ "link_label": "central government debt, NT$",
+ "subject": "The central government of Taiwan (Republic of China)",
+ "hist_label": "Central Government Debt Outstanding",
+ "sum_note": "Taiwan's central government debt outstanding (debts of one year or more plus short-term debts), from the National Treasury Administration's weekly statement. The closest Taiwanese measure to the US Total Public Debt Outstanding: central government only.",
+ "scope_note": "This is the National Treasury Administration's statement of central government debt outstanding: debts with a maturity of one year or more plus short-term debts (under one year), in New Taiwan dollars, as of the date of each weekly row. Local governments, state-owned enterprises, special funds' liabilities not issued as central government debt, and unfunded pension obligations are not in it. The Administration's \"debt outstanding\" is the amount owed and is not reduced by any cash or other assets.",
+ "trend_why": "We use the latest twelve months rather than the last few weeks because changes between single weekly figures swing with the issuance calendar.",
+ "legend": "Taiwan's central government debt is reported weekly. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official weekly figures, shown here next to them.",
+ "cadence": "Weekly. The National Treasury Administration updates its open dataset about weekly; the page re-bases to each new row.",
+ "after_text": ", about a week after each reporting date",
+ "next_update": "The National Treasury Administration updates the figure about weekly; this page re-bases to each new row automatically on the next daily build after it appears.",
+ "population": {
+  "value": 23213251,
+  "noun": "people",
+  "as_of": "2026-10-16",
+  "source_name": "Ministry of the Interior (Taiwan), resident population, as reproduced in the National Treasury Administration's debt dataset",
+  "source_url": "https://nss.nta.gov.tw/nss/files/opendata/D3-12F.csv",
+  "publisher_short": "MOI",
+  "tag": "MOI",
+  "possessive": "the Ministry of the Interior's",
+  "method_short": "the Ministry of the Interior's registered population, from the same open dataset",
+  "noun_full": "people in Taiwan"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Taiwan central government debt outstanding",
+   "short": "Central government debt",
+   "value": 5936400000000,
+   "as_of": "2026-10-16",
+   "prior_value": 5902900000000,
+   "prior_as_of": "2025-10-17",
+   "source_name": "National Treasury Administration, Ministry of Finance, open dataset D3-12F (central government debt outstanding, NT$100 million)",
+   "source_url": "https://www.nta.gov.tw/",
+   "source_locator": "open dataset D3-12F: https://nss.nta.gov.tw/nss/files/opendata/D3-12F.csv, columns for debts of one year or more and short-term debts, added together",
+   "includes": "Central government debt outstanding: debts with maturity of one year or more and short-term debts, gross, in New Taiwan dollars. Local governments and state-owned enterprises are separate.",
+   "facts": [],
+   "history": [
+    [
+     "2025-10-17",
+     5902900000000
+    ],
+    [
+     "2025-10-31",
+     5902900000000
+    ],
+    [
+     "2025-11-30",
+     5867900000000
+    ],
+    [
+     "2025-12-31",
+     5907900000000
+    ],
+    [
+     "2026-01-31",
+     6037900000000
+    ],
+    [
+     "2026-02-28",
+     6262900000000
+    ],
+    [
+     "2026-03-31",
+     6297900000000
+    ],
+    [
+     "2026-04-30",
+     6352900000000
+    ],
+    [
+     "2026-05-31",
+     6332900000000
+    ],
+    [
+     "2026-06-30",
+     6101400000000
+    ],
+    [
+     "2026-07-31",
+     6001400000000
+    ],
+    [
+     "2026-08-31",
+     5966400000000
+    ],
+    [
+     "2026-09-30",
+     5966400000000
+    ],
+    [
+     "2026-10-16",
+     5936400000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Debts with a maturity of one year or more",
+     "value": 5866400000000,
+     "group": "Long-term"
+    },
+    {
+     "label": "Short-term debts",
+     "value": 70000000000,
+     "group": "Short-term"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "National Treasury Administration, Ministry of Finance",
+   "url": "https://www.nta.gov.tw/"
+  },
+  {
+   "name": "Ministry of Finance, Taiwan",
+   "url": "https://www.mof.gov.tw/"
+  },
+  {
+   "name": "Directorate-General of Budget, Accounting and Statistics (DGBAS)",
+   "url": "https://www.dgbas.gov.tw/"
+  }
+ ],
+ "notes": [
+  "Why this dataset: it is the National Treasury Administration's own machine-readable open dataset of central government debt, updated weekly, and carries the date of each row.",
+  "Scope: central government only. Debt of local governments is reported separately and is not in the number. The Public Debt Act's debt ceiling counts only debts of one year or more, a narrower measure than this page's total; the two parts are shown in the breakdown.",
+  "Currency: New Taiwan dollars. The Taiwan central bank does not publish daily rates in a machine-readable form that the daily build can read, so the World Debt Clock converts at the US Federal Reserve's weekly H.10 rate for TWD, labelled on that page.",
+  "Population: the same open dataset reports the Ministry of the Interior's registered population for each date, which this page uses for the per-person figures."
+ ],
+ "world_measure": "Central government, gross"
+}

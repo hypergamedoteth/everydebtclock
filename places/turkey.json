@@ -1,0 +1,147 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Turkish lira. The debt component, history and facts are refreshed by pipeline/fetch_turkey.py from the Treasury's monthly central government debt stock release; edit wording here, not numbers.",
+ "slug": "turkey",
+ "kind": "country",
+ "country": "TR",
+ "iso3": "TUR",
+ "name": "Turkey",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Ministry of Treasury and Finance of the Republic of Türkiye (Hazine ve Maliye Bakanlığı)",
+ "currency": {
+  "code": "TRY",
+  "symbol": "₺"
+ },
+ "frequency": "monthly",
+ "title": "Turkey Debt Clock: Live Central Government Debt Stock, Official Data",
+ "headline": "central government debt stock",
+ "headline_long": "central government debt stock",
+ "link_label": "central government debt stock, ₺",
+ "subject": "The central government of Turkey (Türkiye)",
+ "hist_label": "Central Government Debt Stock",
+ "sum_note": "Turkey's central government debt stock (domestic and external, in lira), month-end, from the Ministry of Treasury and Finance's monthly release. The closest Turkish measure to the US Total Public Debt Outstanding: central government only.",
+ "scope_note": "This is the Ministry of Treasury and Finance's monthly \"Central Government Debt Stock\": the debt of the central government, domestic and foreign-currency, with the foreign-currency part reported converted into lira. Debt of local governments, state economic enterprises and the Central Bank is not in it, and the Ministry reports it before subtracting any assets. Figures are in Turkish lira and are published for each month-end. The lira has lost value against foreign currencies for years, which on its own raises the lira value of the foreign-currency part of the stock; the page shows the split.",
+ "trend_why": "We use the latest twelve months rather than the last month because changes between single reporting dates swing with the issuance calendar and short-term borrowing.",
+ "legend": "Turkey's central government debt stock is reported monthly, at month-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official month-end figures, shown here next to them.",
+ "cadence": "Monthly. The Ministry of Treasury and Finance publishes each month-end debt stock in the following month (about the 20th).",
+ "after_text": ", about three weeks after each month-end",
+ "next_update": "The October 2026 month-end figure is expected from the Ministry of Treasury and Finance around the 20th of the following month; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 86092168,
+  "noun": "people",
+  "as_of": "2025-12-31",
+  "source_name": "Turkish Statistical Institute (TurkStat), Address Based Population Registration System results 2025, population at 31 December 2025",
+  "source_url": "https://nip.tuik.gov.tr/Home/Adnks",
+  "publisher_short": "TurkStat",
+  "tag": "TurkStat",
+  "possessive": "TurkStat's",
+  "method_short": "TurkStat address-based population registration, 31 December 2025",
+  "noun_full": "people in Türkiye"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Türkiye central government debt stock",
+   "short": "Central government debt",
+   "value": 16202200000000,
+   "as_of": "2026-09-30",
+   "prior_value": 12964000000000,
+   "prior_as_of": "2025-09-30",
+   "source_name": "Ministry of Treasury and Finance, Central Government Debt Stock (monthly release), TL billion",
+   "source_url": "https://api-en.hmb.gov.tr/2026/10/20/central-government-debt-stock-as-of-september-30th-2026/",
+   "source_locator": "Monthly release \"Central Government Debt Stock as of <date>\" on en.hmb.gov.tr (also readable through its public WordPress API: en.hmb.gov.tr/portal/v2/posts)",
+   "includes": "Central government debt stock in lira: debt in lira and foreign-currency debt converted to lira. Excludes local governments, state economic enterprises and the Central Bank.",
+   "facts": [
+    {
+     "key": "fxshare",
+     "label": "Share of the stock denominated in foreign currency",
+     "value": 50.73,
+     "kind": "pct",
+     "as_of": "2026-09-30",
+     "note": "As the Ministry states it in the same release: the part of the central government debt stock that is denominated in foreign currencies.",
+     "source_name": "Ministry of Treasury and Finance, Central Government Debt Stock",
+     "source_url": "https://en.hmb.gov.tr/",
+     "source_locator": "same release, foreign-currency part / total"
+    }
+   ],
+   "history": [
+    [
+     "2025-09-30",
+     12964000000000
+    ],
+    [
+     "2025-11-30",
+     13325000000000
+    ],
+    [
+     "2025-12-31",
+     13656000000000
+    ],
+    [
+     "2026-01-31",
+     14264200000000
+    ],
+    [
+     "2026-02-28",
+     14395800000000
+    ],
+    [
+     "2026-03-31",
+     14446900000000
+    ],
+    [
+     "2026-04-30",
+     14765300000000
+    ],
+    [
+     "2026-05-31",
+     14989100000000
+    ],
+    [
+     "2026-06-30",
+     14992500000000
+    ],
+    [
+     "2026-07-31",
+     15463300000000
+    ],
+    [
+     "2026-08-31",
+     15893800000000
+    ],
+    [
+     "2026-09-30",
+     16202200000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Domestic debt (Turkish lira)",
+     "value": 7983200000000,
+     "group": "Currency"
+    },
+    {
+     "label": "Foreign-currency debt (converted to lira)",
+     "value": 8219100000000,
+     "group": "Currency"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Central Bank of the Republic of Türkiye, EVDS data portal",
+   "url": "https://evds2.tcmb.gov.tr/"
+  },
+  {
+   "name": "Ministry of Treasury and Finance, public finance statistics",
+   "url": "https://en.hmb.gov.tr/"
+  }
+ ],
+ "notes": [
+  "Why the Ministry's release: it is the Treasury's own monthly statement of the debt it owes and is published in English with the exact figure and date. The fetcher reads the release text and checks that the domestic and foreign-currency parts add up to the total.",
+  "Scope: central government only. The wider general government debt measure that Türkiye reports under EU-style definitions (which also includes local governments and social security) is a different, somewhat larger, number and is not the one ticking here.",
+  "The lira: figures are in Turkish lira. The World Debt Clock converts them to US dollars at the ECB's daily reference rate for TRY."
+ ],
+ "world_measure": "Central government, gross"
+}

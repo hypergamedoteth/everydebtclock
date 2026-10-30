@@ -47,24 +47,24 @@ def texts(p):
     t = {"head": p.get("headline", "state + local debt"), "head_long": p.get("headline_long", "state and local government debt"),
          "subject": p.get("subject", f"{name} state and local governments"),
          "sum_note": p.get("sum_note", "Sum of the official state and local totals below." if len(p["components"]) > 1 else p["components"][0].get("includes", "")),
-         "freq": freq, "periodic": freq in ("monthly", "quarterly"), "once": {"monthly": "once a month", "quarterly": "once a quarter"}.get(freq, "once a year"),
-         "end": p.get("end_label") or {"monthly": "month-end", "quarterly": "quarter-end"}.get(freq, "fiscal year-end"), "unit": {"monthly": "month", "quarterly": "quarter"}.get(freq, "year"),
-         "period": p.get("trend_period", "12 months" if freq in ("monthly", "quarterly") else "year"),
-         "pace": p.get("trend_pace", "the past 12 months' pace" if freq in ("monthly", "quarterly") else "last year's pace"),
+         "freq": freq, "periodic": freq in ("weekly", "monthly", "quarterly"), "once": {"weekly": "once a week", "monthly": "once a month", "quarterly": "once a quarter"}.get(freq, "once a year"),
+         "end": p.get("end_label") or {"weekly": "week-end", "monthly": "month-end", "quarterly": "quarter-end"}.get(freq, "fiscal year-end"), "unit": {"weekly": "week", "monthly": "month", "quarterly": "quarter"}.get(freq, "year"),
+         "period": p.get("trend_period", "12 months" if freq in ("weekly", "monthly", "quarterly") else "year"),
+         "pace": p.get("trend_pace", "the past 12 months' pace" if freq in ("weekly", "monthly", "quarterly") else "last year's pace"),
          "pop_pub": p["population"].get("publisher_short", "Census Bureau"), "pop_tag": p["population"].get("tag", "Census"),
-         "report": {"monthly": "monthly figures", "quarterly": "quarterly figures"}.get(freq, "annual reports")}
+         "report": {"weekly": "weekly figures", "monthly": "monthly figures", "quarterly": "quarterly figures"}.get(freq, "annual reports")}
     t["pop_pos"] = p["population"].get("possessive", f"the {t['pop_pub']}'s")
     t["Head"] = p.get("hist_label", "State + local" if "headline" not in p else t["head"][0].upper() + t["head"][1:])
-    t["rate_phrase"] = "last year's official change per second" if freq not in ("monthly", "quarterly") else "the official change per second over the past 12 months"
+    t["rate_phrase"] = "last year's official change per second" if freq not in ("weekly", "monthly", "quarterly") else f"the official change per second over the {'past 12 months' if t['period'] == '12 months' else 'past ' + t['period']}"
     t["pop_tag2"] = p["population"].get("tag", "Census")
-    t["after"] = p.get("after_text") or (", after the fiscal year ends" if freq not in ("monthly", "quarterly") else ", a few business days after each month-end")
+    t["after"] = p.get("after_text") or (", after the fiscal year ends" if freq not in ("weekly", "monthly", "quarterly") else ", a few business days after each month-end")
     t["noun"] = p["population"].get("noun", "residents")
     t["noun_full"] = p["population"].get("noun_full", f"{name} {t['noun']}")
     return t
 
 def _when(p, d_):
     """How a figure date is labelled: FY2025 (annual, fiscal year-end) or Sep 2026 (monthly, month-end)."""
-    return _d(d_).strftime("%b %Y") if p.get("frequency") in ("monthly", "quarterly") else f"FY{_d(d_).year}"
+    return _d(d_).strftime("%b %Y") if p.get("frequency") in ("weekly", "monthly", "quarterly") else f"FY{_d(d_).year}"
 
 def comp_rate(c):
     if c.get("prior_value") and c.get("prior_as_of"):
@@ -141,6 +141,8 @@ def meta_head(SITE, url, title, desc, img, depth, extra_css="", ld="", css_link=
 
 # small additions on top of style.css (kept here so the US homepage is untouched)
 PL_CSS = """.brand a,.brand{color:inherit}.tile .pp{grid-template-columns:1fr 1fr}.wcc .x b{color:var(--txt);font-weight:600}
+.trio>div,.grid>.tile{min-width:0}@media (min-width:641px){.tile.l1 .val{font-size:21px}.tile.l2 .val{font-size:18px}.tile.l3 .val{font-size:16px}}.meta .badge{white-space:normal}.trio .num{overflow-wrap:anywhere}
+@media (max-width:640px){.grid.dense .tile .val{font-size:clamp(11px,3.1vw,16px);overflow-wrap:anywhere}#details,.det{overflow-x:auto}table.v td,table.v th{padding:6px 5px}table.v td.num{white-space:nowrap}}
 details.det{margin:8px 0}details.det summary{cursor:pointer;color:var(--blue);font-size:13px;margin:6px 0}
 table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:right}.dnote{color:var(--mut);font-size:12.5px}
 .badge.ann{border-color:#5a3a12;color:var(--amber)}
@@ -155,7 +157,8 @@ def tile_html(tid, label, value_txt, acc, badge, rate_txt="fixed", pp=None, tick
     pph = ""
     if pp:
         pph = '<div class="pp">' + "".join(f'<div><span class="l">{E(l)}</span><span class="num"{f" data-pp={chr(34)}{dv}{chr(34)}" if dv else ""}>{E(v)}</span></div>' for l, v, dv in pp) + "</div>"
-    return (f'<div class="tile{" fixed" if not tick else ""}{" wide" if wide else ""}" id="t-{tid}" style="--acc:{acc}"{data}>'
+    n = len(value_txt); lv = " l3" if n >= 25 else " l2" if n >= 22 else " l1" if n >= 19 else ""
+    return (f'<div class="tile{" fixed" if not tick else ""}{" wide" if wide else ""}{lv}" id="t-{tid}" style="--acc:{acc}"{data}>'
             f'<div class="lab"><span>{E(label)}</span></div><div class="val num">{E(value_txt)}</div>{pph}'
             f'<div class="meta"><span class="rate{" up" if tick and tick[1] > 0 else ""}">{E(rate_txt)}</span>{badge}</div></div>')
 
@@ -217,8 +220,8 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
              + "".join(f'<span>·</span><a href="../../{dict((k, d) for k, d, _, _ in SECTIONS)[o["kind"]]}/{o["slug"]}/">{E(o["name"])}</a>' for o in sorted(others, key=lambda x: x["name"])[:8]) + '</div>')
     intro = (f'<section class="intro" id="intro">{crumb}<h1>{E(name)} Debt Clock</h1>'
              f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
-             + (f'on <b>{as_of}</b>' if T["periodic"] else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to the '
-             + " and the ".join(f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
+             + (f'on <b>{as_of}</b>' if T["periodic"] else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
+             + " and ".join(("" if n_.startswith("Eurostat") else "the ") + f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
              + (f': {parts}' if len(cs) > 1 else '') + f'. {E(p.get("scope_note", ""))}{" " if p.get("scope_note") else ""}That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by {E(T["pop_pos"])} estimate of {pop["value"]:,} {E(T['noun_full'])} on {_fd(pop["as_of"])}. {proj_txt}</p></section>')
 
     # ---- hero (same block and labels as the US hero)

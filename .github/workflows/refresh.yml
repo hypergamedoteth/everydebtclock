@@ -74,7 +74,7 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y fonts-dejavu-core poppler-utils
           python -m pip install --upgrade pip
-          pip install Pillow openpyxl
+          pip install Pillow openpyxl pypdf
 
       - name: Fetch official data (skipped on plain pushes)
         if: github.event_name != 'push'
@@ -88,7 +88,7 @@ jobs:
           python3 pipeline/fetch_singapore.py || echo "singapore fetch skipped"
           # United Kingdom: ONS public sector finances series BKPX / HF6W / CPPH (keyless JSON). Never fails the run.
           python3 pipeline/fetch_united_kingdom.py || echo "united-kingdom fetch skipped"
-          # Germany, France, Italy: Eurostat gov_10q_ggdebt (central government Maastricht debt, quarterly) and demo_pjan. Never fails the run.
+          # Germany, France, Italy, Spain, Netherlands, Belgium, Austria, Ireland, Poland, Sweden: Eurostat gov_10q_ggdebt (central government Maastricht debt, quarterly) and demo_pjan. Never fails the run.
           python3 pipeline/fetch_eurostat.py || echo "eurostat fetch skipped"
           # Japan: Ministry of Finance Central Government Debt pages (quarterly). Never fails the run.
           python3 pipeline/fetch_japan.py || echo "japan fetch skipped"
@@ -100,6 +100,21 @@ jobs:
           python3 pipeline/fetch_russia.py || echo "russia fetch skipped"
           # Brazil: Banco Central do Brasil SGS 13761 / 13762 (DBGG, monthly). Never fails the run.
           python3 pipeline/fetch_brazil.py || echo "brazil fetch skipped"
+          # Batch 3 (Spain, Netherlands, Belgium, Austria, Ireland, Poland, Sweden are in fetch_eurostat.py above)
+          # Turkey: Ministry of Treasury and Finance monthly central government debt stock release. Never fails the run.
+          python3 pipeline/fetch_turkey.py || echo "turkey fetch skipped"
+          # Switzerland: Federal Finance Administration GFS quarterly workbooks. Never fails the run.
+          python3 pipeline/fetch_switzerland.py || echo "switzerland fetch skipped"
+          # Taiwan: National Treasury Administration open dataset D3-12F (weekly). Never fails the run.
+          python3 pipeline/fetch_taiwan.py || echo "taiwan fetch skipped"
+          # South Korea: Ministry of Planning and Budget Monthly Fiscal Trends PDF (needs pypdf). Never fails the run.
+          python3 pipeline/fetch_korea.py || echo "south-korea fetch skipped"
+          # Australia: AOFM Data Hub portfolio aggregate workbook (monthly). Never fails the run.
+          python3 pipeline/fetch_australia.py || echo "australia fetch skipped"
+          # Indonesia: DJPPR home page debt position (quarterly). Never fails the run.
+          python3 pipeline/fetch_indonesia.py || echo "indonesia fetch skipped"
+          # Saudi Arabia: National Debt Management Center Reports & Statistics (quarterly). Never fails the run.
+          python3 pipeline/fetch_saudi_arabia.py || echo "saudi-arabia fetch skipped"
           # World Debt Clock inputs: ECB + Bank of Russia daily FX, IMF WEO GDP weights. Keeps the last good file on any failure. Never fails the run.
           python3 pipeline/fetch_world.py || echo "world fetch skipped"
 
