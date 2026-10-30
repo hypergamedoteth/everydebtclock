@@ -22,8 +22,15 @@ def get(url, tries=3):
         except Exception:
             if i == tries - 1: raise
 
-def census(fips):
-    d = json.loads(get(API.format(fips=fips)))["response"]["data"]; h = d[0]; ix = {k: h.index(k) for k in h}
+def census(fips, tries=6):
+    # data.census.gov sometimes answers a burst of requests with an HTML/empty page instead of JSON: back off and retry before calling it unverifiable
+    import time
+    for i in range(tries):
+        try: d = json.loads(get(API.format(fips=fips)))["response"]["data"]; break
+        except (ValueError, KeyError):
+            if i == tries - 1: raise
+            time.sleep(4 * (i + 1))
+    h = d[0]; ix = {k: h.index(k) for k in h}
     out = {}
     for r in d[1:]:
         if r[ix["AGG_DESC"]] in ("LF0231", "LF0232", "LF0233") and r[ix["GOVTYPE_LABEL"]] in ("State", "Local", "State and Local"):
