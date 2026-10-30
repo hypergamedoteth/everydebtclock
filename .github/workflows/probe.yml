@@ -5,13 +5,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
+          sudo apt-get install -y poppler-utils >/dev/null 2>&1
           UA="Mozilla/5.0 (X11; Linux x86_64) everydebtclock.com"
-          curl -s -m 25 -L -A "$UA" "http://dea.gov.in/reports-public-debt-management" -o /tmp/dea.html
+          curl -s -m 60 -L -A "$UA" "http://dea.gov.in/reports-public-debt-management" -o /tmp/dea.html
           python3 - <<'PY'
-          import re,html
+          import re,html,subprocess,urllib.parse
           t=open('/tmp/dea.html',encoding='utf-8',errors='replace').read()
-          print(len(t))
-          for m in re.finditer(r'href="([^"]*public_debt_management_documents[^"]*)"',t):
-              ctx=html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',t[max(0,m.start()-300):m.start()])))[-90:]
-              print('LINK',m.group(1)[-100:],'<=',ctx)
+          hs=re.findall(r'href="([^"]*Report[^"]*Public[^"]*Debt[^"]*Management[^"]*quarter[^"]*)"',t)
+          print('NHREF',len(hs))
+          for i,h in enumerate(hs[:4]):
+              print('HREF',h)
+              u=h.replace('https://','http://').replace(' ','%20')
+              subprocess.run(['curl','-s','-m','90','-L','-A','Mozilla/5.0',u,'-o','/tmp/r%d.pdf'%i])
+              x=subprocess.run(['pdftotext','-layout','/tmp/r%d.pdf'%i,'-'],capture_output=True,text=True).stdout
+              for l in x.splitlines():
+                  if re.search(r'Public Debt|Gross Liabilit|Total Liabilit|End [A-Z][a-z]{2}|Net Liabil|Internal Debt|External Debt',l) and len(l)<200:
+                      print('PDF%d'%i,re.sub(r'\s{2,}','  ',l.strip()))
           PY
