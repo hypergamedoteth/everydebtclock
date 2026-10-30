@@ -1,0 +1,141 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in reais. The debt component, history and facts are refreshed by pipeline/fetch_brazil.py from BCB SGS series 13761 and 13762; edit wording here, not numbers.",
+ "slug": "brazil",
+ "kind": "country",
+ "country": "BR",
+ "name": "Brazil",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Banco Central do Brasil",
+ "currency": {
+  "code": "BRL",
+  "symbol": "R$"
+ },
+ "frequency": "monthly",
+ "title": "Brazil Debt Clock: Live Gross Government Debt, Official Data",
+ "headline": "gross government debt",
+ "headline_long": "general government gross debt (DBGG)",
+ "link_label": "gross government debt, R$",
+ "subject": "The Brazilian general government (federal, state and municipal)",
+ "hist_label": "General government gross debt (DBGG)",
+ "sum_note": "Brazil's general government gross debt (Dívida Bruta do Governo Geral, DBGG), month-end, from the Banco Central do Brasil. The closest Brazilian measure to the US Total Public Debt Outstanding: gross, not net of assets.",
+ "scope_note": "This is the Banco Central do Brasil's gross general government debt (DBGG, SGS series 13761): the debt of the federal government, the social security system (INSS), and state and municipal governments, in reais and before subtracting any assets. It does not include state-owned companies or the Central Bank's own liabilities. Under the Central Bank's methodology, in use since 2008, it does include the Central Bank's repurchase operations with government securities, because of their link to Treasury debt, but not the Treasury securities held in the Central Bank's own portfolio. The Central Bank also publishes net public sector debt, which subtracts assets and is a different measure. The page shows the DBGG as a share of GDP as a fact.",
+ "trend_why": "We use 12 months rather than the last month because month-to-month changes swing with auctions and redemptions.",
+ "legend": "Brazil's gross government debt is reported monthly, at month-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official month-end figures, shown here next to them.",
+ "cadence": "Monthly. The Banco Central do Brasil publishes each month-end figure about a month after the month ends (series 13761).",
+ "after_text": ", about a month after each month-end",
+ "next_update": "The October 2026 month-end figure is expected from the Banco Central do Brasil about a month after the month ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 213421037,
+  "noun": "people",
+  "as_of": "2025-07-01",
+  "source_name": "Brazilian Institute of Geography and Statistics (IBGE), Estimativas da população residente, 1 July 2025",
+  "source_url": "https://agenciadenoticias.ibge.gov.br/agencia-noticias/2012-agencia-de-noticias/noticias/44305-populacao-estimada-do-pais-chega-a-213-4-milhoes-de-habitantes-em-2025",
+  "publisher_short": "IBGE",
+  "tag": "IBGE",
+  "possessive": "IBGE's",
+  "method_short": "IBGE estimate of the resident population on 1 July 2025",
+  "noun_full": "people in Brazil"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Brazil general government gross debt",
+   "short": "Gross government debt",
+   "value": 11113782530000,
+   "as_of": "2026-09-30",
+   "prior_value": 9748473480000,
+   "prior_as_of": "2025-09-30",
+   "source_name": "Banco Central do Brasil, Sistema Gerenciador de Séries Temporais (SGS), series 13761, Dívida bruta do governo geral, R$ million",
+   "source_url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.13761/dados/ultimos/14?formato=json",
+   "source_locator": "SGS series 13761 (R$ million) and 13762 (% of GDP)",
+   "includes": "Gross debt of the federal government (including the INSS social security system) and of state and municipal governments, owed to the private sector, public financial institutions and abroad. Includes the Central Bank's repurchase operations with government securities; excludes state-owned companies and the Central Bank's own liabilities.",
+   "facts": [
+    {
+     "key": "pctgdp",
+     "label": "General government gross debt, % of GDP",
+     "value": 82.93,
+     "kind": "pct",
+     "as_of": "2026-09-30",
+     "note": "The same series expressed as a share of GDP by the Banco Central do Brasil (series 13762). A year earlier (2025-09-30) it was 77.84% of GDP.",
+     "source_name": "Banco Central do Brasil, SGS series 13762",
+     "source_url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.13762/dados/ultimos/14?formato=json",
+     "source_locator": "SGS 13762, Dívida bruta do governo geral (% PIB)"
+    }
+   ],
+   "history": [
+    [
+     "2025-09-30",
+     9748473480000
+    ],
+    [
+     "2025-10-31",
+     9855839290000
+    ],
+    [
+     "2025-11-30",
+     9990926090000
+    ],
+    [
+     "2025-12-31",
+     10017919140000
+    ],
+    [
+     "2026-01-31",
+     10079963200000
+    ],
+    [
+     "2026-02-28",
+     10178332410000
+    ],
+    [
+     "2026-03-31",
+     10355752430000
+    ],
+    [
+     "2026-04-30",
+     10442787180000
+    ],
+    [
+     "2026-05-31",
+     10622334580000
+    ],
+    [
+     "2026-06-30",
+     10809475190000
+    ],
+    [
+     "2026-07-31",
+     10946725800000
+    ],
+    [
+     "2026-08-31",
+     11054954370000
+    ],
+    [
+     "2026-09-30",
+     11113782530000
+    ]
+   ],
+   "breakdown": []
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Banco Central do Brasil, open data: DBGG (% of GDP), methodology used since 2008",
+   "url": "https://dadosabertos.bcb.gov.br/dataset/13762-divida-bruta-do-governo-geral--pib---metodologia-utilizada-a-partir-de-2008"
+  },
+  {
+   "name": "Banco Central do Brasil, Estatísticas fiscais (Nota para a imprensa)",
+   "url": "https://www.bcb.gov.br/estatisticas/estatisticasfiscais"
+  },
+  {
+   "name": "Tesouro Nacional, Dívida pública federal",
+   "url": "https://www.tesourotransparente.gov.br/"
+  }
+ ],
+ "notes": [
+  "Why this measure: DBGG is the headline gross debt statistic in Brazil's fiscal reporting. It is broader than the federal Treasury debt alone because it includes state and municipal governments.",
+  "Gross, not net: this is not net of the government's assets. The Banco Central do Brasil publishes net public sector debt separately."
+ ]
+}

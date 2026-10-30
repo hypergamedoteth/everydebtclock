@@ -64,7 +64,7 @@ FIP gotcha: requesting a `fields=` subset makes the API collapse identical rows.
 - Site URL defaults to `https://everydebtclock.com` (override with `DEBTCLOCK_SITE_URL` for previews).
 
 ## Cron plan (`.github/workflows/refresh.yml`, cron in UTC)
-- `30 11 * * *` — full morning recalibration (Census, BEA, MTS on release days ~8th business day, OMB, Canada, Mexico, Singapore, UK).
+- `30 11 * * *` — full morning recalibration (Census, BEA, MTS on release days ~8th business day, OMB, Canada, Mexico, Singapore, UK, Germany, France, Italy, Japan, China, India, Russia, Brazil).
 - `*/15 19-20 * * 1-5` and `0 21 * * 1-5` — weekday checks every 15 min, 2:00–4:00 PM CDT / 1:00–3:00 PM CST. Each runs `pipeline/check_new.py` and only fetches, commits and deploys when Treasury's Debt to the Penny has a newer `record_date` than `data/data.json`.
 - `45 21 * * 1-5` — full end-of-day refresh, 4:45 PM CDT / 3:45 PM CST.
 - Manual runs (`workflow_dispatch`) are gated the same way unless `force` is checked. Pushes rebuild and deploy without fetching.
