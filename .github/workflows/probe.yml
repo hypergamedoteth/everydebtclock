@@ -4,30 +4,19 @@ jobs:
   p:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - run: |
           sudo apt-get install -y poppler-utils >/dev/null 2>&1
-          UA="Mozilla/5.0 (X11; Linux x86_64) everydebtclock.com"
-          curl -s -m 60 -L -A "$UA" "http://dea.gov.in/reports-public-debt-management" -o /tmp/dea.html
-          curl -s -m 60 -L -A "$UA" "https://minfin.gov.ru/ru/perfomance/public_debt/internal/" -o /tmp/in.html
-          curl -s -m 60 -L -A "$UA" "https://minfin.gov.ru/ru/perfomance/public_debt/external/" -o /tmp/ex.html
+          cp places/india.json /tmp/india0.json; cp places/russia.json /tmp/russia0.json
+          python3 pipeline/fetch_india.py; python3 pipeline/fetch_russia.py
+          echo "== second run"; python3 pipeline/fetch_india.py; python3 pipeline/fetch_russia.py
           python3 - <<'PY'
-          import re,html,subprocess
-          t=open('/tmp/dea.html',encoding='utf-8',errors='replace').read()
-          hs=re.findall(r'href="([^"]*Report[^"]*Public[^"]*Debt[^"]*Management[^"]*quarter[^"]*)"',t)
-          h=hs[0]
-          u=h.replace('https://','http://').replace(' ','%20')
-          subprocess.run(['curl','-s','-m','90','-L','-A','Mozilla/5.0',u,'-o','/tmp/r0.pdf'])
-          x=subprocess.run(['pdftotext','-layout','/tmp/r0.pdf','-'],capture_output=True,text=True).stdout.splitlines()
-          idx=[i for i,l in enumerate(x) if 'Table 4.1: Total Liabilities' in l]
-          print('IDX',idx)
-          i=idx[-1]
-          for l in x[i:i+45]: print('P0',re.sub(r'\s{3,}','  |  ',l.rstrip())[:170])
-          for n in ('in','ex'):
-              s=open('/tmp/%s.html'%n,encoding='utf-8',errors='replace').read()
-              print('MF',n,len(s))
-              i=s.find('dept_point')
-              seg=s[i-200:i+4500]
-              seg=re.sub(r'\s+',' ',seg)
-              print('MFRAW',n,seg[:3500])
-              for m in re.finditer(r'href="([^"]*\.xlsx?[^"]*)"',s): print('MFLINK',n,m.group(1)[:140])
+          import json
+          for n in ('india','russia'):
+              a=json.load(open('/tmp/%s0.json'%n)); b=json.load(open('places/%s.json'%n))
+              c=b['components'][0]
+              print('RES',n,c['as_of'],c['value'],c['prior_as_of'],c['prior_value'],'changed' if a!=b else 'same')
+              print('RES hist',c['history'])
+              print('RES facts',[(f['key'],f['value'],f['as_of']) for f in c['facts']])
+              print('RES next',b['next_update'])
           PY

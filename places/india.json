@@ -1,0 +1,117 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Indian rupees. The debt component, history and facts are refreshed by pipeline/fetch_india.py from the DEA Quarterly Report on Public Debt Management; edit wording here, not numbers.",
+ "slug": "india",
+ "kind": "country",
+ "country": "IN",
+ "name": "India",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Department of Economic Affairs, Ministry of Finance",
+ "currency": {
+  "code": "INR",
+  "symbol": "₹"
+ },
+ "frequency": "quarterly",
+ "title": "India Debt Clock: Live Central Government Debt, Official Data",
+ "headline": "central government liabilities",
+ "headline_long": "central government gross liabilities",
+ "link_label": "central government liabilities, ₹",
+ "subject": "The Government of India (Union Government)",
+ "hist_label": "Central government gross liabilities",
+ "sum_note": "India's central (Union) government gross liabilities as per the FRBM Act (quarter-end, provisional), from the Department of Economic Affairs' Quarterly Report on Public Debt Management. The closest Indian measure to the US Total Public Debt Outstanding: gross, central government only.",
+ "scope_note": "This is the gross liabilities figure the Department of Economic Affairs publishes each quarter for the Union Government, defined as in the Fiscal Responsibility and Budget Management (FRBM) Act: public debt (internal and external), the other liabilities in the public account, and extra-budgetary resources, less the cash balance, in rupees. State governments' own debt is not in it. The reports label the figures provisional, and later reports revise them, so the page can move when a new report corrects earlier quarters. The report also gives other measures of the same liabilities, shown as facts.",
+ "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with the borrowing calendar, treasury bill rollovers and small savings flows.",
+ "legend": "India's central government liabilities are reported quarterly, at quarter-end. Borrowing happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
+ "cadence": "Quarterly. The Department of Economic Affairs publishes each quarterly report on its website, roughly three months after the quarter ends. The figures are provisional.",
+ "after_text": ", about three months after each quarter-end",
+ "next_update": "Refreshed automatically by the daily build.",
+ "population": {
+  "value": 1423435000,
+  "noun": "people",
+  "as_of": "2026-03-01",
+  "source_name": "Technical Group on Population Projections, National Commission on Population (Ministry of Health and Family Welfare), Population Projections for India and States 2011-2036, projected population on 1 March 2026",
+  "source_url": "https://www.descg.gov.in/pdf/statistics/pp/Population_Projection_Report_2011-2036.pdf",
+  "publisher_short": "NCP",
+  "tag": "NCP",
+  "possessive": "the NCP's",
+  "method_short": "official projected population on 1 March 2026 (India has had no census since 2011)",
+  "noun_full": "people in India"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "India central government gross liabilities",
+   "short": "Central government liabilities",
+   "value": 201168890000000,
+   "as_of": "2026-03-31",
+   "prior_value": 185938060000000,
+   "prior_as_of": "2025-03-31",
+   "source_name": "Department of Economic Affairs, Ministry of Finance, Quarterly Report on Public Debt Management, Table 4.1 Total Liabilities of Central Government, item H Gross Liabilities as per FRBM Act, rupees crore",
+   "source_url": "http://dea.gov.in/reports-public-debt-management",
+   "source_locator": "Table 4.1, item H Gross Liabilities as per FRBM Act (A + B - C + F - G)",
+   "includes": "Public debt (internal and external, with external debt at the current rate of exchange), other public account liabilities, and extra-budgetary resources, less the cash balance. The reports label the figures provisional.",
+   "facts": [
+    {
+     "key": "public_debt",
+     "label": "Public debt (internal and external)",
+     "value": 183434340000000,
+     "kind": "usd",
+     "as_of": "2026-03-31",
+     "note": "Item A of the same table: the Union Government's internal and external debt, with external debt at the current rate of exchange. Excludes the public account liabilities and extra-budgetary resources included in the headline.",
+     "source_name": "Department of Economic Affairs, Quarterly Report on Public Debt Management, Table 4.1",
+     "source_url": "http://dea.gov.in/reports-public-debt-management",
+     "source_locator": "Table 4.1, item A Public Debt (A1 + A2)"
+    },
+    {
+     "key": "net_liabilities",
+     "label": "Total (net) liabilities as reported in the Union Budget",
+     "value": 198821590000000,
+     "kind": "usd",
+     "as_of": "2026-03-31",
+     "note": "Item D of the same table: total liabilities in line with the Union Budget's reporting, with external debt at the historical rate of exchange. It is lower than the gross liabilities figure because the gross figure also adds extra-budgetary resources and deducts the cash balance on a different basis.",
+     "source_name": "Department of Economic Affairs, Quarterly Report on Public Debt Management, Table 4.1",
+     "source_url": "http://dea.gov.in/reports-public-debt-management",
+     "source_locator": "Table 4.1, item D Total (net) Liabilities"
+    }
+   ],
+   "history": [
+    [
+     "2025-03-31",
+     185938060000000
+    ],
+    [
+     "2025-06-30",
+     187862580000000
+    ],
+    [
+     "2025-09-30",
+     191297550000000
+    ],
+    [
+     "2025-12-31",
+     193937950000000
+    ],
+    [
+     "2026-03-31",
+     201168890000000
+    ]
+   ],
+   "breakdown": []
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Department of Economic Affairs, Status Paper on Government Debt",
+   "url": "http://dea.gov.in/reports-public-debt-management"
+  },
+  {
+   "name": "Reserve Bank of India, Handbook of Statistics on the Indian Economy",
+   "url": "https://www.rbi.org.in/Scripts/AnnualPublications.aspx?head=Handbook+of+Statistics+on+Indian+Economy"
+  }
+ ],
+ "notes": [
+  "Why this measure: the Department of Economic Affairs' gross liabilities as per the FRBM Act is its widest published quarterly figure for the Union Government, and the nearest match to the US clock's gross Total Public Debt Outstanding.",
+  "Provisional and revised: the reports mark the figures provisional and revise earlier quarters when a new report is published, so past values on this page can change slightly.",
+  "Population: India has had no census since 2011, so debt per person divides by the official projected population (National Commission on Population) for 1 March 2026."
+ ]
+}
