@@ -6,13 +6,14 @@ jobs:
     steps:
       - run: |
           UA="Mozilla/5.0 (X11; Linux x86_64) everydebtclock.com"
-          pip install -q xlrd 2>&1 | tail -1
-          curl -s -m 40 -A "$UA" "https://minfin.gov.ru/common/upload/library/2026/10/main/Obem_gosdolga_s_garantiyami_god_polnostu_na_01_10_2026.xls" -o /tmp/x.xls
+          curl -s -m 25 -L -A "$UA" "http://dea.gov.in/reports-public-debt-management" -o /tmp/dea.html
           python3 - <<'PY'
-          import xlrd
-          b=xlrd.open_workbook('/tmp/x.xls')
-          for n in ('2025 г.','2026 г.'):
-              s=b.sheet_by_name(n)
-              for r in range(s.nrows):
-                  print(n,r,[str(c.value).strip()[:30] for c in s.row(r) if c.value!=''])
+          import re,html
+          t=open('/tmp/dea.html',encoding='utf-8',errors='replace').read()
+          for m in re.finditer(r'<tr[^>]*>(.*?)</tr>',t,flags=re.S):
+              r=m.group(1)
+              h=re.findall(r'href="([^"]*\.pdf)"',r)
+              if h:
+                  txt=html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',r))).strip()
+                  print('ROW',txt[:150],'=>',h[0][-110:])
           PY
