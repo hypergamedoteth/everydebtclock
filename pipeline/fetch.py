@@ -684,7 +684,7 @@ if tf:
         s = series(accts)[-13:]
         add(slug, calc=ols_calc([d for d in ds][-13:], [x for x, _ in s], [y for _, y in s], "last 13 month-ends"), label=label, group="trust", kind="usd", base=s[-1][1], t0=s[-1][0], rate=ols_slope([x for x, _ in s], [y for _, y in s]), as_of=last,
             source=FIP_URL, source_name="Treasury, Federal Investments Program: Principal Outstanding",
-            method=f"Par value of Treasury securities held by the fund(s) at month-end {last}. Ticks at the 12-month trend; a falling number means the fund is being drawn down.", stale=tf_stale)
+            method=f"Par value of Treasury securities held by the fund(s) at month-end {last}. Ticks at the 12-month trend; a falling number means the fund is being drawn down." + (" Medicare HI/SMI dip at month-ends before a weekend 1st (next month's Medicare payments go out early)." if "075X8005" in accts or "075X8004" in accts else ""), stale=tf_stale)
 
 # ---- "Why the debt grew more than the deficit" (FY explainer, computed from official data)
 def src_explain():
@@ -746,6 +746,14 @@ DERIVED = {
 }
 
 # ---------------------------------------------------------------- validation (daily)
+# Medicare HI/SMI month-end balances dip by tens of $bn when the 1st of the next month falls on a weekend: the monthly
+# Medicare Advantage / Part D payments are made on the last business day instead, so that day's official balance is
+# already net of next month's payments (observed in the Treasury FIP data: Oct 2025, Jan/Feb/Jul/Oct 2026 and no other month).
+# The balance is real, but comparing it with a trend projected from an ordinary month-end is not a projection error.
+TF_TIMING = {"tf_medicare", "tf_hi", "tf_smi"}
+def early_payment_month_end(d):
+    d = dt.date.fromisoformat(d); first = (d.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
+    return first.weekday() >= 5 and (first - d).days <= 3
 def project(x, t):
     """Same math as core.js/app.js val(): base + rate x elapsed (capped at freeze_t) + any scheduled payment ramps."""
     if x.get("freeze_t") and t > x["freeze_t"]: t = x["freeze_t"]
@@ -772,13 +780,14 @@ if os.path.exists(prev_path):
             err = (proj - n["base"]) / abs(n["base"]) * 100
             # Like-for-like: a change of basis/source, or of the official anchor (e.g. the first MTS of the year replacing
             # the DTS-only estimate), re-bases the figure; that jump is not a projection error.
+            timing = slug in TF_TIMING and early_payment_month_end(p["as_of"]) != early_payment_month_end(n["as_of"])
             switched = (p.get("basis") != n.get("basis") or p.get("source") != n.get("source")
                         or (p.get("anchor") is not None and p.get("anchor") != n.get("anchor")))
             validation_rows.append({"ticker": slug, "from": p["as_of"], "to": n["as_of"], "projected": round(proj, 2),
                                     "official": n["base"], "error_pct": round(err, 4),
-                                    "mode": ("method_switch_" + str(p.get("basis") or "mts") + "_to_" + str(n.get("basis"))) if switched else ("daily_vs_dts" if n.get("basis") == "dts" else "daily"),
+                                    "mode": ("method_switch_" + str(p.get("basis") or "mts") + "_to_" + str(n.get("basis"))) if switched else ("payment_timing" if timing else "daily_vs_dts" if n.get("basis") == "dts" else "daily"),
                                     "thr": THR.get(slug, 0.25 if n["group"] == "debt" else 3.0 if n.get("basis") == "dts" else 5.0)})
-            if switched: continue
+            if switched or timing: continue
             thr = THR.get(slug, 0.25 if n["group"] == "debt" else 3.0 if n.get("basis") == "dts" else 5.0)
             n.setdefault("validation", {}).update({"last_error_pct": round(err, 4), "threshold_pct": thr, "flag": abs(err) > thr,
                                                    "against": n["source_name"]})
@@ -800,7 +809,7 @@ with open(logp, "a", newline="") as f:
     if new: w.writeheader()
     for r in validation_rows:
         thr = r.pop("thr", None) or (5.0 if r["mode"] == "dts_ratio_backtest" else THR.get(r["ticker"], 0.25 if r["ticker"].startswith("debt") else 5.0))
-        w.writerow({"run_iso": META["generated_iso"], **r, "flag": (not r["mode"].startswith("method_switch")) and r["error_pct"] is not None and abs(r["error_pct"]) > thr, "threshold_pct": thr})
+        w.writerow({"run_iso": META["generated_iso"], **r, "flag": (not r["mode"].startswith(("method_switch", "payment_timing"))) and r["error_pct"] is not None and abs(r["error_pct"]) > thr, "threshold_pct": thr})
 
 flags = [s for s, t in T.items() if t.get("validation", {}).get("flag")]
 META.update({"errors": errors, "flags": flags, "denominators": {"population": "population", "tax_returns": "tax_returns"}})
