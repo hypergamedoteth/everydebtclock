@@ -5,19 +5,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          t(){ echo "== $1"; curl -s -m 25 -L -A "Mozilla/5.0 (X11; Linux x86_64) everydebtclock.com" -o /tmp/o.bin -w "%{http_code} %{size_download} %{content_type}\n" "$1" || echo "curl-fail $?"; head -c 120 /tmp/o.bin | tr '\n' ' '; echo; }
+          sudo apt-get install -y -qq poppler-utils >/dev/null 2>&1 || true
           which pdftotext || echo "no pdftotext"
-          t "https://dea.gov.in/reports-public-debt-management"
-          t "http://dea.gov.in/files/public_debt_management_documents/Quarterly%20Report%20on%20Public%20Debt%20Management%20for%20the%20quarter%20October%20-%20December%202025.pdf"
-          t "https://minfin.gov.ru/ru/perfomance/public_debt/internal/"
-          t "https://minfin.gov.ru/ru/perfomance/public_debt/external/"
-          t "https://gks.mof.gov.cn/tongjishuju/"
-          t "https://gks.mof.gov.cn/tongjishuju/202610/P020261026531673083870.pdf"
-          t "https://www.mof.go.jp/english/policy/jgbs/reference/gbb/e202606.html"
-          t "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt?format=JSON&lang=EN&geo=DE&sector=S1311&unit=MIO_EUR&na_item=GD&sinceTimePeriod=2026-Q1"
-          t "https://api.bcb.gov.br/dados/serie/bcdata.sgs.13761/dados/ultimos/2?formato=json"
-          t "https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?lastNObservations=1&format=csvdata"
-          t "https://www.cbr.ru/scripts/XML_daily.asp"
-          t "https://www.imf.org/external/datamapper/api/v1/NGDPD/USA"
-          t "https://www.federalreserve.gov/releases/h10/current/"
-          t "https://api.worldbank.org/v2/country/USA/indicator/NY.GDP.MKTP.CD?format=json&mrv=1"
+          UA="Mozilla/5.0 (X11; Linux x86_64) everydebtclock.com"
+          echo "### DEA listing http"; curl -s -m 25 -L -A "$UA" "http://dea.gov.in/reports-public-debt-management" -o /tmp/dea.html -w "%{http_code} %{size_download}\n" || echo fail
+          grep -o 'href="[^"]*[Qq]uarterly[^"]*"' /tmp/dea.html | head -12
+          echo "### DEA pdf"
+          curl -s -m 40 -A "$UA" "http://dea.gov.in/files/public_debt_management_documents/Quarterly%20Report%20on%20Public%20Debt%20Management%20for%20the%20quarter%20October%20-%20December%202025.pdf" -o /tmp/dea.pdf
+          pdftotext -layout /tmp/dea.pdf /tmp/dea.txt; grep -n "Public Debt (A\|Total (net)\|Gross Liabilities\|End Dec\|Provisional\|A1\. Internal\|Table 4.1" /tmp/dea.txt | head -20
+          echo "### MINFIN internal"
+          curl -s -m 25 -A "$UA" "https://minfin.gov.ru/ru/perfomance/public_debt/internal/" -o /tmp/mf.html
+          grep -o 'href="[^"]*\(xls\|xlsx\|doc\|id_4\|download\)[^"]*"' /tmp/mf.html | sort -u | head -15
+          python3 - <<'PY'
+          import re,html
+          t=open('/tmp/mf.html',encoding='utf-8',errors='replace').read()
+          t=re.sub(r'<script.*?</script>|<style.*?</style>','',t,flags=re.S)
+          t=html.unescape(re.sub(r'<[^>]+>',' ',t)); t=re.sub(r'\s+',' ',t)
+          for m in re.finditer(r'(01\.0[6-9]\.2026|Объем государственного внутреннего долга|33 15)',t):
+              print(t[max(0,m.start()-100):m.start()+250]); print('--'); break
+          i=t.find('Динамика'); print(t[i:i+800])
+          PY
+          echo "### MINFIN external"
+          curl -s -m 25 -A "$UA" "https://minfin.gov.ru/ru/perfomance/public_debt/external/" -o /tmp/mx.html
+          grep -o 'href="[^"]*\(xls\|xlsx\|id_4\)[^"]*"' /tmp/mx.html | sort -u | head -10
+          python3 - <<'PY'
+          import re,html
+          t=open('/tmp/mx.html',encoding='utf-8',errors='replace').read()
+          t=re.sub(r'<script.*?</script>|<style.*?</style>','',t,flags=re.S)
+          t=html.unescape(re.sub(r'<[^>]+>',' ',t)); t=re.sub(r'\s+',' ',t)
+          i=t.find('внешн'); print(t[i:i+200])
+          for m in re.finditer(r'(на 1 (сентября|августа|октября) 2026|01\.09\.2026|01\.10\.2026)',t):
+              print(t[max(0,m.start()-200):m.start()+400]); break
+          PY
