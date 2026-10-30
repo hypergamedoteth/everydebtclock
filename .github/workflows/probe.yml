@@ -1,0 +1,23 @@
+name: probe
+on: push
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          t(){ echo "== $1"; curl -s -m 25 -L -A "Mozilla/5.0 (X11; Linux x86_64) everydebtclock.com" -o /tmp/o.bin -w "%{http_code} %{size_download} %{content_type}\n" "$1" || echo "curl-fail $?"; head -c 120 /tmp/o.bin | tr '\n' ' '; echo; }
+          which pdftotext || echo "no pdftotext"
+          t "https://dea.gov.in/reports-public-debt-management"
+          t "http://dea.gov.in/files/public_debt_management_documents/Quarterly%20Report%20on%20Public%20Debt%20Management%20for%20the%20quarter%20October%20-%20December%202025.pdf"
+          t "https://minfin.gov.ru/ru/perfomance/public_debt/internal/"
+          t "https://minfin.gov.ru/ru/perfomance/public_debt/external/"
+          t "https://gks.mof.gov.cn/tongjishuju/"
+          t "https://gks.mof.gov.cn/tongjishuju/202610/P020261026531673083870.pdf"
+          t "https://www.mof.go.jp/english/policy/jgbs/reference/gbb/e202606.html"
+          t "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt?format=JSON&lang=EN&geo=DE&sector=S1311&unit=MIO_EUR&na_item=GD&sinceTimePeriod=2026-Q1"
+          t "https://api.bcb.gov.br/dados/serie/bcdata.sgs.13761/dados/ultimos/2?formato=json"
+          t "https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?lastNObservations=1&format=csvdata"
+          t "https://www.cbr.ru/scripts/XML_daily.asp"
+          t "https://www.imf.org/external/datamapper/api/v1/NGDPD/USA"
+          t "https://www.federalreserve.gov/releases/h10/current/"
+          t "https://api.worldbank.org/v2/country/USA/indicator/NY.GDP.MKTP.CD?format=json&mrv=1"
