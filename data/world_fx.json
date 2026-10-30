@@ -37,8 +37,8 @@
   "feed": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
  },
  "cbr": {
-  "date": "2026-10-30",
-  "rub_per_usd": 80.6761,
+  "date": "2026-10-31",
+  "rub_per_usd": 80.5573,
   "source": "Bank of Russia, official exchange rate of the rouble to the US dollar",
   "source_url": "https://www.cbr.ru/eng/currency_base/daily/",
   "feed": "https://www.cbr.ru/scripts/XML_daily.asp"
