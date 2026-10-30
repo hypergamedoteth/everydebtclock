@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Quarterly re-base of places/germany.json, places/france.json and places/italy.json from Eurostat's official dissemination API,
-table gov_10q_ggdebt "Quarterly government debt" (national accounts, Maastricht definition, EUR million, quarter-end).
+"""Quarterly re-base of the Eurostat-sourced places (see PLACES: Germany, France, Italy, Spain, Netherlands, Belgium, Austria, Ireland, Poland, Sweden) from Eurostat's official dissemination API,
+table gov_10q_ggdebt "Quarterly government debt" (national accounts, Maastricht definition, million euro, or million national currency for Poland and Sweden; quarter-end).
 
 Series used per country:
   sector S1311 (central government), na_item GD  <- the ticking hero: consolidated gross debt of central government
@@ -16,7 +16,10 @@ import json, os, re, sys, calendar, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 API = "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/"
-PLACES = {"germany": "DE", "france": "FR", "italy": "IT"}
+PLACES = {"germany": "DE", "france": "FR", "italy": "IT", "spain": "ES", "netherlands": "NL", "belgium": "BE", "austria": "AT", "ireland": "IE",
+          "poland": "PL", "sweden": "SE"}
+NAC = {"PL", "SE"}   # reported in national currency (MIO_NAC: zloty, krona); the rest are euro (MIO_EUR)
+CONSOLIDATION = {"NL", "IE"}   # central government debt can exceed the general government total (intra-government holdings netted only in S13)
 PARTS = [("F2", "Currency and deposits", "Deposits"), ("F31", "Short-term debt securities", "Debt securities"),
          ("F32", "Long-term debt securities", "Debt securities"), ("F41", "Short-term loans", "Loans"), ("F42", "Long-term loans", "Loans")]
 M = 1_000_000
@@ -45,11 +48,12 @@ def qend(k):  # "2026-Q2" -> 2026-06-30
 
 def fetch_debt():
     items = "&".join("na_item=" + n for n in ["GD"] + [x[0] for x in PARTS])
-    geos = "&".join("geo=" + g for g in PLACES.values())
-    url = f"{API}gov_10q_ggdebt?format=JSON&lang=EN&{geos}&sector=S1311&sector=S13&unit=MIO_EUR&{items}&sinceTimePeriod=2024-Q1"
     ser = {}
-    for c, v in cells(get(url)):
-        ser[(c["geo"], c["sector"], c["na_item"], c["time"])] = v
+    for unit, grp in (("MIO_EUR", [g for g in PLACES.values() if g not in NAC]), ("MIO_NAC", sorted(NAC))):
+        geos = "&".join("geo=" + g for g in grp)
+        url = f"{API}gov_10q_ggdebt?format=JSON&lang=EN&{geos}&sector=S1311&sector=S13&unit={unit}&{items}&sinceTimePeriod=2024-Q1"
+        for c, v in cells(get(url)):
+            ser[(c["geo"], c["sector"], c["na_item"], c["time"])] = v
     return ser
 
 def rebase(p, geo, ser):
@@ -62,10 +66,11 @@ def rebase(p, geo, ser):
         ya, qa = int(a[:4]), int(a[6]); nxt = f"{ya + (qa == 4)}-Q{qa % 4 + 1}"
         if nxt != b: raise RuntimeError(f"gap in quarters between {a} and {b}")
     last, prior = q[-1], q[-5]
-    v = lambda t, s, n: int(round(ser[(geo, s, n, t)] * M))   # EUR million with one decimal -> whole euro (exact to EUR 100k)
+    v = lambda t, s, n: int(round(ser[(geo, s, n, t)] * M))   # million with one decimal -> whole currency unit (exact to 100k)
+    sym = p["currency"]["symbol"]
     tot = v(last, "S1311", "GD")
     if abs(sum(v(last, "S1311", n) for n, _, _ in PARTS) - tot) > 1 * M: raise RuntimeError("instruments do not add up to the total")
-    if v(last, "S13", "GD") < tot: raise RuntimeError("general government debt below central government debt")
+    if v(last, "S13", "GD") < tot and geo not in CONSOLIDATION: raise RuntimeError("general government debt below central government debt")
     c = p["components"][0]; as_of = qend(last)
     if as_of < c["as_of"]: raise RuntimeError(f"Eurostat quarter {as_of} older than file {c['as_of']}")
     c.update(value=tot, as_of=as_of, prior_value=v(prior, "S1311", "GD"), prior_as_of=qend(prior),
@@ -75,8 +80,9 @@ def rebase(p, geo, ser):
         if f.get("key") == "gg":
             gg, gg0 = v(last, "S13", "GD"), v(prior, "S13", "GD")
             f.update(value=gg, as_of=as_of)
-            f["note"] = (f["note"].split(" A year earlier")[0].strip() + f" A year earlier ({qend(prior)}) it was €{gg0 / 1e9:,.1f} billion. "
-                         f"Central government is {100 * tot / gg:.1f}% of it.")
+            f["note"] = (f["note"].split(" A year earlier")[0].strip() + f" A year earlier ({qend(prior)}) it was {sym}{gg0 / 1e9:,.1f} billion. "
+                         + (f"Central government is {100 * tot / gg:.1f}% of it." if tot <= gg else
+                            "Central government debt here is larger than the general government total because the general government figure nets out debt held between government units, which the central government figure does not."))
     y, qq = int(last[:4]), int(last[6]); ny, nq = (y + (qq == 4), qq % 4 + 1)
     p["next_update"] = (f"The Q{nq} {ny} quarter-end figure is expected from Eurostat roughly three months after the quarter ends; "
                         "this page re-bases to it automatically on the next daily build after it appears.")
@@ -109,7 +115,7 @@ def main():
             print(f"{slug}: not updated:", e); continue
         if new != p:
             json.dump(new, open(path, "w"), indent=1, ensure_ascii=False); open(path, "a").write("\n")
-            c = new["components"][0]; print(f"{slug}: {c['as_of']} €{c['value']:,} (prior {c['prior_as_of']} €{c['prior_value']:,})")
+            c = new["components"][0]; sy = new["currency"]["symbol"]; print(f"{slug}: {c['as_of']} {sy}{c['value']:,} (prior {c['prior_as_of']} {sy}{c['prior_value']:,})")
         else: print(f"{slug}: unchanged")
     return 0
 

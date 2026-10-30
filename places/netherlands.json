@@ -1,0 +1,154 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in euros. The debt component, history and facts are refreshed by pipeline/fetch_eurostat.py from Eurostat tables gov_10q_ggdebt and demo_pjan; edit wording here, not numbers.",
+ "slug": "netherlands",
+ "kind": "country",
+ "country": "NL",
+ "name": "Netherlands",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Eurostat (national statistical institutes' EDP data)",
+ "currency": {
+  "code": "EUR",
+  "symbol": "€"
+ },
+ "frequency": "quarterly",
+ "title": "Netherlands Debt Clock: Live Central Government Debt, Official Data",
+ "headline": "central government debt",
+ "headline_long": "central government gross debt",
+ "link_label": "central government debt, €",
+ "subject": "The central government of the Netherlands",
+ "hist_label": "Central government gross debt",
+ "sum_note": "The Netherlands' central government gross debt (Maastricht definition, quarter-end), from Eurostat's quarterly government debt statistics, which are compiled from national data. The closest EU-comparable measure to the US Total Public Debt Outstanding.",
+ "scope_note": "This is central government gross debt in the EU's Maastricht (excessive deficit procedure) definition, taken from Eurostat's quarterly table: everything the central government sector owes in currency and deposits, debt securities and loans, at nominal value and before subtracting any cash or other assets.  It is the closest EU-comparable match to the US national debt clock's Total Public Debt Outstanding. Figures are in euros. Eurostat publishes it by sector, so the wider general government total is shown below as a fact.",
+ "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with bond issuance calendars and short-term borrowing.",
+ "legend": "The Netherlands' government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
+ "cadence": "Quarterly. Eurostat publishes each quarter-end figure (table gov_10q_ggdebt) about three months after the quarter ends.",
+ "after_text": ", about three months after each quarter-end",
+ "next_update": "The Q3 2026 quarter-end figure is expected from Eurostat roughly three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 18044027,
+  "noun": "people",
+  "as_of": "2025-01-01",
+  "source_name": "Eurostat, Population on 1 January by age and sex (demo_pjan), Netherlands",
+  "source_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_pjan/default/table",
+  "publisher_short": "Eurostat",
+  "tag": "Eurostat",
+  "possessive": "Eurostat's",
+  "method_short": "Eurostat population on 1 January, the latest published",
+  "noun_full": "people in the Netherlands"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Netherlands central government gross debt",
+   "short": "Central government debt",
+   "value": 581531000000,
+   "as_of": "2026-06-30",
+   "prior_value": 536789000000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Eurostat, Quarterly government debt (gov_10q_ggdebt), central government (S1311), Maastricht debt, million euro",
+   "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+   "source_locator": "geo=NL, sector S1311, na_item GD, unit MIO_EUR; machine-readable: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt",
+   "includes": "Central government gross debt at nominal value in the EU's Maastricht (EDP) definition: currency and deposits, short- and long-term debt securities and loans. In the Netherlands this is the central government (the State and central-government bodies); municipalities, provinces, water boards and social security funds are separate sectors.",
+   "facts": [
+    {
+     "key": "gg",
+     "label": "Netherlands general government gross debt (Maastricht)",
+     "value": 523795000000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "All levels of government (central, state, local and social security) in the same Eurostat table, the measure used in EU fiscal rules. It is a wider measure than the one ticking on this page. A year earlier (2025-06-30) it was €491.5 billion. Central government debt here is larger than the general government total because the general government figure nets out debt held between government units, which the central government figure does not.",
+     "source_name": "Eurostat, gov_10q_ggdebt (sector S13, GD)",
+     "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+     "source_locator": "geo=NL, sector S13, na_item GD, unit MIO_EUR"
+    }
+   ],
+   "history": [
+    [
+     "2024-06-30",
+     514544000000
+    ],
+    [
+     "2024-09-30",
+     501305000000
+    ],
+    [
+     "2024-12-31",
+     522080000000
+    ],
+    [
+     "2025-03-31",
+     523477000000
+    ],
+    [
+     "2025-06-30",
+     536789000000
+    ],
+    [
+     "2025-09-30",
+     539890000000
+    ],
+    [
+     "2025-12-31",
+     566928000000
+    ],
+    [
+     "2026-03-31",
+     564552000000
+    ],
+    [
+     "2026-06-30",
+     581531000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Currency and deposits",
+     "value": 109249000000,
+     "group": "Deposits"
+    },
+    {
+     "label": "Short-term debt securities",
+     "value": 39936000000,
+     "group": "Debt securities"
+    },
+    {
+     "label": "Long-term debt securities",
+     "value": 408569000000,
+     "group": "Debt securities"
+    },
+    {
+     "label": "Short-term loans",
+     "value": 1741000000,
+     "group": "Loans"
+    },
+    {
+     "label": "Long-term loans",
+     "value": 22036000000,
+     "group": "Loans"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Eurostat, Government finance statistics - quarterly data",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Government_finance_statistics_-_quarterly_data"
+  },
+  {
+   "name": "Statistics Netherlands (CBS), Government debt (EMU debt)",
+   "url": "https://www.cbs.nl/en-gb/figures/detail/84071ENG"
+  },
+  {
+   "name": "De Nederlandsche Bank, Public finance statistics",
+   "url": "https://www.dnb.nl/en/statistics/"
+  }
+ ],
+ "notes": [
+  "Why Eurostat: it is the official EU statistical office and publishes quarterly government debt for every member state on one definition, compiled from the figures the national statistical institutes and central banks report to it. The fetcher reads its public API directly.",
+  "Provisional data: Eurostat flags the latest quarters as provisional and revises them in later releases. The page re-bases to each new release.",
+  "Why central government: the US clock ticks the federal Treasury's gross debt. The central government sector (Eurostat code S.1311) is the nearest match; state, local and social security debt are not in it. The table's breakdown by instrument adds up to the headline.",
+  "Why central government can exceed the general government total: the general government (S.13) figure is consolidated across all government units, so debt held between the central government and local governments or social security funds is netted out, while the central government sector's own figure is consolidated only within the sector. Both are published on the same Eurostat table; this page ticks the central government figure and shows the general government total as a fact."
+ ],
+ "reporter": "The Netherlands"
+}

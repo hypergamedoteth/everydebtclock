@@ -1,0 +1,146 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Swiss francs. The debt component, history and facts are refreshed by pipeline/fetch_switzerland.py from the Federal Finance Administration's quarterly GFS workbooks; edit wording here, not numbers.",
+ "slug": "switzerland",
+ "kind": "country",
+ "country": "CH",
+ "iso3": "CHE",
+ "name": "Switzerland",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Federal Finance Administration (EFV / AFF), Switzerland",
+ "currency": {
+  "code": "CHF",
+  "symbol": "CHF "
+ },
+ "frequency": "quarterly",
+ "title": "Switzerland Debt Clock: Live Federal Gross Debt, Official Data",
+ "headline": "federal gross debt",
+ "headline_long": "Confederation gross debt",
+ "link_label": "federal gross debt, CHF",
+ "subject": "The Swiss Confederation (federal government)",
+ "hist_label": "Federal Gross Debt",
+ "sum_note": "Swiss Confederation gross debt (Bruttoschulden) in the Federal Finance Administration's quarterly GFS statistics (SDDS Plus), quarter-end. Gross, federal government only; includes non-borrowing liabilities such as accounts payable.",
+ "scope_note": "This is the Federal Finance Administration's \"Bruttoschulden Bund\" from its quarterly government finance statistics (GFS), as reported for the IMF's SDDS Plus: all the Confederation's financial liabilities except gold and special drawing rights. Besides deposits, debt securities and loans, GFS counts insurance and pension liabilities and other accounts payable, which is why this is larger than the amount the Confederation has actually borrowed; that borrowed part is shown below as a fact. Cantons, municipalities and the social insurance funds are not in it; the wider general government total is shown as a second fact. Figures are in Swiss francs and are not reduced by any assets.",
+ "trend_why": "We use the latest twelve months rather than the last quarter because changes between single reporting dates swing with the issuance calendar and short-term borrowing.",
+ "legend": "Switzerland's federal debt is reported quarterly, at quarter-end. The live number is a straight-line projection between official quarter-end figures, shown here next to them.",
+ "cadence": "Quarterly. The Federal Finance Administration publishes each quarter-end figure about three months after the quarter ends.",
+ "after_text": ", about three months after each quarter-end",
+ "next_update": "The Q3 2026 quarter-end figure is expected from the Federal Finance Administration roughly three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 9127100,
+  "noun": "people",
+  "as_of": "2025-12-31",
+  "source_name": "Federal Statistical Office (FSO), permanent resident population, definitive result at 31 December 2025",
+  "source_url": "https://www.bfs.admin.ch/news/de/2026-0167",
+  "publisher_short": "FSO",
+  "tag": "FSO",
+  "possessive": "the FSO's",
+  "method_short": "FSO permanent resident population at 31 December 2025 (definitive, rounded to hundreds)",
+  "noun_full": "people in Switzerland"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Swiss Confederation gross debt",
+   "short": "Federal gross debt",
+   "value": 177553647048,
+   "as_of": "2026-06-30",
+   "prior_value": 181227608050,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Federal Finance Administration, GFS quarterly data (SDDS Plus), \"Schulden Bund\", row Bruttoschulden, CHF thousand",
+   "source_url": "https://www.efv.admin.ch/de/fs-daten",
+   "source_locator": "cgd_q-d.xlsx on data.finance.admin.ch (machine-readable: https://www.data.finance.admin.ch/static/assets/datasets/gfs_dashboard/cgd_q-d.xlsx), row Bruttoschulden",
+   "includes": "All financial liabilities of the Confederation except gold and SDRs: deposits, debt securities, loans, insurance and pension liabilities and other accounts payable, gross. Cantons, municipalities and social insurance are separate.",
+   "facts": [
+    {
+     "key": "borrowed",
+     "label": "Of which borrowed: deposits, debt securities and loans",
+     "value": 105141034932,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "The sum of currency and deposits, debt securities and loans in the same table: the money the Confederation has actually borrowed. The rest of the headline is insurance and pension liabilities and other accounts payable.",
+     "source_name": "Federal Finance Administration, GFS quarterly data (SDDS Plus)",
+     "source_url": "https://www.efv.admin.ch/de/fs-daten",
+     "source_locator": "cgd_q-d.xlsx, rows Bargeld und Einlagen, Schuldtitel, Kredite"
+    },
+    {
+     "key": "gg",
+     "label": "Swiss general government gross debt (all levels)",
+     "value": 340303508905,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "Confederation, cantons, municipalities and social insurance together (row Bruttoschulden, general government), same publication. A wider measure than the one ticking on this page. A year earlier (2025-06-30) it was CHF 340.0 billion.",
+     "source_name": "Federal Finance Administration, GFS quarterly data (SDDS Plus)",
+     "source_url": "https://www.efv.admin.ch/de/fs-daten",
+     "source_locator": "ggd_q-d.xlsx, row Bruttoschulden"
+    }
+   ],
+   "history": [
+    [
+     "2025-06-30",
+     181227608050
+    ],
+    [
+     "2025-09-30",
+     180792829426
+    ],
+    [
+     "2025-12-31",
+     181395915630
+    ],
+    [
+     "2026-03-31",
+     183154348738
+    ],
+    [
+     "2026-06-30",
+     177553647048
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Currency and deposits",
+     "value": 17903145473,
+     "group": "Deposits"
+    },
+    {
+     "label": "Debt securities",
+     "value": 80366452154,
+     "group": "Debt securities"
+    },
+    {
+     "label": "Loans",
+     "value": 6871437305,
+     "group": "Loans"
+    },
+    {
+     "label": "Insurance and pension liabilities",
+     "value": 2378917890,
+     "group": "Other liabilities"
+    },
+    {
+     "label": "Other liabilities (accounts payable and other)",
+     "value": 70033694226,
+     "group": "Other liabilities"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Federal Finance Administration, Finance statistics data",
+   "url": "https://www.efv.admin.ch/de/fs-daten"
+  },
+  {
+   "name": "Swiss National Bank, Data portal",
+   "url": "https://data.snb.ch/en"
+  }
+ ],
+ "notes": [
+  "Why this measure: Bruttoschulden is the Federal Finance Administration's own gross debt line in the quarterly GFS statistics it reports to the IMF, the closest official match to the US clock's gross total. Its breakdown by instrument adds up to the headline and the fetcher checks that.",
+  "Why it is larger than borrowing: the GFS gross debt counts all liabilities except gold and SDRs, including insurance and pension liabilities and other accounts payable. The money actually borrowed is shown as a fact.",
+  "The debt brake: Switzerland's constitutional debt brake works on the federal budget balance, not on this stock measure. The Federal Finance Administration publishes other debt figures on a national accounting basis that differ from this GFS series.",
+  "The franc: the World Debt Clock converts Swiss francs to US dollars at the ECB's daily reference rate for CHF."
+ ],
+ "world_measure": "Central government, gross (GFS)"
+}

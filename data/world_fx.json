@@ -42,5 +42,17 @@
   "source": "Bank of Russia, official exchange rate of the rouble to the US dollar",
   "source_url": "https://www.cbr.ru/eng/currency_base/daily/",
   "feed": "https://www.cbr.ru/scripts/XML_daily.asp"
+ },
+ "fed": {
+  "date": "2026-10-23",
+  "per_usd": {
+   "TWD": 32.54
+  },
+  "dates": {
+   "TWD": "2026-10-23"
+  },
+  "source": "Federal Reserve Board, H.10 Foreign Exchange Rates (weekly release; noon buying rates in New York)",
+  "source_url": "https://www.federalreserve.gov/releases/h10/current/",
+  "feed": "https://www.federalreserve.gov/releases/h10/current/"
  }
 }

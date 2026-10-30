@@ -1,0 +1,154 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in kronor. The debt component, history and facts are refreshed by pipeline/fetch_eurostat.py from Eurostat tables gov_10q_ggdebt and demo_pjan; edit wording here, not numbers.",
+ "slug": "sweden",
+ "kind": "country",
+ "country": "SE",
+ "name": "Sweden",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Eurostat (national statistical institutes' EDP data)",
+ "currency": {
+  "code": "SEK",
+  "symbol": "kr"
+ },
+ "frequency": "quarterly",
+ "title": "Sweden Debt Clock: Live Central Government Debt, Official Data",
+ "headline": "central government debt",
+ "headline_long": "central government gross debt",
+ "link_label": "central government debt, kr",
+ "subject": "The central government of Sweden",
+ "hist_label": "Central government gross debt",
+ "sum_note": "Sweden central government gross debt (Maastricht definition, quarter-end), from Eurostat's quarterly government debt statistics, which are compiled from national data. The closest EU-comparable measure to the US Total Public Debt Outstanding.",
+ "scope_note": "This is central government gross debt in the EU's Maastricht (excessive deficit procedure) definition, taken from Eurostat's quarterly table: everything the central government sector owes in currency and deposits, debt securities and loans, at nominal value and before subtracting any cash or other assets.  It is the closest EU-comparable match to the US national debt clock's Total Public Debt Outstanding. Figures are in kronor. Eurostat publishes it by sector, so the wider general government total is shown below as a fact.",
+ "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with bond issuance calendars and short-term borrowing.",
+ "legend": "Sweden's government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
+ "cadence": "Quarterly. Eurostat publishes each quarter-end figure (table gov_10q_ggdebt) about three months after the quarter ends.",
+ "after_text": ", about three months after each quarter-end",
+ "next_update": "The Q3 2026 quarter-end figure is expected from Eurostat roughly three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 10587710,
+  "noun": "people",
+  "as_of": "2025-01-01",
+  "source_name": "Eurostat, Population on 1 January by age and sex (demo_pjan), Sweden",
+  "source_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_pjan/default/table",
+  "publisher_short": "Eurostat",
+  "tag": "Eurostat",
+  "possessive": "Eurostat's",
+  "method_short": "Eurostat population on 1 January, the latest published",
+  "noun_full": "people in Sweden"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Sweden central government gross debt",
+   "short": "Central government debt",
+   "value": 1449632000000,
+   "as_of": "2026-06-30",
+   "prior_value": 1312115000000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Eurostat, Quarterly government debt (gov_10q_ggdebt), central government (S1311), Maastricht debt, million kronor",
+   "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+   "source_locator": "geo=SE, sector S1311, na_item GD, unit MIO_NAC; machine-readable: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt",
+   "includes": "Central government gross debt at nominal value in the EU's Maastricht (EDP) definition: currency and deposits, short- and long-term debt securities and loans. In Sweden this is the central government (the State, including the Swedish National Debt Office's borrowing); municipalities, county councils and the pension system are separate sectors.",
+   "facts": [
+    {
+     "key": "gg",
+     "label": "Sweden general government gross debt (Maastricht)",
+     "value": 2395981000000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "All levels of government (central, state, local and social security) in the same Eurostat table, the measure used in EU fiscal rules. It is a wider measure than the one ticking on this page. A year earlier (2025-06-30) it was kr2,199.8 billion. Central government is 60.5% of it.",
+     "source_name": "Eurostat, gov_10q_ggdebt (sector S13, GD)",
+     "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+     "source_locator": "geo=SE, sector S13, na_item GD, unit MIO_NAC"
+    }
+   ],
+   "history": [
+    [
+     "2024-06-30",
+     1213125000000
+    ],
+    [
+     "2024-09-30",
+     1217769000000
+    ],
+    [
+     "2024-12-31",
+     1288806000000
+    ],
+    [
+     "2025-03-31",
+     1266076000000
+    ],
+    [
+     "2025-06-30",
+     1312115000000
+    ],
+    [
+     "2025-09-30",
+     1289737000000
+    ],
+    [
+     "2025-12-31",
+     1390488000000
+    ],
+    [
+     "2026-03-31",
+     1388799000000
+    ],
+    [
+     "2026-06-30",
+     1449632000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Currency and deposits",
+     "value": 199496000000,
+     "group": "Deposits"
+    },
+    {
+     "label": "Short-term debt securities",
+     "value": 229950000000,
+     "group": "Debt securities"
+    },
+    {
+     "label": "Long-term debt securities",
+     "value": 916380000000,
+     "group": "Debt securities"
+    },
+    {
+     "label": "Short-term loans",
+     "value": 94875000000,
+     "group": "Loans"
+    },
+    {
+     "label": "Long-term loans",
+     "value": 8931000000,
+     "group": "Loans"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Eurostat, Government finance statistics - quarterly data",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Government_finance_statistics_-_quarterly_data"
+  },
+  {
+   "name": "Swedish National Debt Office (Riksgälden), Central government debt",
+   "url": "https://www.riksgalden.se/en/our-operations/central-government-debt/"
+  },
+  {
+   "name": "Statistics Sweden (SCB), Public finances",
+   "url": "https://www.scb.se/en/finding-statistics/statistics-by-subject-area/public-finances/"
+  }
+ ],
+ "notes": [
+  "Why Eurostat: it is the official EU statistical office and publishes quarterly government debt for every member state on one definition, compiled from the figures the national statistical institutes and central banks report to it. The fetcher reads its public API directly.",
+  "Provisional data: Eurostat flags the latest quarters as provisional and revises them in later releases. The page re-bases to each new release.",
+  "Why central government: the US clock ticks the federal Treasury's gross debt. The central government sector (Eurostat code S.1311) is the nearest match; state, local and social security debt are not in it. The table's breakdown by instrument adds up to the headline.",
+  "Currency: Sweden reports to Eurostat in kronor (million SEK, national currency, unit MIO_NAC). The world page converts to US dollars at the ECB's daily reference rate for SEK.",
+  "The Swedish National Debt Office publishes central government debt on its own national basis, which differs from the Eurostat Maastricht central government figure used here."
+ ]
+}
