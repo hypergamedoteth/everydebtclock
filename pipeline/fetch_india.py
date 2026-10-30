@@ -42,7 +42,7 @@ def parse_pdf(raw):
     with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
         f.write(raw); f.flush()
         lines = subprocess.run(["pdftotext", "-layout", f.name, "-"], capture_output=True, text=True, timeout=90, check=True).stdout.splitlines()
-    idx = [i for i, l in enumerate(lines) if re.search(r"Table\s*4\.1\s*:?\s*Total Liabilities", l) and "....." not in l]
+    idx = [i for i, l in enumerate(lines) if re.search(r"Table\s*4\.\s*1\s*:?\s*Total Liabilities", l) and "....." not in l]
     if not idx: raise RuntimeError("Table 4.1 not found")
     t = lines[idx[-1]:idx[-1] + 70]
     def row(pat):
