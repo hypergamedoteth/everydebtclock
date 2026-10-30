@@ -6,20 +6,13 @@ jobs:
     steps:
       - run: |
           UA="Mozilla/5.0 (X11; Linux x86_64) everydebtclock.com"
-          curl -s -m 25 -A "$UA" "https://minfin.gov.ru/ru/perfomance/public_debt/internal/" -o /tmp/mf.html
-          grep -o 'href="[^"]*\(\.xls\)"' /tmp/mf.html | sort -u
-          grep -o 'href="/ru/document[^"]*"' /tmp/mf.html | sort -u | head -20
           pip install -q xlrd 2>&1 | tail -1
-          for u in $(grep -o 'href="[^"]*\.xls"' /tmp/mf.html | sed 's/href="//;s/"$//' | sort -u); do
-            echo "##### $u"; curl -s -m 40 -A "$UA" "https://minfin.gov.ru$u" -o /tmp/x.xls -w "%{http_code} %{size_download}\n"
-            python3 - <<'PY'
+          curl -s -m 40 -A "$UA" "https://minfin.gov.ru/common/upload/library/2026/10/main/Obem_gosdolga_s_garantiyami_god_polnostu_na_01_10_2026.xls" -o /tmp/x.xls
+          python3 - <<'PY'
           import xlrd
-          b=xlrd.open_workbook('/tmp/x.xls'); print(b.sheet_names())
-          for s in b.sheets()[:3]:
-              print('sheet',s.name,s.nrows,s.ncols)
-              rows=list(range(min(14,s.nrows)))+list(range(max(14,s.nrows-6),s.nrows))
-              for r in rows:
-                  v=[str(c.value)[:26] for c in s.row(r)[:8] if c.value!='']
-                  if v: print(r,' | '.join(v))
+          b=xlrd.open_workbook('/tmp/x.xls')
+          for n in ('2025 г.','2026 г.'):
+              s=b.sheet_by_name(n)
+              for r in range(s.nrows):
+                  print(n,r,[str(c.value).strip()[:30] for c in s.row(r) if c.value!=''])
           PY
-          done
