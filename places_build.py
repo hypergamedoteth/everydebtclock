@@ -47,7 +47,7 @@ def texts(p):
          "subject": p.get("subject", f"{name} state and local governments"),
          "sum_note": p.get("sum_note", "Sum of the official state and local totals below." if len(p["components"]) > 1 else p["components"][0].get("includes", "")),
          "freq": freq, "periodic": freq in ("monthly", "quarterly"), "once": {"monthly": "once a month", "quarterly": "once a quarter"}.get(freq, "once a year"),
-         "end": {"monthly": "month-end", "quarterly": "quarter-end"}.get(freq, "fiscal year-end"), "unit": {"monthly": "month", "quarterly": "quarter"}.get(freq, "year"),
+         "end": p.get("end_label") or {"monthly": "month-end", "quarterly": "quarter-end"}.get(freq, "fiscal year-end"), "unit": {"monthly": "month", "quarterly": "quarter"}.get(freq, "year"),
          "period": p.get("trend_period", "12 months" if freq in ("monthly", "quarterly") else "year"),
          "pace": p.get("trend_pace", "the past 12 months' pace" if freq in ("monthly", "quarterly") else "last year's pace"),
          "pop_pub": p["population"].get("publisher_short", "Census Bureau"), "pop_tag": p["population"].get("tag", "Census"),
@@ -172,7 +172,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     days = (_d(c["as_of"]) - _d(cs[0]["prior_as_of"])).days if rate else None
     up_ = (rate or 0) >= 0
     title = p.get("title", f"{name} Debt Clock: Live State and Local Debt, From Official Data")
-    desc = (f"{name} {T['head_long']}: {_b(c['total'])} at {T['end']} {as_of}"
+    desc = (f"{name} {T['head_long']}: {_b(c['total'])} {'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}"
             + (" (" + " + ".join(f"{x['short'].lower()} {_b(x['value'])}" for x in cs) + ")" if len(cs) > 1 else "")
             + f", {_usd0(pp_off)} per {dem}. Live clock projected from the official {T['freq']} figures, with sources and the math.")
     img = f"og/places/{p['slug']}.png"

@@ -72,7 +72,7 @@ jobs:
       - name: Install fonts and Python deps
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y fonts-dejavu-core
+          sudo apt-get install -y fonts-dejavu-core poppler-utils
           python -m pip install --upgrade pip
           pip install Pillow openpyxl
 
@@ -88,6 +88,18 @@ jobs:
           python3 pipeline/fetch_singapore.py || echo "singapore fetch skipped"
           # United Kingdom: ONS public sector finances series BKPX / HF6W / CPPH (keyless JSON). Never fails the run.
           python3 pipeline/fetch_united_kingdom.py || echo "united-kingdom fetch skipped"
+          # Germany, France, Italy: Eurostat gov_10q_ggdebt (central government Maastricht debt, quarterly) and demo_pjan. Never fails the run.
+          python3 pipeline/fetch_eurostat.py || echo "eurostat fetch skipped"
+          # Japan: Ministry of Finance Central Government Debt pages (quarterly). Never fails the run.
+          python3 pipeline/fetch_japan.py || echo "japan fetch skipped"
+          # China: Ministry of Finance Central Government Operations And Debt PDF (SDDS, quarterly; needs pdftotext). Never fails the run.
+          python3 pipeline/fetch_china.py || echo "china fetch skipped"
+          # India: DEA Quarterly Report on Public Debt Management PDFs (needs pdftotext). Falls back to the committed figure. Never fails the run.
+          python3 pipeline/fetch_india.py || echo "india fetch skipped"
+          # Russia: Minfin internal debt page (monthly). Falls back to the committed figure. Never fails the run.
+          python3 pipeline/fetch_russia.py || echo "russia fetch skipped"
+          # Brazil: Banco Central do Brasil SGS 13761 / 13762 (DBGG, monthly). Never fails the run.
+          python3 pipeline/fetch_brazil.py || echo "brazil fetch skipped"
 
       - name: Build site
         env:

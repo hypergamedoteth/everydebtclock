@@ -1,0 +1,153 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in euros. The debt component, history and facts are refreshed by pipeline/fetch_eurostat.py from Eurostat tables gov_10q_ggdebt and demo_pjan; edit wording here, not numbers.",
+ "slug": "germany",
+ "kind": "country",
+ "country": "DE",
+ "name": "Germany",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Eurostat (national statistical institutes' EDP data)",
+ "currency": {
+  "code": "EUR",
+  "symbol": "€"
+ },
+ "frequency": "quarterly",
+ "title": "Germany Debt Clock: Live Federal Debt, Official Data",
+ "headline": "central government debt",
+ "headline_long": "central government gross debt",
+ "link_label": "central government debt, €",
+ "subject": "The central government of Germany",
+ "hist_label": "Central government gross debt",
+ "sum_note": "Germany central government gross debt (Maastricht definition, quarter-end), from Eurostat's quarterly government debt statistics, which are compiled from national data. The closest EU-comparable measure to the US Total Public Debt Outstanding.",
+ "scope_note": "This is central government gross debt in the EU's Maastricht (excessive deficit procedure) definition, taken from Eurostat's quarterly table: everything the central government sector owes in currency and deposits, debt securities and loans, at nominal value and before subtracting any cash or other assets.  It is the closest EU-comparable match to the US national debt clock's Total Public Debt Outstanding. Figures are in euros. Eurostat publishes it by sector, so the wider general government total is shown below as a fact.",
+ "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with bond issuance calendars and short-term borrowing.",
+ "legend": "Germany's government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
+ "cadence": "Quarterly. Eurostat publishes each quarter-end figure (table gov_10q_ggdebt) about three months after the quarter ends.",
+ "after_text": ", about three months after each quarter-end",
+ "next_update": "The Q3 2026 quarter-end figure is expected from Eurostat roughly three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 83577140,
+  "noun": "people",
+  "as_of": "2025-01-01",
+  "source_name": "Eurostat, Population on 1 January by age and sex (demo_pjan), Germany",
+  "source_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_pjan/default/table",
+  "publisher_short": "Eurostat",
+  "tag": "Eurostat",
+  "possessive": "Eurostat's",
+  "method_short": "Eurostat population on 1 January, the latest published",
+  "noun_full": "people in Germany"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Germany central government gross debt",
+   "short": "Central government debt",
+   "value": 2054716500000,
+   "as_of": "2026-06-30",
+   "prior_value": 1924613700000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Eurostat, Quarterly government debt (gov_10q_ggdebt), central government (S1311), Maastricht debt, million euro",
+   "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+   "source_locator": "geo=DE, sector S1311, na_item GD, unit MIO_EUR; machine-readable: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt",
+   "includes": "Central government gross debt at nominal value in the EU's Maastricht (EDP) definition: currency and deposits, short- and long-term debt securities and loans. In Germany this is the federal government and its special funds; the Länder (states), municipalities and social security funds are separate sectors.",
+   "facts": [
+    {
+     "key": "gg",
+     "label": "Germany general government gross debt (Maastricht)",
+     "value": 2924674200000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "All levels of government (central, state, local and social security) in the same Eurostat table, the measure used in EU fiscal rules. It is a wider measure than the one ticking on this page. A year earlier (2025-06-30) it was €2,734.0 billion. Central government is 70.3% of it.",
+     "source_name": "Eurostat, gov_10q_ggdebt (sector S13, GD)",
+     "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+     "source_locator": "geo=DE, sector S13, na_item GD, unit MIO_EUR"
+    }
+   ],
+   "history": [
+    [
+     "2024-06-30",
+     1851612100000
+    ],
+    [
+     "2024-09-30",
+     1879060400000
+    ],
+    [
+     "2024-12-31",
+     1893510200000
+    ],
+    [
+     "2025-03-31",
+     1891240700000
+    ],
+    [
+     "2025-06-30",
+     1924613700000
+    ],
+    [
+     "2025-09-30",
+     1973270300000
+    ],
+    [
+     "2025-12-31",
+     2000597900000
+    ],
+    [
+     "2026-03-31",
+     2040674400000
+    ],
+    [
+     "2026-06-30",
+     2054716500000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Currency and deposits",
+     "value": 15151700000,
+     "group": "Deposits"
+    },
+    {
+     "label": "Short-term debt securities",
+     "value": 99713100000,
+     "group": "Debt securities"
+    },
+    {
+     "label": "Long-term debt securities",
+     "value": 1760386300000,
+     "group": "Debt securities"
+    },
+    {
+     "label": "Short-term loans",
+     "value": 56550000000,
+     "group": "Loans"
+    },
+    {
+     "label": "Long-term loans",
+     "value": 122915400000,
+     "group": "Loans"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Eurostat, Government debt statistics (explanation of Maastricht debt)",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Government_finance_statistics_-_quarterly_data"
+  },
+  {
+   "name": "Destatis, Public debt (Öffentliche Schulden)",
+   "url": "https://www.destatis.de/DE/Themen/Staat/Oeffentliche-Finanzen/Schulden-Finanzvermoegen/_inhalt.html"
+  },
+  {
+   "name": "Deutsche Bundesbank, Time series database",
+   "url": "https://www.bundesbank.de/en/statistics/public-finances"
+  }
+ ],
+ "notes": [
+  "Why Eurostat: it is the official EU statistical office and publishes quarterly government debt for every member state on one definition, compiled from the figures the national statistical institutes and central banks report to it. The fetcher reads its public API directly.",
+  "Provisional data: Eurostat flags the latest quarters as provisional and revises them in later releases. The page re-bases to each new release.",
+  "Why central government: the US clock ticks the federal Treasury's gross debt. The central government sector (Eurostat code S.1311) is the nearest match; state, local and social security debt are not in it. The table's breakdown by instrument adds up to the headline.",
+  "Cross-check: Destatis (the federal statistical office, press release PD26_341_713) reports the federal government's debt to the non-public sector at €1,907.1 billion at 30 June 2026 and the whole public budget at €2,753.5 billion. Destatis counts debt owed to the non-public sector on its national definition, which covers different units and debt types from Eurostat's Maastricht definition, so its figures are lower than the ones on this page. This page uses Eurostat so that France, Germany and Italy are on one definition."
+ ]
+}

@@ -1,0 +1,140 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in roubles. The debt component, history and facts are refreshed by pipeline/fetch_russia.py from the Ministry of Finance internal debt page; edit wording here, not numbers.",
+ "slug": "russia",
+ "kind": "country",
+ "country": "RU",
+ "name": "Russia",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Ministry of Finance of the Russian Federation (Минфин России)",
+ "currency": {
+  "code": "RUB",
+  "symbol": "₽"
+ },
+ "frequency": "monthly",
+ "title": "Russia Debt Clock: Live State Internal Debt, Official Data",
+ "headline": "state internal debt",
+ "headline_long": "state internal debt (incl. guarantees)",
+ "link_label": "state internal debt, ₽",
+ "subject": "The Government of the Russian Federation",
+ "hist_label": "State internal debt (total)",
+ "sum_note": "Russia's state internal debt, total including state guarantees in roubles, as of the first of each month, from the Ministry of Finance. The closest official figure to the US Total Public Debt Outstanding that Russia publishes in one number; it excludes state external debt, which is reported separately in US dollars.",
+ "scope_note": "This is the Ministry of Finance's \"Государственный внутренний долг Российской Федерации, всего\" (state internal debt of the Russian Federation, total): debt in roubles, including state guarantees in roubles. It does not include the state external debt, which the Ministry reports separately in US dollars, and it does not include the debt of regional governments. Figures are in roubles and are published as of the first day of each month. The Ministry's page also reports a separate, narrower figure for internal debt in government securities only.",
+ "trend_why": "We use 12 months rather than the last month because month-to-month changes swing with bond auctions and redemptions.",
+ "legend": "Russia's state internal debt is reported monthly, as of the first day of the month. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official monthly figures, shown here next to them.",
+ "cadence": "Monthly. The Ministry of Finance updates the figure as of the first of each month.",
+ "after_text": ", as of the first day of each month",
+ "next_update": "Minfin updates the figure monthly, as of the 1st of the month (2026-11-01 next); this page picks it up automatically on the next daily build after it appears.",
+ "population": {
+  "value": 146119928,
+  "noun": "people",
+  "as_of": "2025-01-01",
+  "source_name": "Federal State Statistics Service (Rosstat), resident population estimate at 1 January 2025",
+  "source_url": "https://rosstat.gov.ru/folder/12781",
+  "publisher_short": "Rosstat",
+  "tag": "Rosstat",
+  "possessive": "Rosstat's",
+  "method_short": "Rosstat estimate of the resident population at 1 January 2025, the latest published at the time of the last edit",
+  "noun_full": "people in Russia"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Russia state internal debt",
+   "short": "State internal debt",
+   "value": 36682056417700,
+   "as_of": "2026-10-01",
+   "prior_value": 27347992000000,
+   "prior_as_of": "2025-10-01",
+   "source_name": "Минфин России, Государственный внутренний долг Российской Федерации, всего (тыс. руб.)",
+   "source_url": "https://minfin.gov.ru/ru/perfomance/public_debt/internal/",
+   "source_locator": "Block \"Объем государственного внутреннего долга Российской Федерации, тыс. руб.\", row всего; history: graphDynamicsDebt_ru xlsx on the same page",
+   "includes": "State internal debt in roubles (government securities and other internal obligations) including state guarantees in roubles. State external debt in foreign currency is excluded.",
+   "facts": [
+    {
+     "key": "guarantees",
+     "label": "Of which state guarantees in roubles",
+     "value": 505739151000,
+     "kind": "usd",
+     "as_of": "2026-10-01",
+     "note": "Included in the total above, as reported by the Ministry of Finance on the same page.",
+     "source_name": "Минфин России, Государственный внутренний долг Российской Федерации",
+     "source_url": "https://minfin.gov.ru/ru/perfomance/public_debt/internal/",
+     "source_locator": "в том числе государственные гарантии Российской Федерации в валюте Российской Федерации"
+    }
+   ],
+   "history": [
+    [
+     "2025-10-01",
+     27347992000000
+    ],
+    [
+     "2025-11-01",
+     28297823000000
+    ],
+    [
+     "2025-12-01",
+     30019275000000
+    ],
+    [
+     "2026-01-01",
+     30654831000000
+    ],
+    [
+     "2026-02-01",
+     30545704000000
+    ],
+    [
+     "2026-03-01",
+     31298890000000
+    ],
+    [
+     "2026-04-01",
+     31459729000000
+    ],
+    [
+     "2026-05-01",
+     32404649000000
+    ],
+    [
+     "2026-06-01",
+     32923876000000
+    ],
+    [
+     "2026-07-01",
+     33194318000000
+    ],
+    [
+     "2026-08-01",
+     33157322000000
+    ],
+    [
+     "2026-09-01",
+     33155017000000
+    ],
+    [
+     "2026-10-01",
+     36682056417700
+    ]
+   ],
+   "breakdown": []
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Минфин России, Государственный внешний долг Российской Федерации",
+   "url": "https://minfin.gov.ru/ru/perfomance/public_debt/external/"
+  },
+  {
+   "name": "Минфин России, Государственный долг (раздел)",
+   "url": "https://minfin.gov.ru/ru/perfomance/public_debt/"
+  }
+ ],
+ "notes": [
+  "Source and transparency: the figures are those the Ministry of Finance publishes on its website. This page does not adjust, estimate or reconcile them with other sources.",
+  "Scope: the headline is internal debt in roubles including state guarantees in roubles. State external debt (in foreign currency, reported by the Ministry in US dollars) and regional government debt are not included, so this is not a total for the whole Russian public sector.",
+  "A step in the series: the total rose by about ₽3.5 trillion between 1 September 2026 and 1 October 2026, a larger monthly step than any other in the last 13 months. The Ministry's page does not explain the change. The page shows the figures as published; the 12-month trend is computed from them as they are.",
+  "Time series: the Ministry's page shows only the latest figure, so the monthly history on this page is built from the Ministry's published monthly dynamics file and extended each month by the daily build."
+ ],
+ "end_label": "as of"
+}

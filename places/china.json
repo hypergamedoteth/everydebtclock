@@ -1,0 +1,125 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in yuan renminbi. The debt component, history and facts are refreshed by pipeline/fetch_china.py from the Ministry of Finance Central Government Operations And Debt PDF; edit wording here, not numbers.",
+ "slug": "china",
+ "kind": "country",
+ "country": "CN",
+ "name": "China",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Ministry of Finance of China (SDDS data)",
+ "currency": {
+  "code": "CNY",
+  "symbol": "¥"
+ },
+ "frequency": "quarterly",
+ "title": "China Debt Clock: Live Central Government Debt, Official Data",
+ "headline": "central government debt",
+ "headline_long": "central government debt balance",
+ "link_label": "central government debt, ¥",
+ "subject": "The central government of China",
+ "hist_label": "Central government debt balance",
+ "sum_note": "China's central government debt balance (quarter-end), as published by the Ministry of Finance in its Central Government Operations And Debt table under the IMF's Special Data Dissemination Standard. The closest official Chinese measure to the US Total Public Debt Outstanding, central government only.",
+ "scope_note": "This is the Ministry of Finance's central government debt balance: debt of the central government only, in yuan, at the end of each quarter, split into domestic and foreign debt. Local governments' debt is not in it. The Ministry reports local government debt balances separately, so this page does not show the debt of the whole public sector. The figure is published as a table in a PDF on the Ministry's statistics page, under China's commitment to the IMF's Special Data Dissemination Standard, and the fetcher reads that table directly.",
+ "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with the bond issuance calendar.",
+ "legend": "China's central government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
+ "cadence": "Quarterly. The Ministry of Finance publishes the quarter-end table on its statistics page, usually within a few weeks of the end of the quarter.",
+ "after_text": ", within about a month of each quarter-end",
+ "next_update": "The Q3 2026 quarter-end balance is expected from the Ministry of Finance roughly four weeks after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 1404890000,
+  "noun": "people",
+  "as_of": "2025-12-31",
+  "source_name": "National Bureau of Statistics of China, Statistical Communiqué on the 2025 National Economic and Social Development, total population at the end of 2025",
+  "source_url": "https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html",
+  "publisher_short": "NBS",
+  "tag": "NBS",
+  "possessive": "the NBS's",
+  "method_short": "NBS year-end 2025 total population of the 31 provinces, autonomous regions and municipalities plus military personnel (excludes Hong Kong, Macao, Taiwan)",
+  "noun_full": "people in China"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "China central government debt balance",
+   "short": "Central government debt",
+   "value": 43926200000000,
+   "as_of": "2026-06-30",
+   "prior_value": 37963800000000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Ministry of Finance of China, Central Government Operations And Debt (SDDS), quarterly central government debt balance, RMB billion",
+   "source_url": "https://gks.mof.gov.cn/tongjishuju/",
+   "source_locator": "PDF titled \"中央政府债务余额（季度）…Central_Government_Operations_And_Debt\", row 债务余额 (Debt)",
+   "includes": "The central government's domestic and foreign debt balance at quarter-end, in yuan. Local government debt is not included.",
+   "facts": [
+    {
+     "key": "domestic",
+     "label": "Of which domestic debt",
+     "value": 43424500000000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "Debt owed inside China, as reported by the Ministry of Finance in the same table. A year earlier (2025-06-30) it was ¥37.58 trillion.",
+     "source_name": "Ministry of Finance of China, Central Government Operations And Debt (SDDS)",
+     "source_url": "https://gks.mof.gov.cn/tongjishuju/",
+     "source_locator": "Row: Domestic debt (按期限划分的国内债务)"
+    },
+    {
+     "key": "foreign",
+     "label": "Of which foreign debt",
+     "value": 501700000000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "Debt owed abroad, as reported by the Ministry of Finance in the same table. A year earlier (2025-06-30) it was ¥0.39 trillion.",
+     "source_name": "Ministry of Finance of China, Central Government Operations And Debt (SDDS)",
+     "source_url": "https://gks.mof.gov.cn/tongjishuju/",
+     "source_locator": "Row: Foreign debt (按期限划分的国外债务)"
+    }
+   ],
+   "history": [
+    [
+     "2025-03-31",
+     36055700000000
+    ],
+    [
+     "2025-06-30",
+     37963800000000
+    ],
+    [
+     "2025-09-30",
+     40007100000000
+    ],
+    [
+     "2025-12-31",
+     41231800000000
+    ],
+    [
+     "2026-03-31",
+     42349800000000
+    ],
+    [
+     "2026-06-30",
+     43926200000000
+    ]
+   ],
+   "breakdown": []
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Ministry of Finance of China, statistics (统计数据) page",
+   "url": "https://gks.mof.gov.cn/tongjishuju/"
+  },
+  {
+   "name": "Ministry of Finance of China, Report on the 2025 central and local budget execution and the 2026 draft budget (national and local government debt balances at end-2025)",
+   "url": "https://bgt.mof.gov.cn/zhuantilanmu/rdwyh/czyw/202603/t20260316_3985331.htm"
+  },
+  {
+   "name": "IMF Dissemination Standards Bulletin Board, China (SDDS)",
+   "url": "https://dsbb.imf.org/sdds/dqaf-base/country/CHN/category"
+  }
+ ],
+ "notes": [
+  "Source and transparency: the figures are those the Ministry of Finance publishes under the IMF's Special Data Dissemination Standard. This page does not adjust, estimate or reconcile them with other sources.",
+  "Scope: the measure is central government debt only. Local government debt is reported separately and is not added here, so this is not a total for the Chinese public sector. For scale, the Ministry of Finance's report on the 2025 budget execution (March 2026) gives the local government debt balance at the end of 2025 as ¥54.82 trillion (general debt ¥17.51 trillion, special debt ¥37.31 trillion, including local government debt used to replace hidden debt) and the central government debt balance as ¥41.23 trillion, which matches the Q4 2025 figure in this series.",
+  "Format: the quarterly figures are published as PDF tables. If the PDF layout or the web page changes so that the fetcher cannot read it with certainty, the page keeps the last official figure it has and the daily build leaves it untouched."
+ ]
+}

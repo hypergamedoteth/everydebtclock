@@ -1,0 +1,138 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in yen. The debt component, history and facts are refreshed by pipeline/fetch_japan.py from the Ministry of Finance Central Government Debt pages; edit wording here, not numbers.",
+ "slug": "japan",
+ "kind": "country",
+ "country": "JP",
+ "name": "Japan",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Ministry of Finance Japan",
+ "currency": {
+  "code": "JPY",
+  "symbol": "¥"
+ },
+ "frequency": "quarterly",
+ "title": "Japan Debt Clock: Live National Government Debt, Official Data",
+ "headline": "national government debt",
+ "headline_long": "Central Government Debt (Total)",
+ "link_label": "national government debt, ¥",
+ "subject": "The Japanese central government",
+ "hist_label": "Central government debt (total)",
+ "sum_note": "Japan's central government debt (government bonds, borrowings and financing bills, quarter-end), as published by the Ministry of Finance. The closest Japanese measure to the US Total Public Debt Outstanding: gross, not net of financial assets.",
+ "scope_note": "This is the total of the Ministry of Finance's \"Central Government Debt\" table: the government bonds (including Japanese government bonds and the bonds issued for the Fiscal Investment and Loan Program), borrowings and financing bills the central government has issued and not repaid, in yen and before subtracting any financial assets. The Ministry notes that the figures include government bonds held by, and borrowings within, the government itself. They also include bonds held by the Bank of Japan, just as the US figure includes securities held by the Federal Reserve and by government trust funds. Debts the government has guaranteed are published separately and are not added. Local governments' own debt is not in it. Amounts are in yen.",
+ "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with the issuance calendar and short-term bill rollovers.",
+ "legend": "Japan's central government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
+ "cadence": "Quarterly. The Ministry of Finance publishes each quarter-end figure about six weeks after the quarter ends.",
+ "after_text": ", about six weeks after each quarter-end",
+ "next_update": "The September 2026 quarter-end figure is expected from the Ministry of Finance roughly six weeks after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 123210000,
+  "noun": "people",
+  "as_of": "2025-10-01",
+  "source_name": "Statistics Bureau of Japan, Population Estimates, total population at 1 October 2025 (provisional)",
+  "source_url": "https://www.stat.go.jp/english/data/jinsui/index.html",
+  "publisher_short": "Statistics Bureau",
+  "tag": "Statistics Bureau",
+  "possessive": "the Statistics Bureau's",
+  "method_short": "Statistics Bureau estimate of the total population on 1 October 2025",
+  "noun_full": "people in Japan"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Japan central government debt (total)",
+   "short": "Central government debt",
+   "value": 1346683300000000,
+   "as_of": "2026-06-30",
+   "prior_value": 1332187200000000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Ministry of Finance Japan, Central Government Debt (government bonds, borrowings, financing bills), quarterly table, 100 million yen",
+   "source_url": "https://www.mof.go.jp/english/policy/jgbs/reference/gbb/",
+   "source_locator": "Quarterly pages e{YYYYMM}.html under https://www.mof.go.jp/english/policy/jgbs/reference/gbb/, table 1 row Total (e.g. e202606.html)",
+   "includes": "Government bonds, borrowings and financing bills of the central government, at the end of the quarter. Government-guaranteed debts are not included.",
+   "facts": [
+    {
+     "key": "guar",
+     "label": "Government-guaranteed debts (not included above)",
+     "value": 27434600000000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "Debts guaranteed by the government (for example of public corporations) as reported by the Ministry of Finance alongside the debt figures. They are not added to the total. A year earlier (2025-06-30) it was ¥27.9 trillion.",
+     "source_name": "Ministry of Finance Japan, Central Government Debt",
+     "source_url": "https://www.mof.go.jp/english/policy/jgbs/reference/gbb/",
+     "source_locator": "Government-guaranteed debts row of the quarterly table"
+    }
+   ],
+   "history": [
+    [
+     "2024-06-30",
+     1311042100000000
+    ],
+    [
+     "2024-09-30",
+     1310438500000000
+    ],
+    [
+     "2024-12-31",
+     1317636500000000
+    ],
+    [
+     "2025-03-31",
+     1323715500000000
+    ],
+    [
+     "2025-06-30",
+     1332187200000000
+    ],
+    [
+     "2025-09-30",
+     1333591400000000
+    ],
+    [
+     "2025-12-31",
+     1342172000000000
+    ],
+    [
+     "2026-03-31",
+     1343842600000000
+    ],
+    [
+     "2026-06-30",
+     1346683300000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Government bonds",
+     "value": 1211746600000000,
+     "group": "Bonds, loans and bills"
+    },
+    {
+     "label": "Borrowings",
+     "value": 40537400000000,
+     "group": "Bonds, loans and bills"
+    },
+    {
+     "label": "Financing bills",
+     "value": 94399400000000,
+     "group": "Bonds, loans and bills"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Ministry of Finance Japan, Japanese Government Bonds (statistics and data)",
+   "url": "https://www.mof.go.jp/english/policy/jgbs/reference/index.html"
+  },
+  {
+   "name": "Ministry of Finance Japan, Debt Management Report",
+   "url": "https://www.mof.go.jp/english/policy/jgbs/publication/debt_management_report/"
+  }
+ ],
+ "notes": [
+  "Why this measure: the US clock ticks the Treasury's gross debt. The Ministry of Finance's Central Government Debt total is the Japanese equivalent: everything the central government has issued or borrowed and not repaid, including bonds held by the Bank of Japan.",
+  "Net position: this is gross debt. It is not net of the government's financial assets, so it is not comparable with net-debt figures published by international organisations.",
+  "Reporting date: the Ministry of Finance publishes the figures for the end of March, June, September and December."
+ ]
+}
