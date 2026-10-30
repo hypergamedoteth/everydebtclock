@@ -4,27 +4,27 @@ jobs:
   p:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - run: |
-          sudo apt-get install -y poppler-utils >/dev/null 2>&1
-          python3 - <<'PY2'
-          import sys; sys.path.insert(0,'pipeline'); import fetch_india as f, subprocess, tempfile, re
-          fs=f.listing(); print('KEYS',sorted(fs))
-          for k in sorted(fs,reverse=True)[:6]:
-              raw=f.get(fs[k]); open('/tmp/x.pdf','wb').write(raw)
-              L=subprocess.run(['pdftotext','-layout','/tmp/x.pdf','-'],capture_output=True,text=True).stdout.splitlines()
-              print('DBG',k,len(raw),len(L),[l.strip()[:70] for l in L if 'Table 4' in l][:4])
-          PY2
-          cp places/india.json /tmp/india0.json; cp places/russia.json /tmp/russia0.json
-          python3 pipeline/fetch_india.py; python3 pipeline/fetch_russia.py
-          echo "== second run"; python3 pipeline/fetch_india.py; python3 pipeline/fetch_russia.py
+          pip install xlrd openpyxl >/dev/null 2>&1
+          UA="Mozilla/5.0 (X11; Linux x86_64) everydebtclock.com"
+          B=https://minfin.gov.ru/common/upload/library/2026
+          curl -s -m 60 -L -A "$UA" "$B/10/main/Obem_gosdolga_s_garantiyami_god_polnostu_na_01_10_2026.xls" -o /tmp/a.xls
+          curl -s -m 60 -L -A "$UA" "$B/01/main/Obem_gos._dolga_s_vydeleniem_garantiy_na_01.01.26_po_godam.xls" -o /tmp/b.xls
+          curl -s -m 60 -L -A "$UA" "$B/10/main/graphDynamicsDebt_ru_01.10.2026.xlsx" -o /tmp/c.xlsx
+          ls -la /tmp/a.xls /tmp/b.xls /tmp/c.xlsx
           python3 - <<'PY'
-          import json
-          for n in ('india','russia'):
-              a=json.load(open('/tmp/%s0.json'%n)); b=json.load(open('places/%s.json'%n))
-              c=b['components'][0]
-              print('RES',n,c['as_of'],c['value'],c['prior_as_of'],c['prior_value'],'changed' if a!=b else 'same')
-              print('RES hist',c['history'])
-              print('RES facts',[(f['key'],f['value'],f['as_of']) for f in c['facts']])
-              print('RES next',b['next_update'])
+          import xlrd, openpyxl
+          for n in ('a','b'):
+              wb=xlrd.open_workbook('/tmp/%s.xls'%n)
+              for sh in wb.sheets():
+                  print('XLS',n,sh.name,sh.nrows,sh.ncols)
+                  for r in range(min(sh.nrows,60)):
+                      row=[str(c.value)[:60] for c in sh.row(r) if c.value!='']
+                      if row: print('XLS',n,r,row[:16])
+          wb=openpyxl.load_workbook('/tmp/c.xlsx',data_only=True)
+          for ws in wb.worksheets:
+              print('XLSX',ws.title,ws.max_row,ws.max_column)
+              for row in ws.iter_rows(min_row=1,max_row=40,values_only=True):
+                  r=[str(v)[:50] for v in row if v is not None]
+                  if r: print('XLSX',r[:14])
           PY
