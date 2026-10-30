@@ -3,7 +3,7 @@ name: Refresh data and deploy
 on:
   schedule:
     # Cron is UTC. Times below are CDT (UTC-5, until Nov 1, 2026) / CST (UTC-6, after). GitHub can start scheduled runs late.
-    # 11:30 UTC daily = 6:30 AM CDT / 5:30 AM CST: full morning recalibration (Census, BEA, MTS, OMB, Canada). Always runs.
+    # 11:30 UTC daily = 6:30 AM CDT / 5:30 AM CST: full morning recalibration (Census, BEA, MTS, OMB, Canada, Mexico, Singapore, UK). Always runs.
     - cron: "30 11 * * *"
     # Weekday checks every 15 min, 19:00-21:00 UTC = 2:00-4:00 PM CDT / 1:00-3:00 PM CST, so Treasury's afternoon
     # Debt to the Penny release reaches the site before the ~3:45 PM CT X post. Each check fetches + deploys only if
@@ -82,6 +82,12 @@ jobs:
           python3 pipeline/fetch.py
           # Canada: re-base places/canada.json to the Bank of Canada's latest month-end figure (Valet API, keyless). Never fails the run.
           python3 pipeline/fetch_canada.py || echo "canada fetch skipped"
+          # Mexico: Banco de Mexico SIE table CG7 (net public sector debt, keyless CSV export). Never fails the run.
+          python3 pipeline/fetch_mexico.py || echo "mexico fetch skipped"
+          # Singapore: SingStat Table Builder M130181 (Total Government Debt, quarterly; AGD and MAS data). Never fails the run.
+          python3 pipeline/fetch_singapore.py || echo "singapore fetch skipped"
+          # United Kingdom: ONS public sector finances series BKPX / HF6W / CPPH (keyless JSON). Never fails the run.
+          python3 pipeline/fetch_united_kingdom.py || echo "united-kingdom fetch skipped"
 
       - name: Build site
         env:

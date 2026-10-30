@@ -1,0 +1,144 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in pounds sterling. The debt component, history and facts are refreshed by pipeline/fetch_united_kingdom.py from the ONS public sector finances time series (BKPX, HF6W, CPPH); edit wording here, not numbers.",
+ "slug": "united-kingdom",
+ "kind": "country",
+ "country": "GB",
+ "name": "United Kingdom",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Office for National Statistics",
+ "currency": {
+  "code": "GBP",
+  "symbol": "£"
+ },
+ "frequency": "monthly",
+ "title": "United Kingdom Debt Clock: Live Government Debt, Official Data",
+ "headline": "government debt",
+ "headline_long": "general government gross debt",
+ "link_label": "government debt, £",
+ "subject": "The UK general government (central and local government)",
+ "hist_label": "General government gross debt",
+ "sum_note": "UK general government consolidated gross debt (Maastricht definition), month-end, from the Office for National Statistics public sector finances. The closest UK measure to the US Total Public Debt Outstanding: gross, not net of cash.",
+ "scope_note": "This is general government gross debt, the closest UK match to the US national debt clock's Total Public Debt Outstanding: what central and local government have borrowed and not repaid, before subtracting any cash or other liquid assets, including gilts held by the Bank of England. Debt of public corporations is not included. It is a different measure from public sector net debt (PSND), the figure the UK headlines usually quote, which is net of liquid assets and covers the wider public sector; both are shown below and neither is added to the clock. Amounts are in pounds sterling.",
+ "trend_why": "We use 12 months rather than the last month because month-to-month changes swing with gilt auctions, redemptions and Treasury-bill rollovers.",
+ "legend": "The UK's government debt is reported monthly, at month-end, and the latest months are provisional. Borrowing happens in lumps at gilt auctions and redemptions, so the live number is a straight-line projection between official month-end figures, shown here next to them.",
+ "cadence": "Monthly. The ONS publishes each month-end figure in its public sector finances release, about three weeks after the month ends (series BKPX). The latest months are provisional and are revised.",
+ "next_update": "The October 2026 month-end figure is expected in the ONS public sector finances release about three weeks after the month ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 69483900,
+  "noun": "people",
+  "as_of": "2025-06-30",
+  "source_name": "Office for National Statistics, Population estimates for the UK, England, Wales, Scotland and Northern Ireland: mid-2025",
+  "source_url": "https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/bulletins/annualmidyearpopulationestimates/mid2025",
+  "publisher_short": "ONS",
+  "tag": "ONS",
+  "possessive": "the ONS",
+  "method_short": "ONS mid-2025 estimate, the latest published",
+  "noun_full": "people in the United Kingdom"
+ },
+ "components": [
+  {
+   "key": "gg",
+   "label": "UK general government gross debt",
+   "short": "Government debt",
+   "value": 3231915000000,
+   "as_of": "2026-09-30",
+   "prior_value": 3056810000000,
+   "prior_as_of": "2025-09-30",
+   "source_name": "ONS, GG: General government consolidated gross debt (Maastricht), £ million, series BKPX (public sector finances)",
+   "source_url": "https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/bkpx/pusf",
+   "source_locator": "Series BKPX, dataset PUSF; machine-readable: https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/bkpx/pusf/data",
+   "includes": "Gilts, Treasury bills, National Savings and Investments products, loans and other liabilities of central and local government, consolidated within the sector and at nominal value as the Maastricht definition requires. It counts gilts held by the Bank of England. It is gross: cash and other liquid assets are not deducted.",
+   "facts": [
+    {
+     "key": "psnd",
+     "label": "Public sector net debt (excluding public sector banks)",
+     "value": 3005000000000,
+     "kind": "usd",
+     "as_of": "2026-09-30",
+     "note": "The headline UK measure: debt of the whole public sector minus liquid assets (cash, bank deposits and reserves), excluding public sector banks. A different, wider and net measure, shown for comparison and not added to the clock. A year earlier (2025-09-30) it was £2,913.3 billion.",
+     "source_name": "ONS, PS: Net debt (excluding public sector banks), series HF6W",
+     "source_url": "https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6w/pusf",
+     "source_locator": "Series HF6W, dataset PUSF"
+    },
+    {
+     "key": "psnd_exboe",
+     "label": "Public sector net debt (excluding public sector banks and the Bank of England)",
+     "value": 2897800000000,
+     "kind": "usd",
+     "as_of": "2026-09-30",
+     "note": "The same net debt measure with the Bank of England also excluded, because its quantitative-easing operations move the figure for reasons unrelated to government borrowing. Shown for comparison and not added to the clock. A year earlier (2025-09-30) it was £2,742.6 billion.",
+     "source_name": "ONS, Public sector: PSND (ex PS banks ex BoE), series CPPH",
+     "source_url": "https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/cpph/pusf",
+     "source_locator": "Series CPPH, dataset PUSF"
+    }
+   ],
+   "history": [
+    [
+     "2025-09-30",
+     3056810000000
+    ],
+    [
+     "2025-10-31",
+     3065779000000
+    ],
+    [
+     "2025-11-30",
+     3090744000000
+    ],
+    [
+     "2025-12-31",
+     3106423000000
+    ],
+    [
+     "2026-01-31",
+     3074534000000
+    ],
+    [
+     "2026-02-28",
+     3099074000000
+    ],
+    [
+     "2026-03-31",
+     3101303000000
+    ],
+    [
+     "2026-04-30",
+     3121712000000
+    ],
+    [
+     "2026-05-31",
+     3142837000000
+    ],
+    [
+     "2026-06-30",
+     3183350000000
+    ],
+    [
+     "2026-07-31",
+     3175403000000
+    ],
+    [
+     "2026-08-31",
+     3195974000000
+    ],
+    [
+     "2026-09-30",
+     3231915000000
+    ]
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "ONS, Public sector finances, UK (latest bulletin)",
+   "url": "https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/bulletins/publicsectorfinances/latest"
+  }
+ ],
+ "notes": [
+  "Why this measure: the US clock ticks Treasury's Total Public Debt Outstanding, a gross total that counts securities held by the Federal Reserve. The ONS general government gross debt is the UK series built the same way: gross, and including gilts held by the central bank. The UK usually quotes public sector net debt (PSND) instead, which is net of liquid assets and covers more of the public sector.",
+  "Gross and net differ by hundreds of billions of pounds. We show the net figures as separate facts so a reader can compare them with news reports; they are never added to the headline.",
+  "Population: debt per person divides by the ONS mid-2025 estimate for the whole UK, the latest published; it is not projected forward."
+ ],
+ "after_text": ", about three weeks after each month-end"
+}
