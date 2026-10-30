@@ -1,8 +1,8 @@
 {
  "meta": {
-  "generated_epoch": 1793323299.0348902,
-  "generated_iso": "2026-10-29T21:21:39.034890-04:00",
-  "debt_fetched_epoch": 1793323299.0348902,
+  "generated_epoch": 1793369358.1845615,
+  "generated_iso": "2026-10-30T10:09:18.184561-04:00",
+  "debt_fetched_epoch": 1793369358.1845615,
   "fy": 2027,
   "fy_start_epoch": 1790827200.0,
   "fy_end_epoch": 1822363200.0,
@@ -1565,7 +1565,7 @@
    "kind": "count",
    "base": 134790000,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "2025",
    "source": "https://www2.census.gov/programs-surveys/demo/tables/families/time-series/households/hh1.xls",
    "source_name": "Census CPS ASEC 2025, Table HH-1",
@@ -1588,7 +1588,7 @@
    "kind": "count",
    "base": 162754810,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY2025",
    "source": "https://www.irs.gov/statistics/soi-tax-stats-numbers-of-returns-filed-by-type-of-return-irs-data-book-table-1-2",
    "source_name": "IRS Data Book FY2025, Table 1-2",
@@ -1757,20 +1757,16 @@
     "type": "ols",
     "window": "last 4 quarters (mid-quarter anchors)",
     "n": 4,
-    "slope": 58245.66263662768,
+    "slope": 67522.1876939563,
     "first": [
-     "2025-Q3",
-     31180493000000.0
+     "2025-Q4",
+     31462523000000.0
     ],
     "last": [
-     "2026-Q2",
-     32563030000000.0
+     "2026-Q3",
+     33010036000000.0
     ],
     "points": [
-     [
-      "2025-Q3",
-      31180493000000.0
-     ],
      [
       "2025-Q4",
       31462523000000.0
@@ -1782,22 +1778,32 @@
      [
       "2026-Q2",
       32563030000000.0
+     ],
+     [
+      "2026-Q3",
+      33010036000000.0
      ]
     ]
    },
    "label": "GDP (annual rate)",
    "group": "economy",
    "kind": "usd",
-   "base": 32563030000000.0,
-   "t0": 1778817600.0,
-   "rate": 58245.66263662768,
-   "as_of": "2026-Q2",
+   "base": 33010036000000.0,
+   "t0": 1786766400.0,
+   "rate": 67522.1876939563,
+   "as_of": "2026-Q3",
    "source": "https://apps.bea.gov/iTable/?reqid=19&step=2&isuri=1&categories=survey#eyJhcHBpZCI6MTksInN0ZXBzIjpbMSwyLDNdLCJkYXRhIjpbWyJjYXRlZ29yaWVzIiwiU3VydmV5Il0sWyJOSVBBX1RhYmxlX0xpc3QiLCI1Il1dfQ==",
    "source_name": "BEA NIPA Table 1.1.5 (via DBnomics mirror)",
-   "method": "Nominal GDP, seasonally adjusted annual rate, 2026-Q2 = $32.563T. Ticks at the trend of the last 4 quarters, anchored at mid-quarter.",
+   "method": "Nominal GDP, seasonally adjusted annual rate, 2026-Q3 = $33.010T. Ticks at the trend of the last 4 quarters, anchored at mid-quarter.",
    "stale": false,
    "status": "ok",
-   "slug": "gdp"
+   "slug": "gdp",
+   "validation": {
+    "last_error_pct": 0.0484,
+    "threshold_pct": 5.0,
+    "flag": false,
+    "against": "BEA NIPA Table 1.1.5 (via DBnomics mirror)"
+   }
   },
   "revenue": {
    "label": "Federal revenue",
@@ -2938,7 +2944,7 @@
    "kind": "pct",
    "base": 3.518,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "2026-09-30",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -2962,7 +2968,7 @@
    "kind": "pct",
    "base": 3.531,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "2026-09-30",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -3115,13 +3121,7 @@
    "method": "Bills + notes/bonds + FRNs + TIPS incl. inflation compensation, par value, weekly (Wednesday). Ticks at the 13-week trend.",
    "stale": false,
    "status": "ok",
-   "slug": "fed_treasuries",
-   "validation": {
-    "last_error_pct": 0.0013,
-    "threshold_pct": 5.0,
-    "flag": false,
-    "against": "Federal Reserve Bank of New York, SOMA holdings (H.4.1 basis)"
-   }
+   "slug": "fed_treasuries"
   },
   "m2": {
    "calc": {
@@ -3682,7 +3682,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3706,7 +3706,7 @@
    "kind": "pct",
    "base": -0.1,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3730,7 +3730,7 @@
    "kind": "pct",
    "base": 32.6,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3754,7 +3754,7 @@
    "kind": "pct",
    "base": 2.6,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3778,7 +3778,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3802,7 +3802,7 @@
    "kind": "pct",
    "base": 3.7,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3826,7 +3826,7 @@
    "kind": "pct",
    "base": 55.6,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3850,7 +3850,7 @@
    "kind": "pct",
    "base": -2.3,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3874,7 +3874,7 @@
    "kind": "pct",
    "base": 90.9,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3898,7 +3898,7 @@
    "kind": "pct",
    "base": 8.7,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3922,7 +3922,7 @@
    "kind": "pct",
    "base": 126.1,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -3946,7 +3946,7 @@
    "kind": "pct",
    "base": 14.5,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -3970,7 +3970,7 @@
    "kind": "pct",
    "base": 123.3,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
@@ -3994,7 +3994,7 @@
    "kind": "pct",
    "base": 5.9,
    "rate": 0,
-   "t0": 1793323299.0348902,
+   "t0": 1793369358.1845615,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
