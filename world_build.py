@@ -16,7 +16,8 @@ ISO3 = {"US": "USA", "CA": "CAN", "MX": "MEX", "SG": "SGP", "GB": "GBR", "DE": "
         "FI": "FIN", "NZ": "NZL", "CZ": "CZE", "HK": "HKG", "TH": "THA", "MY": "MYS", "PH": "PHL", "NG": "NGA", "EG": "EGY", "CL": "CHL", "CO": "COL", "TW": "TWN", "AE": "ARE", "QA": "QAT", "KW": "KWT", "OM": "OMN",
         "BH": "BHR", "MA": "MAR", "DZ": "DZA", "TN": "TUN", "LY": "LBY", "KE": "KEN", "ET": "ETH", "AO": "AGO", "GH": "GHA"}
 # Currencies officially pegged to the US dollar: the central bank's fixed rate (no daily rate to fetch).
-PEGS = {"SAR": (3.75, "Saudi Central Bank (SAMA), official peg of the riyal to the US dollar")}
+PEGS = {"SAR": (3.75, "Saudi Central Bank (SAMA), official peg of the riyal to the US dollar"),
+        "QAR": (3.64, "Qatar Central Bank, official peg of the riyal to the US dollar")}
 US_URL = "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny"
 
 def _load(path):
@@ -30,6 +31,8 @@ def usd_per_unit(code, fx):
     if code == "RUB" and cbr.get("rub_per_usd"): return 1.0 / cbr["rub_per_usd"], cbr["date"], cbr["source"], f"{cbr['rub_per_usd']:g} RUB per USD"
     fed = fx.get("fed") or {}
     if code in (fed.get("per_usd") or {}): return 1.0 / fed["per_usd"][code], (fed.get("dates") or {}).get(code, fed["date"]), fed["source"], f"{fed['per_usd'][code]:g} {code} per USD"
+    ust = fx.get("ust") or {}
+    if code in (ust.get("per_usd") or {}): return 1.0 / ust["per_usd"][code], (ust.get("dates") or {}).get(code, ust["date"]), ust["source"], f"{ust['per_usd'][code]:g} {code} per USD"
     if code in PEGS: v, who = PEGS[code]; return 1.0 / v, None, who, f"pegged: {v:g} {code} per USD"
     pe = ecb.get("per_eur") or {}
     if code == "EUR" and pe.get("USD"): return pe["USD"], ecb["date"], ecb["source"], f"{pe['USD']:g} USD per EUR"
@@ -85,7 +88,7 @@ def cov_line(W):
 
 def api_json(W, SITE, now):
     cv = W["cov"]; fx = W["fx"]
-    return {"_doc": "World Debt Clock inputs and result. The sum of the latest published government debt of the countries listed (different measures, different dates), in US dollars at the stated daily reference rates. Not the total debt of the world. projected_now = sum of each country's official figure + its own trend, at the fixed rate shown.",
+    return {"_doc": "World Debt Clock inputs and result. The sum of the latest published government debt of the countries listed (different measures, different dates), in US dollars at the stated official reference rates. Not the total debt of the world. projected_now = sum of each country's official figure + its own trend, at the fixed rate shown.",
             "generated": dt.datetime.fromtimestamp(now, pb.CT).isoformat(timespec="seconds"), "url": f"{SITE}/world/",
             "countries_count": len(W["rows"]), "total_official_usd": round(W["total"]), "total_projected_now_usd": round(W["now_total"]), "rate_usd_per_sec": round(W["rate_s"], 2),
             "population_sum": round(W["pop"]), "per_person_usd": round(W["total"] / W["pop"], 2),
@@ -141,7 +144,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
     intro = (f'<section class="intro" id="intro">{crumb}<h1>World Debt Clock</h1>'
              f'<p>This adds up the latest published government debt of {n} countries that have a clock on this site, in US dollars: <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}). '
              f'It is the US national debt plus {n - 1} other countries. Each country reports a different measure on a different date, so the sum is a comparison of what is published, not one agreed worldwide figure. '
-             f'Each figure is converted at an official daily reference rate. The live number below projects each country\'s own debt forward at the trend its own page uses.</p></section>')
+             f'Each figure is converted at an official reference rate (daily where the central banks publish one; see Exchange rates). The live number below projects each country\'s own debt forward at the trend its own page uses.</p></section>')
     hero_dlg = ""
     hero = (f'<div class="hero lead" id="total" data-b="{big_now:.2f}" data-r="{W["rate_s"]:.6f}" data-t="{now:.0f}" style="cursor:default">'
             f'<div class="k">Government debt of {n} countries · in US dollars · live</div><div class="big num" id="hv">{_usd0(big_now)}</div>'
@@ -176,10 +179,10 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
         if x["code"] in seen or x["code"] == "USD": continue
         seen.add(x["code"])
         fr += f'<tr><td class="c"><b>{E(x["code"])}</b></td><td class="num" data-l="Rate as published">{E(x["quote"])}</td><td class="num" data-l="USD per 1 unit">{x["rate"]:.6f}</td><td data-l="Rate date">{E(_fd(x["rate_date"]) if x["rate_date"] else "fixed peg")}</td><td class="m" data-l="Source">{E(x["rate_src"])}</td></tr>'
-    rates = (f'<section id="rates" class="wsec"><div class="sh"><span class="bar" style="background:var(--teal)"></span><h2>Exchange rates used</h2><span class="h2n">Official daily reference rates, refreshed with the daily data update</span></div>'
+    rates = (f'<section id="rates" class="wsec"><div class="sh"><span class="bar" style="background:var(--teal)"></span><h2>Exchange rates used</h2><span class="h2n">Official reference rates, refreshed with the daily data update</span></div>'
              f'<div class="tw"><table class="wt wstk" style="min-width:640px"><tr class="hd"><th>Currency</th><th class="num">Rate as published</th><th class="num">USD per 1 unit</th><th>Rate date</th><th>Source</th></tr>{fr}</table></div>'
              '<p class="dnote">Euro reference rates come from the <a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html" rel="noopener">European Central Bank</a>; other currencies are converted through the euro rate (USD per unit = USD per EUR ÷ units per EUR). '
-             'The ECB does not publish a rouble rate, so Russia uses the <a href="https://www.cbr.ru/eng/currency_base/daily/" rel="noopener">Bank of Russia official rate</a>. The rate is held fixed between updates: the clock does not project exchange-rate moves.</p></section>')
+             'The ECB does not publish a rouble rate, so Russia uses the <a href="https://www.cbr.ru/eng/currency_base/daily/" rel="noopener">Bank of Russia official rate</a>. Taiwan uses the Federal Reserve H.10 weekly rate. The Egyptian pound, Ghanaian cedi, Kenyan shilling and Nigerian naira have no ECB or Fed rate, so they use the US Treasury Reporting Rates of Exchange, which is published quarterly (the date of each rate is in the table; these currencies can move a lot between quarter-ends). Currencies pegged to the dollar use the central bank\'s fixed rate. The rate is held fixed between updates: the clock does not project exchange-rate moves.</p></section>')
     # ---- method
     mrows = ""
     for x in rows:

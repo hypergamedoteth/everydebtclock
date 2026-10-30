@@ -1,0 +1,120 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Nigerian naira. The debt component, history and facts are refreshed by pipeline/fetch_nigeria.py from the DMO's quarterly Total Public Debt PDF; edit wording here, not numbers.",
+ "slug": "nigeria",
+ "kind": "country",
+ "country": "NG",
+ "iso3": "NGA",
+ "name": "Nigeria",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Debt Management Office (DMO), Nigeria",
+ "currency": {
+  "code": "NGN",
+  "symbol": "₦"
+ },
+ "frequency": "quarterly",
+ "title": "Nigeria Debt Clock: Live Total Public Debt, Official Data",
+ "headline": "total public debt",
+ "headline_long": "total public debt",
+ "link_label": "total public debt, ₦",
+ "subject": "The federal government, the 36 states and the Federal Capital Territory of Nigeria",
+ "hist_label": "Total Public Debt",
+ "sum_note": "Nigeria's total public debt (federal government, 36 states and the FCT; domestic and external), quarter-end, from the Debt Management Office. Gross, general government.",
+ "scope_note": "This is the \"Total Public Debt\" that Nigeria's Debt Management Office (DMO) states for each quarter-end: the debt of the federal government plus the 36 state governments and the Federal Capital Territory, domestic and external, in naira. Unlike most pages in this series it is a wider measure than central government alone, because the DMO's headline number includes the states. The federal-government-only part is shown as a separate fact. Debt of government-owned companies is not included, and the figure is as the DMO states it, not adjusted here.",
+ "trend_why": "We use the change over the latest twelve months rather than the last quarter because quarterly changes swing with the exchange rate (about a third of the debt is in foreign currency) and with issuance.",
+ "legend": "Nigeria's public debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Quarterly. The DMO publishes each quarter-end position as a PDF about three months after the quarter ends.",
+ "after_text": ", about three months after each quarter-end",
+ "next_update": "The next quarter-end position (September 2026) is expected from the Debt Management Office roughly three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 237527782,
+  "noun": "people",
+  "as_of": "2025-07-01",
+  "source_name": "World Bank, World Development Indicators, Population, total (SP.POP.TOTL), 2025, which is the UN World Population Prospects 2024 estimate",
+  "source_url": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=NG",
+  "publisher_short": "World Bank",
+  "tag": "World Bank",
+  "possessive": "the World Bank's",
+  "method_short": "World Bank / UN World Population Prospects 2024 estimate for 2025 (Nigeria has not counted its population since 2006)",
+  "noun_full": "people in Nigeria"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Nigeria total public debt",
+   "short": "Total public debt",
+   "value": 166788480190000,
+   "as_of": "2026-06-30",
+   "prior_value": 152398613100000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Debt Management Office of Nigeria, Total Public Debt as at quarter-end (PDF), N million",
+   "source_url": "https://www.dmo.gov.ng/6080-nigeria-s-total-public-debt-as-at-june-30-2026/file",
+   "source_locator": "PDF \"Nigeria's Total Public Debt as at <date>\", rows Total External Debt, Total Domestic Debt, Total Public Debt (A+B)",
+   "includes": "Federal government, 36 states and the FCT: domestic and external debt in naira. Excludes the debt of government-owned companies.",
+   "facts": [
+    {
+     "key": "fgn",
+     "label": "Federal government's own share of that total (domestic plus external)",
+     "value": 152773509600000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "The \"FGN Only\" rows of the same DMO table: the federal government's debt without the states and the FCT.",
+     "source_name": "Debt Management Office of Nigeria, Total Public Debt",
+     "source_url": "https://www.dmo.gov.ng/debt-profile/total-public-debt",
+     "source_locator": "same PDF, rows \"FGN Only\""
+    }
+   ],
+   "history": [
+    [
+     "2025-06-30",
+     152398613100000
+    ],
+    [
+     "2025-09-30",
+     153292482360000
+    ],
+    [
+     "2025-12-31",
+     159276069180000
+    ],
+    [
+     "2026-03-31",
+     159351581440000
+    ],
+    [
+     "2026-06-30",
+     166788480190000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Domestic debt (federal, states and FCT)",
+     "value": 91590433920000,
+     "group": "Domestic"
+    },
+    {
+     "label": "External debt (federal, states and FCT; converted at the CBN official rate)",
+     "value": 75198046270000,
+     "group": "External"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Central Bank of Nigeria, Statistics",
+   "url": "https://www.cbn.gov.ng/rates/"
+  },
+  {
+   "name": "Federal Ministry of Finance, Budget Office and National Planning",
+   "url": "https://budgetoffice.gov.ng/"
+  }
+ ],
+ "notes": [
+  "Why the DMO: it is the statutory manager of Nigeria's public debt and states the total itself, with the date and the exchange rate it used. The fetcher reads every quarter-end PDF from the last year and checks that domestic plus external equals the total.",
+  "Wider than central government: the DMO's headline total includes state governments and the FCT, so it is not like-for-like with a central-government-only page. The federal-government-only amount is shown as a fact.",
+  "Exchange rate: the DMO converts naira debt and dollar debt using the Central Bank's rate at the date; the naira figures here are as stated in naira.",
+  "Currency: Nigerian naira. The World Debt Clock converts it to US dollars at the US Treasury's Reporting Rates of Exchange (a quarterly official rate as of 30 September 2026; the page for the World Debt Clock shows the rate and its date)."
+ ],
+ "world_measure": "Total public debt (federal, states and FCT)"
+}

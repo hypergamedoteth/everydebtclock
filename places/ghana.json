@@ -1,0 +1,104 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Ghanaian cedis. The debt component, history and facts are refreshed by pipeline/fetch_ghana.py from the Ministry of Finance's quarterly Public Debt Statistical Bulletin (needs pypdf); edit wording here, not numbers.",
+ "slug": "ghana",
+ "kind": "country",
+ "country": "GH",
+ "iso3": "GHA",
+ "name": "Ghana",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Ministry of Finance of Ghana",
+ "currency": {
+  "code": "GHS",
+  "symbol": "GH₵"
+ },
+ "frequency": "quarterly",
+ "title": "Ghana Debt Clock: Live Central Government Public Debt, Official Data",
+ "headline": "central government debt",
+ "headline_long": "central government public debt (including government-guaranteed debt)",
+ "link_label": "central government debt, GH₵",
+ "subject": "The Government of Ghana",
+ "hist_label": "Central Government Public Debt",
+ "sum_note": "Ghana's provisional nominal central government debt, including government-guaranteed debt, quarter-end, from the Ministry of Finance's Public Debt Statistical Bulletin.",
+ "scope_note": "This is the \"provisional nominal central government debt (including government-guaranteed debt)\" that the Ministry of Finance states in its quarterly Public Debt Statistical Bulletin, Table 1: external plus domestic debt, in cedis. It includes debt the government has guaranteed, which many countries report separately, so it is wider than a plain central government borrowing figure. Local governments are not in it. The Ministry labels the latest quarter provisional and may revise it in the next bulletin; this page re-bases to each new bulletin.",
+ "trend_why": "We use the change over the latest twelve months rather than the last quarter because quarterly changes swing with the exchange rate and with issuance.",
+ "legend": "Ghana's public debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Quarterly. The Ministry of Finance publishes each quarter's bulletin about two to three months after the quarter ends.",
+ "after_text": ", about two to three months after each quarter-end",
+ "next_update": "The Ministry of Finance publishes each quarter's Public Debt Statistical Bulletin about two to three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 30832019,
+  "noun": "people",
+  "as_of": "2021-06-27",
+  "source_name": "Ghana Statistical Service, 2021 Population and Housing Census, total population",
+  "source_url": "https://census2021.statsghana.gov.gh/",
+  "publisher_short": "GSS",
+  "tag": "GSS",
+  "possessive": "the GSS's",
+  "method_short": "GSS 2021 census count, the latest official count",
+  "noun_full": "people in Ghana"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Ghana central government public debt",
+   "short": "Public debt",
+   "value": 719520000000,
+   "as_of": "2026-06-30",
+   "prior_value": 614100000000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Ministry of Finance of Ghana, Public Debt Statistical Bulletin, Table 1 Public Debt Dynamics, GH₵ billion",
+   "source_url": "https://www.mofep.gov.gh/sites/default/files/basic-page/Debt-Statistics-Bulletin-2026-Q2.pdf",
+   "source_locator": "Quarterly PDF Public Debt Statistical Bulletin, Table 1, total public debt (external + domestic)",
+   "includes": "Central government debt in cedis, domestic and external, including government-guaranteed debt. Excludes local governments and the borrowing of state-owned enterprises that the government has not guaranteed.",
+   "facts": [],
+   "history": [
+    [
+     "2025-06-30",
+     614100000000
+    ],
+    [
+     "2025-12-31",
+     641110000000
+    ],
+    [
+     "2026-03-31",
+     686100000000
+    ],
+    [
+     "2026-06-30",
+     719520000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Domestic debt",
+     "value": 391120000000,
+     "group": "Domestic"
+    },
+    {
+     "label": "External debt",
+     "value": 328400000000,
+     "group": "External"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Bank of Ghana, Statistics",
+   "url": "https://www.bog.gov.gh/"
+  },
+  {
+   "name": "Ghana Statistical Service",
+   "url": "https://statsghana.gov.gh/"
+  }
+ ],
+ "notes": [
+  "Why the Ministry's bulletin: it is the Ministry of Finance's own quarterly statement of the debt, with domestic and external parts. The fetcher reads Table 1 and checks that external plus domestic equals the total.",
+  "Includes guarantees: the Ministry's headline measure counts government-guaranteed debt, so the figure is not like-for-like with pages that count only direct borrowing.",
+  "Provisional: the latest quarter is provisional and may be revised.",
+  "Currency: Ghanaian cedis. The World Debt Clock converts them to US dollars at the US Treasury's Reporting Rates of Exchange (a quarterly official rate as of 30 September 2026; the page for the World Debt Clock shows the rate and its date)."
+ ],
+ "world_measure": "Central government incl. guaranteed, gross"
+}

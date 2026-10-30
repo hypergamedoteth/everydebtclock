@@ -87,3 +87,15 @@ def run(slug, build, label=None):
         print(f"{slug}: {c['as_of']} {s}{c['value']:,} (prior {c['prior_as_of']} {s}{c['prior_value']:,})")
     else: print(f"{slug}: unchanged")
     return 0
+
+def pdf_text(data):
+    """Text of a PDF (bytes): pypdf if installed (GitHub Actions), else the poppler `pdftotext` binary. Raises if neither works."""
+    try:
+        import pypdf, io
+        r = pypdf.PdfReader(io.BytesIO(data))
+        return "\n".join((pg.extract_text() or "") for pg in r.pages)
+    except ImportError:
+        import subprocess, tempfile
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
+            f.write(data); f.flush()
+            return subprocess.run(["pdftotext", "-layout", f.name, "-"], capture_output=True, check=True, timeout=60).stdout.decode("utf-8", "replace")

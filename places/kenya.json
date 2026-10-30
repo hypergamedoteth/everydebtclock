@@ -1,0 +1,108 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Kenyan shillings. The debt component, history and facts are refreshed by pipeline/fetch_kenya.py from the National Treasury's Quarterly Economic and Budgetary Review (needs pypdf); edit wording here, not numbers.",
+ "slug": "kenya",
+ "kind": "country",
+ "country": "KE",
+ "iso3": "KEN",
+ "name": "Kenya",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "National Treasury and Economic Planning, Kenya",
+ "currency": {
+  "code": "KES",
+  "symbol": "KSh "
+ },
+ "frequency": "quarterly",
+ "title": "Kenya Debt Clock: Live Public and Publicly Guaranteed Debt, Official Data",
+ "headline": "public and publicly guaranteed debt",
+ "headline_long": "public and publicly guaranteed debt",
+ "link_label": "public and publicly guaranteed debt, KSh",
+ "subject": "The Government of Kenya",
+ "hist_label": "Public and Publicly Guaranteed Debt",
+ "sum_note": "Kenya's public and publicly guaranteed debt (gross; domestic and external), quarter-end, from the National Treasury's Quarterly Economic and Budgetary Review.",
+ "scope_note": "This is the \"total public and publicly guaranteed debt\" that Kenya's National Treasury states in its Quarterly Economic and Budgetary Review: the national government's external and domestic debt at the end of the quarter, in Kenyan shillings, plus debt the government has guaranteed. It is gross: the Treasury's separate net figure, which subtracts deposits, is lower. County governments' own borrowing is not included. The newest quarter in the report is provisional.",
+ "trend_why": "We use the change over the latest twelve months rather than the last quarter because quarterly changes swing with the exchange rate and with issuance.",
+ "legend": "Kenya's public debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Quarterly. The National Treasury publishes a Quarterly Economic and Budgetary Review about six weeks after each quarter ends.",
+ "after_text": ", about six weeks after each quarter-end",
+ "next_update": "The National Treasury publishes a Quarterly Economic and Budgetary Review about six weeks after each quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 53330978,
+  "noun": "people",
+  "as_of": "2025-07-01",
+  "source_name": "Kenya National Bureau of Statistics (KNBS), population projections based on the 2019 census, mid-2025",
+  "source_url": "https://www.knbs.or.ke/",
+  "publisher_short": "KNBS",
+  "tag": "KNBS",
+  "possessive": "the KNBS's",
+  "method_short": "KNBS mid-2025 projection from the 2019 census (a projection, not a count)",
+  "noun_full": "people in Kenya"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Kenya public and publicly guaranteed debt",
+   "short": "Public debt",
+   "value": 13013211000000,
+   "as_of": "2026-06-30",
+   "prior_value": 11813919000000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "National Treasury of Kenya, Quarterly Economic and Budgetary Review, Public and Publicly Guaranteed Debt, KSh million",
+   "source_url": "https://www.treasury.go.ke/sites/default/files/QEBRs/Fourth%20QEBR%20Report%20FY%202025-26.pdf",
+   "source_locator": "QEBR PDF, table of public and publicly guaranteed debt, GRAND TOTAL GROSS",
+   "includes": "National government external and domestic debt in shillings, gross, with publicly guaranteed debt. Excludes county governments' own borrowing.",
+   "facts": [],
+   "history": [
+    [
+     "2025-06-30",
+     11813919000000
+    ],
+    [
+     "2025-09-30",
+     12053947000000
+    ],
+    [
+     "2025-12-31",
+     12301231000000
+    ],
+    [
+     "2026-03-31",
+     12827260000000
+    ],
+    [
+     "2026-06-30",
+     13013211000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Domestic debt",
+     "value": 7328524000000,
+     "group": "Domestic"
+    },
+    {
+     "label": "External debt",
+     "value": 5684687000000,
+     "group": "External"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Central Bank of Kenya, Public debt",
+   "url": "https://www.centralbank.go.ke/public-debt/"
+  },
+  {
+   "name": "Kenya National Bureau of Statistics",
+   "url": "https://www.knbs.or.ke/"
+  }
+ ],
+ "notes": [
+  "Why the Treasury's review: it is the National Treasury's own quarterly statement of the debt. The fetcher reads the table with nine consecutive quarter-ends and checks that domestic plus external equals the grand total.",
+  "Gross: the Treasury also reports net debt (after deposits); the gross figure is used here.",
+  "Provisional: the newest quarter in each report is marked provisional and may be revised in the next review.",
+  "Currency: Kenyan shillings. The World Debt Clock converts them to US dollars at the US Treasury's Reporting Rates of Exchange (a quarterly official rate as of 30 September 2026; the page for the World Debt Clock shows the rate and its date)."
+ ],
+ "world_measure": "Public and publicly guaranteed, gross"
+}
