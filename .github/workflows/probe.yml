@@ -5,35 +5,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          sudo apt-get install -y -qq poppler-utils >/dev/null 2>&1 || true
-          which pdftotext || echo "no pdftotext"
           UA="Mozilla/5.0 (X11; Linux x86_64) everydebtclock.com"
-          echo "### DEA listing http"; curl -s -m 25 -L -A "$UA" "http://dea.gov.in/reports-public-debt-management" -o /tmp/dea.html -w "%{http_code} %{size_download}\n" || echo fail
-          grep -o 'href="[^"]*[Qq]uarterly[^"]*"' /tmp/dea.html | head -12
-          echo "### DEA pdf"
-          curl -s -m 40 -A "$UA" "http://dea.gov.in/files/public_debt_management_documents/Quarterly%20Report%20on%20Public%20Debt%20Management%20for%20the%20quarter%20October%20-%20December%202025.pdf" -o /tmp/dea.pdf
-          pdftotext -layout /tmp/dea.pdf /tmp/dea.txt; grep -n "Public Debt (A\|Total (net)\|Gross Liabilities\|End Dec\|Provisional\|A1\. Internal\|Table 4.1" /tmp/dea.txt | head -20
-          echo "### MINFIN internal"
           curl -s -m 25 -A "$UA" "https://minfin.gov.ru/ru/perfomance/public_debt/internal/" -o /tmp/mf.html
-          grep -o 'href="[^"]*\(xls\|xlsx\|doc\|id_4\|download\)[^"]*"' /tmp/mf.html | sort -u | head -15
-          python3 - <<'PY'
-          import re,html
-          t=open('/tmp/mf.html',encoding='utf-8',errors='replace').read()
-          t=re.sub(r'<script.*?</script>|<style.*?</style>','',t,flags=re.S)
-          t=html.unescape(re.sub(r'<[^>]+>',' ',t)); t=re.sub(r'\s+',' ',t)
-          for m in re.finditer(r'(01\.0[6-9]\.2026|Объем государственного внутреннего долга|33 15)',t):
-              print(t[max(0,m.start()-100):m.start()+250]); print('--'); break
-          i=t.find('Динамика'); print(t[i:i+800])
-          PY
-          echo "### MINFIN external"
           curl -s -m 25 -A "$UA" "https://minfin.gov.ru/ru/perfomance/public_debt/external/" -o /tmp/mx.html
-          grep -o 'href="[^"]*\(xls\|xlsx\|id_4\)[^"]*"' /tmp/mx.html | sort -u | head -10
           python3 - <<'PY'
           import re,html
-          t=open('/tmp/mx.html',encoding='utf-8',errors='replace').read()
-          t=re.sub(r'<script.*?</script>|<style.*?</style>','',t,flags=re.S)
-          t=html.unescape(re.sub(r'<[^>]+>',' ',t)); t=re.sub(r'\s+',' ',t)
-          i=t.find('внешн'); print(t[i:i+200])
-          for m in re.finditer(r'(на 1 (сентября|августа|октября) 2026|01\.09\.2026|01\.10\.2026)',t):
-              print(t[max(0,m.start()-200):m.start()+400]); break
+          for f,keys in (('/tmp/mf.html',['Объем государственного внутреннего долга','гарант']),('/tmp/mx.html',['Объем государственного внешнего долга','внешнего долга Российской Федерации'])):
+              raw=open(f,encoding='utf-8',errors='replace').read()
+              t=re.sub(r'<script.*?</script>|<style.*?</style>','',raw,flags=re.S)
+              t=html.unescape(re.sub(r'<[^>]+>',' ',t)); t=re.sub(r'\s+',' ',t)
+              print('=====',f,len(t))
+              for k in keys[:1]:
+                  for m in list(re.finditer(k,t))[:2]:
+                      print(t[max(0,m.start()-300):m.start()+1100]); print('--')
+              # raw html near table
+              i=raw.find('01.10.2026'); print('RAW:',re.sub(r'\s+',' ',raw[max(0,i-700):i+700]))
           PY
