@@ -6,18 +6,31 @@ jobs:
     steps:
       - run: |
           UA="Mozilla/5.0 (X11; Linux x86_64) everydebtclock.com"
-          curl -s -m 25 -A "$UA" "https://minfin.gov.ru/ru/perfomance/public_debt/internal/" -o /tmp/mf.html
-          curl -s -m 25 -A "$UA" "https://minfin.gov.ru/ru/perfomance/public_debt/external/" -o /tmp/mx.html
-          python3 - <<'PY'
-          import re,html
-          for f,keys in (('/tmp/mf.html',['Объем государственного внутреннего долга','гарант']),('/tmp/mx.html',['Объем государственного внешнего долга','внешнего долга Российской Федерации'])):
-              raw=open(f,encoding='utf-8',errors='replace').read()
-              t=re.sub(r'<script.*?</script>|<style.*?</style>','',raw,flags=re.S)
-              t=html.unescape(re.sub(r'<[^>]+>',' ',t)); t=re.sub(r'\s+',' ',t)
-              print('=====',f,len(t))
-              for k in keys[:1]:
-                  for m in list(re.finditer(k,t))[:2]:
-                      print(t[max(0,m.start()-300):m.start()+1100]); print('--')
-              # raw html near table
-              i=raw.find('01.10.2026'); print('RAW:',re.sub(r'\s+',' ',raw[max(0,i-700):i+700]))
+          B=https://minfin.gov.ru/common/upload/library/2026/10/main
+          curl -s -m 40 -A "$UA" "$B/graphDynamicsDebt_ru_01.10.2026.xlsx" -o /tmp/g.xlsx -w "%{http_code} %{size_download}\n"
+          curl -s -m 40 -A "$UA" "$B/GVD_20261001.xlsx" -o /tmp/e.xlsx -w "%{http_code} %{size_download}\n"
+          cat > /tmp/dump.py <<'PY'
+          import zipfile,re,sys,html
+          z=zipfile.ZipFile(sys.argv[1]); names=z.namelist(); print(names[:12])
+          ss=[]
+          if 'xl/sharedStrings.xml' in names:
+              x=z.read('xl/sharedStrings.xml').decode('utf-8')
+              ss=[html.unescape(re.sub(r'<[^>]+>','',m)) for m in re.findall(r'<si>(.*?)</si>',x,flags=re.S)]
+          wb=z.read('xl/workbook.xml').decode(); print(re.findall(r'<sheet [^>]*name="([^"]+)"',wb))
+          for n in names:
+              if n.startswith('xl/worksheets/sheet'):
+                  x=z.read(n).decode('utf-8'); print('##',n,len(x))
+                  rows=re.findall(r'<row [^>]*>(.*?)</row>',x,flags=re.S)
+                  for r in rows[:45]:
+                      out=[]
+                      for c in re.finditer(r'<c r="([A-Z]+\d+)"([^>]*?)(?:/>|>(.*?)</c>)',r,flags=re.S):
+                          ref,attr,body=c.groups(); v=re.search(r'<v>(.*?)</v>',body or '')
+                          if not v: continue
+                          val=v.group(1)
+                          if 't="s"' in attr: val=ss[int(val)]
+                          out.append(f'{ref}={val[:40]}')
+                      if out: print(' | '.join(out)[:300])
           PY
+          python3 /tmp/dump.py /tmp/g.xlsx | head -70
+          echo ========== EXT
+          python3 /tmp/dump.py /tmp/e.xlsx | head -60
