@@ -25,6 +25,7 @@ def load(R):
 
 def _d(s): return dt.date.fromisoformat(s)
 def _fd(s): return _d(s).strftime("%b %-d, %Y")
+WORLD = False  # set by build.py when the World Debt Clock page is built, so every nav/link to /world/ is only emitted when it exists
 CUR = "$"  # currency symbol for the page being rendered ("$" for US places, "C$" for Canada); set by _cur(p)
 def _cur(p): global CUR; CUR = (p.get("currency") or {}).get("symbol", "$"); return CUR
 def _usd0(x): return ("−" if x < 0 else "") + CUR + f"{abs(x):,.0f}"
@@ -85,6 +86,7 @@ def nav_html(places, depth, current=None, cls="pl"):
     kinds = {p["kind"] for p in places}
     items = [(up or "./", "United States", current == "us")]
     items += [(f"{up}{d}/", lab, current == k) for k, d, lab, _ in SECTIONS if k in kinds]
+    if WORLD and "country" in kinds: items.append((f"{up}world/", "World", current == "world"))
     return f'<nav class="{cls}">' + "".join(f'<a href="{h}"{" class=on" if on else ""}>{lab}</a>' for h, lab, on in items) + "</nav>"
 
 def hub_label(places, short=False):
@@ -368,9 +370,10 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     method = (f'<section id="method"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>How it works</h2>'
               f'<span class="h2n">Official {T["freq"]} figures · projection labelled · sources linked</span></div><div class="sk foot">{meth}</div></section>')
 
+    WL2 = '<li><a href="../../world/">World debt clock</a></li>' if WORLD else ""
     links = (f'<section class="answers" id="answers"><div class="sh"><h2>More clocks</h2></div><ul>'
              f'<li><a href="../../">US national debt clock (live, checked daily against Treasury)</a></li>'
-             f'<li><a href="../../states/">All {E(hub_label(places))}</a></li><li><a href="../../national-debt-per-person/">US national debt per person</a></li></ul>'
+             f'<li><a href="../../states/">All {E(hub_label(places))}</a></li><li><a href="../../national-debt-per-person/">US national debt per person</a></li>{WL2}</ul>'
              + ('<div class="sh"><h2>Other places</h2></div><ul>' + "".join(f'<li><a href="../../{dict((k, d) for k, d, _, _ in SECTIONS)[o["kind"]]}/{o["slug"]}/">{E(o["name"])} debt clock</a></li>' for o in sorted(others, key=lambda x: x["name"])) + '</ul>' if others else '')
              + '</section>')
 
@@ -434,10 +437,12 @@ const usd=(v,d,c)=>(v<0?'−':'')+(c||'$')+(d?nf2:nf0).format(Math.abs(v)),T=[..
 const val=k=>k.b+k.r*(Date.now()/1000-k.t);document.getElementById('hsort').onchange=ev=>{const m=ev.target.value;document.querySelectorAll('.grid.hub').forEach(g=>{const ts=T.filter(k=>k.e.parentNode===g);
 ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='total'?val(b)-val(a):val(b)/b.pop-val(a)/a.pop);ts.forEach(k=>g.appendChild(k.e))})};
 (function f(){T.forEach(k=>{if(!k.r)return;const v=val(k);k.v.textContent=usd(v,0,k.c);k.p.textContent=usd(v/k.pop,2,k.c)});requestAnimationFrame(f)})()})()</script>"""
+    WL1 = '<li><a href="../world/">World debt clock</a></li>' if WORLD else ""
+    WTXT = ' The <a href="../world/">World Debt Clock</a> adds the countries up in US dollars.' if WORLD else ""
     body = (f'{header}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>{E(hub_label(places)[0].upper() + hub_label(places)[1:])}</h1><p>Every place with a live clock, built from figures its own government publishes. Each clock shows who publishes the numbers and how often, '
-            f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.</p></section>'
+            f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p></section>'
             f'<main id="app">{sort}{secs}</main>'
-            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li><li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')
+            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')
     hub_css = PL_CSS + ".hubsort{display:flex;justify-content:flex-end;margin:4px 2px -14px;font-size:12px;color:var(--mut)}.hubsort select{margin-left:6px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit;font-size:12px}.tile.hubt .lab span:last-child{font-size:11px;color:var(--dim)}"
     page = meta_head(SITE, url, title, desc, "og/home.png", 1, hub_css) + body
     os.makedirs(f"{R}/{sec_dir}", exist_ok=True)

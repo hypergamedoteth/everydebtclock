@@ -244,9 +244,14 @@ ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="k">US n
 <noscript><p>Turn on JavaScript to watch these figures tick in real time.</p></noscript></section></div><!--/SSR-->""")
 import places_build
 PLACES_LIVE = places_build.load(R) if os.path.isdir(f"{R}/places") else []
+# World Debt Clock: US national debt + every live country, in USD (world_build.py). None when there is no live country or no inputs.
+import world_build
+WORLD = world_build.compute(R, PLACES_LIVE, {"official": OFF_V, "date": OFF_D, "base": val("debt_total", NOW), "rate": (val("debt_total", NOW + 3600) - val("debt_total", NOW)) / 3600,
+                                             "pop": POP_OFF, "pop_date": POP_OFF_DATE}, NOW) if PLACES_LIVE else None
+places_build.WORLD = bool(WORLD)
 links = (f"""<!--LINKS-->""" + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
          f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> ({html.escape(p.get("link_label", "state + local"))})</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
-         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
+         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (sum of the countries, in US dollars)</li>' if WORLD else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
 <div class="sh"><h2>Popular counters</h2></div><ul>{''.join(f'<li><a href="t/{k}.html">{html.escape(label(k, ALL[k]))}</a></li>' for k in KEY_TICKERS if k in ALL)}</ul><!--/LINKS-->""")
 if "<!--INTRO-->" in idx: idx = re.sub(r"<!--INTRO-->.*?<!--/INTRO-->", lambda m: intro, idx, flags=re.S)
 else: idx = idx.replace('<main id="app">', f'<section class="intro" id="intro">{intro}</section>\n<main id="app">', 1)
@@ -255,7 +260,7 @@ else: idx = idx.replace('<main id="app"></main>', f'<main id="app">{ssr}</main>'
 if "<!--LINKS-->" in idx: idx = re.sub(r"<!--LINKS-->.*?<!--/LINKS-->", lambda m: links, idx, flags=re.S)
 else: idx = idx.replace('<dialog id="dlg"></dialog>', f'<dialog id="dlg"></dialog>\n<section class="answers" id="answers">{links}</section>', 1)
 PLNAV = ("<!--PLNAV-->" + ('<nav class="plnav"><a href="./" class="on">United States</a>' + "".join(f'<a href="{d}/">{lab}</a>' for k, d, lab, _ in places_build.SECTIONS
-         if any(p["kind"] == k for p in PLACES_LIVE)) + "</nav>" if PLACES_LIVE else "") + "<!--/PLNAV-->")
+         if any(p["kind"] == k for p in PLACES_LIVE)) + ('<a href="world/">World</a>' if WORLD else "") + "</nav>" if PLACES_LIVE else "") + "<!--/PLNAV-->")
 if "<!--PLNAV-->" in idx: idx = re.sub(r"<!--PLNAV-->.*?<!--/PLNAV-->", lambda m: PLNAV, idx, flags=re.S)
 else: idx = idx.replace('<span class="live">', PLNAV + '<span class="live">', 1)
 # "Your state" card under the US hero: one compact card for the visitor's place (picked client-side in app.js from
@@ -751,6 +756,7 @@ if OFF_V:
 # ---------------------------------------------------------------- place pages: /states/<slug>/, /countries/<slug>/ from places/*.json
 import places_build
 PLACE_URLS = places_build.build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, STAMP, NOW)
+PLACE_URLS += world_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE, WORLD) if WORLD else []
 
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()
@@ -778,7 +784,7 @@ import hashlib, glob as _glob
 AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in ("style.css", "app.js", "core.js") if os.path.exists(f"{R}/{a}")}
 _vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
 _pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html")] + _glob.glob(f"{R}/t/*.html")
-          + [f for d in ["states", "countries"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
+          + [f for d in ["states", "countries", "world"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
 # Every page gets the homepage's inline icon, so browsers never fall back to requesting /favicon.ico (a 404).
 _icon = (re.search(r'<link rel="icon"[^>]*>', open(f"{R}/index.html").read()) or [None])[0]
 for f in _pages:

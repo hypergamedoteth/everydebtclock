@@ -100,6 +100,8 @@ jobs:
           python3 pipeline/fetch_russia.py || echo "russia fetch skipped"
           # Brazil: Banco Central do Brasil SGS 13761 / 13762 (DBGG, monthly). Never fails the run.
           python3 pipeline/fetch_brazil.py || echo "brazil fetch skipped"
+          # World Debt Clock inputs: ECB + Bank of Russia daily FX, IMF WEO GDP weights. Keeps the last good file on any failure. Never fails the run.
+          python3 pipeline/fetch_world.py || echo "world fetch skipped"
 
       - name: Build site
         env:
@@ -129,7 +131,7 @@ jobs:
         run: |
           mkdir -p _site
           cp -r index.html 404.html privacy.html CNAME robots.txt sitemap.xml style.css app.js core.js widget.html \
-                apple-touch-icon.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person national-debt-by-year when-will-debt-hit-41-trillion methodology states countries _site/
+                apple-touch-icon.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person national-debt-by-year when-will-debt-hit-41-trillion methodology states countries world _site/
           rm -f _site/data/validation_log.csv
 
       - uses: actions/upload-pages-artifact@v3
