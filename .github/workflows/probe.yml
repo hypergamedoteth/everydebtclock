@@ -10,10 +10,8 @@ jobs:
           python3 - <<'PY'
           import re,html
           t=open('/tmp/dea.html',encoding='utf-8',errors='replace').read()
-          for m in re.finditer(r'<tr[^>]*>(.*?)</tr>',t,flags=re.S):
-              r=m.group(1)
-              h=re.findall(r'href="([^"]*\.pdf)"',r)
-              if h:
-                  txt=html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',r))).strip()
-                  print('ROW',txt[:150],'=>',h[0][-110:])
+          print(len(t))
+          for m in re.finditer(r'href="([^"]*public_debt_management_documents[^"]*)"',t):
+              ctx=html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',t[max(0,m.start()-300):m.start()])))[-90:]
+              print('LINK',m.group(1)[-100:],'<=',ctx)
           PY
