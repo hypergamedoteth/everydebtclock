@@ -20,7 +20,8 @@ def read(pdf):
         return float(ms[nth][1].replace(",", "")) * M
     ext, dom, tot = row(r"Total External Debt"), row(r"Total Domestic Debt"), row(r"Total Public Debt\s*\(A\+B\)")
     if abs(ext + dom - tot) > 0.02 * M * 1000: raise RuntimeError("external + domestic != total")
-    fgn_ext, fgn_dom = row(r"FGN Only", 0), row(r"FGN Only", 1)
+    try: fgn_ext, fgn_dom = row(r"FGN Only", 0), row(r"FGN Only", 1)
+    except RuntimeError: fgn_ext = fgn_dom = None            # older PDFs lay this row out differently; it is only a side fact
     fx = re.search(r"Exchange Rate of US\$\s*1\s*/\s*N\s*([\d,.]+)", t)
     return tot, dom, ext, fgn_dom, fgn_ext, (float(fx.group(1).replace(",", "")) if fx else None)
 
@@ -45,7 +46,7 @@ def build(p):
     c["breakdown"] = [{"label": "Domestic debt (federal, states and FCT)", "value": int(dom), "group": "Domestic"},
                       {"label": "External debt (federal, states and FCT; converted at the CBN official rate)", "value": int(ext), "group": "External"}]
     for f in c.get("facts", []):
-        if f.get("key") == "fgn": f.update(value=int(fdom + fext), as_of=last)
+        if f.get("key") == "fgn" and fdom is not None: f.update(value=int(fdom + fext), as_of=last)
     y, mo = int(last[:4]), int(last[5:7]) + 3
     if mo > 12: y, mo = y + 1, mo - 12
     p["next_update"] = f"The next quarter-end position ({MONTHS[mo - 1]} {y}) is expected from the Debt Management Office roughly three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears."

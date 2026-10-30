@@ -2,7 +2,8 @@
 """Inputs for the World Debt Clock (/world/): daily exchange rates and the IMF GDP weights.
   data/world_fx.json   ECB euro foreign exchange reference rates (daily, keyless XML), and the Bank of Russia official
                        USD/RUB rate (neither the ECB nor the Fed H.10 publishes a rouble rate any more)
-                       and the Federal Reserve Board H.10 weekly release, for currencies the ECB does not publish (Taiwan dollar)
+                       and the Federal Reserve Board H.10 weekly release, for currencies the ECB does not publish (Taiwan dollar),
+                       and the US Treasury's quarterly Reporting Rates of Exchange (Egyptian pound, Ghanaian cedi, Kenyan shilling, Nigerian naira)
   data/world_gdp.json  IMF World Economic Outlook NGDPD (GDP, current US dollars, billions) for the current calendar year,
                        every country plus the world aggregate: https://www.imf.org/external/datamapper/api/v1/NGDPD
 
@@ -80,6 +81,25 @@ def fed():
     date = max(dates.values())
     return {"date": date, "per_usd": out, "dates": dates, "source": "Federal Reserve Board, H.10 Foreign Exchange Rates (weekly release; noon buying rates in New York)", "source_url": H10, "feed": H10}
 
+UST = "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange"
+UST_ROWS = {"EGP": "Egypt-Pound", "GHS": "Ghana-Cedi", "KES": "Kenya-Shilling", "NGN": "Nigeria-Naira"}   # US Treasury label per currency code (units per US dollar)
+
+def ust():
+    """US Treasury Reporting Rates of Exchange (quarterly, as of quarter-end; currency units per US dollar) for currencies the ECB and Fed H.10 do not publish."""
+    since = (dt.date.today() - dt.timedelta(days=200)).isoformat()
+    q = (UST + "?filter=country_currency_desc:in:(" + ",".join(UST_ROWS.values()) + "),record_date:gte:" + since +
+         "&sort=-record_date&page%5Bsize%5D=100&fields=record_date,country_currency_desc,exchange_rate")
+    rows = json.loads(get(q))["data"]
+    out, dates = {}, {}
+    for code, label in UST_ROWS.items():
+        r = [x for x in rows if x["country_currency_desc"] == label]
+        if not r: raise RuntimeError("US Treasury rates: no row for " + label)
+        r.sort(key=lambda x: x["record_date"]); v = float(r[-1]["exchange_rate"])
+        if not v > 0: raise RuntimeError("US Treasury rates: bad rate for " + label)
+        out[code], dates[code] = v, r[-1]["record_date"]
+    return {"date": max(dates.values()), "per_usd": out, "dates": dates, "source": "US Treasury, Treasury Reporting Rates of Exchange (quarterly, as of quarter-end)",
+            "source_url": "https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange", "feed": UST}
+
 def imf(year):
     vals = json.loads(get(IMF))["values"]["NGDPD"]
     y = str(year)
@@ -95,7 +115,7 @@ def newer_or_same(new, old, key="date"): return not old.get(key) or new[key] >= 
 
 def main():
     fx = load(FX); changed = False
-    for name, fn in (("ecb", ecb), ("cbr", cbr), ("fed", fed)):
+    for name, fn in (("ecb", ecb), ("cbr", cbr), ("fed", fed), ("ust", ust)):
         try:
             new = fn(); old = fx.get(name, {})
             if not newer_or_same(new, old): raise RuntimeError(f"{name} date {new['date']} older than stored {old['date']}")
@@ -105,9 +125,9 @@ def main():
             if name == "cbr" and old.get("rub_per_usd") and old["date"] != new["date"]:
                 jump = abs(new["rub_per_usd"] / old["rub_per_usd"] - 1)
                 if jump > 0.5: raise RuntimeError(f"RUB/USD moved {jump:.0%} in one fetch; not trusted")
-            if name == "fed" and old.get("per_usd") and old["date"] != new["date"]:
+            if name in ("fed", "ust") and old.get("per_usd") and old["date"] != new["date"]:
                 jump = max(abs(new["per_usd"][k] / old["per_usd"][k] - 1) for k in new["per_usd"] if k in old["per_usd"])
-                if jump > 0.25: raise RuntimeError(f"H.10 rate moved {jump:.0%} in one fetch; not trusted")
+                if jump > (0.25 if name == "fed" else 0.6): raise RuntimeError(f"{name} rate moved {jump:.0%} in one fetch; not trusted")
             if new != old: fx[name] = new; changed = True; print(f"world fx {name}: {new['date']}")
             else: print(f"world fx {name}: unchanged")
         except Exception as e:

@@ -115,6 +115,12 @@ jobs:
           python3 pipeline/fetch_indonesia.py || echo "indonesia fetch skipped"
           # Saudi Arabia: National Debt Management Center Reports & Statistics (quarterly). Never fails the run.
           python3 pipeline/fetch_saudi_arabia.py || echo "saudi-arabia fetch skipped"
+          python3 pipeline/fetch_qatar.py || echo "qatar fetch skipped"
+          python3 pipeline/fetch_nigeria.py || echo "nigeria fetch skipped"
+          python3 pipeline/fetch_ghana.py || echo "ghana fetch skipped"
+          python3 pipeline/fetch_kenya.py || echo "kenya fetch skipped"
+          python3 pipeline/fetch_egypt.py || echo "egypt fetch skipped"
+          python3 pipeline/fetch_south_africa.py || echo "south-africa fetch skipped"
           # World Debt Clock inputs: ECB + Bank of Russia daily FX, IMF WEO GDP weights. Keeps the last good file on any failure. Never fails the run.
           python3 pipeline/fetch_world.py || echo "world fetch skipped"
 

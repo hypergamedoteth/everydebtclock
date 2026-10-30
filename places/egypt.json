@@ -1,0 +1,108 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Egyptian pounds. The debt component, history and facts are refreshed by pipeline/fetch_egypt.py from the Ministry of Finance's quarterly Budget Sector Statistical Debt Bulletin (needs pypdf); edit wording here, not numbers.",
+ "slug": "egypt",
+ "kind": "country",
+ "country": "EG",
+ "iso3": "EGY",
+ "name": "Egypt",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Ministry of Finance of Egypt (Debt Management Unit)",
+ "currency": {
+  "code": "EGP",
+  "symbol": "E£"
+ },
+ "frequency": "quarterly",
+ "title": "Egypt Debt Clock: Live Budget Sector Debt, Official Data",
+ "headline": "budget sector debt",
+ "headline_long": "budget sector debt",
+ "link_label": "budget sector debt, E£",
+ "subject": "The Egyptian state budget sector (central government, local administration and service authorities)",
+ "hist_label": "Budget Sector Debt",
+ "sum_note": "Egypt's budget sector debt (domestic and external), from the Ministry of Finance's Budget Sector Statistical Debt Bulletin, quarter-end. Gross.",
+ "scope_note": "This is the \"Total Budget Sector Debt Outstanding\" that Egypt's Ministry of Finance states in its quarterly Budget Sector Statistical Debt Bulletin: the domestic debt of the state budget sector plus the external debt serviced by the Ministry, converted into Egyptian pounds. The domestic part includes foreign-currency debt owed to Egyptian residents. It does not include the debt of the economic public authorities and state-owned companies, nor the Central Bank's own liabilities. Because about a quarter of the debt is in foreign currency, the pound figure moves with the exchange rate as well as with borrowing.",
+ "trend_why": "We use the change over the latest twelve months rather than the last quarter because quarterly changes swing with the exchange rate and with issuance.",
+ "legend": "Egypt's public debt is reported quarterly, with a lag of several months. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Quarterly. The Ministry of Finance publishes a bulletin for each quarter-end with a lag of several months.",
+ "after_text": ", after a lag of several months",
+ "next_update": "The Ministry of Finance publishes a Budget Sector Statistical Debt Bulletin each quarter, with a lag of several months; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 109600000,
+  "noun": "people",
+  "as_of": "2026-10-01",
+  "source_name": "Central Agency for Public Mobilization and Statistics (CAPMAS), Population clock, resident population of Egypt (about 109.6 million in October 2026)",
+  "source_url": "https://www.capmas.gov.eg/Pages/populationClock.aspx",
+  "publisher_short": "CAPMAS",
+  "tag": "CAPMAS",
+  "possessive": "CAPMAS's",
+  "method_short": "CAPMAS population clock, October 2026, rounded as published",
+  "noun_full": "people in Egypt"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Egypt budget sector debt",
+   "short": "Budget sector debt",
+   "value": 17850712000000,
+   "as_of": "2026-03-31",
+   "prior_value": 14686262000000,
+   "prior_as_of": "2025-03-31",
+   "source_name": "Ministry of Finance of Egypt, Budget Sector Statistical Debt Bulletin, Total Budget Sector Debt Outstanding, EGP million",
+   "source_url": "https://media.mof.gov.eg/mof-prd/Budget_Sector_Statistical_Debt_Bulletin_March_2026_d781c16aad.pdf",
+   "source_locator": "Quarterly bulletin PDF, rows Total Budget Sector Debt Outstanding, Total Domestic Budget Sector Debt, Total External Budget Sector Debt",
+   "includes": "State budget sector debt in pounds, domestic and external, gross. Excludes economic public authorities, state-owned companies and the Central Bank.",
+   "facts": [],
+   "history": [
+    [
+     "2025-03-31",
+     14686262000000
+    ],
+    [
+     "2025-06-30",
+     14964314000000
+    ],
+    [
+     "2025-09-30",
+     15818531000000
+    ],
+    [
+     "2025-12-31",
+     16411777000000
+    ],
+    [
+     "2026-03-31",
+     17850712000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Domestic budget sector debt (includes foreign-currency debt owed to Egyptian residents)",
+     "value": 13675849000000,
+     "group": "Domestic"
+    },
+    {
+     "label": "External budget sector debt (foreign-currency debt held by non-residents)",
+     "value": 4174863000000,
+     "group": "External"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Central Bank of Egypt, Statistics",
+   "url": "https://www.cbe.org.eg/en/economic-research/statistics"
+  },
+  {
+   "name": "Ministry of Finance of Egypt",
+   "url": "https://mof.gov.eg/"
+  }
+ ],
+ "notes": [
+  "Why the Ministry's bulletin: it is the Ministry of Finance's own quarterly statement of the budget sector's debt. The fetcher reads the latest bulletin and the one about a year earlier and checks that domestic plus external equals the total.",
+  "Budget sector, not general government: the measure is narrower than the IMF's general-government figure, which includes more entities, and not like-for-like with other countries' pages.",
+  "Lag: the newest bulletin is several months behind the date.",
+  "Currency: Egyptian pounds. The World Debt Clock converts them to US dollars at the US Treasury's Reporting Rates of Exchange (a quarterly official rate as of 30 September 2026; the page for the World Debt Clock shows the rate and its date)."
+ ],
+ "world_measure": "Budget sector, gross"
+}

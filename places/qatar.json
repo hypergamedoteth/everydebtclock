@@ -1,0 +1,96 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in Qatari riyals. The debt component, history and facts are refreshed by pipeline/fetch_qatar.py from the Ministry of Finance's Public Debt dataset; edit wording here, not numbers.",
+ "slug": "qatar",
+ "kind": "country",
+ "country": "QA",
+ "iso3": "QAT",
+ "name": "Qatar",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Ministry of Finance of Qatar (open-data portal, data.gov.qa)",
+ "currency": {
+  "code": "QAR",
+  "symbol": "QAR "
+ },
+ "frequency": "annual",
+ "title": "Qatar Debt Clock: Live Total Public Debt, Official Data",
+ "headline": "total public debt",
+ "headline_long": "total public debt",
+ "link_label": "total public debt, QAR",
+ "subject": "The State of Qatar",
+ "hist_label": "Total Public Debt",
+ "sum_note": "Qatar's total public debt (domestic and external), year-end, from the Ministry of Finance's Public Debt dataset on the national open-data portal. Annual figures only.",
+ "scope_note": "This is the \"Total Public Debt\" that Qatar's Ministry of Finance publishes in its Public Debt dataset on the national open-data portal (data.gov.qa): domestic debt plus external debt at the end of each calendar year, in Qatari riyals. It is the Ministry's own figure and is gross; it is not reduced by the government's financial assets, which are large. Qatar publishes this series once a year, so the figure on this page can be many months old and the live number is a projection of the year-on-year trend.",
+ "trend_why": "We use the change over the last full year, because Qatar publishes only year-end positions.",
+ "legend": "Qatar's public debt is reported once a year, at year-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Annual. The Ministry of Finance adds each year-end position to the open-data portal some months after the year closes.",
+ "after_text": ", some months after each year-end",
+ "next_update": "The Ministry of Finance adds each year-end position to its open-data portal after the year closes; the 2026 figure is expected during 2027. This page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 3143491,
+  "noun": "people",
+  "as_of": "2024-06-30",
+  "source_name": "Planning and Statistics Authority (PSA), Population estimates by gender and age group, 2024, total of all age groups (data.gov.qa)",
+  "source_url": "https://www.data.gov.qa/explore/dataset/population-estimates-by-gender-and-age-groups/",
+  "publisher_short": "PSA",
+  "tag": "PSA",
+  "possessive": "the PSA's",
+  "method_short": "PSA 2024 population estimate (the latest year on the open-data portal), all ages",
+  "noun_full": "people in Qatar"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Qatar total public debt",
+   "short": "Public debt",
+   "value": 338600000000,
+   "as_of": "2025-12-31",
+   "prior_value": 329221000000,
+   "prior_as_of": "2024-12-31",
+   "source_name": "Ministry of Finance of Qatar, Public Debt dataset (data.gov.qa), Total Public Debt, QAR million",
+   "source_url": "https://www.data.gov.qa/explore/dataset/public-debt/",
+   "source_locator": "Dataset public-debt, record item \"Total Public Debt\" (also Domestic Debt and External Debt), by year; machine-readable through the portal's open API",
+   "includes": "The state's total public debt: domestic and external, in riyals, gross. The dataset does not break out the debt of state-owned entities and none is added here; the assets of the sovereign wealth fund are not netted off.",
+   "facts": [],
+   "history": [
+    [
+     "2024-12-31",
+     329221000000
+    ],
+    [
+     "2025-12-31",
+     338600000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Domestic debt",
+     "value": 158442000000,
+     "group": "Domestic"
+    },
+    {
+     "label": "External debt",
+     "value": 180158000000,
+     "group": "External"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Planning and Statistics Authority of Qatar",
+   "url": "https://www.psa.gov.qa/en/"
+  },
+  {
+   "name": "Qatar Central Bank",
+   "url": "https://www.qcb.gov.qa/"
+  }
+ ],
+ "notes": [
+  "Why the Ministry's dataset: it is the Ministry of Finance's own published series on the government's open-data portal (open licence), with the domestic and external parts. The fetcher checks that the two parts add up to the total.",
+  "Annual only: Qatar does not publish a more frequent official debt series that we could find, so the figure is a year-end position and the live number between years is a projection, labelled as such.",
+  "Gross: Qatar holds very large financial assets, mostly in the Qatar Investment Authority; none of that is subtracted here.",
+  "Currency: Qatari riyals. The riyal is pegged to the US dollar at 3.64 riyals per dollar, which the World Debt Clock uses for conversion."
+ ],
+ "world_measure": "Public debt, gross (annual)"
+}

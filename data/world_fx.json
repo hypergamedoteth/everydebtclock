@@ -54,5 +54,23 @@
   "source": "Federal Reserve Board, H.10 Foreign Exchange Rates (weekly release; noon buying rates in New York)",
   "source_url": "https://www.federalreserve.gov/releases/h10/current/",
   "feed": "https://www.federalreserve.gov/releases/h10/current/"
+ },
+ "ust": {
+  "date": "2026-09-30",
+  "per_usd": {
+   "EGP": 51.89,
+   "GHS": 11.69,
+   "KES": 129.53,
+   "NGN": 1326.78
+  },
+  "dates": {
+   "EGP": "2026-09-30",
+   "GHS": "2026-09-30",
+   "KES": "2026-09-30",
+   "NGN": "2026-09-30"
+  },
+  "source": "US Treasury, Treasury Reporting Rates of Exchange (quarterly, as of quarter-end)",
+  "source_url": "https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange",
+  "feed": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange"
  }
 }

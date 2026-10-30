@@ -1,0 +1,120 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in South African rand. The debt component, history and facts are refreshed by pipeline/fetch_south_africa.py from the SARB Quarterly Bulletin public finance tables (needs pypdf); edit wording here, not numbers.",
+ "slug": "south-africa",
+ "kind": "country",
+ "country": "ZA",
+ "iso3": "ZAF",
+ "name": "South Africa",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "South African Reserve Bank (SARB), with National Treasury",
+ "currency": {
+  "code": "ZAR",
+  "symbol": "R"
+ },
+ "frequency": "monthly",
+ "title": "South Africa Debt Clock: Live National Government Gross Loan Debt, Official Data",
+ "headline": "national government gross loan debt",
+ "headline_long": "national government gross loan debt",
+ "link_label": "national government gross loan debt, R",
+ "subject": "The national government of South Africa",
+ "hist_label": "National Government Gross Loan Debt",
+ "sum_note": "South Africa's national government total gross loan debt at face value (domestic and foreign), month-end, from the Reserve Bank's Quarterly Bulletin statistical tables. Gross, national government.",
+ "scope_note": "This is the \"total gross loan debt\" of the national government that the South African Reserve Bank (SARB) publishes in the statistical tables of its Quarterly Bulletin (series KB406, table \"National government debt, at face value\"): domestic debt plus foreign debt, in rand, before subtracting the government's cash balances. Provincial and local governments, state-owned companies and their guaranteed debt are not included. The SARB shows the series at fiscal year-end (31 March), calendar year-end and monthly for the current year.",
+ "trend_why": "We use the latest twelve months rather than the last month because changes between single reporting dates swing with the issuance calendar and short-term borrowing.",
+ "legend": "South Africa's national government debt is reported monthly in the Reserve Bank's quarterly bulletin. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official month-end figures, shown here next to them.",
+ "cadence": "Monthly data, published quarterly. The Reserve Bank's Quarterly Bulletin (March, June, September, December) adds the months since the previous one.",
+ "after_text": ", with each new Quarterly Bulletin",
+ "next_update": "The Reserve Bank publishes the Quarterly Bulletin in March, June, September and December; each adds the months since the last one. This page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 63100945,
+  "noun": "people",
+  "as_of": "2025-06-30",
+  "source_name": "Statistics South Africa, Mid-year population estimates 2025 (P0302), total population at 30 June 2025",
+  "source_url": "https://www.statssa.gov.za/publications/P0302/P03022025.pdf",
+  "publisher_short": "Stats SA",
+  "tag": "Stats SA",
+  "possessive": "Stats SA's",
+  "method_short": "Stats SA mid-year 2025 population estimate",
+  "noun_full": "people in South Africa"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "South Africa national government gross loan debt",
+   "short": "Gross loan debt",
+   "value": 6203942000000,
+   "as_of": "2026-07-31",
+   "prior_value": 5900114000000,
+   "prior_as_of": "2025-07-31",
+   "source_name": "South African Reserve Bank, Quarterly Bulletin, National government debt at face value, total gross loan debt (KB406 / 4114M), R million",
+   "source_url": "https://www.resbank.co.za/en/home/publications/quarterly-bulletin1",
+   "source_locator": "Quarterly Bulletin statistical table \"7. Public finance\", page \"National government debt, at face value\", column Total gross loan debt",
+   "includes": "National government gross loan debt (domestic and foreign) at face value, in rand. Excludes provincial and local governments, state-owned companies and guaranteed debt.",
+   "facts": [],
+   "history": [
+    [
+     "2025-07-31",
+     5900114000000
+    ],
+    [
+     "2025-12-31",
+     6018060000000
+    ],
+    [
+     "2026-02-28",
+     6042983000000
+    ],
+    [
+     "2026-03-31",
+     6104450000000
+    ],
+    [
+     "2026-04-30",
+     6102050000000
+    ],
+    [
+     "2026-05-31",
+     6113911000000
+    ],
+    [
+     "2026-06-30",
+     6155965000000
+    ],
+    [
+     "2026-07-31",
+     6203942000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Domestic debt",
+     "value": 5635368000000,
+     "group": "Domestic"
+    },
+    {
+     "label": "Foreign debt",
+     "value": 568574000000,
+     "group": "External"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "National Treasury, Budget documents",
+   "url": "https://www.treasury.gov.za/documents/national%20budget/"
+  },
+  {
+   "name": "Statistics South Africa",
+   "url": "https://www.statssa.gov.za/"
+  }
+ ],
+ "notes": [
+  "Why the Reserve Bank: it publishes the Treasury's debt statistics monthly in a machine-readable table, with domestic and foreign parts. The fetcher checks that domestic plus foreign equals the total gross loan debt in every row it uses.",
+  "Gross: the Treasury and the Bank also publish net loan debt (after cash balances); the gross figure is used here.",
+  "Face value: the table's market-value version is lower or higher and is not used.",
+  "Currency: South African rand. The World Debt Clock converts it to US dollars at the ECB's daily reference rate for ZAR."
+ ],
+ "world_measure": "National government, gross (face value)"
+}
