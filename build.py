@@ -249,7 +249,14 @@ import world_build
 WORLD = world_build.compute(R, PLACES_LIVE, {"official": OFF_V, "date": OFF_D, "base": val("debt_total", NOW), "rate": (val("debt_total", NOW + 3600) - val("debt_total", NOW)) / 3600,
                                              "pop": POP_OFF, "pop_date": POP_OFF_DATE}, NOW) if PLACES_LIVE else None
 places_build.WORLD = bool(WORLD)
-links = (f"""<!--LINKS-->""" + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
+import explore
+explore.check(PLACES_LIVE)
+# IMF GDP by place slug, used to rank countries in the "Explore more clocks" links (US included as "united-states")
+_gdp = json.load(open(f"{R}/data/world_gdp.json")).get("countries", {}) if os.path.exists(f"{R}/data/world_gdp.json") else {}
+places_build.GDP_BY_SLUG = {p["slug"]: _gdp.get(p.get("iso3") or world_build.ISO3.get(p.get("country", ""), ""), 0) for p in PLACES_LIVE if p["kind"] == "country"}
+places_build.GDP_BY_SLUG["united-states"] = _gdp.get("USA", 0)
+HOME_EXPLORE = explore.explore("", PLACES_LIVE, places_build.calc, cur=None, gdp=places_build.GDP_BY_SLUG, kind_hint="us") if PLACES_LIVE else ""
+links = (f"""<!--LINKS-->""" + HOME_EXPLORE + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
          f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> ({html.escape(p.get("link_label", "state + local"))})</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
          + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (sum of the countries, in US dollars)</li>' if WORLD else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
 <div class="sh"><h2>Popular counters</h2></div><ul>{''.join(f'<li><a href="t/{k}.html">{html.escape(label(k, ALL[k]))}</a></li>' for k in KEY_TICKERS if k in ALL)}</ul><!--/LINKS-->""")
@@ -261,6 +268,9 @@ if "<!--LINKS-->" in idx: idx = re.sub(r"<!--LINKS-->.*?<!--/LINKS-->", lambda m
 else: idx = idx.replace('<dialog id="dlg"></dialog>', f'<dialog id="dlg"></dialog>\n<section class="answers" id="answers">{links}</section>', 1)
 PLNAV = ("<!--PLNAV-->" + ('<nav class="plnav"><a href="./" class="on">United States</a>' + "".join(f'<a href="{d}/">{lab}</a>' for k, d, lab, _ in places_build.SECTIONS
          if any(p["kind"] == k for p in PLACES_LIVE)) + ('<a href="world/">World</a>' if WORLD else "") + "</nav>" if PLACES_LIVE else "") + "<!--/PLNAV-->")
+SEARCH = "<!--SEARCH-->" + (explore.search_box("") if PLACES_LIVE else "") + "<!--/SEARCH-->"
+if "<!--SEARCH-->" in idx: idx = re.sub(r"<!--SEARCH-->.*?<!--/SEARCH-->", lambda m: SEARCH, idx, flags=re.S)
+else: idx = idx.replace("</header>", "</header>" + SEARCH, 1)
 if "<!--PLNAV-->" in idx: idx = re.sub(r"<!--PLNAV-->.*?<!--/PLNAV-->", lambda m: PLNAV, idx, flags=re.S)
 else: idx = idx.replace('<span class="live">', PLNAV + '<span class="live">', 1)
 # "Your state" card under the US hero: one compact card for the visitor's place (picked client-side in app.js from
