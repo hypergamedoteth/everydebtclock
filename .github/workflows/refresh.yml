@@ -88,7 +88,7 @@ jobs:
           python3 pipeline/fetch_singapore.py || echo "singapore fetch skipped"
           # United Kingdom: ONS public sector finances series BKPX / HF6W / CPPH (keyless JSON). Never fails the run.
           python3 pipeline/fetch_united_kingdom.py || echo "united-kingdom fetch skipped"
-          # Germany, France, Italy, Spain, Netherlands, Belgium, Austria, Ireland, Poland, Sweden: Eurostat gov_10q_ggdebt (central government Maastricht debt, quarterly) and demo_pjan. Never fails the run.
+          # Germany, France, Italy, Spain, Netherlands, Belgium, Austria, Ireland, Poland, Sweden, Denmark, Czechia, Romania, Portugal, Finland, Hungary: Eurostat gov_10q_ggdebt (central government Maastricht debt, quarterly) and demo_pjan. Never fails the run.
           python3 pipeline/fetch_eurostat.py || echo "eurostat fetch skipped"
           # Japan: Ministry of Finance Central Government Debt pages (quarterly). Never fails the run.
           python3 pipeline/fetch_japan.py || echo "japan fetch skipped"

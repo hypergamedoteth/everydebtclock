@@ -17,9 +17,9 @@ import json, os, re, sys, calendar, urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 API = "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/"
 PLACES = {"germany": "DE", "france": "FR", "italy": "IT", "spain": "ES", "netherlands": "NL", "belgium": "BE", "austria": "AT", "ireland": "IE",
-          "poland": "PL", "sweden": "SE"}
-NAC = {"PL", "SE"}   # reported in national currency (MIO_NAC: zloty, krona); the rest are euro (MIO_EUR)
-CONSOLIDATION = {"NL", "IE"}   # central government debt can exceed the general government total (intra-government holdings netted only in S13)
+          "poland": "PL", "sweden": "SE", "denmark": "DK", "czechia": "CZ", "romania": "RO", "portugal": "PT", "finland": "FI", "hungary": "HU"}
+NAC = {"PL", "SE", "DK", "CZ", "RO", "HU"}   # reported in national currency (MIO_NAC: zloty, krona, krone, koruna, leu); the rest are euro (MIO_EUR)
+CONSOLIDATION = {"NL", "IE", "CZ", "RO", "PT", "HU"}   # central government debt can exceed the general government total (intra-government holdings netted only in S13)
 PARTS = [("F2", "Currency and deposits", "Deposits"), ("F31", "Short-term debt securities", "Debt securities"),
          ("F32", "Long-term debt securities", "Debt securities"), ("F41", "Short-term loans", "Loans"), ("F42", "Long-term loans", "Loans")]
 M = 1_000_000

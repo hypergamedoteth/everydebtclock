@@ -6,6 +6,7 @@ Ticking numbers are a labelled projection: latest official figure + (latest - pr
 x (seconds since latest). Places without two consecutive official figures show the official figure, fixed."""
 import json, os, html, glob, datetime as dt
 from zoneinfo import ZoneInfo
+import explore as ex
 
 CT = ZoneInfo("America/Chicago")
 # Sections shown in the place nav. A section appears in the nav once it has at least one live place.
@@ -25,6 +26,7 @@ def load(R):
 
 def _d(s): return dt.date.fromisoformat(s)
 def _fd(s): return _d(s).strftime("%b %-d, %Y")
+GDP_BY_SLUG = {}  # slug -> IMF GDP (US$ bn), set by build.py; ranks countries in the Explore links
 WORLD = False  # set by build.py when the World Debt Clock page is built, so every nav/link to /world/ is only emitted when it exists
 CUR = "$"  # currency symbol for the page being rendered ("$" for US places, "C$" for Canada); set by _cur(p)
 def _cur(p): global CUR; CUR = (p.get("currency") or {}).get("symbol", "$"); return CUR
@@ -116,6 +118,8 @@ def build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, stamp, now):
     urls = []
     os.makedirs(f"{R}/api", exist_ok=True)
     with open(f"{R}/api/places.json", "w") as f: json.dump(index(places, now), f, indent=1)
+    ex.check(places)
+    with open(f"{R}/api/search.json", "w") as f: json.dump(ex.search_index(places), f, separators=(",", ":"))
     os.makedirs(f"{R}/og/places", exist_ok=True)
     for k, d, lab, desc_ in SECTIONS:
         live = [p for p in places if p["kind"] == k]
@@ -176,10 +180,13 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     yr_change = c["total"] - prior_total if rate else None
     days = (_d(c["as_of"]) - _d(cs[0]["prior_as_of"])).days if rate else None
     up_ = (rate or 0) >= 0
-    title = p.get("title", f"{name} Debt Clock: Live State and Local Debt, From Official Data")
-    desc = (f"{name} {T['head_long']}: {_b(c['total'])} {'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}"
-            + (" (" + " + ".join(f"{x['short'].lower()} {_b(x['value'])}" for x in cs) + ")" if len(cs) > 1 else "")
-            + f", {_usd0(pp_off)} per {dem}. Live clock projected from the official {T['freq']} figures, with sources and the math.")
+    # Search-targeted wording, one rule for every place (the JSON "title" is no longer used): countries match "<name> national debt" and
+    # "<name> debt clock"; states match "<state> debt", "<state> state debt" and "<state> debt clock".
+    is_state = p["kind"] == "state"
+    title = f"{name} Debt Clock: Live State Debt, Official Data" if is_state else f"{name} National Debt Clock: Live Debt, Official Data"
+    h1 = f"{name} State Debt Clock" if is_state else f"{name} National Debt Clock"
+    desc = (f"{name} {'state debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, {'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
+            f"Live {name} debt clock, {_usd0(pp_off)} per {dem}, with sources.")
     img = f"og/places/{p['slug']}.png"
     if og:
         og(f"{R}/{img}", f"{name} {T['head']} · ticking live", _usd0(proj),
@@ -216,9 +223,9 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                 f"it re-bases when the next {T['report']} come out.") if rate else \
                f"{E(rep)} reports {E(rep_its)} debt {T['once']} and only one official figure is available, so the clock shows the official figure without projecting."
     others = [o for o in places if o["slug"] != p["slug"]]
-    crumb = (f'<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../states/">All {E(hub_label(places))}</a>'
-             + "".join(f'<span>·</span><a href="../../{dict((k, d) for k, d, _, _ in SECTIONS)[o["kind"]]}/{o["slug"]}/">{E(o["name"])}</a>' for o in sorted(others, key=lambda x: x["name"])[:8]) + '</div>')
-    intro = (f'<section class="intro" id="intro">{crumb}<h1>{E(name)} Debt Clock</h1>'
+    crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span>'
+             f'<a href="../../{sec_dir}/">All {"US state" if is_state else "country"} debt clocks</a>' + ('<span>·</span><a href="../../world/">World debt clock</a>' if WORLD else "") + '</div>')
+    intro = (f'<section class="intro" id="intro">{crumb}<h1>{E(h1)}</h1>'
              f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
              + (f'on <b>{as_of}</b>' if T["periodic"] else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
              + " and ".join(("" if n_.startswith("Eurostat") else "the ") + f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
@@ -397,8 +404,9 @@ dlg.addEventListener('close',()=>mt=null);document.querySelectorAll('[data-d]').
 (function f(){{const t=now(),x=tot(t);if(R){{hv.textContent=usd(x);if(hs)hs.textContent=(R<0?'':'+')+usd(Math.abs(x-tot(OPENED)));if(wcn)wcn.textContent=short(x);if(wcd)wcd.textContent=sg(x-B)+short(Math.abs(x-B));pps.forEach(e=>e.textContent=usd(x/+e.dataset.pp,e.closest('.hero')?2:0));
 ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);k.ppx.forEach(e=>e.textContent=usd(v/+e.dataset.pp,2))}})}}if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
 
-    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + intro + '<main id="app">' + hero + wc + debt_sec + comp_secs + people + hist + details + method
-            + '</main><dialog id="dlg"></dialog>' + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
+    explore_html = ex.explore("../../", places, calc, cur=p, gdp=GDP_BY_SLUG)
+    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + ex.search_box("../../") + intro + '<main id="app">' + hero + wc + debt_sec + comp_secs + people + hist + details + method
+            + '</main><dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))
     _cur({})
@@ -428,9 +436,11 @@ def index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, kind, sec_dir, lab, d
         if not items: continue
         secs += (f'<section id="{d}"><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>{E(lab_)}</h2>'
                  f'<span class="h2n">{len(items)} live</span></div><div class="grid hub">{tiles}</div></section>')
-    names = ", ".join(x["name"] for x in ix)
-    title = f"{lab} Debt Clocks | Every Debt Clock"
-    desc = f"{desc_}: live clocks projected from official government debt figures, with sources. Now live: {names}."
+    ns, nc = sum(1 for x in ix if x["kind"] == "state"), sum(1 for x in ix if x["kind"] == "country")
+    if kind == "state":
+        title, h1, desc = "US State Debt Clocks: Debt of Every State, Official Data", "US State Debt Clocks", f"State debt of {ns} US states: live debt clock for each state, projected from official Census figures, with sources. Also {nc} country national debt clocks."
+    else:
+        title, h1, desc = "Country Debt Clocks: National Debt by Country, Official Data", "Country Debt Clocks: National Debt by Country", f"National debt of {nc} countries: a live debt clock for each, projected from official government and central-bank figures, with sources and as-of dates. Also {ns} US state debt clocks."
     header = (f'<header class="top"><div class="topin"><a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>{nav_html(places, 1, kind, "plnav")}'
               f'<span class="live"><span class="dot"></span><span>official data</span></span></div></header>')
     sort = ('<div class="hubsort"><label>Sort <select id="hsort"><option value="name">A–Z</option><option value="total">Total debt</option>'
@@ -442,7 +452,7 @@ ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='
 (function f(){T.forEach(k=>{if(!k.r)return;const v=val(k);k.v.textContent=usd(v,0,k.c);k.p.textContent=usd(v/k.pop,2,k.c)});requestAnimationFrame(f)})()})()</script>"""
     WL1 = '<li><a href="../world/">World debt clock</a></li>' if WORLD else ""
     WTXT = ' The <a href="../world/">World Debt Clock</a> adds the countries up in US dollars.' if WORLD else ""
-    body = (f'{header}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>{E(hub_label(places)[0].upper() + hub_label(places)[1:])}</h1><p>Every place with a live clock, built from figures its own government publishes. Each clock shows who publishes the numbers and how often, '
+    body = (f'{header}{ex.search_box("../")}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>{E(h1)}</h1><p>Every place with a live clock, built from figures its own government publishes. Each clock shows who publishes the numbers and how often, '
             f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p></section>'
             f'<main id="app">{sort}{secs}</main>'
             f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')
