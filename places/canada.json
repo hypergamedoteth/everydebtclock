@@ -25,7 +25,7 @@
  "trend_why": "We use 12 months rather than the last month because month-to-month changes swing by tens of billions with bond maturities and treasury-bill rollovers.",
  "legend": "Canada's federal securities are reported monthly, at month-end. Borrowing happens in lumps at bond auctions and maturities, so the live number is a straight-line projection between official month-end figures, shown here next to them.",
  "cadence": "Monthly. The Bank of Canada publishes each month-end figure in the first days of the following month (series V42141673).",
- "next_update": "The October 2026 month-end figure is expected in early November 2026; this page re-bases to it automatically on the next daily build after it appears.",
+ "next_update": "The November 2026 month-end figure is expected in early December 2026; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
   "value": 41798407,
   "as_of": "2026-07-01",
@@ -41,10 +41,10 @@
    "key": "securities",
    "label": "Government of Canada securities outstanding",
    "short": "Federal securities",
-   "value": 1649639000000,
-   "as_of": "2026-09-30",
-   "prior_value": 1535818000000,
-   "prior_as_of": "2025-09-30",
+   "value": 1665761000000,
+   "as_of": "2026-10-31",
+   "prior_value": 1553597000000,
+   "prior_as_of": "2025-10-31",
    "source_name": "Bank of Canada, Government of Canada direct securities and loans: Distribution of holdings (month-end), Total securities outstanding (inflation adjusted), series V42141673",
    "source_url": "https://www.bankofcanada.ca/?p=194263",
    "source_locator": "Series V42141673; machine-readable: https://www.bankofcanada.ca/valet/observations/V42141673/json",
@@ -53,11 +53,11 @@
     {
      "key": "par",
      "label": "Same securities at par value",
-     "value": 1623188000000,
+     "value": 1639340000000,
      "kind": "usd",
-     "as_of": "2026-09-30",
+     "as_of": "2026-10-31",
      "source_locator": "Series V37340",
-     "note": "The same securities at face value, without the inflation adjustment on Real Return Bonds (Bank of Canada series V37340); 2025-09-30: C$1,511.6 billion."
+     "note": "The same securities at face value, without the inflation adjustment on Real Return Bonds (Bank of Canada series V37340); 2025-10-31: C$1,529.4 billion."
     },
     {
      "label": "Federal debt (accumulated deficit), Mar 31, 2026",
@@ -71,10 +71,6 @@
     }
    ],
    "history": [
-    [
-     "2025-09-30",
-     1535818000000
-    ],
     [
      "2025-10-31",
      1553597000000
@@ -122,32 +118,36 @@
     [
      "2026-09-30",
      1649639000000
+    ],
+    [
+     "2026-10-31",
+     1665761000000
     ]
    ],
    "breakdown": [
     {
      "label": "Bank of Canada (inflation adjusted)",
-     "value": 150237000000,
+     "value": 150755000000,
      "group": "Holders"
     },
     {
      "label": "General public: treasury bills",
-     "value": 305318000000,
+     "value": 297798000000,
      "group": "Holders"
     },
     {
      "label": "General public: Canada Bills issued in US dollars",
-     "value": 2301000000,
+     "value": 2665000000,
      "group": "Holders"
     },
     {
      "label": "General public: marketable bonds and notes (inflation adjusted)",
-     "value": 1191429000000,
+     "value": 1214190000000,
      "group": "Holders"
     },
     {
      "label": "General public: retail debt",
-     "value": 354000000,
+     "value": 353000000,
      "group": "Holders"
     }
    ]
@@ -167,7 +167,7 @@
  "hero_extra": [
   {
    "label": "Official figure in US$ (BoC rate 2026-10-26: 1.4025)",
-   "value": "US$1.176 trillion"
+   "value": "US$1.188 trillion"
   }
  ],
  "fx_note": {
