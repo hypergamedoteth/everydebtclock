@@ -140,7 +140,7 @@
    "url": "https://www.akk.hu/en"
   },
   {
-   "name": "Hungarian Central Statistical Office, Government finance",
+   "name": "Hungarian Central Statistical Office",
    "url": "https://www.ksh.hu/?lang=en"
   }
  ],
@@ -149,7 +149,7 @@
   "Provisional data: Eurostat flags the latest quarters as provisional and revises them in later releases. The page re-bases to each new release.",
   "Why central government: the US clock ticks the federal Treasury's gross debt. The central government sector (Eurostat code S.1311) is the nearest match; state, local and social security debt are not in it. The table's breakdown by instrument adds up to the headline.",
   "Currency: Hungary reports to Eurostat in forint (million HUF, national currency, as published in table gov_10q_ggdebt, unit MIO_NAC). The world page converts to US dollars at the ECB's daily reference rate for HUF.",
-  "Cross-check: the Government Debt Management Agency (ÁKK) publishes the central government debt on a national basis, which differs from the Maastricht central government sector used here.",
+  "Cross-check: the Government Debt Management Agency (ÁKK) publishes central government debt on a national basis. National figures can differ from the Maastricht central government sector used here.",
   "Why central government can exceed the general government total: the general government (S.13) figure is consolidated across all government units, so debt held between the central government and local governments or social security funds is netted out, while the central government sector's own figure is consolidated only within the sector. Both are published on the same Eurostat table; this page ticks the central government figure and shows the general government total as a fact."
  ],
  "iso3": "HUN"
