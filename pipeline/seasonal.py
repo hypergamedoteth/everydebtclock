@@ -47,10 +47,10 @@ class History:
     def __init__(self, rows):
         self.rows = rows; self.dates = sorted(rows)
         self.cum = {}
-        for k in ("rev", "out", "int", "cus", "revx"):
+        for k in ("rev", "out", "int", "cus", "revx", "outx"):
             s, c = 0.0, []
             for d in self.dates:
-                r = rows[d]; s += (r["rev"] - r.get("cus", 0.0)) if k == "revx" else r.get(k, 0.0); c.append(s)
+                r = rows[d]; s += (r["rev"] - r.get("cus", 0.0)) if k == "revx" else (r["out"] - r.get("int", 0.0)) if k == "outx" else r.get(k, 0.0); c.append(s)
             self.cum[k] = c
         self.by_month = {}
         for d in self.dates: self.by_month.setdefault(d[:7], []).append(d)
@@ -95,7 +95,10 @@ def expected_flow(H, kind, d, n):
     """kind 'rev' (receipts) or 'out' (outlays): projected cash flow over (d, n]."""
     if kind == "rev":
         return same_window_last_year(H, "revx", d, n) + customs_prev_month(H, d, n)
-    return same_window_last_year(H, "out", d, n)
+    # Outlays = non-interest outlays (same weekdays a year earlier x growth) + interest from the coupon calendar. Coupons settle on the
+    # 15th and month-end, or the next business day, so a weekday-aligned year-ago window puts the ~$30B month-end interest on the wrong
+    # day whenever the calendar shifts (Oct 31 2025 was a Friday, Oct 31 2026 a Saturday): that flagged spending on Oct 30 2026.
+    return same_window_last_year(H, "outx", d, n) + expected_interest(H, d, n)
 
 # ---------------------------------------------------------------- coupon calendar for cash interest
 def _nominal(y, m): return [dt.date(y, m, 15), dt.date(y, m, calendar.monthrange(y, m)[1])]

@@ -416,12 +416,13 @@ if mts:
                 fexp = SEA.expected_flow(HIST, kind, d_l, n_b)
                 parts = ({"non_customs_same_window_last_year": SEA.same_window_last_year(HIST, "revx", d_l, n_b), "growth": SEA.growth_note(HIST, "revx", d_l),
                           "customs_same_bday_last_month": SEA.customs_prev_month(HIST, d_l, n_b)} if kind == "rev" else
-                         {"same_window_last_year": fexp, "growth": SEA.growth_note(HIST, "out", d_l)})
+                         {"non_interest_same_window_last_year": SEA.same_window_last_year(HIST, "outx", d_l, n_b), "interest_coupon_calendar": SEA.expected_interest(HIST, d_l, n_b),
+                           "growth": SEA.growth_note(HIST, "outx", d_l)})
                 rate = ratio * fexp / (t_n - t_l)
                 calc.update({"type": "dts_seasonal", "next_bday": n_b.isoformat(), "cash_flow_next": fexp, "seconds_next": t_n - t_l, "pace_parts": parts})
                 pace_txt = (f"Ticks toward the projected close for {n_b.isoformat()}: expected cash ${fexp/1e9:,.1f}B × {ratio:.4f} "
                             + ("(non-customs receipts from the same weekdays a year earlier, scaled by the trailing-year growth, plus customs duties from the same business day last month, since tariffs arrive in one monthly lump)"
-                               if kind == "rev" else "(outlays on the same weekdays a year earlier, scaled by the trailing-year growth)"))
+                               if kind == "rev" else "(non-interest outlays on the same weekdays a year earlier, scaled by the trailing-year growth, plus interest from the Treasury coupon calendar, which settles on the 15th and month-end rather than on a fixed weekday)"))
             else:
                 rate = ratio * flow90 / days90; pace_txt = "Ticks at the last 90 days' cash pace × the same ratio (fallback: daily DTS history unavailable)"
             totals[slug] = dict(base=est, t0=t_l, rate=rate, as_of=L["date"], how=how, ratio=ratio, calc=calc, pace_txt=pace_txt, anchor=(base_d or "dts"),
