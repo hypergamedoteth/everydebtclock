@@ -49,7 +49,7 @@ for _r, _s in {"Europe": "austria belgium france germany ireland italy netherlan
     for _x in _s.split(): COUNTRY_REGION[_x] = _r
 # Other names people type
 ALIASES = {"united-kingdom": "uk u.k. britain great britain england scotland", "south-korea": "korea republic of korea", "south-africa": "rsa",
-           "united-arab-emirates": "uae emirates dubai", "czechia": "czech republic", "netherlands": "holland dutch", "russia": "russian federation",
+           "united-arab-emirates": "uae emirates dubai", "czechia": "czech republic czech", "denmark": "danmark", "hungary": "magyarorszag", "finland": "suomi", "portugal": "portuguese", "romania": "romanian", "netherlands": "holland dutch", "russia": "russian federation",
            "taiwan": "chinese taipei roc", "turkey": "turkiye türkiye", "china": "prc", "hong-kong": "hk", "egypt": "arab republic of egypt",
            "new-york": "ny nyc", "district-of-columbia": "dc washington dc"}
 POSTAL = {"alabama": "AL", "alaska": "AK", "arizona": "AZ", "arkansas": "AR", "california": "CA", "colorado": "CO", "connecticut": "CT", "delaware": "DE", "florida": "FL",
@@ -75,6 +75,8 @@ def search_index(places):
            {"n": "World", "u": "world/", "k": "world", "a": "world debt global all countries"}]
     for p in sorted(places, key=lambda x: (x["kind"], x["name"])):
         a = ALIASES.get(p["slug"], "")
+        if p["kind"] == "country":      # ISO codes: "pt", "dk", "deu" jump to the right country
+            a = " ".join(x for x in (p.get("country", "").lower(), (p.get("iso3") or "").lower(), a) if x)
         if p["kind"] == "state": a = (POSTAL.get(p["slug"], "").lower() + " " + a).strip()
         out.append({"n": p["name"], "u": f'{SEC[p["kind"]]}/{p["slug"]}/', "k": p["kind"], "a": a})
     return {"_doc": "Client-side search index for the clock pages: n name, u url relative to the site root, k kind, a extra search words.", "places": out}

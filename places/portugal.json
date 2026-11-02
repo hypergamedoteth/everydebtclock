@@ -136,8 +136,8 @@
    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Government_finance_statistics_-_quarterly_data"
   },
   {
-   "name": "Banco de Portugal, Public finance statistics",
-   "url": "https://www.bportugal.pt/en/page/public-finance"
+   "name": "Statistics Portugal (INE)",
+   "url": "https://www.ine.pt/xportal/xmain?xpid=INE&xpgid=ine_main&xlang=en"
   },
   {
    "name": "IGCP, Portuguese Treasury and Debt Management Agency",
@@ -148,7 +148,7 @@
   "Why Eurostat: it is the official EU statistical office and publishes quarterly government debt for every member state on one definition, compiled from the figures the national statistical institutes and central banks report to it. The fetcher reads its public API directly.",
   "Provisional data: Eurostat flags the latest quarters as provisional and revises them in later releases. The page re-bases to each new release.",
   "Why central government: the US clock ticks the federal Treasury's gross debt. The central government sector (Eurostat code S.1311) is the nearest match; state, local and social security debt are not in it. The table's breakdown by instrument adds up to the headline.",
-  "Cross-check: Banco de Portugal and the national statistics institute (INE) publish the same EDP (Maastricht) debt by sub-sector; IGCP publishes the State's direct debt on a national basis, which differs.",
+  "Cross-check: Statistics Portugal (INE) and Banco de Portugal publish EDP (Maastricht) debt by sub-sector, and IGCP publishes the State's debt on a national basis. National figures can differ from the Maastricht central government sector used here.",
   "Why central government can exceed the general government total: the general government (S.13) figure is consolidated across all government units, so debt held between the central government and local governments or social security funds is netted out, while the central government sector's own figure is consolidated only within the sector. Both are published on the same Eurostat table; this page ticks the central government figure and shows the general government total as a fact."
  ],
  "iso3": "PRT"

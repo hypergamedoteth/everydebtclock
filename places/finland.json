@@ -136,19 +136,19 @@
    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Government_finance_statistics_-_quarterly_data"
   },
   {
-   "name": "State Treasury of Finland, State debt",
-   "url": "https://www.treasuryfinland.fi/state-debt/"
+   "name": "State Treasury of Finland, Central government debt management",
+   "url": "https://www.treasuryfinland.fi/"
   },
   {
-   "name": "Statistics Finland, Public finances",
-   "url": "https://stat.fi/en/topics/national-accounts"
+   "name": "Statistics Finland",
+   "url": "https://stat.fi/en"
   }
  ],
  "notes": [
   "Why Eurostat: it is the official EU statistical office and publishes quarterly government debt for every member state on one definition, compiled from the figures the national statistical institutes and central banks report to it. The fetcher reads its public API directly.",
   "Provisional data: Eurostat flags the latest quarters as provisional and revises them in later releases. The page re-bases to each new release.",
   "Why central government: the US clock ticks the federal Treasury's gross debt. The central government sector (Eurostat code S.1311) is the nearest match; state, local and social security debt are not in it. The table's breakdown by instrument adds up to the headline.",
-  "Cross-check: the State Treasury of Finland publishes the central government debt on a national basis, which differs from the Maastricht central government sector used here."
+  "Cross-check: the State Treasury of Finland publishes central government debt on a national basis. National figures can differ from the Maastricht central government sector used here."
  ],
  "iso3": "FIN"
 }

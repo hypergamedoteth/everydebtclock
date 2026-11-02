@@ -136,8 +136,8 @@
    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Government_finance_statistics_-_quarterly_data"
   },
   {
-   "name": "Ministry of Finance of the Czech Republic, State debt management",
-   "url": "https://www.mfcr.cz/en/state-budget/state-debt"
+   "name": "Ministry of Finance of the Czech Republic",
+   "url": "https://www.mfcr.cz/en"
   },
   {
    "name": "Czech Statistical Office, Government finance statistics",
@@ -149,7 +149,7 @@
   "Provisional data: Eurostat flags the latest quarters as provisional and revises them in later releases. The page re-bases to each new release.",
   "Why central government: the US clock ticks the federal Treasury's gross debt. The central government sector (Eurostat code S.1311) is the nearest match; state, local and social security debt are not in it. The table's breakdown by instrument adds up to the headline.",
   "Currency: Czechia reports to Eurostat in koruna (million CZK, national currency, as published in table gov_10q_ggdebt, unit MIO_NAC). The world page converts to US dollars at the ECB's daily reference rate for CZK.",
-  "Cross-check: the Czech Ministry of Finance publishes the state debt on a national definition that differs from the Maastricht central government sector used here.",
+  "Cross-check: the Czech Ministry of Finance publishes state debt on a national basis. National figures can differ from the Maastricht central government sector used here.",
   "Why central government can exceed the general government total: the general government (S.13) figure is consolidated across all government units, so debt held between the central government and local governments or social security funds is netted out, while the central government sector's own figure is consolidated only within the sector. Both are published on the same Eurostat table; this page ticks the central government figure and shows the general government total as a fact."
  ],
  "iso3": "CZE"
