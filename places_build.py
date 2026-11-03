@@ -56,6 +56,12 @@ def texts(p):
          "pace": p.get("trend_pace", "the past 12 months' pace" if freq in ("weekly", "monthly", "quarterly") else "last year's pace"),
          "pop_pub": p["population"].get("publisher_short", "Census Bureau"), "pop_tag": p["population"].get("tag", "Census"),
          "report": {"weekly": "weekly figures", "monthly": "monthly figures", "quarterly": "quarterly figures"}.get(freq, "annual reports")}
+    # The trend window is whatever the official history really spans: say "12 months" only when it is about a year (350-380 days), otherwise the true length.
+    c0 = p["components"][0]
+    if t["periodic"] and "trend_period" not in p and c0.get("prior_as_of") and c0.get("as_of"):
+        wd = (_d(c0["as_of"]) - _d(c0["prior_as_of"])).days
+        if not 350 <= wd <= 380:
+            mo = max(1, round(wd / 30.44)); t["period"] = f"{mo} month" + ("" if mo == 1 else "s"); t["pace"] = f"the past {t['period']}' pace"
     t["pop_pos"] = p["population"].get("possessive", f"the {t['pop_pub']}'s")
     t["Head"] = p.get("hist_label", "State + local" if "headline" not in p else t["head"][0].upper() + t["head"][1:])
     t["rate_phrase"] = "last year's official change per second" if freq not in ("weekly", "monthly", "quarterly") else f"the official change per second over the {'past 12 months' if t['period'] == '12 months' else 'past ' + t['period']}"
@@ -64,6 +70,13 @@ def texts(p):
     t["noun"] = p["population"].get("noun", "residents")
     t["noun_full"] = p["population"].get("noun_full", f"{name} {t['noun']}")
     return t
+
+def _gap(T, d0, d1):
+    """Note for a change column whose two dates are further apart than one reporting period (a missing month or quarter)."""
+    n = (_d(d1) - _d(d0)).days
+    lim = {"month": 45, "quarter": 110}.get(T["unit"])
+    if not lim or n <= lim: return ""
+    return f' <small>over {round(n / 30.44)} months</small>'
 
 def _when(p, d_):
     """How a figure date is labelled: FY2025 (annual, fiscal year-end) or Sep 2026 (monthly, month-end)."""
@@ -190,7 +203,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     title = (f"{name} State & Local Debt Clock: {lv}Debt, Official Census Data" if is_state else f"{name} National Debt Clock: {lv}Debt, Official Data")
     h1 = f"{name} State & Local Debt Clock" if is_state else f"{name} National Debt Clock"
     desc = (f"{name} {'state and local debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, {'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
-            f"{'Live ' if rate else 'Official '}{name} debt clock, {_usd0(pp_off)} per {dem}, with sources.")
+            f"{'Live ' if rate else 'Official '}{name} debt clock, {'about ' if rate else ''}{_usd0(proj / pop['value'])} per {dem}{' (projected)' if rate else ''}, with sources.")
     img = f"og/places/{p['slug']}.png"
     if og:
         og(f"{R}/{img}", f"{name} {T['head']} · ticking live", _usd0(proj),
@@ -222,9 +235,23 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
 
     # ---- intro (mirrors the US intro paragraph: official figure first, then how the clock projects)
     parts = " and ".join(f"{_b(x['value'])} of {E(x['label'].lower())}" for x in cs)
+    # When the latest reporting period went the other way from the clock's trend (or is a small fraction of it), say so on the page.
+    recent = ""
+    if rate and T["periodic"] and all(x.get("history") for x in cs):
+        _ds = sorted(set.intersection(*[{h[0] for h in x["history"]} for x in cs]))
+        _hv = lambda d_: sum(dict(map(tuple, x["history"]))[d_] for x in cs)
+        if _ds and _ds[-1] == c["as_of"]:
+            _c = [d_ for d_ in _ds[:-1] if 60 <= (_d(c["as_of"]) - _d(d_)).days <= 130]
+            if _c:
+                _p = min(_c, key=lambda d_: abs((_d(c["as_of"]) - _d(d_)).days - 91)); _g = (_d(c["as_of"]) - _d(_p)).days
+                _r = (_hv(c["as_of"]) - _hv(_p)) / (_g * 86400)   # per second, like rate
+                if _r * rate < 0 or abs(_r) < 0.25 * abs(rate):
+                    _sd = lambda v: ("+" if v >= 0 else "−") + _short(abs(v) * 86400)   # signed amount per day
+                    recent = (f"Recent pace differs: over the latest {_g} days ({_fd(_p)} → {as_of}) the official figure changed {'+' if _r >= 0 else '−'}{_short(abs(_r) * _g * 86400)} "
+                              f"({_sd(_r)}/day), while the clock runs at {_sd(rate)}/day, the trend over the latest {T['period']}, so the ticking number {'is moving against the latest change' if _r * rate < 0 else 'may run ahead of the latest change'}.")
     proj_txt = (f"The clock below starts from that official figure and projects forward at {T['pace']} (about {_short(abs(rate) * 86400)} a day{'' if up_ else ' less'}), "
                 f"the official change from {_fd(cs[0]['prior_as_of'])} to {as_of}. {E(rep)} reports {E(rep_its)} debt {T['once']}, not daily, so the ticking number is a projection, not an official figure; "
-                f"it re-bases when the next {T['report']} come out.") if rate else \
+                f"it re-bases when the next {T['report']} come out." + (" " + E(recent) if recent else "")) if rate else \
                (f"{E(rep)} reports {E(rep_its)} debt {T['once']}, not daily. This page shows the official figure for {as_of} and does not tick it forward, because {E(p['hold_why'])}. Earlier official years are in the What changed table."
                 if p.get("hold_trend") and p.get("hold_why") else
                 f"{E(rep)} reports {E(rep_its)} debt {T['once']} and only one official figure is available, so the clock shows the official figure without projecting.")
@@ -243,7 +270,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
             f'<div class="k">{E(name)} {E(T["head"])} · {"live" if rate else "official"}</div><div class="big num" id="hv">{_usd0(proj)}</div>')
     if rate:
         hero += (f'<div class="sub"><span>{_rate_txt(rate)}</span><span class="note">rate: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}, so this is a projection</span>'
-                 f'<span>Since you opened this page: <span class="num" id="hs">{CUR}0</span> {"more" if up_ else "less"} debt</span></div>')
+                 + (f'<span class="note">{E(recent)}</span>' if recent else "") + f'<span>Since you opened this page: <span class="num" id="hs">{CUR}0</span> {"more" if up_ else "less"} debt</span></div>')
     else:
         hero += f'<div class="sub"><span>fixed</span><span class="note">{E(rep)} reports {T["once"]}; {"shown fixed, not ticking" if p.get("hold_trend") else "one official figure available"}</span></div>'
     trio_x = [(x["short"] + " · official " + _fd(x["as_of"]), _usd0(x["value"])) for x in cs[:2]] if len(cs) > 1 else \
@@ -265,7 +292,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         for i, d_ in enumerate(ds):
             tot = sum(H[d_]); prev = ds[i + 1] if i + 1 < len(ds) else None
             cards += (f'<div class="wcc"><div class="d">{_when(p, d_)} · {_fd(d_)}</div><div class="v num">{_short(tot)}</div>'
-                      + (f'<div class="x">{"change" if T["periodic"] else "year"} {dl(tot - sum(H[prev]))}</div>' + ("".join(f'<div class="x">{E(x["short"].split()[0].lower())} {dl(H[d_][k] - H[prev][k])}</div>' for k, x in enumerate(cs)) if len(cs) > 1 else "") if prev else f'<div class="x">earliest {T["unit"]} shown</div>')
+                      + (f'<div class="x">{"change" if T["periodic"] else "year"} {dl(tot - sum(H[prev]))}{_gap(T, prev, d_)}</div>' + ("".join(f'<div class="x">{E(x["short"].split()[0].lower())} {dl(H[d_][k] - H[prev][k])}</div>' for k, x in enumerate(cs)) if len(cs) > 1 else "") if prev else f'<div class="x">earliest {T["unit"]} shown</div>')
                       + (f'<div class="x">per {E(dem)} <b>{_usd0(tot / pop["value"])}</b></div>' if d_ == pop.get("debt_match_date", c["as_of"]) else "") + "</div>")
         now_card = (f'<div class="wcc now"><div class="d">NOW · projected</div><div class="v num" id="wcn">{_short(proj)}</div>'
                     f'<div class="x">vs last official <span class="num" id="wcd">{_sg(proj - c["total"])}{_short(abs(proj - c["total"]))}</span></div>'
@@ -348,9 +375,12 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         for k, d_ in enumerate(reversed(ds)):
             prev = ds[len(ds) - 2 - k] if len(ds) - 2 - k >= 0 else None
             ch = sum(HV[d_]) - sum(HV[prev]) if prev else None
+            gap = _gap(T, prev, d_) if prev else ""   # "over 2 months" when a month is missing between two rows
             rows += (f"<tr><td>{_fd(d_)}</td>" + "".join(f'<td class="num">{_usd0(v)}</td>' for v in HV[d_]) + f'<td class="num">{_usd0(sum(HV[d_]))}</td>'
-                     f'<td class="num">{"—" if ch is None else ("+" if ch >= 0 else "−") + _short(abs(ch))}</td></tr>')
-        det_hist = (f'<h3>{"By " + T["unit"]} (official)</h3><table class="v"><tr><th>{T["end"].capitalize()}</th>' + "".join(f"<th>{E(x['short'])}</th>" for x in cs)
+                     f'<td class="num">{"—" if ch is None else ("+" if ch >= 0 else "−") + _short(abs(ch)) + gap}</td></tr>')
+        # a weekly dataset whose stored history is month-end rows is labelled for what the rows are
+        month_rows = T["unit"] == "week" and len(ds) > 2 and (_d(ds[-1]) - _d(ds[0])).days / (len(ds) - 1) > 20
+        det_hist = (f'<h3>{"By month-end (and the latest weekly figure)" if month_rows else "By " + T["unit"]} (official)</h3><table class="v"><tr><th>{"Date" if month_rows else T["end"].capitalize()}</th>' + "".join(f"<th>{E(x['short'])}</th>" for x in cs)
                     + f"<th>Combined</th><th>Change</th></tr>{rows}</table>")
 
     # ---- Details: the long tables, below the fold (like the US detail sections)

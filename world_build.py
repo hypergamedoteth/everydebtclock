@@ -81,6 +81,9 @@ def compute(R, places, us, now):
 def _tn(x): return f"${x/1e12:,.2f} trillion"
 def _bn(x, code=None): return (f"{code} " if code else "") + f"{x/1e9:,.1f} bn"
 def _usd0(x): return f"${x:,.0f}"
+def _sgn(x, spec=",.0f", unit="", plus=True):
+    """Signed dollar amount with the sign before the symbol: +$218.91, −$218.91 (never $-218.91)."""
+    return ("+" if x >= 0 and plus else "" if x >= 0 else "−") + f"${abs(x):{spec}}{unit}"
 def _fd(s): return pb._fd(s)
 def cov_line(W):
     cv = W["cov"]
@@ -125,7 +128,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
     if og:
         og(f"{R}/{img}", f"World debt clock · {n} countries · ticking live", _usd0(big_now),
            [("Countries", f"{n}" + (f" · {cv['pct']:.1f}% of world GDP" if cv else "")), ("Latest official sum", _usd0(W["total"]))],
-           f"+${W['rate_s'] * 86400 / 1e9:,.1f}B/day",
+           f"{_sgn(W['rate_s'] * 86400 / 1e9, ',.1f', 'B')}/day",
            "#ff4d5e", "Sum of each country's latest published government debt\nin US dollars · measures and dates differ")
     names = [x["name"] for x in rows]
     ld = '<script type="application/ld+json">' + json.dumps({
@@ -149,7 +152,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
     hero_dlg = ""
     hero = (f'<div class="hero lead" id="total" data-b="{big_now:.2f}" data-r="{W["rate_s"]:.6f}" data-t="{now:.0f}" style="cursor:default">'
             f'<div class="k">Government debt of {n} countries · in US dollars · live</div><div class="big num" id="hv">{_usd0(big_now)}</div>'
-            f'<div class="sub"><span>+${W["rate_s"]:,.0f}/sec · +${W["rate_s"] * 86400 / 1e9:,.1f} billion/day</span>'
+            f'<div class="sub"><span>{_sgn(W["rate_s"])}/sec · {_sgn(W["rate_s"] * 86400 / 1e9, ",.1f")} billion/day</span>'
             f'<span class="note">sum of each country\'s own projected trend; a projection, not an official figure</span>'
             f'<span>Since you opened this page: <span class="num" id="hs">$0</span> more debt</span></div>'
             f'<div class="trio"><div><span class="l">Latest official sum</span><span class="num">{_usd0(W["total"])}</span></div>'
@@ -187,8 +190,8 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
     # ---- method
     mrows = ""
     for x in rows:
-        tr = (f'{x["rate_usd_s"]:,.2f}' if x["rate_usd_s"] else "0 (fixed)")
-        mrows += (f'<tr><td class="c"><b>{E(x["name"])}</b></td><td class="num" data-l="Population">{x["pop"]:,.0f}</td><td data-l="Population date">{E(_fd(x["pop_date"]))}</td><td class="num" data-l="Trend, USD per sec">${tr}</td>'
+        tr = (_sgn(x["rate_usd_s"], ",.2f", plus=False) if x["rate_usd_s"] else "0 (fixed)")
+        mrows += (f'<tr><td class="c"><b>{E(x["name"])}</b></td><td class="num" data-l="Population">{x["pop"]:,.0f}</td><td data-l="Population date">{E(_fd(x["pop_date"]))}</td><td class="num" data-l="Trend, USD per sec">{tr}</td>'
                   f'<td class="m" data-l="Trend basis">{E(("Official change " + _fd(x["trend_from"]) + " to " + _fd(x["as_of"])) if x["trend_from"] else (x["trend_note"] or "No trend: figure shown fixed"))}</td>'
                   f'<td class="m" data-l="Source"><a href="{E(x["source_url"])}" rel="noopener">{E(x["source"] or "Source")}</a></td></tr>')
     mt = (f'<table class="wt wstk" style="min-width:760px"><tr class="hd"><th>Country</th><th class="num">Population</th><th>Population date</th><th class="num">Trend, USD per sec</th><th>Trend basis</th><th>Source</th></tr>{mrows}</table>')
@@ -197,9 +200,9 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
     method = (f'<section id="method" class="wsec"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>How it works</h2><span class="h2n">Official figures · projection labelled · sources linked</span></div><div class="sk foot">'
               f'<p><b>The sum.</b> For each country, its latest official debt figure in local currency × the USD exchange rate on the rate date. The United States uses Treasury\'s Debt to the Penny, and every other country uses the figure on its own page. The sum is {_usd0(W["total"])}. '
               f'It is not the total debt of the world: only the {n} countries listed are included, they use different measures, and the dates differ.</p>'
-              f'<p><b>The live number</b> = Σ (official figure + that country\'s trend × seconds since its figure) × exchange rate. Each trend is the one that country\'s own clock uses: the official change over its latest 12 months, spread evenly (the US uses Treasury\'s 90-day trend). '
+              f'<p><b>The live number</b> = Σ (official figure + that country\'s trend × seconds since its figure) × exchange rate. Each trend is the one that country\'s own clock uses: the official change over the window shown on its own page (usually the latest 12 months, shorter where a country has less history), spread evenly (the US uses Treasury\'s 90-day trend). '
               f'Governments report once a month, once a quarter or daily, so the live number is a projection, not an official figure, and it re-bases whenever a country publishes a new one. '
-              f'The combined rate is ${W["rate_s"]:,.2f} per second. Exchange rates are held fixed.</p>'
+              f'The combined rate is {_sgn(W["rate_s"], ",.2f", plus=False)} per second. Exchange rates are held fixed.</p>'
               + (f'<p><b>GDP coverage.</b> The {cv["n"]} countries\' {cv["year"]} GDP in current US dollars ({_usd0(cv["gdp_bn"] * 1e9)}) ÷ the IMF\'s world aggregate ({_usd0(cv["world_bn"] * 1e9)}) = {cv["pct"]:.2f}%. '
                  f'Source: <a href="{E(cv["source_url"])}" rel="noopener">{E(cv["source"])}</a>, fetched with the daily data refresh{(", last read " + E(_fd(cv["fetched"]))) if cv.get("fetched") else ""}. These are IMF estimates for the current year, not final statistics.</p>' if cv else '')
               + f'<p><b>Per person</b> = USD equivalent ÷ each country\'s official population estimate on the date shown (not projected). The total row divides the sum by the sum of those populations.</p>'

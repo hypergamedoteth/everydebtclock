@@ -140,6 +140,7 @@
  ],
  "notes": [
   "Why this dataset: it is the National Treasury Administration's own machine-readable open dataset of central government debt, updated weekly, and carries the date of each row.",
+  "Since the April 30, 2026 figure (NT$6,352.9 billion, the highest in the stored history) the official total has fallen to NT$5,936.4 billion at October 22, 2026, a decline of about NT$416.5 billion. The clock still projects the 12-month trend (October 2025 to October 2026, a small net rise), so it can run against the direction of the most recent figures.",
   "Scope: central government only. Debt of local governments is reported separately and is not in the number. The Public Debt Act's debt ceiling counts only debts of one year or more, a narrower measure than this page's total; the two parts are shown in the breakdown.",
   "Currency: New Taiwan dollars. The Taiwan central bank does not publish daily rates in a machine-readable form that the daily build can read, so the World Debt Clock converts at the US Federal Reserve's weekly H.10 rate for TWD, labelled on that page.",
   "Population: the same open dataset reports the Ministry of the Interior's registered population for each date, which this page uses for the per-person figures."

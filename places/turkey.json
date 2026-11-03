@@ -48,7 +48,7 @@
    "prior_value": 12964000000000,
    "prior_as_of": "2025-09-30",
    "source_name": "Ministry of Treasury and Finance, Central Government Debt Stock (monthly release), TL billion",
-   "source_url": "https://api-en.hmb.gov.tr/2026/10/20/central-government-debt-stock-as-of-september-30th-2026/",
+   "source_url": "https://en.hmb.gov.tr/2026/10/20/central-government-debt-stock-as-of-september-30th-2026/",
    "source_locator": "Monthly release \"Central Government Debt Stock as of <date>\" on en.hmb.gov.tr (also readable through its public WordPress API: en.hmb.gov.tr/portal/v2/posts)",
    "includes": "Central government debt stock in lira: debt in lira and foreign-currency debt converted to lira. Excludes local governments, state economic enterprises and the Central Bank.",
    "facts": [
@@ -68,6 +68,10 @@
     [
      "2025-09-30",
      12964000000000
+    ],
+    [
+     "2025-10-31",
+     13172000000000
     ],
     [
      "2025-11-30",

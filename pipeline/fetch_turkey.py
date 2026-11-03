@@ -22,8 +22,8 @@ def parse():
         mon = MONTHS.index(m.group(2).capitalize()) + 1; y = int(m.group(4)); day = int(m.group(3))
         date = f"{y:04d}-{mon:02d}-{day:02d}"
         tot, loc, fx = (float(m.group(i).replace(",", "")) for i in (1, 5, 6))
-        if abs(loc + fx - tot) > 0.3: continue            # the two parts must add up to the total (rounded to 0.1 billion)
-        out[date] = (tot, loc, fx, post.get("link") or "")
+        if abs(loc + fx - tot) > (0.3 if "." in m.group(1) else 0.6): continue   # the two parts must add up to the total (parts to 0.1 billion; some releases round the total to a whole billion)
+        out[date] = (tot, loc, fx, (post.get("link") or "").replace("://api-en.hmb.gov.tr/", "://en.hmb.gov.tr/"))   # the REST API host has no public pages
     return out
 
 def build(p):

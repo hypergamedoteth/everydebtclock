@@ -19,22 +19,22 @@
  "subject": "The central government of Austria",
  "hist_label": "Central government gross debt",
  "sum_note": "Austria central government gross debt (Maastricht definition, quarter-end), from Eurostat's quarterly government debt statistics, which are compiled from national data. The closest EU-comparable measure to the US Total Public Debt Outstanding.",
- "scope_note": "This is central government gross debt in the EU's Maastricht (excessive deficit procedure) definition, taken from Eurostat's quarterly table: everything the central government sector owes in currency and deposits, debt securities and loans, at nominal value and before subtracting any cash or other assets.  It is the closest EU-comparable match to the US national debt clock's Total Public Debt Outstanding. Figures are in euros. Eurostat publishes it by sector, so the wider general government total is shown below as a fact.",
+ "scope_note": "This is central government gross debt in the EU's Maastricht (excessive deficit procedure) definition, taken from Eurostat's quarterly table: everything the central government sector owes in currency and deposits, debt securities and loans, at nominal value and before subtracting any cash or other assets.  It is the closest EU-comparable match to the US national debt clock's Total Public Debt Outstanding. Figures are in euros. Eurostat publishes it by sector, so the general government total is shown below as a fact.",
  "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with bond issuance calendars and short-term borrowing.",
  "legend": "Austria's government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
  "cadence": "Quarterly. Eurostat publishes each quarter-end figure (table gov_10q_ggdebt) about three months after the quarter ends.",
  "after_text": ", about three months after each quarter-end",
  "next_update": "The Q3 2026 quarter-end figure is expected from Eurostat roughly three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
-  "value": 9197213,
+  "value": 9215956,
   "noun": "people",
-  "as_of": "2025-01-01",
-  "source_name": "Eurostat, Population on 1 January by age and sex (demo_pjan), Austria",
-  "source_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_pjan/default/table",
+  "as_of": "2026-01-01",
+  "source_name": "Eurostat, Population change, population on 1 January (demo_gind), Austria (provisional)",
+  "source_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_gind/default/table",
   "publisher_short": "Eurostat",
   "tag": "Eurostat",
   "possessive": "Eurostat's",
-  "method_short": "Eurostat population on 1 January, the latest published",
+  "method_short": "Eurostat population on 1 January, the latest published (provisional estimate)",
   "noun_full": "people in Austria"
  },
  "components": [
@@ -57,7 +57,7 @@
      "value": 438856200000,
      "kind": "usd",
      "as_of": "2026-06-30",
-     "note": "All levels of government (central, state, local and social security) in the same Eurostat table, the measure used in EU fiscal rules. It is a wider measure than the one ticking on this page. A year earlier (2025-06-30) it was €412.5 billion. Central government is 94.0% of it.",
+     "note": "All levels of government (central, state, local and social security) in the same Eurostat table, the measure used in EU fiscal rules. It covers more levels of government than the one ticking on this page. A year earlier (2025-06-30) it was €412.5 billion. Central government is 94.0% of it.",
      "source_name": "Eurostat, gov_10q_ggdebt (sector S13, GD)",
      "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
      "source_locator": "geo=AT, sector S13, na_item GD, unit MIO_EUR"
@@ -136,12 +136,12 @@
    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Government_finance_statistics_-_quarterly_data"
   },
   {
-   "name": "Statistics Austria, Maastricht debt and deficit",
-   "url": "https://www.statistik.at/en/statistics/national-economy-and-public-finances/public-finances/maastricht-debt-and-deficit"
+   "name": "Statistics Austria, Public finance",
+   "url": "https://www.statistik.at/en/statistics/national-economy-and-public-finance/public-finance"
   },
   {
    "name": "Austrian Federal Financing Agency (OeBFA)",
-   "url": "https://www.oebfa.at/en.html"
+   "url": "https://www.oebfa.at/"
   }
  ],
  "notes": [

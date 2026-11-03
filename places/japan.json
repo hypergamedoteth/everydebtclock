@@ -28,15 +28,15 @@
  "after_text": ", about six weeks after each quarter-end",
  "next_update": "The September 2026 quarter-end figure is expected from the Ministry of Finance roughly six weeks after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
-  "value": 123210000,
+  "value": 122690000,
   "noun": "people",
-  "as_of": "2025-10-01",
-  "source_name": "Statistics Bureau of Japan, Population Estimates, total population at 1 October 2025 (provisional)",
+  "as_of": "2026-10-01",
+  "source_name": "Statistics Bureau of Japan, Population Estimates, total population at 1 October 2026 (provisional, rounded to the nearest 10,000 as published)",
   "source_url": "https://www.stat.go.jp/english/data/jinsui/index.html",
   "publisher_short": "Statistics Bureau",
   "tag": "Statistics Bureau",
   "possessive": "the Statistics Bureau's",
-  "method_short": "Statistics Bureau estimate of the total population on 1 October 2025",
+  "method_short": "Statistics Bureau estimate of the total population on 1 October 2026 (provisional)",
   "noun_full": "people in Japan"
  },
  "components": [

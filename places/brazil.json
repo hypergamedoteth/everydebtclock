@@ -28,15 +28,15 @@
  "after_text": ", about a month after each month-end",
  "next_update": "The October 2026 month-end figure is expected from the Banco Central do Brasil about a month after the month ends; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
-  "value": 213421037,
+  "value": 214211951,
   "noun": "people",
-  "as_of": "2025-07-01",
-  "source_name": "Brazilian Institute of Geography and Statistics (IBGE), Estimativas da população residente, 1 July 2025",
-  "source_url": "https://agenciadenoticias.ibge.gov.br/agencia-noticias/2012-agencia-de-noticias/noticias/44305-populacao-estimada-do-pais-chega-a-213-4-milhoes-de-habitantes-em-2025",
+  "as_of": "2026-07-01",
+  "source_name": "Brazilian Institute of Geography and Statistics (IBGE), Estimativas da população residente, 1 July 2026",
+  "source_url": "https://agenciadenoticias.ibge.gov.br/agencia-noticias/2012-agencia-de-noticias/noticias/47878-populacao-estimada-do-pais-chega-a-214-2-milhoes-de-pessoas-em-2026",
   "publisher_short": "IBGE",
   "tag": "IBGE",
   "possessive": "IBGE's",
-  "method_short": "IBGE estimate of the resident population on 1 July 2025",
+  "method_short": "IBGE estimate of the resident population on 1 July 2026",
   "noun_full": "people in Brazil"
  },
  "components": [

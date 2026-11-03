@@ -26,7 +26,7 @@
  "legend": "India's central government liabilities are reported quarterly, at quarter-end. Borrowing happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
  "cadence": "Quarterly. The Department of Economic Affairs publishes each quarterly report on its website, roughly three months after the quarter ends. The figures are provisional.",
  "after_text": ", about three months after each quarter-end",
- "next_update": "The next quarterly report (quarter ending June 2026) is usually published about three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears. Figures are provisional and are revised in later reports.",
+ "next_update": "The next quarterly report (quarter ending September 2026) is usually published about three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears. Figures are provisional and are revised in later reports.",
  "population": {
   "value": 1423435000,
   "noun": "people",
@@ -44,10 +44,10 @@
    "key": "cgdebt",
    "label": "India central government gross liabilities",
    "short": "Central government liabilities",
-   "value": 201168890000000,
-   "as_of": "2026-03-31",
-   "prior_value": 185938060000000,
-   "prior_as_of": "2025-03-31",
+   "value": 203856920000000,
+   "as_of": "2026-06-30",
+   "prior_value": 187862580000000,
+   "prior_as_of": "2025-06-30",
    "source_name": "Department of Economic Affairs, Ministry of Finance, Quarterly Report on Public Debt Management, Table 4.1 Total Liabilities of Central Government, item H Gross Liabilities as per FRBM Act, rupees crore",
    "source_url": "http://dea.gov.in/reports-public-debt-management",
    "source_locator": "Table 4.1, item H Gross Liabilities as per FRBM Act (A + B - C + F - G)",
@@ -56,9 +56,9 @@
     {
      "key": "public_debt",
      "label": "Public debt (internal and external)",
-     "value": 183434340000000,
+     "value": 185406590000000,
      "kind": "usd",
-     "as_of": "2026-03-31",
+     "as_of": "2026-06-30",
      "note": "Item A of the same table: the Union Government's internal and external debt, with external debt at the current rate of exchange. Excludes the public account liabilities and extra-budgetary resources included in the headline.",
      "source_name": "Department of Economic Affairs, Quarterly Report on Public Debt Management, Table 4.1",
      "source_url": "http://dea.gov.in/reports-public-debt-management",
@@ -67,9 +67,9 @@
     {
      "key": "net_liabilities",
      "label": "Total (net) liabilities as reported in the Union Budget",
-     "value": 198821590000000,
+     "value": 203306290000000,
      "kind": "usd",
-     "as_of": "2026-03-31",
+     "as_of": "2026-06-30",
      "note": "Item D of the same table: total liabilities in line with the Union Budget's reporting, with external debt at the historical rate of exchange. It differs from the gross liabilities headline in valuing external debt at the historical rate of exchange and in leaving out extra-budgetary resources and the cash balance.",
      "source_name": "Department of Economic Affairs, Quarterly Report on Public Debt Management, Table 4.1",
      "source_url": "http://dea.gov.in/reports-public-debt-management",
@@ -108,6 +108,10 @@
     [
      "2026-03-31",
      201168890000000
+    ],
+    [
+     "2026-06-30",
+     203856920000000
     ]
    ],
    "breakdown": []

@@ -27,15 +27,15 @@
  "after_text": ", about three months after each quarter-end",
  "next_update": "DIPRES publishes the quarterly debt report about three months after each quarter-end; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
-  "value": 19859921,
+  "value": 20150948,
   "noun": "people",
-  "as_of": "2025-07-01",
-  "source_name": "World Bank, World Development Indicators, Population, total (SP.POP.TOTL), Chile, 2025 (UN Population Division and national statistical offices)",
-  "source_url": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=CL",
-  "publisher_short": "World Bank",
-  "tag": "WB",
-  "possessive": "the World Bank's",
-  "method_short": "World Bank 2025 population estimate, all ages",
+  "as_of": "2026-06-30",
+  "source_name": "National Statistics Institute of Chile (INE), Estimaciones y Proyecciones de Población, base 2024: projected population for June 2026",
+  "source_url": "http://www.ine.gob.cl/sala-de-prensa/prensa/general/noticia/2026/01/28/el-ine-proyecta-que-en-2026-la-poblaci%C3%B3n-de-chile-alcanzar%C3%A1-las-20.150.948-personas-llegando-a-su-nivel-m%C3%A1ximo-a-mediados-de-la-pr%C3%B3xima-d%C3%A9cada",
+  "publisher_short": "INE",
+  "tag": "INE",
+  "possessive": "the INE's",
+  "method_short": "INE projected population for June 2026 (EEPP base 2024, which adjusts the 2024 census for an estimated 7.0% omission)",
   "noun_full": "people in Chile"
  },
  "components": [

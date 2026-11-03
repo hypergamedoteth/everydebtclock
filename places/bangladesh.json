@@ -23,7 +23,7 @@
  "scope_note": "This is \"Total Debt (A+B)\" in the government debt stock table of the Finance Division's Quarterly Debt Bulletin: domestic debt (banking and non-bank sources, including national savings certificates) plus external debt, in taka. The Bulletin gives the stock at each fiscal year-end (30 June) and at the latest quarter-end. It is the gross government debt; it does not include the guarantees the government has given to state-owned enterprises, which the Bulletin reports separately.",
  "trend_why": "The Bulletin gives each 30 June and the latest quarter-end, so we use the change since the 2025 fiscal year-end rather than twelve months back.",
  "legend": "Bangladesh's government debt is reported at period-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
- "cadence": "Quarterly, with a lag. The Finance Division publishes the Quarterly Debt Bulletin some months after each quarter closes.",
+ "cadence": "Quarterly, with a lag.",
  "after_text": ", some months after each quarter-end",
  "next_update": "The Finance Division publishes the Quarterly Debt Bulletin some months after each quarter closes; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
