@@ -547,7 +547,7 @@
     "source": "IMF World Economic Outlook, October 2026 (population estimate)",
     "url": "https://www.imf.org/external/datamapper/LP@WEO",
     "office": false,
-    "scope": "Total population (about 70% are non-citizens)"
+    "scope": "Total resident population, including non-citizens"
    },
    "alloc": null,
    "regions": null,
@@ -781,7 +781,7 @@
     "source": "IMF World Economic Outlook, October 2026 (population estimate)",
     "url": "https://www.imf.org/external/datamapper/LP@WEO",
     "office": false,
-    "scope": "Total population (most residents are non-citizens)"
+    "scope": "Total resident population, including non-citizens"
    },
    "alloc": null,
    "regions": null,

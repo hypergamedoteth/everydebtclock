@@ -184,7 +184,7 @@ def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
           f'<p class="eq">${bn:,.1f} billion ÷ {pop["value"]:,.0f} people = <b>{"about " if est else ""}${pp:,.0f}</b> per person</p>'
           f'<div class="wfacts"><div><span class="l">Population used</span><span class="v">{pop["value"]:,.0f}</span></div><div><span class="l">Population date</span><span class="v">{E(_date(pop["as_of"]) if pop["as_of"][:2] == "20" else pop["as_of"])}</span></div>'
           f'<div><span class="l">Population source</span><span class="v"><a href="{E(pop["url"])}" rel="noopener">{E(pop["source"])}</a></span></div>'
-          f'<div><span class="l">Source type</span><span class="v">{"National statistics office" if pop["office"] else "IMF estimate (no official figure reachable)"}</span></div></div>'
+          f'<div><span class="l">Source type</span><span class="v">{"National statistics office" if pop["office"] else "IMF estimate (the national office figure could not be reached)"}</span></div></div>'
           f'<p class="dnote">Population counted: {E(scope)}. "Per citizen" here means per person in that population; the fund belongs to the state, and no individual owns a share of it. '
           + ("The assets are an estimate, so this figure is too. " if est else "")
           + ("The assets and the population are from different dates. " if a["as_of"][:4] != pop["as_of"][:4] else "")
