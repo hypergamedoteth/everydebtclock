@@ -114,7 +114,7 @@ def _invest(f):
     else: out += '<h3>By asset class</h3><div class="wnote">Not disclosed. The fund does not publish an asset-class mix.</div>'
     if sc: out += blk(sc["title"], sc, _alloc_table(sc))
     if rg: out += blk(rg["title"], rg, _alloc_table(rg))
-    elif f["quality"] != "estimate": out += '<h3>By region</h3><p class="dnote">Not disclosed as a regional mix.</p>'
+    elif f["quality"] != "estimate": out += '<h3>By region</h3><p class="dnote">No regional mix is shown. We only show one when the fund publishes it in the report this page is built from.</p>'
     if hd: out += blk("Largest holdings", hd, _holdings_table(hd))
     else: out += '<h3>Notable holdings</h3><p class="dnote">No holdings table is shown. We only show one when every line can be checked against the fund\'s own report, and none has been for this fund. Any named investments are in its own report, linked under Sources.</p>'
     return out
@@ -155,7 +155,7 @@ def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
            f'<div><span class="l">In local currency</span><span class="num" style="font-size:14px">{E(a.get("local_note", "Not reported in a local currency"))}</span></div>')
     hero = (f'<div class="hero lead" id="assets" style="cursor:default"><div class="k">{E(f["name"])} · total assets · {"estimate" if est else "official"}</div>'
             f'<div class="big num">{"≈ " if est else ""}{usd(bn)}</div>'
-            f'<div class="sub"><span>{"Global SWF estimate, " + E(_date(a["as_of"])) if est else "As of " + E(_date(a["as_of"]))}</span>{"" if est or a["basis"] != "official" else f'<span class="note">${bn * 1e9:,.0f}</span>'}'
+            f'<div class="sub"><span>{"Global SWF estimate, " + E(_date(a["as_of"])) if est else "As of " + E(_date(a["as_of"]))}</span>{"" if est or a["basis"] != "official" or a.get("round") else f'<span class="note">${bn * 1e9:,.0f}</span>'}'
             f'<span>Per person in {E(f["country"])}: <b>{"≈ " if est else ""}${pp:,.0f}</b></span></div>'
             f'<div class="trio"><div><span class="l">Assets, USD</span><span class="num">{usd(bn)}</span></div>{loc}'
             f'<div><span class="l">Per person</span><span class="num">{"≈ " if est else ""}${pp:,.0f}</span></div></div>'
@@ -167,7 +167,7 @@ def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
     intro = f'<section class="intro" id="intro">{crumb}<h1>{E(f["nick"])}: Assets, Per Citizen and Holdings</h1><p>{E(intro_txt)} Managed by {E(f["manager"])}. Figures do not tick: they are the latest disclosure, with the date shown.</p></section>'
     # ---- assets table
     srow = lambda k, v, m="": f'<tr><td class="c">{k}</td><td class="num" data-l="Value">{v}</td><td class="m" data-l="Detail">{m}</td></tr>'
-    ar = srow("Total assets, US dollars", ("≈ " if est else "") + usd(bn), (f"${bn * 1e9:,.0f}. " if a["basis"] == "official" else "") + ("Estimate; " + E(a["estimate_note"]) if est else ("Converted from the official local-currency figure below." if a["basis"] == "official_converted" else "As reported by the fund.")))
+    ar = srow("Total assets, US dollars", ("≈ " if est else "") + usd(bn), (f"${bn * 1e9:,.0f}. " if a["basis"] == "official" and not a.get("round") else "") + ("Estimate; " + E(a["estimate_note"]) if est else ("Converted from the official local-currency figure below." if a["basis"] == "official_converted" else "As reported by the fund.")))
     if a.get("local"): ar += srow("Total assets, local currency", E(a["local"]["label"]), "Official figure as published.")
     ar += srow("As of", E(_date(a["as_of"])), "Estimate date: the month the ranking was published." if est else "Date of the fund's own figure.")
     ar += srow("Source", "", _src(a["source"]))
@@ -193,7 +193,7 @@ def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
     notes = ("<ul>" + "".join(f"<li>{E(n)}</li>" for n in f["notes"]) + "</ul>") if f.get("notes") else ""
     inv = (f'<section id="invested" class="wsec"><div class="sh"><span class="bar" style="background:var(--violet)"></span><h2>Where the money is invested</h2><span class="h2n">What the fund discloses, with date and source</span></div>'
            + _invest(f) + notes + '</section>')
-    why = {"full": f"{f['short']} publishes its total value and an allocation. Every number on this page is from its own report, except the dollar conversion and the per-person figure, which we calculate.",
+    why = {"full": f"{f['short']} publishes its total value and an allocation. Every number on this page is from its own report, except any dollar conversion, percentage or per-person figure, which we calculate and say so where it appears.",
            "total": f"{f['short']} publishes audited total assets but no asset-class mix, so only the total and the per-person figure are shown.",
            "partial": f"{f['short']} publishes an allocation or ranges and returns, but not its total assets. The total here is a labelled third-party estimate.",
            "estimate": f"{f['short']} publishes neither its total assets nor an allocation. The only number here is a labelled third-party estimate, and nothing about its holdings is shown."}[f["quality"]]
