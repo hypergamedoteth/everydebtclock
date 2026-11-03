@@ -1,0 +1,154 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in euros. The debt component, history and facts are refreshed by pipeline/fetch_eurostat.py from Eurostat tables gov_10q_ggdebt and demo_pjan; edit wording here, not numbers.",
+ "slug": "slovenia",
+ "kind": "country",
+ "country": "SI",
+ "name": "Slovenia",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Eurostat (national statistical institutes' EDP data)",
+ "currency": {
+  "code": "EUR",
+  "symbol": "€"
+ },
+ "frequency": "quarterly",
+ "title": "Slovenia National Debt Clock: Live Debt, Official Data",
+ "headline": "central government debt",
+ "headline_long": "central government gross debt",
+ "link_label": "central government debt, €",
+ "subject": "The central government of Slovenia",
+ "hist_label": "Central government gross debt",
+ "sum_note": "Slovenia central government gross debt (Maastricht definition, quarter-end), from Eurostat's quarterly government debt statistics, which are compiled from national data. The closest EU-comparable measure to the US Total Public Debt Outstanding.",
+ "scope_note": "This is central government gross debt in the EU's Maastricht (excessive deficit procedure) definition, taken from Eurostat's quarterly table: everything the central government sector owes in currency and deposits, debt securities and loans, at nominal value and before subtracting any cash or other assets.  It is the closest EU-comparable match to the US national debt clock's Total Public Debt Outstanding. Figures are in euros. Eurostat publishes it by sector, so the wider general government total is shown below as a fact.",
+ "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with bond issuance calendars and short-term borrowing.",
+ "legend": "Slovenia's government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
+ "cadence": "Quarterly. Eurostat publishes each quarter-end figure (table gov_10q_ggdebt) about three months after the quarter ends.",
+ "after_text": ", about three months after each quarter-end",
+ "next_update": "The Q3 2026 quarter-end figure is expected from Eurostat roughly three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 2130850,
+  "noun": "people",
+  "as_of": "2025-01-01",
+  "source_name": "Eurostat, Population on 1 January by age and sex (demo_pjan), Slovenia",
+  "source_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_pjan/default/table",
+  "publisher_short": "Eurostat",
+  "tag": "Eurostat",
+  "possessive": "Eurostat's",
+  "method_short": "Eurostat population on 1 January, the latest published",
+  "noun_full": "people in Slovenia"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Slovenia central government gross debt",
+   "short": "Central government debt",
+   "value": 46694900000,
+   "as_of": "2026-06-30",
+   "prior_value": 46657800000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Eurostat, Quarterly government debt (gov_10q_ggdebt), central government (S1311), Maastricht debt, million euros",
+   "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+   "source_locator": "geo=SI, sector S1311, na_item GD, unit MIO_EUR; machine-readable: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt",
+   "includes": "Central government gross debt at nominal value in the EU's Maastricht (EDP) definition: currency and deposits, short- and long-term debt securities and loans. In Slovenia this is the central government (the State and the central-government bodies classified with it); the municipalities and the social security funds are separate sectors.",
+   "facts": [
+    {
+     "key": "gg",
+     "label": "Slovenia general government gross debt (Maastricht)",
+     "value": 47706800000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "All levels of government (central, state, local and social security) in the same Eurostat table, the measure used in EU fiscal rules. It is a wider measure than the one ticking on this page. A year earlier (2025-06-30) it was €47.6 billion. Central government is 97.9% of it.",
+     "source_name": "Eurostat, gov_10q_ggdebt (sector S13, GD)",
+     "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+     "source_locator": "geo=SI, sector S13, na_item GD, unit MIO_EUR"
+    }
+   ],
+   "history": [
+    [
+     "2024-06-30",
+     44490700000
+    ],
+    [
+     "2024-09-30",
+     43267400000
+    ],
+    [
+     "2024-12-31",
+     43811500000
+    ],
+    [
+     "2025-03-31",
+     46275400000
+    ],
+    [
+     "2025-06-30",
+     46657800000
+    ],
+    [
+     "2025-09-30",
+     46155900000
+    ],
+    [
+     "2025-12-31",
+     45334700000
+    ],
+    [
+     "2026-03-31",
+     45337900000
+    ],
+    [
+     "2026-06-30",
+     46694900000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Currency and deposits",
+     "value": 413700000,
+     "group": "Deposits"
+    },
+    {
+     "label": "Short-term debt securities",
+     "value": 492900000,
+     "group": "Debt securities"
+    },
+    {
+     "label": "Long-term debt securities",
+     "value": 39664000000,
+     "group": "Debt securities"
+    },
+    {
+     "label": "Short-term loans",
+     "value": 2072000000,
+     "group": "Loans"
+    },
+    {
+     "label": "Long-term loans",
+     "value": 4052400000,
+     "group": "Loans"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Eurostat, Government finance statistics - quarterly data",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Government_finance_statistics_-_quarterly_data"
+  },
+  {
+   "name": "Ministry of Finance of Slovenia, Public debt",
+   "url": "https://www.gov.si/en/state-authorities/ministries/ministry-of-finance/"
+  },
+  {
+   "name": "Statistical Office of the Republic of Slovenia, Government finance",
+   "url": "https://www.stat.si/StatWeb/en"
+  }
+ ],
+ "notes": [
+  "Why Eurostat: it is the official EU statistical office and publishes quarterly government debt for every member state on one definition, compiled from the figures the national statistical institutes and central banks report to it. The fetcher reads its public API directly.",
+  "Provisional data: Eurostat flags the latest quarters as provisional and revises them in later releases. The page re-bases to each new release.",
+  "Why central government: the US clock ticks the federal Treasury's gross debt. The central government sector (Eurostat code S.1311) is the nearest match; state, local and social security debt are not in it. The table's breakdown by instrument adds up to the headline.",
+  "Cross-check: the Ministry of Finance publishes the central government debt on a national basis, which differs from the Maastricht central government sector used here."
+ ],
+ "iso3": "SVN"
+}

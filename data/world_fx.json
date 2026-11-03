@@ -61,13 +61,19 @@
    "EGP": 51.89,
    "GHS": 11.69,
    "KES": 129.53,
-   "NGN": 1326.78
+   "NGN": 1326.78,
+   "CLP": 973.27,
+   "PEN": 3.44,
+   "BDT": 124.0
   },
   "dates": {
    "EGP": "2026-09-30",
    "GHS": "2026-09-30",
    "KES": "2026-09-30",
-   "NGN": "2026-09-30"
+   "NGN": "2026-09-30",
+   "CLP": "2026-09-30",
+   "PEN": "2026-09-30",
+   "BDT": "2026-09-30"
   },
   "source": "US Treasury, Treasury Reporting Rates of Exchange (quarterly, as of quarter-end)",
   "source_url": "https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange",

@@ -1,0 +1,84 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in USD. The debt component and history are refreshed by pipeline/fetch_argentina.py from the official source named below; edit wording here, not numbers.",
+ "slug": "argentina",
+ "kind": "country",
+ "country": "AR",
+ "iso3": "ARG",
+ "name": "Argentina",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Secretaría de Finanzas, Ministerio de Economía de la República Argentina",
+ "currency": {
+  "code": "USD",
+  "symbol": "US$"
+ },
+ "frequency": "monthly",
+ "title": "Argentina Debt Clock: Live Gross Central Government Debt, Official Data",
+ "headline": "gross central government debt",
+ "headline_long": "gross central government debt",
+ "link_label": "gross central government debt, US$",
+ "subject": "The Argentine Republic",
+ "hist_label": "Gross Central Government Debt",
+ "sum_note": "Argentina's gross central government debt (administración central), month-end, in US dollars, from the Secretaría de Finanzas' monthly debt bulletin.",
+ "scope_note": "This is the \"deuda bruta\" in the Secretaría de Finanzas' Boletín mensual de deuda: the gross debt of the central administration, at month-end, expressed in US dollars. Debt payable in pesos, euros, yen or SDRs is converted at the exchange rate of the last business day of the month, so the dollar figure moves with the peso as well as with new borrowing. The total covers debt in normal payment status plus debt still pending restructuring and deferred-payment debt that was not part of the exchanges. It is gross: it is not reduced by the Treasury's deposits, and it does not include provincial debt or the Central Bank's own liabilities.",
+ "trend_why": "We use the change over the latest twelve months rather than the latest period alone, because changes between single reporting dates swing with the issuance calendar and short-term borrowing.",
+ "legend": "Argentina's gross central government debt is reported at period-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Monthly. The Secretaría de Finanzas publishes the bulletin in the weeks after each month ends.",
+ "after_text": ", in the weeks after each month-end",
+ "next_update": "The Secretaría de Finanzas publishes the monthly debt bulletin in the weeks after each month ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 45851378,
+  "noun": "people",
+  "as_of": "2025-07-01",
+  "source_name": "World Bank, World Development Indicators, Population, total (SP.POP.TOTL), Argentina, 2025 (UN Population Division and national statistical offices)",
+  "source_url": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=AR",
+  "publisher_short": "World Bank",
+  "tag": "WB",
+  "possessive": "the World Bank's",
+  "method_short": "World Bank 2025 population estimate, all ages",
+  "noun_full": "people in Argentina"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Argentina gross central government debt",
+   "short": "Public debt",
+   "value": 486628000000,
+   "as_of": "2026-09-30",
+   "prior_value": 454031000000,
+   "prior_as_of": "2025-09-30",
+   "source_name": "Secretaría de Finanzas (Ministerio de Economía), Boletín mensual de deuda, total gross debt (deuda bruta total), US$ million",
+   "source_url": "https://www.argentina.gob.ar/economia/finanzas/datos-mensuales-de-la-deuda/informes-mensuales",
+   "source_locator": "Executive summary of each monthly bulletin: \"el stock de deuda bruta ascendió a un monto total equivalente a USD … millones\"",
+   "includes": "Gross debt of the central administration in US dollars: debt in normal payment status, debt pending restructuring and deferred-payment debt not included in the exchanges. Provincial and municipal debt, and the Central Bank's liabilities, are not included.",
+   "facts": [],
+   "history": [
+    [
+     "2025-09-30",
+     454031000000
+    ],
+    [
+     "2026-09-30",
+     486628000000
+    ]
+   ],
+   "breakdown": []
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Ministerio de Economía, Datos mensuales de la deuda",
+   "url": "https://www.argentina.gob.ar/economia/finanzas/datos-mensuales-de-la-deuda"
+  },
+  {
+   "name": "INDEC, Instituto Nacional de Estadística y Censos",
+   "url": "https://www.indec.gob.ar/"
+  }
+ ],
+ "notes": [
+  "Why the bulletin: it is the Secretaría de Finanzas' own monthly publication of the national government's gross debt, and it states the total in the executive summary of each issue. The fetcher reads the latest bulletin and the one from twelve months earlier.",
+  "Currency: the Finance Secretariat reports in US dollars, converting peso debt at the last business day's rate, so a peso move changes the dollar total even without new borrowing. The World Debt Clock uses the figure as published.",
+  "Gross: the Treasury's deposits are not netted off. Provincial debt and the Central Bank's own liabilities are outside this series."
+ ],
+ "world_measure": "Central government, gross"
+}

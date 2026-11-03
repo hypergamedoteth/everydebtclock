@@ -1,0 +1,97 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in BDT. The debt component and history are refreshed by pipeline/fetch_bangladesh.py from the official source named below; edit wording here, not numbers.",
+ "slug": "bangladesh",
+ "kind": "country",
+ "country": "BD",
+ "iso3": "BGD",
+ "name": "Bangladesh",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Finance Division, Ministry of Finance of Bangladesh",
+ "currency": {
+  "code": "BDT",
+  "symbol": "Tk "
+ },
+ "frequency": "quarterly",
+ "title": "Bangladesh Debt Clock: Live Government Debt, Official Data",
+ "headline": "government debt",
+ "headline_long": "government debt",
+ "link_label": "government debt, Tk",
+ "subject": "The People's Republic of Bangladesh",
+ "hist_label": "Government Debt",
+ "sum_note": "Bangladesh's total government debt (domestic and external), quarter-end, from the Finance Division's Quarterly Debt Bulletin.",
+ "scope_note": "This is \"Total Debt (A+B)\" in the government debt stock table of the Finance Division's Quarterly Debt Bulletin: domestic debt (banking and non-bank sources, including national savings certificates) plus external debt, in taka. The Bulletin gives the stock at each fiscal year-end (30 June) and at the latest quarter-end. It is the gross government debt; it does not include the guarantees the government has given to state-owned enterprises, which the Bulletin reports separately.",
+ "trend_why": "The Bulletin gives each 30 June and the latest quarter-end, so we use the change since the 2025 fiscal year-end rather than twelve months back.",
+ "legend": "Bangladesh's government debt is reported at period-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Quarterly, with a lag. The Finance Division publishes the Quarterly Debt Bulletin some months after each quarter closes.",
+ "after_text": ", some months after each quarter-end",
+ "next_update": "The Finance Division publishes the Quarterly Debt Bulletin some months after each quarter closes; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 175686899,
+  "noun": "people",
+  "as_of": "2025-07-01",
+  "source_name": "World Bank, World Development Indicators, Population, total (SP.POP.TOTL), Bangladesh, 2025 (UN Population Division and national statistical offices)",
+  "source_url": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=BD",
+  "publisher_short": "World Bank",
+  "tag": "WB",
+  "possessive": "the World Bank's",
+  "method_short": "World Bank 2025 population estimate, all ages",
+  "noun_full": "people in Bangladesh"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Bangladesh government debt",
+   "short": "Public debt",
+   "value": 22591010000000,
+   "as_of": "2026-03-31",
+   "prior_value": 21440340000000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Finance Division, Quarterly Debt Bulletin, Table 6 Government Debt Stock, Total Debt (A+B), crore taka",
+   "source_url": "https://www.spfms.gov.bd/Home/DebtBulletin",
+   "source_locator": "Table 6 \"Government Debt Stock\", row \"C. Total Debt (A+B)\", columns for each 30 June and the latest quarter-end (read from the bulletin PDF)",
+   "includes": "Gross government debt in taka: domestic debt (banking sources, treasury bills and bonds, national savings certificates and the provident fund) plus external debt. Government guarantees to state-owned enterprises are not included.",
+   "facts": [],
+   "history": [
+    [
+     "2025-06-30",
+     21440340000000
+    ],
+    [
+     "2026-03-31",
+     22591010000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Domestic debt",
+     "value": 12953760000000,
+     "group": "Domestic"
+    },
+    {
+     "label": "External debt",
+     "value": 9637250000000,
+     "group": "External"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Bangladesh Bank, Statistics",
+   "url": "https://www.bb.org.bd/en/index.php/econdata/index"
+  },
+  {
+   "name": "Bangladesh Bureau of Statistics",
+   "url": "https://bbs.gov.bd/"
+  }
+ ],
+ "notes": [
+  "Why the Bulletin: it is the Finance Division's own debt publication and states the total with its domestic and external parts. The fetcher checks that the two parts add up to the total.",
+  "The Bulletin gives each fiscal year-end (30 June) and the latest quarter-end; the trend is the change from the 30 June 2025 fiscal year-end to the latest quarter-end.",
+  "Currency: Bangladeshi taka, from crore taka in the Bulletin (1 crore is 10 million). The World Debt Clock converts at the US Treasury's quarter-end rate for the taka."
+ ],
+ "world_measure": "Government, gross",
+ "trend_pace": "the pace since the 2025 fiscal year-end (30 June)",
+ "trend_period": "nine months"
+}

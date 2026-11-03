@@ -41,8 +41,8 @@ for _r, _s in {"Northeast": "connecticut maine massachusetts new-hampshire rhode
     for _x in _s.split(): STATE_REGION[_x] = _r
 # Country regions (hand-kept; a new country needs one line here, otherwise it falls back to "Other regions" and still gets the largest-economies links)
 COUNTRY_REGION = {}
-for _r, _s in {"Europe": "austria belgium france germany ireland italy netherlands poland russia spain sweden switzerland united-kingdom norway denmark finland portugal greece czechia romania hungary",
-               "Asia-Pacific": "australia china india indonesia japan singapore south-korea taiwan new-zealand thailand malaysia philippines vietnam hong-kong",
+for _r, _s in {"Europe": "austria belgium france germany ireland italy netherlands poland russia spain sweden switzerland united-kingdom norway denmark finland portugal greece czechia romania hungary slovakia slovenia croatia lithuania",
+               "Asia-Pacific": "australia china india indonesia japan singapore south-korea taiwan new-zealand thailand malaysia philippines vietnam hong-kong bangladesh",
                "Middle East": "qatar saudi-arabia turkey israel united-arab-emirates",
                "Africa": "egypt ghana kenya nigeria south-africa",
                "the Americas": "brazil canada mexico argentina colombia chile peru"}.items():

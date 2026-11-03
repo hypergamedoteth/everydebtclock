@@ -82,7 +82,8 @@ def fed():
     return {"date": date, "per_usd": out, "dates": dates, "source": "Federal Reserve Board, H.10 Foreign Exchange Rates (weekly release; noon buying rates in New York)", "source_url": H10, "feed": H10}
 
 UST = "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange"
-UST_ROWS = {"EGP": "Egypt-Pound", "GHS": "Ghana-Cedi", "KES": "Kenya-Shilling", "NGN": "Nigeria-Naira"}   # US Treasury label per currency code (units per US dollar)
+UST_ROWS = {"EGP": "Egypt-Pound", "GHS": "Ghana-Cedi", "KES": "Kenya-Shilling", "NGN": "Nigeria-Naira",
+            "CLP": "Chile-Peso", "PEN": "Peru-Sol", "BDT": "Bangladesh-Taka"}   # US Treasury label per currency code (units per US dollar)
 
 def ust():
     """US Treasury Reporting Rates of Exchange (quarterly, as of quarter-end; currency units per US dollar) for currencies the ECB and Fed H.10 do not publish."""
