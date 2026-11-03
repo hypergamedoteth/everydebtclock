@@ -38,7 +38,11 @@ def load():
         f["pp"] = f["usd"] / f["pop"]["value"]
         f["url"] = f"wealth/{f['slug']}/"
         f["qual"] = QUALITY[f["quality"]]
-    funds.sort(key=lambda f: f["swf_rank"])
+        if a.get("local") and a.get("fx"):  # a converted figure must equal local amount x rate, so the USD shown can never drift from its own working
+            want = a["local"]["amount_bn"] * a["fx"]["rate"]
+            if abs(want - a["usd_bn"]) > 0.0006 * want: raise SystemExit(f"wealth: {f['slug']} usd_bn {a['usd_bn']} != {a['local']['amount_bn']} x {a['fx']['rate']} = {want:.3f}")
+    funds.sort(key=lambda f: -f["assets"]["usd_bn"])  # the order the table shows is the order of the dollar figures it shows
+    for i, f in enumerate(funds, 1): f["rank"] = i
     return d, funds
 
 def prep(places):
@@ -214,7 +218,7 @@ def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
           f'<div class="wfacts"><div><span class="l">Population used</span><span class="v">{pop["value"]:,.0f}</span></div><div><span class="l">Population date</span><span class="v">{E(_date(pop["as_of"]) if pop["as_of"][:2] == "20" else pop["as_of"])}</span></div>'
           f'<div><span class="l">Population source</span><span class="v"><a href="{E(pop["url"])}" rel="noopener">{E(pop["source"])}</a></span></div>'
           f'<div><span class="l">Source type</span><span class="v">{"National statistics office" if pop["office"] else "IMF estimate (the national office figure could not be reached)"}</span></div></div>'
-          f'<p class="dnote">Population counted: {E(scope)}. "Per citizen" here means per person in that population; the fund belongs to the state, and no individual owns a share of it. '
+          f'<p class="dnote">Population counted: {E(scope)}. "Per citizen" here means per person in that population; ' + E(f.get("ownership_note", "the fund belongs to the state, and no individual owns a share of it")) + '. '
           + ("The assets are an estimate, so this figure is too. " if est else "")
           + ("The assets and the population are from different dates. " if a["as_of"][:4] != pop["as_of"][:4] else "")
           + (f"Other funds in {E(f['country'])} are not included in this per-person figure. " if f.get("other_funds") else "")
@@ -260,7 +264,7 @@ def hub_page(R, SITE, with_analytics, og, places, funds, d, place_urls):
     n = len(funds); url = f"{SITE}/wealth/"
     tot = sum(f["usd"] for f in funds) / 1e12
     title = f"Sovereign Wealth Funds Ranked: Assets and Per Citizen"
-    desc = f"{n} sovereign wealth funds ranked by assets, from Norway's {usd_short(funds[0]['usd'] / 1e9)} fund down, with assets per citizen and where the money is invested. Official figures; estimates are labelled."
+    desc = f"{n} sovereign wealth funds ranked by assets, from {funds[0]['country']}'s {usd_short(funds[0]['usd'] / 1e9)} fund down, with assets per citizen and where the money is invested. Official figures; estimates are labelled."
     img = "og/wealth/index.png"
     if og:
         os.makedirs(f"{R}/og/wealth", exist_ok=True)
@@ -275,18 +279,19 @@ def hub_page(R, SITE, with_analytics, og, places, funds, d, place_urls):
     for i, f in enumerate(funds, 1):
         a = f["assets"]; est = a["basis"] == "estimate"
         q = f["qual"]; cls = {"full": "off", "total": "off", "partial": "pa", "estimate": "est"}[f["quality"]]
-        rows += (f'<tr><td class="num" data-l="Rank" data-v="{f["swf_rank"]}">{f["swf_rank"]}</td><td class="c" data-v="{E(f["nick"])}"><a href="{f["slug"]}/"><b>{E(f["name"].split(" (")[0])}</b></a></td>'
+        rows += (f'<tr><td class="num" data-l="Rank" data-v="{i}">{i}</td><td class="c" data-v="{E(f["nick"])}"><a href="{f["slug"]}/"><b>{E(f["name"].split(" (")[0])}</b></a></td>'
                  f'<td data-l="Country" data-v="{E(f["country"])}">{E(f["country"])}</td>'
                  f'<td class="num" data-l="Assets (USD)" data-v="{f["usd"]:.0f}" title="${f["usd"]:,.0f}">{"≈ " if est else ""}{usd_short(a["usd_bn"])}</td>'
-                 f'<td class="m" data-l="Basis" data-v="{E(BASIS[a["basis"]])}">{"Estimate" if est else "Official"}{"" if est else (", " + E(_date(a["as_of"])))}</td>'
+                 f'<td class="m" data-l="Basis" data-v="{E(BASIS[a["basis"]])}">{"Estimate" if est else "Official"}{"" if est else (", " + E(_date(a["as_of"])))}{"<br>group total, not AuM" if a.get("group_total") else ""}</td>'
                  f'<td class="num" data-l="Per citizen (USD)" data-v="{f["pp"]:.2f}">{"≈ " if est else ""}${f["pp"]:,.0f}</td>'
+                 f'<td class="num" data-l="Global SWF rank" data-v="{f["swf_rank"]}">{f["swf_rank"]}</td>'
                  f'<td data-l="Disclosure" data-v="{q[2]}"><span class="bd {cls}">{E(q[1])}</span></td></tr>')
     hd = ('<tr class="hd"><th class="s num" data-i="0" data-t="n" aria-sort="ascending">#</th><th class="s" data-i="1" data-t="s">Fund</th><th class="s" data-i="2" data-t="s">Country</th>'
-          '<th class="s num" data-i="3" data-t="n">Assets (USD)</th><th class="s" data-i="4" data-t="s">Basis, as of</th><th class="s num" data-i="5" data-t="n">Per citizen (USD)</th><th class="s" data-i="6" data-t="n">Disclosure</th></tr>')
+          '<th class="s num" data-i="3" data-t="n">Assets (USD)</th><th class="s" data-i="4" data-t="s">Basis, as of</th><th class="s num" data-i="5" data-t="n">Per citizen (USD)</th><th class="s num" data-i="6" data-t="n">Global SWF rank</th><th class="s" data-i="7" data-t="n">Disclosure</th></tr>')
     table = (f'<section id="table" class="wsec"><div class="sh"><span class="bar" style="background:var(--teal)"></span><h2>Ranking by assets</h2><span class="h2n">Click a column to sort · figures do not tick</span></div>'
              f'<div class="tw"><table class="wt wstk" id="wr">{hd}{rows}</table></div>'
              '<p class="dnote">Assets are in US dollars. "Official" is the fund\'s own latest figure (converted at an official rate where it reports in another currency); "Estimate" is a third-party number because the fund does not publish a total. '
-             'Per citizen = assets ÷ the country\'s population from its statistics office (or the IMF where none is reachable). The # column is the Global SWF rank among sovereign wealth funds.</p></section>')
+             'Per citizen = assets ÷ the country\'s population from its statistics office (or the IMF where none is reachable). Rows are ordered by the dollar figure shown, largest first. The Global SWF rank column is that list\'s own order, which can differ because it measures some funds differently. Rows marked "group total, not AuM" are a consolidated company balance sheet (banks, operating companies), which is much larger than a pool of investable savings and is not like-for-like with the others. Danantara is shown at Global SWF\'s estimate of the fund itself, not the $1 trillion its own announcements give.</p></section>')
     nest = sum(1 for f in funds if f["assets"]["basis"] == "estimate")
     intro = (f'<section class="intro" id="intro"><div class="crumb"><a href="../">← US national debt clock</a><span>·</span><a href="../world/">World debt clock</a><span>·</span><a href="../countries/">All country debt clocks</a></div>'
              f'<h1>Sovereign Wealth Funds Ranked: Assets and Per Citizen</h1>'
@@ -294,8 +299,8 @@ def hub_page(R, SITE, with_analytics, og, places, funds, d, place_urls):
              f'the same total per person in its country, and where the money is invested. Funds do not tick: each figure is the fund\'s latest disclosure, with its date and a link. '
              f'{nest} of the {n} funds publish no total, so their size is a third-party estimate and is marked as one.</p></section>')
     method = ('<section id="method" class="wsec"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>How it works</h2><span class="h2n">Official first, estimates labelled</span></div><div class="sk foot">'
-              '<p><b>Ranking.</b> Order follows the <a href="https://globalswf.com/ranking" rel="noopener">Global SWF</a> list of sovereign wealth funds by assets under management (October 2026). A fund appears here once every figure on its page has been checked against its own report or disclosure; '
-              'a fund whose figures could not be checked is left off, so ranks can skip.</p>'
+              '<p><b>Ranking.</b> Funds are ordered by the US-dollar assets shown in the table, largest first. The list of funds comes from the <a href="https://globalswf.com/ranking" rel="noopener">Global SWF</a> ranking of sovereign wealth funds (October 2026), whose own rank is shown in the last column. A fund appears here once every figure on its page has been checked against its own report or disclosure; '
+              'a fund whose figures could not be checked is left off, so Global SWF ranks skip.</p>'
               '<p><b>Assets.</b> The fund\'s own annual report or official statement where one exists, with the date it covers. Where a fund reports in local currency, the page shows both and converts at the official rate on the as-of date (ECB reference rate, or the fixed central-bank peg). '
               'Where the fund does not publish its total, the page uses the Global SWF estimate and says so. Totals are not like-for-like: some are gross assets under management, some are a group balance sheet, and some are estimates. Each page says which.</p>'
               '<p><b>Per citizen.</b> Assets in US dollars ÷ the country\'s population. We use the national statistics office where its latest figure is reachable, otherwise the IMF World Economic Outlook population estimate, and each page names which. The count includes non-citizens (large in the Gulf and Singapore), '
@@ -313,12 +318,12 @@ def hub_page(R, SITE, with_analytics, og, places, funds, d, place_urls):
 
 def build(R, SITE, with_analytics, og, places, d, funds):
     live = {p["slug"]: p for p in places}
-    place_urls = {f["slug"]: f"countries/{f['place_slug']}/" for f in funds if f.get("place_slug") in live}
+    place_urls = {f["slug"]: f"{ex.SEC[live[f['place_slug']]['kind']]}/{f['place_slug']}/" for f in funds if f.get("place_slug") in live}
     urls = [hub_page(R, SITE, with_analytics, og, places, funds, d, place_urls)]
     for f in funds: urls.append(fund_page(R, SITE, with_analytics, og, places, f, funds, place_urls.get(f["slug"])))
     os.makedirs(f"{R}/api", exist_ok=True)
-    json.dump({"_doc": "Sovereign wealth funds ranked by assets. basis: official | official_converted | estimate. Per-citizen = assets ÷ population (see population source). Figures do not tick.",
-               "ranking_source": d["ranking"], "funds": [{"slug": f["slug"], "name": f["name"], "country": f["country"], "rank_global_swf": f["swf_rank"], "assets_usd": round(f["usd"]), "assets_basis": f["assets"]["basis"],
+    json.dump({"_doc": "Sovereign wealth funds ranked by the USD assets shown (rank_by_assets); rank_global_swf is Global SWF's own rank. basis: official | official_converted | estimate. Per-citizen = assets ÷ population (see population source). Figures do not tick.",
+               "ranking_source": d["ranking"], "funds": [{"slug": f["slug"], "name": f["name"], "country": f["country"], "rank_by_assets": f["rank"], "rank_global_swf": f["swf_rank"], "assets_usd": round(f["usd"]), "assets_basis": f["assets"]["basis"],
                 "assets_as_of": f["assets"]["as_of"], "assets_local": f["assets"].get("local"), "assets_source": f["assets"]["source"]["url"], "population": f["pop"]["value"], "population_as_of": f["pop"]["as_of"],
                 "population_source": f["pop"]["url"], "assets_per_person_usd": round(f["pp"], 2), "disclosure": f["quality"], "url": f"{SITE}/{f['url']}", **({"detail": f["detail"]} if f.get("detail") else {})} for f in funds]}, open(f"{R}/api/wealth.json", "w"), indent=1, ensure_ascii=False)
     return urls

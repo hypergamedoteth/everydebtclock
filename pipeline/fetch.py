@@ -236,7 +236,25 @@ add("tax_returns", label="Individual income tax returns filed", group="people", 
     calc={"type": "fixed", "base_src": ["FY2025", TAX_RETURNS, IRS_URL]})
 
 # ---- debt (daily)
-THR0 = {"debt_intragov": 0.5}
+# Intragovernmental debt is the sum of the trust-fund balances (Social Security, Medicare, military and civil-service retirement...), so unlike
+# debt held by the public it moves in scheduled steps that a 90-day linear trend cannot see:
+#  1. the monthly benefit payments, taken out of the trust funds on the 1st (or on the last business day before it when the 1st is a
+#     weekend/holiday): -$50bn to -$125bn in one day. Those days are exempted below as payment timing, not scored as projection errors;
+#  2. interest crediting at the end of Jun/Dec and other lumpy days (e.g. Sep 30, mid-month): +-$40bn to $70bn.
+# Backtest of this exact method on Debt to the Penny, Sep 2025 to Oct 2026 (about 290 business days): with the 0.5% threshold, 23 days breached
+# (14 of them payment days); with payment days exempted the largest remaining miss is 0.87%, so 0.5% was tighter than this series can meet
+# and 1.0% (about $79bn) still catches a wrong base or a stale feed. debt_total and debt_public keep 0.25%: their errors stay within it.
+INTRAGOV_THR = 1.0
+THR0 = {"debt_intragov": INTRAGOV_THR}
+def payment_day_between(a, b):
+    """True if the trust funds' monthly payment day falls in (a, b] (ISO dates). Payment day = the 1st of a month, or the Friday before when the
+    1st is a Saturday/Sunday. Holidays need no table: a holiday 1st is simply inside (a, b] when the next record date is b."""
+    a = dt.date.fromisoformat(a); b = dt.date.fromisoformat(b); m = a.replace(day=1)
+    while m <= b + dt.timedelta(days=3):
+        pay = m - dt.timedelta(days=m.weekday() - 4) if m.weekday() >= 5 else m
+        if a < pay <= b: return True
+        m = (m.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
+    return False
 debt, debt_stale = cached("debt_to_penny", src_debt)
 if isinstance(debt, list): debt = {"rows": debt, "year_ago": None}     # pre-Phase-3 cache format
 # When the Debt to the Penny rows were actually pulled from Treasury (cache time if this run fell back to cache).
@@ -270,11 +288,14 @@ if debt:
             proj = float(prev[field]) + s * (tn - tp); off = float(rows[i][field])
             err = (proj - off) / off * 100
             bt.append(err)
+            timing = slug == "debt_intragov" and payment_day_between(prev["record_date"], rows[i]["record_date"])
             validation_rows.append({"ticker": slug, "from": prev["record_date"], "to": rows[i]["record_date"],
-                                    "projected": round(proj, 2), "official": off, "error_pct": round(err, 4), "mode": "backtest"})
+                                    "projected": round(proj, 2), "official": off, "error_pct": round(err, 4), "mode": "payment_timing" if timing else "backtest"})
+            bt_timing = timing
         T[slug]["validation"] = {"last_error_pct": round(bt[-1], 4), "mean_abs_error_pct": round(sum(map(abs, bt)) / len(bt), 4),
                                  "n": len(bt), "against": "Debt to the Penny (next business day)",
-                                 "threshold_pct": THR0.get(slug, 0.25), "flag": abs(bt[-1]) > THR0.get(slug, 0.25)}
+                                 "threshold_pct": THR0.get(slug, 0.25), "flag": abs(bt[-1]) > THR0.get(slug, 0.25) and not bt_timing,
+                                 **({"exempt": "payment_timing", "note": "This step spans the trust funds' monthly benefit payments, which a trend cannot predict, so it is not scored against the threshold."} if bt_timing else {})}
     # identical window → slopes are additive; pin total = public + intragov exactly
     T["debt_total"]["rate"] = T["debt_public"]["rate"] + T["debt_intragov"]["rate"]
     v = T["debt_total"]["validation"]
@@ -810,7 +831,7 @@ def project(x, t):
     return v
 # Deficit is revenue minus spending, two ticking terms that are each re-based from the daily cash statement, so it swings
 # ~3x as much in percent as either alone (observed -4.9% to +6.8% day to day with the shown figure correct): 10%.
-THR = {"debt_intragov": 0.5, "revenue": 3.0, "spending": 3.0, "interest_cash": 10.0, "deficit": 10.0}
+THR = {"debt_intragov": INTRAGOV_THR, "revenue": 3.0, "spending": 3.0, "interest_cash": 10.0, "deficit": 10.0}
 prev_path = os.path.join(DATA, "data.json")
 if os.path.exists(prev_path):
     try:
@@ -827,7 +848,7 @@ if os.path.exists(prev_path):
             err = (proj - n["base"]) / abs(n["base"]) * 100
             # Like-for-like: a change of basis/source, or of the official anchor (e.g. the first MTS of the year replacing
             # the DTS-only estimate), re-bases the figure; that jump is not a projection error.
-            timing = slug in TF_TIMING and early_payment_month_end(p["as_of"]) != early_payment_month_end(n["as_of"])
+            timing = (slug in TF_TIMING and early_payment_month_end(p["as_of"]) != early_payment_month_end(n["as_of"])) or (slug == "debt_intragov" and payment_day_between(p["as_of"], n["as_of"]))
             switched = (p.get("basis") != n.get("basis") or p.get("source") != n.get("source")
                         or (p.get("anchor") is not None and p.get("anchor") != n.get("anchor")))
             validation_rows.append({"ticker": slug, "from": p["as_of"], "to": n["as_of"], "projected": round(proj, 2),
