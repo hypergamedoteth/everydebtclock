@@ -251,6 +251,9 @@ WORLD = world_build.compute(R, PLACES_LIVE, {"official": OFF_V, "date": OFF_D, "
 places_build.WORLD = bool(WORLD)
 import explore
 explore.check(PLACES_LIVE)
+# Wealth tab (wealth_build.py): sets the flags/lists that nav, search and country-page links read, before any page is built
+import wealth_build
+WEALTH_D, WEALTH_FUNDS = wealth_build.prep(PLACES_LIVE)
 # IMF GDP by place slug, used to rank countries in the "Explore more clocks" links (US included as "united-states")
 _gdp = json.load(open(f"{R}/data/world_gdp.json")).get("countries", {}) if os.path.exists(f"{R}/data/world_gdp.json") else {}
 places_build.GDP_BY_SLUG = {p["slug"]: _gdp.get(p.get("iso3") or world_build.ISO3.get(p.get("country", ""), ""), 0) for p in PLACES_LIVE if p["kind"] == "country"}
@@ -267,7 +270,7 @@ else: idx = idx.replace('<main id="app"></main>', f'<main id="app">{ssr}</main>'
 if "<!--LINKS-->" in idx: idx = re.sub(r"<!--LINKS-->.*?<!--/LINKS-->", lambda m: links, idx, flags=re.S)
 else: idx = idx.replace('<dialog id="dlg"></dialog>', f'<dialog id="dlg"></dialog>\n<section class="answers" id="answers">{links}</section>', 1)
 PLNAV = ("<!--PLNAV-->" + ('<nav class="plnav"><a href="./" class="on">United States</a>' + "".join(f'<a href="{d}/">{lab}</a>' for k, d, lab, _ in places_build.SECTIONS
-         if any(p["kind"] == k for p in PLACES_LIVE)) + ('<a href="world/">World</a>' if WORLD else "") + "</nav>" if PLACES_LIVE else "") + "<!--/PLNAV-->")
+         if any(p["kind"] == k for p in PLACES_LIVE)) + ('<a href="world/">World</a>' if WORLD else "") + ('<a href="wealth/">Wealth</a>' if WEALTH_FUNDS else "") + "</nav>" if PLACES_LIVE else "") + "<!--/PLNAV-->")
 SEARCH = "<!--SEARCH-->" + (explore.search_box("") if PLACES_LIVE else "") + "<!--/SEARCH-->"
 if "<!--SEARCH-->" in idx: idx = re.sub(r"<!--SEARCH-->.*?<!--/SEARCH-->", lambda m: SEARCH, idx, flags=re.S)
 else: idx = idx.replace("</header>", "</header>" + SEARCH, 1)
@@ -767,6 +770,7 @@ if OFF_V:
 import places_build
 PLACE_URLS = places_build.build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, STAMP, NOW)
 PLACE_URLS += world_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE, WORLD) if WORLD else []
+PLACE_URLS += wealth_build.build(R, SITE, with_analytics, og, PLACES_LIVE, WEALTH_D, WEALTH_FUNDS) if WEALTH_FUNDS else []
 
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()

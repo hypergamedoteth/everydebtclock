@@ -70,6 +70,8 @@ def check(places):
 
 SEC = {"state": "states", "country": "countries"}
 
+WEALTH = []  # set by wealth_build.prep(): [{name, slug, place_slug, country, short, name_long}]
+
 def search_index(places):
     out = [{"n": "United States", "u": "", "k": "country", "a": "usa us u.s. america national debt federal"},
            {"n": "World", "u": "world/", "k": "world", "a": "world debt global all countries"}]
@@ -79,6 +81,10 @@ def search_index(places):
             a = " ".join(x for x in (p.get("country", "").lower(), (p.get("iso3") or "").lower(), a) if x)
         if p["kind"] == "state": a = (POSTAL.get(p["slug"], "").lower() + " " + a).strip()
         out.append({"n": p["name"], "u": f'{SEC[p["kind"]]}/{p["slug"]}/', "k": p["kind"], "a": a})
+    if WEALTH:
+        out.append({"n": "Sovereign wealth funds", "u": "wealth/", "k": "wealth", "a": "wealth fund funds sovereign swf ranking assets per citizen"})
+        for w in WEALTH:
+            out.append({"n": w["name"], "u": f'wealth/{w["slug"]}/', "k": "wealth", "a": f'{w["name_long"]} {w["short"]} {w["country"]} wealth fund sovereign'.lower()})
     return {"_doc": "Client-side search index for the clock pages: n name, u url relative to the site root, k kind, a extra search words.", "places": out}
 
 SEARCH_JS = """<script>(function(){var f=document.getElementById('qf'),q=document.getElementById('q'),ul=document.getElementById('qr'),up=f.dataset.up,ix=null,cur=-1,shown=[];
@@ -88,7 +94,7 @@ function score(p,t){var n=norm(p.n),a=norm(p.a||'');if(n===t)return 0;if(n.index
 function render(){var t=norm(q.value);ul.innerHTML='';shown=[];cur=-1;if(!t){ul.hidden=true;q.setAttribute('aria-expanded','false');return}
 shown=ix.map(function(p){return[score(p,t),p]}).filter(function(x){return x[0]<9}).sort(function(a,b){return a[0]-b[0]||a[1].n.localeCompare(b[1].n)}).slice(0,8).map(function(x){return x[1]});
 if(!shown.length){ul.innerHTML='<li class="none">No clock for that yet</li>'}else shown.forEach(function(p,i){var li=document.createElement('li'),a=document.createElement('a');a.href=up+p.u;a.setAttribute('role','option');a.id='qr'+i;
-a.innerHTML='<span></span><em></em>';a.firstChild.textContent=p.n;a.lastChild.textContent=p.k==='state'?'US state':p.k==='world'?'All countries':'Country';li.appendChild(a);ul.appendChild(li)});
+a.innerHTML='<span></span><em></em>';a.firstChild.textContent=p.n;a.lastChild.textContent=p.k==='state'?'US state':p.k==='world'?'All countries':p.k==='wealth'?'Wealth fund':'Country';li.appendChild(a);ul.appendChild(li)});
 ul.hidden=false;q.setAttribute('aria-expanded','true')}
 function mark(d){var as=ul.querySelectorAll('a');if(!as.length)return;cur=(cur+d+as.length)%as.length;as.forEach(function(a,i){a.classList.toggle('on',i===cur)});q.setAttribute('aria-activedescendant',as[cur].id)}
 q.addEventListener('focus',function(){load(function(){if(q.value)render()})});q.addEventListener('input',function(){load(render)});
@@ -142,11 +148,13 @@ def explore(up, places, calc, cur=None, gdp=None, usd=None, kind_hint=None):
         groups.append(_group(f"More in {reg}" if reg else "More countries", take(sorted(peers, key=lambda p: -g(p)), 8), up))
         groups.append(_group("Largest economies", take(big_c, 8), up))
         groups.append(_group("US state debt clocks", take(big_states, 5), up))
+        groups.insert(0, _group(f'Sovereign wealth funds of {cur["name"]}', [(w["name"], f'wealth/{w["slug"]}/') for w in WEALTH if w["place_slug"] == cur["slug"]], up))
     else:
         groups.append(_group("Largest countries" if usd else "Largest economies", take(big_c, 10), up))
         groups.append(_group("Largest US states", take(big_states, 10), up))
     base = [("US national debt clock", ""), ("World debt clock", "world/"), ("All country debt clocks", "countries/"), ("All US state debt clocks", "states/")]
     skip = {"us": "", "world": "world/"}.get(kind_hint)
+    if WEALTH: base.append(("Sovereign wealth funds ranked", "wealth/"))
     groups.append(_group("Browse", [b for b in base if b[1] != skip], up))
     return ('<section class="explore" id="explore"><div class="sh"><h2>Explore more clocks</h2></div>' + "".join(groups) + '</section>')
 
