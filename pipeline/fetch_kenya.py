@@ -9,6 +9,8 @@ from place_util import *
 PAGE = "https://www.treasury.go.ke/quarterly-economic-and-budgetary-review-report"
 BASE = "https://www.treasury.go.ke"
 M = 10**6
+QEBR_NAME = "National Treasury of Kenya, Quarterly Economic and Budgetary Review, Public and Publicly Guaranteed Debt, KSh million"
+QEBR_LOC = "QEBR PDF, table of public and publicly guaranteed debt, GRAND TOTAL GROSS"
 
 def nums(line): return [int(x.replace(",", "")) for x in re.findall(r"\(?\d[\d,]{4,}\)?", line)]
 
@@ -33,6 +35,12 @@ def build(p):
         series[month_end(y, mo)] = v * M
         mo -= 3
         if mo < 1: mo += 12; y -= 1
+    c0 = p["components"][0]
+    if "Debt Management Report" in c0["source_name"]:
+        # The file holds the Treasury's final figure for its latest quarter; the QEBR value for that quarter is provisional and must not overwrite it.
+        series = {a: v for a, v in series.items() if a > c0["as_of"]}
+        if not series: return p
+        c0["source_name"] = QEBR_NAME; c0["source_locator"] = QEBR_LOC
     p = rebase(p, series, tol_days=20, keep_months=14)
     c = p["components"][0]; c["source_url"] = url
     c["breakdown"] = [{"label": "Domestic debt", "value": dom[-1] * M, "group": "Domestic"}, {"label": "External debt", "value": ext[-1] * M, "group": "External"}]

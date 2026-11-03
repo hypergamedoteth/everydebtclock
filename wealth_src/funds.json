@@ -958,7 +958,7 @@
      "rate": 0.266667,
      "date": "fixed peg",
      "source": "Saudi Central Bank (SAMA) peg: 3.75 riyals per US dollar",
-     "url": "http://sama.gov.sa/en-US/Currency/FinExc/Pages/Currency.aspx",
+     "url": "https://sama.gov.sa/en-US/Currency/FinExc/Pages/Currency.aspx",
      "quote": "SAR 3.75 = USD 1"
     },
     "note": "Gross assets under management, which PIF says include SAR 30 billion of receivables from other parties. PIF's balance-sheet total assets differ (consolidated total assets SAR 3,166.5 billion at end-2025)."
@@ -1196,7 +1196,7 @@
       "text": "So the total stays a third-party estimate. The older figure is from two years earlier, so part of the gap is time; we cannot say how much."
      }
     ],
-    "cant": "A full list of holdings, and the value of the stakes below at today's prices. Barclays and Sainsbury's have been cut since their dates here; later filings for Barclays were not checked.",
+    "cant": "A full list of holdings, and the value of the stakes below at today's prices. Sainsbury's has been cut since its date here. For Barclays, QIA's 8 February 2024 filing was its exit report (below 5%); EDGAR shows no later QIA filing on Barclays.",
     "owns": {
      "rows": [
       {
@@ -1228,7 +1228,7 @@
       },
       {
        "name": "Barclays",
-       "stake": "2.8% (420.1m shares), down from about 5% in 2022-23. The latest filing we could read; the stake may have changed since",
+       "stake": "2.8% (420.1m shares), down from about 5% in 2022-23. QIA's final SEC filing on Barclays (it reported ceasing to hold more than 5%), so no later SEC filing exists; the stake may have changed since",
        "as_of": "31 Dec 2023",
        "source": {
         "name": "Barclays SC 13G/A filed by QIA, SEC",
@@ -2135,7 +2135,7 @@
     "note": "This is the consolidated balance sheet by type, as published. Percentages are as published."
    },
    "notes": [
-    "The ICD annual report PDF blocks automated downloads from our server, so we could not open it directly. Total assets of AED 1,680,210 million at 31 Dec 2025 are in the report text and are repeated on icd.gov.ae/financial-information, and the two agree."
+    "The ICD annual report PDF blocks automated downloads (Cloudflare 403), so we read its text from a public search index's copy of the PDF. Total assets of AED 1,680,210 million at 31 Dec 2025 are in that text (statement of financial position) and are repeated on icd.gov.ae/financial-information, and the two agree."
    ],
    "other_funds": null,
    "slug": "investment-corporation-of-dubai",
@@ -2850,8 +2850,8 @@
     "fx": {
      "rate": 0.00198977,
      "date": "2025-12-31",
-     "source": "National Bank of Kazakhstan official rate, 31 December 2025: KZT 502.57 per USD (as republished by banki24.kz)",
-     "url": "https://banki24.kz/kurs/nbrk/dollar-na-31-12-2025",
+     "source": "National Bank of Kazakhstan official exchange rate, 31 December 2025: KZT 502.57 per USD (NBRK rates feed)",
+     "url": "https://www.nationalbank.kz/rss/get_rates.cfm?fdate=31.12.2025",
      "quote": "KZT 502.57 = USD 1"
     },
     "note": "Consolidated group total assets, not assets under management. They include the operating assets of the group's companies.",
