@@ -19,22 +19,22 @@
  "subject": "The central government of Slovakia",
  "hist_label": "Central government gross debt",
  "sum_note": "Slovakia central government gross debt (Maastricht definition, quarter-end), from Eurostat's quarterly government debt statistics, which are compiled from national data. The closest EU-comparable measure to the US Total Public Debt Outstanding.",
- "scope_note": "This is central government gross debt in the EU's Maastricht (excessive deficit procedure) definition, taken from Eurostat's quarterly table: everything the central government sector owes in currency and deposits, debt securities and loans, at nominal value and before subtracting any cash or other assets.  It is the closest EU-comparable match to the US national debt clock's Total Public Debt Outstanding. Figures are in euros. Eurostat publishes it by sector, so the wider general government total is shown below as a fact.",
+ "scope_note": "This is central government gross debt in the EU's Maastricht (excessive deficit procedure) definition, taken from Eurostat's quarterly table: everything the central government sector owes in currency and deposits, debt securities and loans, at nominal value and before subtracting any cash or other assets.  It is the closest EU-comparable match to the US national debt clock's Total Public Debt Outstanding. Figures are in euros. Eurostat publishes it by sector, so the general government total is shown below as a fact.",
  "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with bond issuance calendars and short-term borrowing.",
  "legend": "Slovakia's government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
  "cadence": "Quarterly. Eurostat publishes each quarter-end figure (table gov_10q_ggdebt) about three months after the quarter ends.",
  "after_text": ", about three months after each quarter-end",
  "next_update": "The Q3 2026 quarter-end figure is expected from Eurostat roughly three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
-  "value": 5419451,
+  "value": 5409407,
   "noun": "people",
-  "as_of": "2025-01-01",
-  "source_name": "Eurostat, Population on 1 January by age and sex (demo_pjan), Slovakia",
-  "source_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_pjan/default/table",
+  "as_of": "2026-01-01",
+  "source_name": "Eurostat, Population change, population on 1 January (demo_gind), Slovakia (provisional)",
+  "source_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_gind/default/table",
   "publisher_short": "Eurostat",
   "tag": "Eurostat",
   "possessive": "Eurostat's",
-  "method_short": "Eurostat population on 1 January, the latest published",
+  "method_short": "Eurostat population on 1 January, the latest published (provisional estimate)",
   "noun_full": "people in Slovakia"
  },
  "components": [
@@ -57,7 +57,7 @@
      "value": 86423100000,
      "kind": "usd",
      "as_of": "2026-06-30",
-     "note": "All levels of government (central, state, local and social security) in the same Eurostat table, the measure used in EU fiscal rules. It is a wider measure than the one ticking on this page. A year earlier (2025-06-30) it was €83.5 billion. Central government debt here is larger than the general government total because the general government figure nets out debt held between government units, which the central government figure does not.",
+     "note": "All levels of government (central, state, local and social security) in the same Eurostat table, the measure used in EU fiscal rules. It covers more levels of government than the one ticking on this page. A year earlier (2025-06-30) it was €83.5 billion. Central government debt here is larger than the general government total because the general government figure nets out debt held between government units, which the central government figure does not.",
      "source_name": "Eurostat, gov_10q_ggdebt (sector S13, GD)",
      "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
      "source_locator": "geo=SK, sector S13, na_item GD, unit MIO_EUR"
@@ -143,7 +143,8 @@
   "Why Eurostat: it is the official EU statistical office and publishes quarterly government debt for every member state on one definition, compiled from the figures the national statistical institutes and central banks report to it. The fetcher reads its public API directly.",
   "Provisional data: Eurostat flags the latest quarters as provisional and revises them in later releases. The page re-bases to each new release.",
   "Why central government: the US clock ticks the federal Treasury's gross debt. The central government sector (Eurostat code S.1311) is the nearest match; state, local and social security debt are not in it. The table's breakdown by instrument adds up to the headline.",
-  "Cross-check: ARDAL publishes the state debt on a national basis, which differs from the Maastricht central government sector used here."
+  "Cross-check: ARDAL publishes the state debt on a national basis, which differs from the Maastricht central government sector used here.",
+  "Why central government can exceed the general government total: the general government (S.13) figure is consolidated across all government units, so debt held between the central government and local governments or social security funds is netted out, while the central government sector's own figure is consolidated only within the sector. Both are published on the same Eurostat table; this page ticks the central government figure and shows the general government total as a fact."
  ],
  "iso3": "SVK"
 }

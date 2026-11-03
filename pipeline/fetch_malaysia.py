@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Re-base of places/malaysia.json from the Ministry of Finance Malaysia's quarterly federal government debt series on the national open-data portal
+"""Re-base of places/malaysia.json from the quarterly federal government debt series (compiled by Bank Negara Malaysia, by remaining maturity) on the national open-data portal
 (data.gov.my catalogue "federal_finance_qtr_debt_mat", RM million; each row's date is the first day of the quarter, the position is the quarter-end).
 Total = domestic + external must hold, otherwise the file is left untouched (exit 0). Never invents a number."""
 import json, sys, datetime as dt
@@ -20,7 +20,7 @@ def build(p):
     p = rebase(p, ok, tol_days=20, keep_months=14)
     last = max(ok)
     p["components"][0]["breakdown"] = [{"label": "Domestic debt", "value": int(dom[last]), "group": "Domestic"}, {"label": "External debt", "value": int(ext[last]), "group": "External"}]
-    p["next_update"] = "The Ministry of Finance adds each quarter-end position to the open-data portal some weeks after the quarter ends; this page re-bases to it automatically on the next daily build after it appears."
+    p["next_update"] = "Bank Negara Malaysia adds each quarter-end position to the open-data portal some weeks after the quarter ends; this page re-bases to it automatically on the next daily build after it appears."
     return p
 
 if __name__ == "__main__": sys.exit(run("malaysia", build))

@@ -27,15 +27,15 @@
  "after_text": ", with each new Quarterly Bulletin",
  "next_update": "The Reserve Bank publishes the Quarterly Bulletin in March, June, September and December; each adds the months since the last one. This page re-bases to it automatically on the next daily build after it appears.",
  "population": {
-  "value": 63100945,
+  "value": 63522380,
   "noun": "people",
-  "as_of": "2025-06-30",
-  "source_name": "Statistics South Africa, Mid-year population estimates 2025 (P0302), total population at 30 June 2025",
-  "source_url": "https://www.statssa.gov.za/publications/P0302/P03022025.pdf",
+  "as_of": "2026-06-30",
+  "source_name": "Statistics South Africa, Mid-year population estimates 2026 (P0302), total population at 30 June 2026",
+  "source_url": "https://www.statssa.gov.za/publications/P0302/P03022026.pdf",
   "publisher_short": "Stats SA",
   "tag": "Stats SA",
   "possessive": "Stats SA's",
-  "method_short": "Stats SA mid-year 2025 population estimate",
+  "method_short": "Stats SA mid-year 2026 population estimate",
   "noun_full": "people in South Africa"
  },
  "components": [

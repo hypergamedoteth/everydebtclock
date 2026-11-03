@@ -77,6 +77,9 @@ def rebase(p, geo, ser):
     c.update(value=tot, as_of=as_of, prior_value=v(prior, "S1311", "GD"), prior_as_of=qend(prior),
              history=[[qend(t), v(t, "S1311", "GD")] for t in q])
     c["breakdown"] = [{"label": lab, "value": v(last, "S1311", n), "group": g} for n, lab, g in PARTS if v(last, "S1311", n)]
+    EXC = next((n for n in (json.load(open(os.path.join(ROOT, "places", "czechia.json"))).get("notes", [])) if n.startswith("Why central government can exceed")), None)
+    if EXC:   # the explanation is on the page exactly when the central government figure is the larger one
+        p["notes"] = [n for n in p.get("notes", []) if n != EXC] + ([EXC] if tot > v(last, "S13", "GD") else [])
     for f in c.get("facts", []):
         if f.get("key") == "gg":
             gg, gg0 = v(last, "S13", "GD"), v(prior, "S13", "GD")
@@ -90,10 +93,14 @@ def rebase(p, geo, ser):
     return p
 
 def fetch_pop():
+    """Population on 1 January: demo_pjan (final), then demo_gind indicator JAN (published sooner, later years are provisional/estimated).
+    Returns {(geo, year): (value, table)}; a year from demo_pjan wins over the same year from demo_gind."""
     geos = "&".join("geo=" + g for g in PLACES.values())
     out = {}
+    for c, v in cells(get(f"{API}demo_gind?format=JSON&lang=EN&{geos}&indic_de=JAN&sinceTimePeriod=2025")):
+        out[(c["geo"], c["time"])] = (int(v), "demo_gind")
     for c, v in cells(get(f"{API}demo_pjan?format=JSON&lang=EN&{geos}&age=TOTAL&sex=T&unit=NR&sinceTimePeriod=2025")):
-        out[(c["geo"], c["time"])] = int(v)
+        out[(c["geo"], c["time"])] = (int(v), "demo_pjan")
     return out
 
 def main():
@@ -111,7 +118,13 @@ def main():
             new = rebase(json.loads(json.dumps(p)), geo, ser)
             ys = sorted(int(t) for (g, t) in pops if g == geo)
             if ys and f"{ys[-1]}-01-01" >= new["population"]["as_of"]:
-                new["population"]["value"] = pops[(geo, str(ys[-1]))]; new["population"]["as_of"] = f"{ys[-1]}-01-01"
+                v_, tab = pops[(geo, str(ys[-1]))]; pop = new["population"]
+                pop["value"] = v_; pop["as_of"] = f"{ys[-1]}-01-01"
+                nm = pop["source_name"].split(" (demo_")[0].rstrip()
+                pop["source_name"] = (f"Eurostat, Population on 1 January by age and sex (demo_pjan), {p['name']}" if tab == "demo_pjan" else
+                                      f"Eurostat, Population change, population on 1 January (demo_gind), {p['name']} (provisional)")
+                pop["source_url"] = f"https://ec.europa.eu/eurostat/databrowser/view/{tab}/default/table"
+                pop["method_short"] = "Eurostat population on 1 January, the latest published" + (" (provisional estimate)" if tab == "demo_gind" else "")
         except Exception as e:
             print(f"{slug}: not updated:", e); continue
         if new != p:
