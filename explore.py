@@ -142,6 +142,7 @@ def explore(up, places, calc, cur=None, gdp=None, usd=None, kind_hint=None):
         groups.append(_group(f"More {reg} states", take(sorted(peers, key=lambda p: -calc(p)["total"]), 6), up))
         groups.append(_group("Largest state debt clocks", take(big_states, 6), up))
         groups.append(_group("Largest economies", take(big_c, 6), up))
+        groups.insert(0, _group(f'Sovereign wealth funds of {cur["name"]}', [(w["name"], f'wealth/{w["slug"]}/') for w in WEALTH if w["place_slug"] == cur["slug"]], up))
     elif cur and cur["kind"] == "country":
         reg = COUNTRY_REGION.get(cur["slug"], "")
         peers = [p for p in countries if COUNTRY_REGION.get(p["slug"]) == reg] if reg else []
