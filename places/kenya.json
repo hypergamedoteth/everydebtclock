@@ -1,5 +1,5 @@
 {
- "_doc": "One file per place; see places_build.py. Amounts in Kenyan shillings. The debt component, history and facts are refreshed by pipeline/fetch_kenya.py from the National Treasury's Quarterly Economic and Budgetary Review (needs pypdf); edit wording here, not numbers.",
+ "_doc": "One file per place; see places_build.py. Amounts in Kenyan shillings. The debt component, history and facts are refreshed by pipeline/fetch_kenya.py from the National Treasury's Quarterly Economic and Budgetary Review (needs pypdf); a final figure from the Annual Public Debt Management Report is kept in place of the provisional QEBR value (see the guard in build()); edit wording here, not numbers.",
  "slug": "kenya",
  "kind": "country",
  "country": "KE",
@@ -20,7 +20,7 @@
  "subject": "The Government of Kenya",
  "hist_label": "Public and Publicly Guaranteed Debt",
  "sum_note": "Kenya's public and publicly guaranteed debt (gross; domestic and external), quarter-end, from the National Treasury's Quarterly Economic and Budgetary Review.",
- "scope_note": "This is the \"total public and publicly guaranteed debt\" that Kenya's National Treasury states in its Quarterly Economic and Budgetary Review: the national government's external and domestic debt at the end of the quarter, in Kenyan shillings, plus debt the government has guaranteed. It is gross: the Treasury's separate net figure, which subtracts deposits, is lower. County governments' own borrowing is not included. The newest quarter in the report is provisional.",
+ "scope_note": "This is the \"total public and publicly guaranteed debt\" that Kenya's National Treasury states in its Quarterly Economic and Budgetary Review: the national government's external and domestic debt at the end of the quarter, in Kenyan shillings, plus debt the government has guaranteed. It is gross: the Treasury's separate net figure, which subtracts deposits, is lower. County governments' own borrowing is not included. The newest quarter in a Quarterly Review is provisional; this page replaces it with the final figure once the Treasury publishes it (June 2026 is final).",
  "trend_why": "We use the change over the latest twelve months rather than the last quarter because quarterly changes swing with the exchange rate and with issuance.",
  "legend": "Kenya's public debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
  "cadence": "Quarterly. The National Treasury publishes a Quarterly Economic and Budgetary Review about six weeks after each quarter ends.",
@@ -43,19 +43,19 @@
    "key": "cgdebt",
    "label": "Kenya public and publicly guaranteed debt",
    "short": "Public debt",
-   "value": 13013211000000,
+   "value": 13120868000000,
    "as_of": "2026-06-30",
-   "prior_value": 11813919000000,
+   "prior_value": 11814474000000,
    "prior_as_of": "2025-06-30",
-   "source_name": "National Treasury of Kenya, Quarterly Economic and Budgetary Review, Public and Publicly Guaranteed Debt, KSh million",
-   "source_url": "https://www.treasury.go.ke/sites/default/files/QEBRs/Fourth%20QEBR%20Report%20FY%202025-26.pdf",
-   "source_locator": "QEBR PDF, table of public and publicly guaranteed debt, GRAND TOTAL GROSS",
+   "source_name": "National Treasury of Kenya, Annual Public Debt Management Report 2025/26 (final June 2026 figure), KSh million",
+   "source_url": "https://www.treasury.go.ke/sites/default/files/Annual%20Debt%20Management%20Reports%202025-2026.pdf",
+   "source_locator": "Annual Public Debt Management Report 2025/26, total public and publicly guaranteed debt at 30 June 2026: KSh 13,120,868 million (30 June 2025: KSh 11,814,474 million); the final June 2026 Public Debt Bulletin gives the same total",
    "includes": "National government external and domestic debt in shillings, gross, with publicly guaranteed debt. Excludes county governments' own borrowing.",
    "facts": [],
    "history": [
     [
      "2025-06-30",
-     11813919000000
+     11814474000000
     ],
     [
      "2025-09-30",
@@ -71,18 +71,18 @@
     ],
     [
      "2026-06-30",
-     13013211000000
+     13120868000000
     ]
    ],
    "breakdown": [
     {
      "label": "Domestic debt",
-     "value": 7328524000000,
+     "value": 7327202000000,
      "group": "Domestic"
     },
     {
      "label": "External debt",
-     "value": 5684687000000,
+     "value": 5793666000000,
      "group": "External"
     }
    ]
@@ -101,7 +101,7 @@
  "notes": [
   "Why the Treasury's review: it is the National Treasury's own quarterly statement of the debt. The fetcher reads the table with nine consecutive quarter-ends and checks that domestic plus external equals the grand total.",
   "Gross: the Treasury also reports net debt (after deposits); the gross figure is used here.",
-  "Provisional: the newest quarter in each report is marked provisional and may be revised in the next review.",
+  "Final June 2026 figure: the total comes from the Treasury's Annual Public Debt Management Report 2025/26 and the final June 2026 Public Debt Bulletin (KSh 13,120,868 million). It supersedes the provisional KSh 13,013,211 million in the Fourth Quarterly Economic and Budgetary Review. The Treasury's monthly bulletins show later figures (KSh 13,467.52 billion at end-August 2026); this page follows quarter-ends.",
   "Currency: Kenyan shillings. The World Debt Clock converts them to US dollars at the US Treasury's Reporting Rates of Exchange (a quarterly official rate as of 30 September 2026; the page for the World Debt Clock shows the rate and its date)."
  ],
  "world_measure": "Public and publicly guaranteed, gross"
