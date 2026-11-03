@@ -159,8 +159,12 @@
  "notes": [
   "Census publishes Alaska's state + local total as $8.88 billion for 2024 (coefficient of variation 0.01%) and $8.73 billion for 2023. State + local here is exactly Census's state figure plus its local figure.",
   "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the live clock projects from June 30, 2024. Alaska's own audited report is fresher but is not used here: it covers a narrower scope and would not be comparable with the other states.",
+  "The 2023→2024 change (+1.8%) is large enough to measure and small enough to extend, so the live number continues it as a straight line from June 30, 2024. Treat it as a projection, not a reported figure.",
   "Not included: unfunded pension and retiree-health liabilities, and the state's share of the federal debt."
  ],
  "hold_trend": false,
- "legend": "Alaska state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection from the latest Census year, shown here next to the official totals."
+ "legend": "Alaska state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection from the latest Census year, shown here next to the official totals.",
+ "total_cv": 0.01,
+ "trend_pct": 1.8,
+ "hold_why": ""
 }

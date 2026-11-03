@@ -1,6 +1,6 @@
 # Every Debt Clock (everydebtclock.com) — US clock v1
 
-Every number ticks like usdebtclock.org, but each one starts from an **official figure**, ticks at the **official trend**, is **re-based daily**, and is **checked daily** against the next official release. Nothing is hand-typed.
+Every number ticks like usdebtclock.org, but each one starts from an **official figure**, ticks at the **official trend**, is **re-based daily**, and is **checked daily** against the next official release. Figures come from official sources; the few hand-entered inputs are listed in the methodology page. Tiles that are modeled estimates say so on their page.
 
 ## Files
 | Path | What |
@@ -19,7 +19,9 @@ Every number ticks like usdebtclock.org, but each one starts from an **official 
 - **Debt (total / public / intragovernmental):** base = Treasury Debt to the Penny latest close of business; rate = least-squares slope of the trailing 90 days of daily records.
 - **Fiscal-year-to-date (spending, revenue, deficit, every budget function, every revenue source, gross interest):** base = latest Monthly Treasury Statement FYTD figure (or $0 at Oct 1 if the new FY has no statement yet); rate = current-FY average pace once ≥3 months are published, otherwise trailing-12-month pace. The browser also resets FYTD tickers to $0 at Oct 1 00:00 ET if the data hasn't been refreshed yet.
 - **Per person** = value ÷ US population (Census Vintage 2025 Jul 1, 2025 estimate, projected at Census's stated rate). **Per tax return filed** = value ÷ 162,754,810 individual returns filed (IRS Data Book FY2025, Table 1-2). **Per household** = ÷ 134.79M (Census CPS ASEC 2025).
-- **GDP:** BEA NIPA Table 1.1.5 nominal GDP (SAAR) via the DBnomics mirror (BEA's own API needs a key; FRED's CSV endpoint timed out from this box). Ticks at the 4-quarter trend.
+- **GDP:** BEA nominal GDP (SAAR) from FRED series `GDP` (DBnomics mirror only as a fallback), labelled with BEA's vintage (e.g. "BEA advance estimate, 2026-Q3"). It is a **fixed** figure, not extrapolated; it changes only when BEA publishes. Debt-to-GDP and deficit-to-GDP divide by it.
+- **Revenue-source and budget-function tiles (`rev_*`, `out_*`):** *modeled estimates*, not official values: trailing-12-month MTS Table 9 share × the daily total. Exception: `rev_customs` is the DTS gross customs deposits FYTD (MTS customs is net of refunds and was negative in some 2026 months), and the other revenue sources are rescaled so they still sum to revenue.
+- **`interest_share`:** fixed official figure, net interest ÷ receipts over the latest 12 published MTS months (not an FYTD ratio).
 - **Ratios** (debt-to-GDP now, deficit-to-GDP trailing 12 months, interest ÷ revenue, debt per household) are computed live in the browser from the ticking parts.
 - **History** (debt-to-GDP and deficit-to-GDP for FY1960–2025) comes from OMB Historical Tables 7.1 and 1.2 and **does not tick**.
 
@@ -97,5 +99,5 @@ Static files only: Cloudflare Pages or GitHub Pages (free), Cloudflare CDN in fr
 
 ## State pages (all 50) and the weekly audit
 `places/<slug>.json` holds one page of data per state; `pipeline/census_state.py` writes it from the Census Bureau's Annual Survey of State and Local Government Finances (table GS00LOCALFIN, item LF0231 debt outstanding, split into long-term LF0233 and short-term LF0232) and Census Vintage 2025 population. With no arguments it generates only states that have no file yet; pass slugs to regenerate. Anything Census does not publish for a state is left out, not filled in (e.g. a missing short-term row has no tile).
-**Trend rule.** A state's clock ticks forward only when Census's latest one-year change is both larger than about two standard errors of its own estimate and no more than 10% of the prior level. Otherwise the page sets `"hold_trend": true` and shows the official figure fixed, with a note saying why.
+**Trend rule.** A state's clock ticks forward only when Census's latest one-year change is both larger than about two standard errors of its own estimate and no more than 5% of the prior level (`pipeline/state_trend.py`; re-apply with `python3 pipeline/state_trend.py`). Otherwise the page sets `"hold_trend": true` and shows the official figure fixed, with a note saying why.
 `pipeline/audit_places.py` re-downloads the same Census sources and compares every stored figure (headline, prior year, full history, long/short-term parts, population), checks internal consistency, and with `--site DIR` checks each built page exists and is in the sitemap. Exit 1 on drift, a failed check or a newer Census survey year. `.github/workflows/audit-places.yml` runs it weekly, read-only.

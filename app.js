@@ -17,7 +17,6 @@
   const DER = {
     debt_gdp_now: t => { const a = val('debt_total', t), b = val('gdp', t); return a && b ? a / b * 100 : null; },
     deficit_gdp_now: t => { const s = T.spending, r = T.revenue, g = val('gdp', t); return s && r && s.ttm && g ? (s.ttm - r.ttm) / g * 100 : null; },
-    interest_share: t => { const a = val('out_interest', t), b = val('revenue', t); return a && b ? a / b * 100 : null; },
     interest_annual: t => { const a = val('debt_total', t), r = T.rate_all; return a && r ? a * r.base / 100 : null; },
     interest_per_day: t => { const a = DER.interest_annual(t); return a == null ? null : a / 365.25; },
     interest_per_sec: t => { const a = DER.interest_annual(t); return a == null ? null : a / 31557600; },
@@ -52,12 +51,12 @@
   const S = [
     {id: 'debt', title: 'National debt & the debt limit', note: () => `Treasury Debt to the Penny + DTS Table III-C · official as of ${fmtDate(T.debt_total?.as_of)} · re-based every business day`, color: 'var(--red)',
       tiles: ['debt_public', 'debt_intragov', 'debt_subject_limit', 'debt_limit', 'limit_headroom', 'debt_gdp_now']},
-    {id: 'fy', title: () => `FY${curFY()} so far`, note: () => `Fiscal year to date · resets every Oct 1 · ${dtsNote()}`, color: 'var(--amber)', tiles: ['spending', 'revenue', 'deficit', 'interest_cash']},
+    {id: 'fy', title: () => `FY${curFY()} so far`, note: () => `Fiscal year to date, budget-basis estimates (not official until Treasury publishes the month) · resets every Oct 1 · ${dtsNote()}`, color: 'var(--amber)', tiles: ['spending', 'revenue', 'deficit', 'interest_cash']},
     {id: 'interest', title: 'Interest on the debt', note: () => `Live debt × Treasury's average interest rate (${T.rate_all?.base?.toFixed(3)}%, ${fmtDate(T.rate_all?.as_of)})`, color: 'var(--orange)',
       tiles: ['interest_annual', 'interest_per_day', 'interest_per_sec', 'interest_since_open', 'interest_gross', 'interest_share']},
-    {id: 'spend', dense: 1, title: 'Where the money goes', note: 'Outlays by budget function, FY to date', color: 'var(--blue)',
+    {id: 'spend', dense: 1, title: 'Where the money goes', note: 'MODELED ESTIMATES: each function = its share of the Monthly Treasury Statement × the daily FY-to-date spending total. Not official published figures. FY to date', color: 'var(--blue)',
       tiles: ['out_socsec', 'out_medicare', 'out_health', 'out_interest', 'out_defense', 'out_income', 'out_veterans', 'out_justice', 'out_transport', 'out_education', 'out_community', 'out_nature', 'out_agri', 'out_intl', 'out_science', 'out_govt', 'out_energy', 'out_commerce', 'out_offsets']},
-    {id: 'rev', dense: 1, title: 'Where the money comes from', note: 'Receipts by source, FY to date', color: 'var(--green)', tiles: ['rev_individual', 'rev_payroll', 'rev_corporate', 'rev_customs', 'rev_excise', 'rev_misc', 'rev_estate']},
+    {id: 'rev', dense: 1, title: 'Where the money comes from', note: 'Receipts by source, FY to date. Customs = Daily Treasury Statement gross deposits (before refunds); the other sources are MODELED ESTIMATES (MTS share × daily total), not official published figures', color: 'var(--green)', tiles: ['rev_individual', 'rev_payroll', 'rev_corporate', 'rev_customs', 'rev_excise', 'rev_misc', 'rev_estate']},
     {id: 'trust', dense: 1, title: 'Social Security & Medicare trust funds', note: () => `Treasury securities held by each fund · Federal Investments Program, month-end ${fmtDate(T.tf_socsec?.as_of)}`, color: 'var(--violet)',
       tiles: ['tf_socsec', 'tf_medicare', 'tf_oasi', 'tf_di', 'tf_hi', 'tf_smi']},
     {id: 'money', dense: 1, title: 'The Fed & money supply', note: 'NY Fed SOMA (weekly) · Federal Reserve H.6 (monthly)', color: 'var(--teal)', tiles: ['fed_treasuries', 'fed_share_public', 'm2', 'm2_debt_ratio']},
@@ -79,7 +78,9 @@
     const d = short ? shortDate(i.as_of) : fmtDate(i.as_of);
     if (i.historical) return `<span class="badge hist" title="Fixed historical figure (OMB Historical Tables)">HISTORICAL · fixed</span>`;
     if (i.derived) return `<span class="badge calc" title="${esc(i.method || '')}">LIVE CALC</span>`;
+    if (i.badge) return `<span class="badge ${i.modeled ? 'proj' : 'fix'}" title="${esc(i.method || '')}">${esc(i.badge)}</span>`;
     if (i.fixed) return `<span class="badge fix" title="Official figure that does not change until the next official release">FIXED · ${esc(d)}</span>`;
+    if (i.modeled) return `<span class="badge proj" title="Modeled estimate: ${esc(i.method || '')}">MODELED ESTIMATE · from ${esc(d)}</span>`;
     return `<span class="badge proj" title="Projected every frame from the official figure of ${esc(fmtDate(i.as_of))}">PROJECTED · from ${esc(d)}</span>`;
   }
   function badges(i, opts = {}) {
@@ -165,16 +166,7 @@
     }
     let saved = null; try { saved = by(localStorage.getItem(KEY)); } catch (e) {}
     if (saved) show(saved, 'saved');
-    else if (P.length > 1 && /^https?:$/.test(location.protocol)) {
-      // /api/geo is a Cloudflare Worker: {"country":"US","region_code":"TX"}. Any failure, a slow answer (800 ms) or a place without a page keeps the default.
-      const ac = typeof AbortController === 'function' ? new AbortController() : null, to = setTimeout(() => ac && ac.abort(), 800);
-      fetch('/api/geo', {cache: 'no-store', signal: ac ? ac.signal : undefined}).then(r => r.ok ? r.json() : null).then(g => {
-        if (!g || !g.country) return;
-        const c = String(g.country).toUpperCase(), r = String(g.region_code || '').toUpperCase();
-        const m = P.find(x => x.kind === 'state' && x.country === c && x.region_code === r) || P.find(x => x.kind === 'country' && x.country === c);
-        if (m && how === 'default') show(m, 'geo');
-      }).catch(() => {}).finally(() => clearTimeout(to));
-    }
+    // No location lookup: the featured place is a fixed default until the visitor picks one (remembered in localStorage).
     sel.onchange = () => { const p = by(sel.value); if (!p) return; try { localStorage.setItem(KEY, p.slug); } catch (e) {} show(p, 'saved'); };
     const pv = $('pcv'), pp = $('pcp');
     const cu = (v, d) => { const s = usd(v, d), c = cur.sym || '$'; return c === '$' ? s : s.replace('$', c); };
@@ -348,7 +340,7 @@
       <p><b>Method.</b> ${esc(i.method || '')}</p>
       ${mathHTML(slug, i)}
       ${i.rate ? `<p><b>Rate.</b> ${rateTxt(i.rate)}</p>` : ''}
-      ${i.source ? `<p><b>Source.</b> <a href="${esc(i.source)}" target="_blank" rel="noopener">${esc(i.source_name || i.source)}</a>${i.as_of ? ' · official as of ' + esc(fmtDate(i.as_of)) : ''}</p>` : ''}
+      ${i.source ? `<p><b>Source.</b> <a href="${esc(i.source)}" target="_blank" rel="noopener">${esc(i.source_name || i.source)}</a>${i.as_of ? (i.modeled ? ' · daily total as of ' : ' · official as of ') + esc(fmtDate(i.as_of)) : ''}</p>` : ''}
       ${v && v.last_error_pct != null ? `<p><b>Check.</b> Last projection vs ${esc(v.against)}: ${(+v.last_error_pct).toFixed(3)}% (threshold ±${v.threshold_pct}%)${v.mean_abs_error_pct != null ? `; average |error| over ${v.n} days ${v.mean_abs_error_pct.toFixed(3)}%` : ''}. ${esc(v.note || '')}</p>` : ''}
       <p><b>Share:</b> <a href="${share}">${share}</a></p>
       <p class="shr"><button id="cp">Copy link</button><a class="btn" target="_blank" rel="noopener" href="https://x.com/intent/post?text=${encodeURIComponent(i.label + ': ' + (i.kind === 'usd' ? short(get(slug, now())) : i.kind === 'pct' ? pct(get(slug, now()), 2) : nf0.format(get(slug, now()))) + ' and ticking (official data, checked daily)')}&url=${encodeURIComponent(share)}">Post on X</a><a class="btn" href="${base}og/${slug}.png" target="_blank">Share image</a></p>
@@ -373,7 +365,6 @@
   const DF = {   // derived formulas: [text, components]
     debt_gdp_now: ['debt_total ÷ gdp × 100', ['debt_total', 'gdp']],
     deficit_gdp_now: ['(spending TTM − revenue TTM) ÷ gdp × 100', ['gdp']],
-    interest_share: ['out_interest ÷ revenue × 100', ['out_interest', 'revenue']],
     interest_annual: ['debt_total × avg rate on all interest-bearing debt', ['debt_total', 'rate_all']],
     interest_per_day: ['debt_total × rate_all ÷ 365.25', ['debt_total', 'rate_all']],
     interest_per_sec: ['debt_total × rate_all ÷ 31,557,600 s', ['debt_total', 'rate_all']],

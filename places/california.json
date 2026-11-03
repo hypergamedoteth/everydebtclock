@@ -183,10 +183,15 @@
  "notes": [
   "Census publishes California's state + local total as $597.20 billion for 2024 (coefficient of variation 0.52%) and $581.04 billion for 2023. State + local here is exactly Census's state figure plus its local figure.",
   "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the live clock projects from June 30, 2024. The state's own report (California State Controller, audited ACFR FY2025) is fresher but narrower; it is shown separately and never added. Census does not publish a reconciliation to state reports, so we do not itemize the gap.",
+  "The 2023→2024 change (+2.8%) is large enough to measure and small enough to extend, so the live number continues it as a straight line from June 30, 2024. Treat it as a projection, not a reported figure.",
   "About the state's own figure: Figures are principal outstanding from Table 13. The ACFR's Debt Administration summary reports $112.6 billion of bonded debt, which includes unamortized bond premiums; we leave premiums out so the figure counts what the State has to repay at maturity.",
   "About the state's own figure: The State Treasurer's 2025 Debt Affordability Report counts $81.67 billion of General Fund-supported and self-liquidating GO and lease revenue bonds at June 30, 2025; it leaves out agency revenue bonds that the ACFR includes.",
   "About the state's own figure: Not included: local government debt; the University of California (reported as a discretely presented component unit); commercial paper and other short-term borrowings; conduit debt; leases; unfunded pension and retiree-health liabilities; and California's share of the federal debt.",
   "Not included: unfunded pension and retiree-health liabilities, and the state's share of the federal debt."
  ],
- "legend": "California state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection from the latest Census year, shown here next to the official totals."
+ "legend": "California state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection from the latest Census year, shown here next to the official totals.",
+ "total_cv": 0.52,
+ "hold_trend": false,
+ "trend_pct": 2.8,
+ "hold_why": ""
 }

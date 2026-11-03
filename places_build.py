@@ -185,10 +185,12 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     # Search-targeted wording, one rule for every place (the JSON "title" is no longer used): countries match "<name> national debt" and
     # "<name> debt clock"; states match "<state> debt", "<state> state debt" and "<state> debt clock".
     is_state = p["kind"] == "state"
-    title = f"{name} Debt Clock: Live State Debt, Official Data" if is_state else f"{name} National Debt Clock: Live Debt, Official Data"
-    h1 = f"{name} State Debt Clock" if is_state else f"{name} National Debt Clock"
-    desc = (f"{name} {'state debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, {'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
-            f"Live {name} debt clock, {_usd0(pp_off)} per {dem}, with sources.")
+    ticks = bool(rate)  # "Live" only where the number really ticks
+    lv = "Live " if ticks else ""
+    title = (f"{name} State & Local Debt Clock: {lv}Debt, Official Census Data" if is_state else f"{name} National Debt Clock: {lv}Debt, Official Data")
+    h1 = f"{name} State & Local Debt Clock" if is_state else f"{name} National Debt Clock"
+    desc = (f"{name} {'state and local debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, {'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
+            f"{'Live ' if rate else 'Official '}{name} debt clock, {_usd0(pp_off)} per {dem}, with sources.")
     img = f"og/places/{p['slug']}.png"
     if og:
         og(f"{R}/{img}", f"{name} {T['head']} · ticking live", _usd0(proj),
@@ -223,7 +225,9 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     proj_txt = (f"The clock below starts from that official figure and projects forward at {T['pace']} (about {_short(abs(rate) * 86400)} a day{'' if up_ else ' less'}), "
                 f"the official change from {_fd(cs[0]['prior_as_of'])} to {as_of}. {E(rep)} reports {E(rep_its)} debt {T['once']}, not daily, so the ticking number is a projection, not an official figure; "
                 f"it re-bases when the next {T['report']} come out.") if rate else \
-               f"{E(rep)} reports {E(rep_its)} debt {T['once']} and only one official figure is available, so the clock shows the official figure without projecting."
+               (f"{E(rep)} reports {E(rep_its)} debt {T['once']}, not daily. This page shows the official figure for {as_of} and does not tick it forward, because {E(p['hold_why'])}. Earlier official years are in the What changed table."
+                if p.get("hold_trend") and p.get("hold_why") else
+                f"{E(rep)} reports {E(rep_its)} debt {T['once']} and only one official figure is available, so the clock shows the official figure without projecting.")
     others = [o for o in places if o["slug"] != p["slug"]]
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span>'
              f'<a href="../../{sec_dir}/">All {"US state" if is_state else "country"} debt clocks</a>' + ('<span>·</span><a href="../../world/">World debt clock</a>' if WORLD else "") + '</div>')
@@ -241,7 +245,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         hero += (f'<div class="sub"><span>{_rate_txt(rate)}</span><span class="note">rate: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}, so this is a projection</span>'
                  f'<span>Since you opened this page: <span class="num" id="hs">{CUR}0</span> {"more" if up_ else "less"} debt</span></div>')
     else:
-        hero += f'<div class="sub"><span>fixed</span><span class="note">{E(rep)} reports {T["once"]}; one official figure available</span></div>'
+        hero += f'<div class="sub"><span>fixed</span><span class="note">{E(rep)} reports {T["once"]}; {"shown fixed, not ticking" if p.get("hold_trend") else "one official figure available"}</span></div>'
     trio_x = [(x["short"] + " · official " + _fd(x["as_of"]), _usd0(x["value"])) for x in cs[:2]] if len(cs) > 1 else \
              [(f"Official · {_fd(c['as_of'])}", _usd0(c["total"]))]
     trio_x += [(h["label"], h["value"]) for h in p.get("hero_extra", [])]
@@ -273,7 +277,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
 
     # ---- Debt overview tiles (mirror the US "National debt" grid where Texas has an equivalent)
     tiles = [tile_html("combined", f"{name} {T['head']}", _usd0(proj), ACC[0], proj_badge if rate else fix_badge(c["as_of"]), _rate_txt(rate),
-                       pp=[(f"Per {dem} ({T['pop_tag']} pop.)", _usd2(proj / pop["value"]), pop["value"]), ("Official total", _short(c["total"]), None)],
+                       pp=[(f"Per {dem} ({'projected total ÷ ' if rate else ''}{T['pop_tag']} pop.)", _usd2(proj / pop["value"]), pop["value"]), ("Official total", _short(c["total"]), None)],
                        tick=(c["total"], rate, t0) if rate else None,
                        dlg=dlg(f"{name} {T['head']}", "Sum of the official state and local totals." if len(cs) > 1 else T["sum_note"], pub, cs[0]["source_url"], base=c["total"], r=rate, official=f"{_usd0(c['total'])} official, {as_of}"))]
     for i, x in enumerate(cs if len(cs) > 1 else []):
@@ -372,7 +376,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                 + f'{_usd0(yr_change)} over {days} days = {_usd2(rate)} per second. {E(p.get("trend_why", "")) + " " if p.get("trend_why") else ""}The actual path is lumpy (bonds are sold in batches and repaid on schedules), so the projection will drift; '
                 f'when new {T["report"]} come out, the clock re-bases to the new official figures.</p>')
     else:
-        meth = "<p><b>Why this number doesn't tick.</b> Only one official year is available, so there is no defensible trend to project. The figure shown is the official total.</p>"
+        meth = "<p><b>Why this number doesn't tick.</b> " + (f"Earlier official years are in the history table, but {E(p['hold_why'])}, so there is no defensible trend to project. The figure shown is the official total.</p>" if p.get("hold_trend") and p.get("hold_why") else "Only one official year is available, so there is no defensible trend to project. The figure shown is the official total.</p>")
     meth += (f'<p><b>How often it\'s published.</b> {E(p.get("cadence", ""))} {E(p.get("next_update", ""))}</p>'
              f'<p><b>Per {E(dem)}</b> divides by {E(T["pop_pos"])} estimate of {pop["value"]:,} {T["noun"]} on {_fd(pop["as_of"])}. It is not projected forward, so the live per-{E(dem)} figure {"rises" if (rate or 0) >= 0 else "falls"} only with the debt.</p>'
              + "".join(f"<p><b>Note.</b> {E(n)}</p>" for n in p.get("notes", []) + [p.get("fiscal_year_end_note", "")] if n)
@@ -440,7 +444,7 @@ def index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, kind, sec_dir, lab, d
                  f'<span class="h2n">{len(items)} live</span></div><div class="grid hub">{tiles}</div></section>')
     ns, nc = sum(1 for x in ix if x["kind"] == "state"), sum(1 for x in ix if x["kind"] == "country")
     if kind == "state":
-        title, h1, desc = "US State Debt Clocks: Debt of Every State, Official Data", "US State Debt Clocks", f"State debt of {ns} US states: live debt clock for each state, projected from official Census figures, with sources. Also {nc} country national debt clocks."
+        title, h1, desc = "US State Debt Clocks: Debt of Every State, Official Data", "US State Debt Clocks", f"State and local debt of {ns} US states, from official Census figures, with sources. Each state ticks forward only where its trend is reliable; otherwise the official figure is shown as published. Also {nc} country national debt clocks."
     else:
         title, h1, desc = "Country Debt Clocks: National Debt by Country, Official Data", "Country Debt Clocks: National Debt by Country", f"National debt of {nc} countries: a live debt clock for each, projected from official government and central-bank figures, with sources and as-of dates. Also {ns} US state debt clocks."
     header = (f'<header class="top"><div class="topin"><a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>{nav_html(places, 1, kind, "plnav")}'
@@ -454,7 +458,7 @@ ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='
 (function f(){T.forEach(k=>{if(!k.r)return;const v=val(k);k.v.textContent=usd(v,0,k.c);k.p.textContent=usd(v/k.pop,2,k.c)});requestAnimationFrame(f)})()})()</script>"""
     WL1 = '<li><a href="../world/">World debt clock</a></li>' if WORLD else ""
     WTXT = ' The <a href="../world/">World Debt Clock</a> adds the countries up in US dollars.' if WORLD else ""
-    body = (f'{header}{ex.search_box("../")}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>{E(h1)}</h1><p>Every place with a live clock, built from figures its own government publishes. Each clock shows who publishes the numbers and how often, '
+    body = (f'{header}{ex.search_box("../")}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>{E(h1)}</h1><p>Every place with a debt clock, built from figures its own government publishes. A clock ticks only where the official trend is reliable; otherwise the official figure is shown as published. Each clock shows who publishes the numbers and how often, '
             f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p></section>'
             f'<main id="app">{sort}{secs}</main>'
             f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')

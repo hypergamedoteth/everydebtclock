@@ -118,9 +118,16 @@ def src_dts():
               fields="record_date,transaction_type,transaction_catg,transaction_fytd_amt")
 
 def src_gdp():
-    u = ("https://api.db.nomics.world/v22/series/BEA/NIPA-T10105/A191RC-Q?observations=1")
-    s = json.loads(get(u))["series"]["docs"][0]
-    return {"period": s["period"][-6:], "value": s["value"][-6:]}
+    """BEA nominal GDP (SAAR, $ millions) via FRED series GDP (BEA's own API needs a key); DBnomics (BEA NIPA T10105) only as a fallback."""
+    try:
+        rows = [l.split(",") for l in get("https://fred.stlouisfed.org/graph/fredgraph.csv?id=GDP&cosd=2024-01-01", timeout=30).strip().splitlines()[1:]]
+        rows = [(d, v) for d, v in rows if v not in ("", ".")][-6:]
+        per = [f"{d[:4]}-Q{(int(d[5:7]) - 1) // 3 + 1}" for d, _ in rows]
+        return {"period": per, "value": [float(v) * 1000 for _, v in rows], "via": "FRED"}
+    except Exception:
+        u = ("https://api.db.nomics.world/v22/series/BEA/NIPA-T10105/A191RC-Q?observations=1")
+        s = json.loads(get(u))["series"]["docs"][0]
+        return {"period": s["period"][-6:], "value": s["value"][-6:], "via": "DBnomics"}
 
 def src_pop():
     url = "https://www.census.gov/popclock/data/population.php/us"
@@ -168,6 +175,7 @@ def unavailable(slug, label, group, source, why):
 
 DTP_URL = "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny"
 MTS_URL = "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/receipts-of-the-u-s-government"
+MTS_URL_T9 = "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government"
 INT_URL = "https://fiscaldata.treasury.gov/datasets/interest-expense-debt-outstanding/interest-expense"
 AIR_URL = "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities"
 DTS_URL = "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/"
@@ -279,17 +287,18 @@ else:
 gdp, gdp_stale = cached("bea_gdp", src_gdp)
 if gdp:
     per, val = gdp["period"], [v * 1e6 for v in gdp["value"]]
-    def qmid(p):
-        y, q = int(p[:4]), int(p[-1]); m = 3 * (q - 1) + 2
-        return dt.datetime(y, m, 15, tzinfo=ET).timestamp()
-    xs = [qmid(p) for p in per[-4:]]; ys = val[-4:]
-    gcalc = ols_calc(per[-4:], xs, ys, "last 4 quarters (mid-quarter anchors)")
-    add("gdp", calc=gcalc, label="GDP (annual rate)", group="economy", kind="usd", base=val[-1], t0=qmid(per[-1]), rate=ols_slope(xs, ys),
-        as_of=per[-1], source=BEA_URL, source_name="BEA NIPA Table 1.1.5 (via DBnomics mirror)",
-        method=f"Nominal GDP, seasonally adjusted annual rate, {per[-1]} = ${val[-1]/1e12:.3f}T. Ticks at the trend of the last 4 quarters, anchored at mid-quarter.",
+    # BEA publishes a quarter's advance estimate ~1 month after quarter end, then a second and third estimate a month apart.
+    qy, qq = int(per[-1][:4]), int(per[-1][-1]); qend = dt.date(qy + (qq == 4), (qq * 3) % 12 + 1, 1)
+    age = (dt.datetime.fromtimestamp(NOW, ET).date() - qend).days
+    vint = "advance estimate" if age < 60 else "second estimate" if age < 90 else "estimate (latest vintage)"
+    GDP_VINT = f"BEA {vint}, {per[-1]}"
+    # No extrapolation: GDP is a quarterly figure, so the ratios that use it hold at the latest print until BEA publishes the next one.
+    add("gdp", label="GDP (annual rate)", group="economy", kind="usd", base=val[-1], rate=0, t0=NOW, fixed=True,
+        as_of=per[-1], badge=f"FIXED · {GDP_VINT}", basis_txt=f"{GDP_VINT} (BEA via FRED)", source="https://fred.stlouisfed.org/series/GDP", source_name=f"{GDP_VINT} (FRED series GDP, BEA NIPA Table 1.1.5)",
+        method=f"Nominal GDP, seasonally adjusted annual rate: {GDP_VINT} = ${val[-1]/1e12:.3f}T. Not projected: it changes only when BEA publishes a new quarter or revises this one. The debt and deficit ratios on this site divide by this figure.",
         stale=gdp_stale)
 else:
-    unavailable("gdp", "GDP (annual rate)", "economy", BEA_URL, "BEA/DBnomics unreachable and no cache")
+    unavailable("gdp", "GDP (annual rate)", "economy", BEA_URL, "BEA/FRED unreachable and no cache")
 
 # ---- MTS + DTS: FYTD receipts/outlays (budget basis), re-based every business day from the Daily Treasury Statement
 mts, mts_stale = cached("mts_table9", src_mts9)
@@ -450,16 +459,55 @@ if mts:
                 as_of=base_d or dt.datetime.fromtimestamp(FY_START, ET).date().isoformat(), fy=FY, ttm=ttm,
                 prev_fy_total=val(prev_fy_end_d, codes, "current_fytd_rcpt_outly_amt") if prev_fy_end_d else None,
                 source=MTS_URL, source_name="Treasury, Monthly Treasury Statement", method="DTS unavailable; MTS-only projection at the trailing 12-month pace.", stale=True, basis="mts")
+    # Customs duties are the one source that is not a share of the total: the MTS figure is net of refunds (it was negative in
+    # May-Jul 2026), so a trailing-12-month MTS share says little about this month. We show the Daily Treasury Statement's
+    # actual FYTD customs deposits (gross, before refunds) instead, and rescale the other revenue sources so the Sankey still adds up.
+    CUS = None
+    if dts_daily and dtsset and dtsset["latest"]["fy"] == FY:
+        fy0 = dt.datetime.fromtimestamp(FY_START, ET).date().isoformat(); dl = dtsset["latest"]["date"]
+        days = sorted(d for d in dts_daily if fy0 <= d <= dl)
+        if days:
+            d90 = [d for d in dts_daily if (dt.date.fromisoformat(dl) - dt.date.fromisoformat(d)).days < 90 and d <= dl]
+            cus_net_txt = "net customs in the latest MTS months: " + ", ".join(f"{d[:7]} {'−' if val(d, ['100'], 'current_month_rcpt_outly_amt') < 0 else ''}${abs(val(d, ['100'], 'current_month_rcpt_outly_amt'))/1e9:,.1f}B" for d in dates[-4:])
+            CUS = {"fytd": sum(dts_daily[d]["cus"] for d in days), "date": dl,
+                   "rate": sum(dts_daily[d]["cus"] for d in d90) / (90 * 86400)}
     def split(group, items, parent):
         P = T[parent]; tot = amount(TOTALS[parent][1])
+        sh_cus = amount(["100"]) / tot if (CUS and parent == "revenue") else 0.0
         for slug, (label, codes) in items.items():
             sh = amount(codes) / tot
             prev = val(prev_fy_end_d, codes, "current_fytd_rcpt_outly_amt") if prev_fy_end_d else None
-            add(slug, label=label, group=group, kind="usd", mode="fytd", base=P["base"] * sh, t0=P["t0"], rate=P["rate"] * sh, as_of=P["as_of"],
-                fy=FY, prev_fy_total=prev, share=sh, source=MTS_URL, source_name="Treasury MTS Table 9 (share) × daily total",
-                method=f"{sh*100:.2f}% of {P['label'].lower()} (its share over {share_basis}), applied to the daily re-based FY{FY} total. FY{FY-1} final: ${(prev or 0)/1e9:,.1f}B.",
-                stale=P.get("stale"), lines=codes, calc={"type": "share", "parent": parent, "share": sh, "basis": share_basis, "mts_lines": codes})
+            common = dict(group=group, kind="usd", mode="fytd", t0=P["t0"], as_of=P["as_of"], fy=FY, prev_fy_total=prev, lines=codes, stale=P.get("stale"))
+            if CUS and slug == "rev_customs":
+                add(slug, label="Customs duties (tariffs), gross deposits", base=CUS["fytd"], rate=CUS["rate"], t0=eod_et(CUS["date"]), as_of=CUS["date"],
+                    **{k: v for k, v in common.items() if k not in ("t0", "as_of")}, share=None, basis="dts_gross", badge=f"DTS GROSS · through {CUS['date']}",
+                    source=DTS_TABLE_URL, source_name="Treasury Daily Treasury Statement, customs deposits (gross, before refunds)",
+                    method=(f"FY{FY} to date customs duties deposited, through {CUS['date']}: ${CUS['fytd']/1e9:,.2f}B, summed from the Daily Treasury Statement lines "
+                            f"'DHS - Customs Duties, Taxes, and Fees' and 'DHS - Customs and Certain Excise Taxes'. This is gross cash deposited, before refunds; the Monthly Treasury Statement "
+                            f"reports customs net of refunds, so it is lower: {cus_net_txt}. "
+                            f"Ticks at the average daily deposit pace of the last 90 days. FY{FY-1} final (MTS, net): ${(prev or 0)/1e9:,.1f}B."),
+                    calc={"type": "share", "parent": parent, "share": None, "basis": "DTS gross customs deposits", "mts_lines": codes})
+                continue
+            if CUS and parent == "revenue":   # rescale the rest so sources still sum to the revenue total
+                k = (P["base"] - CUS["fytd"]) / (P["base"] * (1 - sh_cus)) if P["base"] else 1
+                kr = (P["rate"] - CUS["rate"]) / (P["rate"] * (1 - sh_cus)) if P["rate"] else 1
+            else: k = kr = 1
+            add(slug, label=label, base=P["base"] * sh * k, rate=P["rate"] * sh * kr, share=sh, modeled=True,
+                source=MTS_URL_T9, source_name="Treasury MTS Table 9 (share) × daily total: modeled estimate",
+                method=(f"MODELED ESTIMATE, not an official published figure. Treasury does not publish {label.lower()} day by day, so we take {sh*100:.2f}% of {P['label'].lower()} "
+                        f"(its share of the monthly Treasury statements over {share_basis}) and apply it to the daily re-based FY{FY} total. Real monthly figures can differ a lot from this, "
+                        f"especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY{FY-1} final (MTS): ${(prev or 0)/1e9:,.1f}B."),
+                calc={"type": "share", "parent": parent, "share": sh, "basis": share_basis, "mts_lines": codes}, **common)
     split("revenue", REV, "revenue"); split("spending", OUT, "spending")
+    # Net interest as a share of revenue: official MTS Table 9 over the last 12 published months (not a ticking FYTD ratio: in
+    # October one month of interest over one seasonally low month of receipts overstates the share).
+    ni, rc = sum(val(d, ["320"], "current_month_rcpt_outly_amt") for d in last12), sum(val(d, ["120"], "current_month_rcpt_outly_amt") for d in last12)
+    if rc:
+        add("interest_share", label="Net interest as share of revenue", group="ratios", kind="pct", base=ni / rc * 100, rate=0, t0=NOW, fixed=True,
+            as_of=last12[-1][:7], badge=f"FIXED · official, 12 months to {last12[-1][:7]}", basis_txt=f"official, 12 months to {last12[-1][:7]}",
+            source=MTS_URL_T9, source_name="Treasury Monthly Statement, Table 9 (net interest ÷ total receipts)",
+            method=(f"Net interest (${ni/1e9:,.1f}B) ÷ total federal receipts (${rc/1e9:,.1f}B) over the 12 monthly Treasury statements {last12[0][:7]} to {last12[-1][:7]}. "
+                    "Official figures only; it changes when Treasury publishes a new month. It is not a fiscal-year-to-date ratio: early in a fiscal year one month of interest over one month of receipts overstates the share."))
     sp, rv = T["spending"], T["revenue"]
     add("deficit", label="Federal deficit", group="fytd", kind="usd", mode="fytd", base=sp["base"] - rv["base"], t0=sp["t0"],
         rate=sp["rate"] - rv["rate"], as_of=sp["as_of"], fy=FY, prev_fy_total=(sp["prev_fy_total"] or 0) - (rv["prev_fy_total"] or 0),
@@ -725,11 +773,9 @@ if omb:
 # ---- derived ratio metadata (computed live in the browser from ticking parts)
 DERIVED = {
     "debt_gdp_now": {"label": "Debt-to-GDP, now", "num": "debt_total", "den": "gdp", "kind": "pct", "group": "ratios",
-                     "method": "Live national debt ÷ live GDP (annual rate). Both tick."},
+                     "method": "Live national debt (ticking) ÷ the latest BEA GDP print (annual rate; not extrapolated, it changes only when BEA publishes). For a ratio on the official Treasury close, divide the latest Debt to the Penny figure by the same GDP."},
     "deficit_gdp_now": {"label": "Deficit-to-GDP, trailing 12 months", "num_ttm": ["spending", "revenue"], "den": "gdp", "kind": "pct", "group": "ratios",
-                        "method": "Last 12 months of official MTS outlays minus receipts ÷ live GDP."},
-    "interest_share": {"label": "Net interest as share of revenue", "num": "out_interest", "den": "revenue", "kind": "pct", "group": "ratios",
-                       "method": "FY-to-date net interest ÷ FY-to-date revenue (both ticking)."},
+                        "method": "Last 12 published months of official MTS outlays minus receipts, divided by the latest BEA GDP print (annual rate; not extrapolated)."},
     "interest_annual": {"label": "Annual interest on today's debt", "kind": "usd", "group": "interest",
                         "method": "Live national debt × Treasury's average interest rate on all interest-bearing debt. What a year of interest costs at today's debt and rates."},
     "interest_per_day": {"label": "Interest cost per day", "kind": "usd", "group": "interest",
