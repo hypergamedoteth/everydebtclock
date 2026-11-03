@@ -27,6 +27,7 @@ def load(R):
 def _d(s): return dt.date.fromisoformat(s)
 def _fd(s): return _d(s).strftime("%b %-d, %Y")
 GDP_BY_SLUG = {}  # slug -> IMF GDP (US$ bn), set by build.py; ranks countries in the Explore links
+WEALTH = False  # set by wealth_build.prep() when the Wealth tab is built
 WORLD = False  # set by build.py when the World Debt Clock page is built, so every nav/link to /world/ is only emitted when it exists
 CUR = "$"  # currency symbol for the page being rendered ("$" for US places, "C$" for Canada); set by _cur(p)
 def _cur(p): global CUR; CUR = (p.get("currency") or {}).get("symbol", "$"); return CUR
@@ -89,6 +90,7 @@ def nav_html(places, depth, current=None, cls="pl"):
     items = [(up or "./", "United States", current == "us")]
     items += [(f"{up}{d}/", lab, current == k) for k, d, lab, _ in SECTIONS if k in kinds]
     if WORLD and "country" in kinds: items.append((f"{up}world/", "World", current == "world"))
+    if WEALTH: items.append((f"{up}wealth/", "Wealth", current == "wealth"))
     return f'<nav class="{cls}">' + "".join(f'<a href="{h}"{" class=on" if on else ""}>{lab}</a>' for h, lab, on in items) + "</nav>"
 
 def hub_label(places, short=False):

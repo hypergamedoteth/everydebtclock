@@ -1,0 +1,846 @@
+{
+ "_doc": "Source data for /wealth/. One record per fund. Every figure carries its source, date and basis. basis: official | official_converted (official local-currency figure converted at the stated official rate) | estimate (third party).",
+ "ranking": {
+  "source": "Global SWF ranking (October 2026), entries classed as sovereign wealth funds (type SWF), by AuM",
+  "url": "https://globalswf.com/ranking"
+ },
+ "funds": [
+  {
+   "slug": "norway-government-pension-fund-global",
+   "name": "Government Pension Fund Global (Norway)",
+   "short": "GPFG / NBIM",
+   "nick": "Norway Sovereign Wealth Fund",
+   "manager": "Norges Bank Investment Management (NBIM)",
+   "country": "Norway",
+   "iso3": "NOR",
+   "place_slug": null,
+   "est": 1990,
+   "swf_rank": 1,
+   "blurb": "Norway's oil fund, managed by NBIM for the Ministry of Finance. It owns shares in about 7,100 listed companies.",
+   "assets": {
+    "usd_bn": 2293.0,
+    "basis": "official_converted",
+    "local": {
+     "code": "NOK",
+     "amount_bn": 22014,
+     "label": "NOK 22,014 billion"
+    },
+    "as_of": "2026-09-30",
+    "source": {
+     "name": "NBIM, key figures Q3 2026",
+     "url": "https://www.nbim.no/en/news-and-insights/the-press/press-releases/2026/negative-return-in-the-third-quarter/",
+     "published": "2026-10-22",
+     "locator": "\"The fund was valued at 22,014 billion kroner on 30 September 2026\""
+    },
+    "fx": {
+     "rate": 0.10416,
+     "date": "2026-09-30",
+     "source": "ECB euro reference rates (USD 1.1355 and NOK 10.9015 per EUR)",
+     "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.NOK+USD.EUR.SP00.A?startPeriod=2026-09-30&endPeriod=2026-09-30",
+     "quote": "NOK→USD via EUR"
+    }
+   },
+   "quality": "full",
+   "pop": {
+    "value": 5636904,
+    "as_of": "2026-07-01",
+    "source": "Statistics Norway (SSB), population",
+    "url": "https://www.ssb.no/en/befolkning/folketall/statistikk/befolkning",
+    "office": true,
+    "scope": "Total resident population"
+   },
+   "alloc": {
+    "as_of": "2026-09-30",
+    "source": {
+     "name": "NBIM, key figures Q3 2026",
+     "url": "https://www.nbim.no/en/news-and-insights/the-press/press-releases/2026/negative-return-in-the-third-quarter/",
+     "published": "2026-10-22",
+     "locator": "Share of fund by asset class"
+    },
+    "unit": null,
+    "rows": [
+     {
+      "name": "Equities",
+      "pct": 72.1
+     },
+     {
+      "name": "Fixed income (bonds)",
+      "pct": 25.8
+     },
+     {
+      "name": "Unlisted real estate",
+      "pct": 1.6
+     },
+     {
+      "name": "Unlisted renewable energy infrastructure",
+      "pct": 0.5
+     }
+    ],
+    "note": "Shares of the fund's value as published by NBIM. NBIM also publishes every individual holding."
+   },
+   "regions": {
+    "title": "Equity portfolio by region",
+    "as_of": "2026-06-30",
+    "source": {
+     "name": "NBIM, half-year report 2026",
+     "url": "https://www.nbim.no/en/news-and-insights/reports/2026/half-year-report-2026/web-report-half-year-report-2026/",
+     "published": "August 2026",
+     "locator": "Table 4, share of equity investments"
+    },
+    "rows": [
+     {
+      "name": "North America",
+      "pct": 57.0,
+      "dp": 1
+     },
+     {
+      "name": "Europe",
+      "pct": 20.1,
+      "dp": 1
+     },
+     {
+      "name": "Asia and Oceania",
+      "pct": 12.9,
+      "dp": 1
+     },
+     {
+      "name": "Emerging markets",
+      "pct": 10.5,
+      "dp": 1
+     }
+    ],
+    "note": "As published: the shares add to 100.5% because the half-year report footnote says cash and derivatives are not included."
+   },
+   "holdings": {
+    "as_of": "2026-06-30",
+    "source": {
+     "name": "NBIM, fund page: largest equity holdings",
+     "url": "https://www.nbim.no/en/",
+     "published": "updated twice a year",
+     "locator": "Largest equity holdings"
+    },
+    "unit": "NOK bn",
+    "rows": [
+     {
+      "name": "NVIDIA",
+      "value": 612
+     },
+     {
+      "name": "Apple",
+      "value": 522
+     },
+     {
+      "name": "Alphabet",
+      "value": 499
+     },
+     {
+      "name": "Microsoft",
+      "value": 347
+     },
+     {
+      "name": "Taiwan Semiconductor Manufacturing",
+      "value": 332
+     },
+     {
+      "name": "Amazon",
+      "value": 315
+     },
+     {
+      "name": "Broadcom",
+      "value": 232
+     },
+     {
+      "name": "Samsung Electronics",
+      "value": 223
+     },
+     {
+      "name": "ASML",
+      "value": 175
+     },
+     {
+      "name": "SK hynix",
+      "value": 174
+     }
+    ],
+    "note": "NBIM publishes every holding, twice a year; the ten largest equity positions are shown."
+   },
+   "notes": [
+    "NBIM's half-year report names the fund's three largest government bond holdings as US, Japanese and German bonds (30 June 2026)."
+   ],
+   "other_funds": "Norway also has the Government Pension Fund Norway (managed by Folketrygdfondet), a separate, much smaller fund."
+  },
+  {
+   "slug": "safe-investment-company",
+   "name": "SAFE Investment Company (China)",
+   "short": "SAFE IC",
+   "nick": "China SAFE Investment Company",
+   "manager": "State Administration of Foreign Exchange (SAFE), through SAFE Investment Company",
+   "country": "China",
+   "iso3": "CHN",
+   "place_slug": "china",
+   "est": null,
+   "swf_rank": 2,
+   "blurb": "The investment arm that manages part of China's foreign exchange reserves. It publishes neither its assets nor its allocation.",
+   "assets": {
+    "usd_bn": 2047,
+    "basis": "estimate",
+    "local": null,
+    "as_of": "2026-10",
+    "source": {
+     "name": "Global SWF, Ranking of sovereign and public pension funds (October 2026)",
+     "url": "https://globalswf.com/ranking",
+     "published": "October 2026",
+     "locator": "AuM ($b) column"
+    },
+    "estimate_note": "SAFE IC does not publish its total assets. This is Global SWF's estimate, not an official figure."
+   },
+   "quality": "estimate",
+   "pop": {
+    "value": 1404890000,
+    "as_of": "2025-12-31",
+    "source": "National Bureau of Statistics of China, 2025 statistical communique",
+    "url": "https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html",
+    "office": true,
+    "scope": "Mainland China: 31 provinces, autonomous regions and municipalities plus servicemen; excludes Hong Kong, Macao, Taiwan and foreigners"
+   },
+   "alloc": null,
+   "regions": null,
+   "holdings": null,
+   "notes": [
+    "SAFE publishes China's official foreign exchange reserves, but not how much of them SAFE IC manages or what it holds."
+   ],
+   "other_funds": "China has two large sovereign funds on this list: SAFE IC and China Investment Corporation (CIC)."
+  },
+  {
+   "slug": "china-investment-corporation",
+   "name": "China Investment Corporation",
+   "short": "CIC",
+   "nick": "China Investment Corporation (CIC)",
+   "manager": "China Investment Corporation",
+   "country": "China",
+   "iso3": "CHN",
+   "place_slug": "china",
+   "est": 2007,
+   "swf_rank": 3,
+   "blurb": "China's sovereign wealth fund. It runs an overseas portfolio and, through Central Huijin, holds state stakes in China's big banks and financial firms.",
+   "assets": {
+    "usd_bn": 1567.334,
+    "basis": "official",
+    "local": null,
+    "local_note": "CIC reports in US dollars.",
+    "as_of": "2024-12-31",
+    "source": {
+     "name": "CIC Annual Report 2024, consolidated balance sheet",
+     "url": "https://www.china-inv.cn/chinainven/xhtml/Media/2024EN.pdf",
+     "published": "2025-12-09",
+     "locator": "Total Assets US$1,567,334 million; net assets US$1.37 trillion"
+    },
+    "note": "Total assets of the CIC group, which includes Central Huijin's domestic financial holdings (long-term equity investments US$967.8 billion), not only the overseas portfolio. The 2025 annual report is not yet out."
+   },
+   "quality": "full",
+   "pop": {
+    "value": 1404890000,
+    "as_of": "2025-12-31",
+    "source": "National Bureau of Statistics of China, 2025 statistical communique",
+    "url": "https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html",
+    "office": true,
+    "scope": "Mainland China: 31 provinces, autonomous regions and municipalities plus servicemen; excludes Hong Kong, Macao, Taiwan and foreigners"
+   },
+   "alloc": {
+    "title": "Overseas (global investment) portfolio",
+    "as_of": "2024-12-31",
+    "source": {
+     "name": "CIC Annual Report 2024",
+     "url": "https://www.china-inv.cn/chinainven/xhtml/Media/2024EN.pdf",
+     "published": "2025-12-09",
+     "locator": "Global Investment Portfolio Distribution"
+    },
+    "unit": null,
+    "rows": [
+     {
+      "name": "Alternative assets (hedge funds, private equity, private credit, real estate, infrastructure, resources)",
+      "pct": 48.49
+     },
+     {
+      "name": "Public equity",
+      "pct": 34.65
+     },
+     {
+      "name": "Fixed income",
+      "pct": 15.53
+     },
+     {
+      "name": "Cash products and others",
+      "pct": 1.33
+     }
+    ],
+    "note": "Covers the overseas investment portfolio only. CIC does not split the alternatives line into private equity, real estate and the rest."
+   },
+   "regions": null,
+   "holdings": null,
+   "notes": [
+    "Ten-year annualised net return on overseas investments: 6.92% in US dollars (CIC Annual Report 2024).",
+    "Central Huijin, a CIC subsidiary, manages state-owned financial capital of CNY 6.87 trillion (end-2024)."
+   ],
+   "other_funds": "China has two large sovereign funds on this list: SAFE IC and China Investment Corporation (CIC)."
+  },
+  {
+   "slug": "gic",
+   "name": "GIC (Singapore)",
+   "short": "GIC",
+   "nick": "Singapore GIC Sovereign Wealth Fund",
+   "manager": "GIC Private Limited",
+   "country": "Singapore",
+   "iso3": "SGP",
+   "place_slug": "singapore",
+   "est": 1981,
+   "swf_rank": 4,
+   "blurb": "Singapore's fund that manages the government's reserves. It publishes returns and a three-group asset mix, but not its total assets.",
+   "assets": {
+    "usd_bn": 1161,
+    "basis": "estimate",
+    "local": null,
+    "as_of": "2026-10",
+    "source": {
+     "name": "Global SWF, Ranking of sovereign and public pension funds (October 2026)",
+     "url": "https://globalswf.com/ranking",
+     "published": "October 2026",
+     "locator": "AuM ($b) column"
+    },
+    "estimate_note": "GIC does not publish the size of the portfolio. This is Global SWF's estimate, not an official figure."
+   },
+   "quality": "partial",
+   "pop": {
+    "value": 6208523,
+    "as_of": "2026-06-30",
+    "source": "Singapore Department of Statistics, Population Trends 2026",
+    "url": "https://www.singstat.gov.sg/find-data/explore-data-themes/population/population-and-population-structure/latest-news-data",
+    "office": true,
+    "scope": "Total population incl. non-residents (1.98 million); citizens 3,684,888"
+   },
+   "alloc": {
+    "as_of": "2026-03-31",
+    "source": {
+     "name": "GIC, Report on the Management of the Government's Portfolio 2025/26",
+     "url": "https://www.gic.com.sg/uploads/sites/2/2026/07/GIC_AR_2025-26_PRINT.pdf",
+     "published": "2026-07",
+     "locator": "Table 2, Asset Mix"
+    },
+    "unit": null,
+    "rows": [
+     {
+      "name": "Equities (public and private)",
+      "pct": 56
+     },
+     {
+      "name": "Fixed income",
+      "pct": 22
+     },
+     {
+      "name": "Real assets (real estate, infrastructure and other)",
+      "pct": 22
+     }
+    ],
+    "note": "GIC reports three broad asset groups that cover both public and private markets. It does not publish separate weights for bonds, real estate or private equity."
+   },
+   "regions": {
+    "title": "Geographic mix",
+    "as_of": "2026-03-31",
+    "source": {
+     "name": "GIC, Report on the Management of the Government's Portfolio 2025/26",
+     "url": "https://www.gic.com.sg/uploads/sites/2/2026/07/GIC_AR_2025-26_PRINT.pdf",
+     "published": "2026-07",
+     "locator": "Table 3, Geographic Mix"
+    },
+    "rows": [
+     {
+      "name": "Americas",
+      "pct": 53
+     },
+     {
+      "name": "Asia Pacific",
+      "pct": 22
+     },
+     {
+      "name": "Europe, Middle East and Africa",
+      "pct": 19
+     },
+     {
+      "name": "Global (funds, commodities and supranational debt without geographic detail)",
+      "pct": 6
+     }
+    ]
+   },
+   "holdings": null,
+   "notes": [
+    "Annualised 20-year real return to 31 March 2026: 3.4% above global inflation (5.6% nominal, in US dollars)."
+   ],
+   "other_funds": "Singapore's other large sovereign fund is Temasek."
+  },
+  {
+   "slug": "adia",
+   "name": "Abu Dhabi Investment Authority",
+   "short": "ADIA",
+   "nick": "Abu Dhabi Investment Authority (ADIA)",
+   "manager": "Abu Dhabi Investment Authority",
+   "country": "United Arab Emirates",
+   "iso3": "ARE",
+   "place_slug": null,
+   "est": 1976,
+   "swf_rank": 5,
+   "blurb": "Abu Dhabi's largest fund. It does not publish its assets; it publishes allocation ranges and long-term returns.",
+   "assets": {
+    "usd_bn": 1128,
+    "basis": "estimate",
+    "local": null,
+    "as_of": "2026-10",
+    "source": {
+     "name": "Global SWF, Ranking of sovereign and public pension funds (October 2026)",
+     "url": "https://globalswf.com/ranking",
+     "published": "October 2026",
+     "locator": "AuM ($b) column"
+    },
+    "estimate_note": "ADIA does not disclose its assets under management. This is Global SWF's estimate, not an official figure."
+   },
+   "quality": "partial",
+   "pop": {
+    "value": 11346000,
+    "as_of": "mid-2025",
+    "source": "IMF World Economic Outlook, October 2026 (population estimate)",
+    "url": "https://www.imf.org/external/datamapper/LP@WEO",
+    "office": false,
+    "scope": "UAE total population (includes the large expatriate population)"
+   },
+   "alloc": {
+    "as_of": "2025",
+    "title": "Long-term strategy portfolio: allocation ranges",
+    "ranges": true,
+    "source": {
+     "name": "ADIA 2025 Review",
+     "url": "https://www.adia.ae/en/pr/2025/pdf/adia-annual-review-2025_final.pdf",
+     "published": "",
+     "locator": "Long-Term Strategy Portfolio: Portfolio by Asset Class"
+    },
+    "unit": null,
+    "rows": [
+     {
+      "name": "Developed market equities",
+      "lo": 32,
+      "hi": 42
+     },
+     {
+      "name": "Emerging market equities",
+      "lo": 7,
+      "hi": 15
+     },
+     {
+      "name": "Small-cap equities",
+      "lo": 1,
+      "hi": 5
+     },
+     {
+      "name": "Government bonds",
+      "lo": 7,
+      "hi": 15
+     },
+     {
+      "name": "Credit",
+      "lo": 2,
+      "hi": 7
+     },
+     {
+      "name": "Financial alternatives",
+      "lo": 7,
+      "hi": 12
+     },
+     {
+      "name": "Real estate",
+      "lo": 2,
+      "hi": 7
+     },
+     {
+      "name": "Private equity",
+      "lo": 15,
+      "hi": 20
+     },
+     {
+      "name": "Infrastructure",
+      "lo": 2,
+      "hi": 7
+     },
+     {
+      "name": "Cash",
+      "lo": 0,
+      "hi": 5
+     }
+    ],
+    "note": "These are target ranges within which allocations can move, not actual weights, so they do not add to 100%. ADIA does not publish its actual allocation."
+   },
+   "regions": {
+    "title": "Geography: target ranges",
+    "ranges": true,
+    "as_of": "2025",
+    "source": {
+     "name": "ADIA 2025 Review",
+     "url": "https://www.adia.ae/en/pr/2025/pdf/adia-annual-review-2025_final.pdf",
+     "published": "",
+     "locator": "Long-Term Strategy Portfolio: Portfolio by Geography"
+    },
+    "rows": [
+     {
+      "name": "North America",
+      "lo": 45,
+      "hi": 60
+     },
+     {
+      "name": "Europe",
+      "lo": 15,
+      "hi": 30
+     },
+     {
+      "name": "Emerging markets",
+      "lo": 10,
+      "hi": 20
+     },
+     {
+      "name": "Developed Asia",
+      "lo": 5,
+      "hi": 10
+     }
+    ]
+   },
+   "holdings": null,
+   "notes": [
+    "Annualised returns in US dollars: 6.6% over 20 years and 7.2% over 30 years (ADIA 2025 Review)."
+   ],
+   "other_funds": "The UAE has several large sovereign funds, including Abu Dhabi's ADIA, Mubadala and L'imad, and Dubai's ICD."
+  },
+  {
+   "slug": "kuwait-investment-authority",
+   "name": "Kuwait Investment Authority",
+   "short": "KIA",
+   "nick": "Kuwait Investment Authority (KIA)",
+   "manager": "Kuwait Investment Authority",
+   "country": "Kuwait",
+   "iso3": "KWT",
+   "place_slug": null,
+   "est": 1953,
+   "swf_rank": 6,
+   "blurb": "Kuwait's fund manages the General Reserve Fund and the Future Generations Fund. It does not publish its assets or allocation.",
+   "assets": {
+    "usd_bn": 1002,
+    "basis": "estimate",
+    "local": null,
+    "as_of": "2026-10",
+    "source": {
+     "name": "Global SWF, Ranking of sovereign and public pension funds (October 2026)",
+     "url": "https://globalswf.com/ranking",
+     "published": "October 2026",
+     "locator": "AuM ($b) column"
+    },
+    "estimate_note": "KIA does not publish its assets or allocation. This is Global SWF's estimate, not an official figure."
+   },
+   "quality": "estimate",
+   "pop": {
+    "value": 4978879,
+    "as_of": "mid-2025",
+    "source": "IMF World Economic Outlook, October 2026 (population estimate)",
+    "url": "https://www.imf.org/external/datamapper/LP@WEO",
+    "office": false,
+    "scope": "Total population (about 70% are non-citizens)"
+   },
+   "alloc": null,
+   "regions": null,
+   "holdings": null,
+   "notes": [],
+   "other_funds": null
+  },
+  {
+   "slug": "public-investment-fund",
+   "name": "Public Investment Fund (Saudi Arabia)",
+   "short": "PIF",
+   "nick": "Saudi Arabia Public Investment Fund (PIF)",
+   "manager": "Public Investment Fund",
+   "country": "Saudi Arabia",
+   "iso3": "SAU",
+   "place_slug": "saudi-arabia",
+   "est": 1971,
+   "swf_rank": 7,
+   "blurb": "Saudi Arabia's sovereign fund, which funds the Vision 2030 projects. About three-quarters of its assets are invested inside the Kingdom.",
+   "assets": {
+    "usd_bn": 905.6,
+    "basis": "official_converted",
+    "local": {
+     "code": "SAR",
+     "amount_bn": 3396,
+     "label": "SAR 3,396 billion"
+    },
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "PIF Annual Report 2025, gross assets under management",
+     "url": "https://www.pif.gov.sa/-/media/project/pif-corporate/pif-corporate-site/annual-reports/reports/pif-annual-report-2025-english-hyperlinked.pdf",
+     "published": "2026-08-17",
+     "locator": "Performance Review: \"3,396 BN\" gross AuM"
+    },
+    "fx": {
+     "rate": 0.266667,
+     "date": "fixed peg",
+     "source": "Saudi Central Bank (SAMA) peg: 3.75 riyals per US dollar",
+     "url": "http://sama.gov.sa/en-US/Currency/FinExc/Pages/Currency.aspx",
+     "quote": "SAR 3.75 = USD 1"
+    },
+    "note": "Gross assets under management, which PIF says include SAR 30 billion of receivables from other parties. PIF's balance-sheet total assets differ (consolidated total assets SAR 3,166.5 billion at end-2025)."
+   },
+   "quality": "full",
+   "pop": {
+    "value": 35300280,
+    "as_of": "mid-2024",
+    "source": "General Authority for Statistics (GASTAT), Population Estimates 2024",
+    "url": "https://www.stats.gov.sa/documents/20117/2435273/Population+Estimates+Statistics+2024+EN.pdf/9b71e303-5fd9-19cb-9913-850a9d521639",
+    "office": true,
+    "scope": "Total population: 19.6 million Saudis and 15.7 million non-Saudis (latest official estimate is mid-2024)"
+   },
+   "alloc": {
+    "title": "By investment pool",
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "PIF Annual Report 2025",
+     "url": "https://www.pif.gov.sa/-/media/project/pif-corporate/pif-corporate-site/annual-reports/reports/pif-annual-report-2025-english-hyperlinked.pdf",
+     "published": "2026-08-17",
+     "locator": "Performance Review, gross AuM by pool"
+    },
+    "unit": "SAR bn",
+    "rows": [
+     {
+      "name": "Saudi Equity Holdings",
+      "pct": 33,
+      "amount": 1108
+     },
+     {
+      "name": "Saudi Sector Development",
+      "pct": 29,
+      "amount": 986
+     },
+     {
+      "name": "International Strategic Investments",
+      "pct": 10,
+      "amount": 340
+     },
+     {
+      "name": "Saudi Real Estate and Infrastructure Development",
+      "pct": 7,
+      "amount": 249
+     },
+     {
+      "name": "Saudi Giga-Projects",
+      "pct": 7,
+      "amount": 227
+     },
+     {
+      "name": "International Diversified Pool",
+      "pct": 6,
+      "amount": 220
+     },
+     {
+      "name": "Treasury",
+      "pct": 4,
+      "amount": 133
+     },
+     {
+      "name": "International Capital Markets Program",
+      "pct": 3,
+      "amount": 104
+     }
+    ],
+    "note": "PIF reports by investment pool, not by asset class (equities, bonds and so on). Percentages are as published and may not add to 100% because of rounding. The pools shown add to SAR 3,367 billion, SAR 29 billion less than the total; PIF's footnote says its AuM includes SAR 30 billion of receivables from other parties."
+   },
+   "regions": {
+    "title": "Local versus international",
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "PIF Annual Report 2025",
+     "url": "https://www.pif.gov.sa/-/media/project/pif-corporate/pif-corporate-site/annual-reports/reports/pif-annual-report-2025-english-hyperlinked.pdf",
+     "published": "2026-08-17",
+     "locator": "Performance Review"
+    },
+    "rows": [
+     {
+      "name": "Local investments (Saudi Arabia)",
+      "pct": 76,
+      "amount": 2570
+     },
+     {
+      "name": "International investments",
+      "pct": 20,
+      "amount": 663
+     },
+     {
+      "name": "Treasury",
+      "pct": 4,
+      "amount": 133
+     }
+    ],
+    "unit": "SAR bn"
+   },
+   "sectors": {
+    "title": "By sector (GICS)",
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "PIF Annual Report 2025",
+     "url": "https://www.pif.gov.sa/-/media/project/pif-corporate/pif-corporate-site/annual-reports/reports/pif-annual-report-2025-english-hyperlinked.pdf",
+     "published": "2026-08-17",
+     "locator": "Performance Review, PIF investments by sector"
+    },
+    "rows": [
+     {
+      "name": "Energy",
+      "pct": 28
+     },
+     {
+      "name": "Real estate",
+      "pct": 15
+     },
+     {
+      "name": "Communication services",
+      "pct": 10
+     },
+     {
+      "name": "Information technology",
+      "pct": 9
+     },
+     {
+      "name": "Financials",
+      "pct": 6
+     },
+     {
+      "name": "Materials",
+      "pct": 5
+     },
+     {
+      "name": "Utilities",
+      "pct": 4
+     },
+     {
+      "name": "Industrials",
+      "pct": 4
+     },
+     {
+      "name": "Consumer discretionary",
+      "pct": 2
+     },
+     {
+      "name": "Consumer staples",
+      "pct": 1
+     },
+     {
+      "name": "Healthcare",
+      "pct": 0.4
+     },
+     {
+      "name": "Unclassified (multisector funds, cash and money markets)",
+      "pct": 15
+     }
+    ],
+    "note": "Shares are as published and may not add to 100% because of rounding."
+   },
+   "holdings": null,
+   "notes": [
+    "Average annual total portfolio return of 5.8% since the Vision Realization Program launched in 2017, to December 31, 2025 (PIF Annual Report 2025)."
+   ],
+   "other_funds": null
+  },
+  {
+   "slug": "qatar-investment-authority",
+   "name": "Qatar Investment Authority",
+   "short": "QIA",
+   "nick": "Qatar Investment Authority (QIA)",
+   "manager": "Qatar Investment Authority",
+   "country": "Qatar",
+   "iso3": "QAT",
+   "place_slug": "qatar",
+   "est": 2005,
+   "swf_rank": 8,
+   "blurb": "Qatar's sovereign fund, funded by gas revenue. It does not publish its assets or allocation.",
+   "assets": {
+    "usd_bn": 580,
+    "basis": "estimate",
+    "local": null,
+    "as_of": "2026-10",
+    "source": {
+     "name": "Global SWF, Ranking of sovereign and public pension funds (October 2026)",
+     "url": "https://globalswf.com/ranking",
+     "published": "October 2026",
+     "locator": "AuM ($b) column"
+    },
+    "estimate_note": "QIA does not publish its assets or allocation. This is Global SWF's estimate, not an official figure."
+   },
+   "quality": "estimate",
+   "pop": {
+    "value": 3174926,
+    "as_of": "mid-2025",
+    "source": "IMF World Economic Outlook, October 2026 (population estimate)",
+    "url": "https://www.imf.org/external/datamapper/LP@WEO",
+    "office": false,
+    "scope": "Total population (most residents are non-citizens)"
+   },
+   "alloc": null,
+   "regions": null,
+   "holdings": null,
+   "notes": [],
+   "other_funds": null
+  },
+  {
+   "slug": "turkiye-wealth-fund",
+   "name": "Türkiye Wealth Fund",
+   "short": "TWF",
+   "nick": "Turkey Wealth Fund (Türkiye Varlık Fonu)",
+   "manager": "Türkiye Wealth Fund (TVF)",
+   "country": "Türkiye",
+   "iso3": "TUR",
+   "place_slug": "turkey",
+   "est": 2016,
+   "swf_rank": 10,
+   "blurb": "Türkiye's state holding fund. It consolidates large state companies and banks, so its balance sheet is that of a group.",
+   "assets": {
+    "usd_bn": 442.2,
+    "basis": "official_converted",
+    "local": {
+     "code": "TRY",
+     "amount_bn": 18997.2,
+     "label": "TRY 18,997.2 billion"
+    },
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "TWF consolidated statement of financial position, 31 December 2025 (audited)",
+     "url": "https://www.tvf.com.tr/uploads/file/twf-consolidated-financial-statement-31-december-2025.pdf",
+     "published": "",
+     "locator": "TOTAL ASSETS 18,997,246 (TRY million)"
+    },
+    "fx": {
+     "rate": 0.023275,
+     "date": "2025-12-31",
+     "source": "ECB euro reference rates (USD 1.175 and TRY 50.4838 per EUR)",
+     "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.TRY+USD.EUR.SP00.A?startPeriod=2025-12-31&endPeriod=2025-12-31",
+     "quote": "TRY→USD via EUR"
+    },
+    "note": "Consolidated total assets of the fund and its subsidiaries, including the balance sheets of banks it owns, so it is larger than the value of its equity stakes."
+   },
+   "quality": "total",
+   "pop": {
+    "value": 86092168,
+    "as_of": "2025-12-31",
+    "source": "TurkStat, Address Based Population Registration System results 2025 (bulletin of 9 Feb 2026)",
+    "url": "https://nip.tuik.gov.tr/Home/Adnks",
+    "office": true,
+    "scope": "Resident population at 31 December 2025, as published in TurkStat's bulletin of 9 February 2026 (also reported by Anadolu Agency)"
+   },
+   "alloc": null,
+   "regions": null,
+   "holdings": null,
+   "notes": [
+    "The fund does not publish an asset-class mix; its accounts consolidate its subsidiaries instead."
+   ],
+   "other_funds": null
+  }
+ ]
+}
