@@ -116,7 +116,7 @@ def _invest(f):
     if rg: out += blk(rg["title"], rg, _alloc_table(rg))
     elif f["quality"] != "estimate": out += '<h3>By region</h3><p class="dnote">Not disclosed as a regional mix.</p>'
     if hd: out += blk("Largest holdings", hd, _holdings_table(hd))
-    else: out += '<h3>Notable holdings</h3><p class="dnote">Not disclosed. The fund does not publish a list of its holdings.</p>'
+    else: out += '<h3>Notable holdings</h3><p class="dnote">No holdings table is shown. We only show one when every line can be checked against the fund\'s own report, and none has been for this fund. Any named investments are in its own report, linked under Sources.</p>'
     return out
 
 def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
@@ -231,14 +231,14 @@ def hub_page(R, SITE, with_analytics, og, places, funds, d, place_urls):
     n = len(funds); url = f"{SITE}/wealth/"
     tot = sum(f["usd"] for f in funds) / 1e12
     title = f"Sovereign Wealth Funds Ranked: Assets and Per Citizen"
-    desc = f"The {n} largest sovereign wealth funds ranked by assets, from Norway's {usd_short(funds[0]['usd'] / 1e9)} fund down, with assets per citizen and where the money is invested. Official figures; estimates are labelled."
+    desc = f"{n} sovereign wealth funds ranked by assets, from Norway's {usd_short(funds[0]['usd'] / 1e9)} fund down, with assets per citizen and where the money is invested. Official figures; estimates are labelled."
     img = "og/wealth/index.png"
     if og:
         os.makedirs(f"{R}/og/wealth", exist_ok=True)
         og(f"{R}/{img}", f"Sovereign wealth funds ranked · {n} funds", f"${tot:,.1f} trillion", [("Largest", f"{funds[0]['short']} · {usd_short(funds[0]['usd'] / 1e9)}"), ("Funds", f"{n} · official or labelled estimate")],
            "RANKING", "#38d39f", "The opposite of the debt clocks\nsources linked per fund")
     ld = '<script type="application/ld+json">' + json.dumps({
-        "@context": "https://schema.org", "@type": "Dataset", "name": f"{n} largest sovereign wealth funds: assets and assets per citizen", "description": desc, "url": url,
+        "@context": "https://schema.org", "@type": "Dataset", "name": f"{n} sovereign wealth funds ranked: assets and assets per citizen", "description": desc, "url": url,
         "isAccessibleForFree": True, "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"},
         "isBasedOn": [d["ranking"]["url"]] + [f"{SITE}/{f['url']}" for f in funds]}).replace("</", "<\\/") + "</script>"
     jump = [("table", "Ranking"), ("method", "How it works"), ("funds", "All funds")]
@@ -275,7 +275,7 @@ def hub_page(R, SITE, with_analytics, og, places, funds, d, place_urls):
               f'<p>Machine-readable: <a href="../api/wealth.json">/api/wealth.json</a>.</p></div></section>')
     fl = '<section class="answers" id="funds"><div class="sh"><h2>All funds</h2></div><ul>' + "".join(f'<li><a href="{f["slug"]}/">{E(f["nick"])}</a></li>' for f in funds) + '</ul>' \
          '<div class="sh"><h2>Debt clocks</h2></div><ul><li><a href="../">US national debt clock</a></li><li><a href="../world/">World debt clock</a></li><li><a href="../countries/">All country debt clocks</a></li><li><a href="../states/">All US state debt clocks</a></li></ul></section>'
-    xg = ("".join(f'<a href="../{pu}">{E(f["country"])} debt clock</a>' for f, pu in [(f, place_urls.get(f["slug"])) for f in funds] if pu))
+    xg = ("".join(f'<a href="../{pu}">{E(c)} debt clock</a>' for pu, c in {pu: f["country"] for f in funds for pu in [place_urls.get(f["slug"])] if pu}.items()))
     explore_html = f'<section class="explore" id="explore"><div class="sh"><h2>Explore more clocks</h2></div><div class="xg"><h3>Debt clocks of fund countries</h3><div class="xc">{xg}</div></div></section>' if xg else ""
     page = (pb.meta_head(SITE, url, title, desc, img, 1, pb.PL_CSS + CSS, ld) + _header(places, 1, jump) + ex.search_box("../") + intro + '<main id="app">' + table + method + '</main>' + explore_html + fl + _foot(1) + SORT_JS + "</body></html>")
     os.makedirs(f"{R}/wealth", exist_ok=True)

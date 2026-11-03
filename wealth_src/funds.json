@@ -841,6 +841,613 @@
     "The fund does not publish an asset-class mix; its accounts consolidate its subsidiaries instead."
    ],
    "other_funds": null
+  },
+  {
+   "slug": "temasek",
+   "name": "Temasek Holdings (Singapore)",
+   "short": "Temasek",
+   "nick": "Singapore Temasek",
+   "manager": "Temasek Holdings",
+   "country": "Singapore",
+   "iso3": "SGP",
+   "place_slug": "singapore",
+   "est": 1974,
+   "swf_rank": 11,
+   "blurb": "Singapore's state-owned investment company. It owns its assets directly and reports a net portfolio value, valuing unlisted investments at market since 2026.",
+   "assets": {
+    "usd_bn": 401.0,
+    "basis": "official_converted",
+    "local": {
+     "code": "SGD",
+     "amount_bn": 518,
+     "label": "S$518 billion"
+    },
+    "as_of": "2026-03-31",
+    "source": {
+     "name": "Temasek Review 2026, net portfolio value (NPV)",
+     "url": "https://www.temasek.com.sg/en/news-and-resources/news-room/news/2026/temasek-net-portfolio-value-grows-to-518b-up-49b-from-last-year",
+     "published": "2026-07-08",
+     "locator": "\"Net Portfolio Value of S$518 billion on a mark-to-market basis as at 31 March 2026\""
+    },
+    "fx": {
+     "rate": 0.774131,
+     "date": "2026-03-31",
+     "source": "Temasek's own conversion in the same release: S$518 billion = US$401 billion",
+     "url": "https://www.temasek.com.sg/en/news-and-resources/news-room/news/2026/temasek-net-portfolio-value-grows-to-518b-up-49b-from-last-year",
+     "quote": "S$518b (US$401b)"
+    },
+    "note": "Net portfolio value, not a balance-sheet total. Temasek's financial year ends 31 March. From this year it values unlisted investments at market (mark-to-market) instead of book value, so figures are not comparable with earlier years' reports."
+   },
+   "quality": "full",
+   "pop": {
+    "value": 6208523,
+    "as_of": "2026-06-30",
+    "source": "Singapore Department of Statistics, Population Trends 2026",
+    "url": "https://www.singstat.gov.sg/find-data/explore-data-themes/population/population-and-population-structure/latest-news-data",
+    "office": true,
+    "scope": "Total population incl. non-residents (1.98 million); citizens 3,684,888"
+   },
+   "alloc": {
+    "title": "By portfolio segment",
+    "as_of": "2026-03-31",
+    "source": {
+     "name": "Temasek Review 2026 (news release)",
+     "url": "https://www.temasek.com.sg/en/news-and-resources/news-room/news/2026/temasek-net-portfolio-value-grows-to-518b-up-49b-from-last-year",
+     "published": "2026-07-08",
+     "locator": "\"From Complexity to Clarity\": 43%, 38% and 19% of portfolio value"
+    },
+    "unit": null,
+    "rows": [
+     {
+      "name": "Singapore-based Temasek Portfolio Companies",
+      "pct": 43
+     },
+     {
+      "name": "Global Direct Investments",
+      "pct": 38
+     },
+     {
+      "name": "Partnerships, Funds and Asset Management Companies",
+      "pct": 19
+     }
+    ],
+    "note": "Temasek reports by portfolio segment, not by asset class (equities, bonds and so on). It says listed investments are 63% of the Global Direct Investments segment and unlisted 37%."
+   },
+   "regions": {
+    "title": "Underlying country exposure",
+    "as_of": "2026-03-31",
+    "source": {
+     "name": "Temasek Review 2026 Highlights, performance charts",
+     "url": "https://www.temasekreview.com.sg/downloads/Temasek-Review-2026-Highlights.pdf",
+     "published": "2026-07-08",
+     "locator": "Underlying Country Exposure (%)"
+    },
+    "rows": [
+     {
+      "name": "Singapore",
+      "pct": 27
+     },
+     {
+      "name": "Americas",
+      "pct": 26
+     },
+     {
+      "name": "China",
+      "pct": 17
+     },
+     {
+      "name": "Europe, Middle East and Africa",
+      "pct": 12
+     },
+     {
+      "name": "Asia Pacific (excluding Singapore, China and India)",
+      "pct": 11
+     },
+     {
+      "name": "India",
+      "pct": 7
+     }
+    ],
+    "note": "Based on where the underlying assets are, not where Temasek invests from."
+   },
+   "sectors": {
+    "title": "Underlying sector exposure",
+    "as_of": "2026-03-31",
+    "source": {
+     "name": "Temasek Review 2026 Highlights, performance charts",
+     "url": "https://www.temasekreview.com.sg/downloads/Temasek-Review-2026-Highlights.pdf",
+     "published": "2026-07-08",
+     "locator": "Underlying Sector Exposure (%)"
+    },
+    "rows": [
+     {
+      "name": "Transportation and Industrials (includes Energy and Resources)",
+      "pct": 24
+     },
+     {
+      "name": "Telecommunications, Media and Technology",
+      "pct": 23
+     },
+     {
+      "name": "Financial Services",
+      "pct": 20
+     },
+     {
+      "name": "Consumer and Real Estate",
+      "pct": 11
+     },
+     {
+      "name": "Others (including credit)",
+      "pct": 9
+     },
+     {
+      "name": "Multi-Sector Funds",
+      "pct": 7
+     },
+     {
+      "name": "Life Sciences and Agri-Food",
+      "pct": 6
+     }
+    ],
+    "note": "Percentages are as published."
+   },
+   "holdings": null,
+   "notes": [
+    "Temasek says it owns its assets and does not manage Singapore's Central Provident Fund savings, the Singapore Government's assets or the foreign exchange reserves (Temasek Review 2026 Highlights).",
+    "Temasek reported investing S$51 billion and divesting S$31 billion in the year to 31 March 2026 (Temasek Review 2026)."
+   ],
+   "other_funds": "Singapore's other large sovereign fund is GIC, which manages the country's foreign reserves."
+  },
+  {
+   "slug": "mubadala",
+   "name": "Mubadala Investment Company (Abu Dhabi, UAE)",
+   "short": "Mubadala",
+   "nick": "UAE Mubadala",
+   "manager": "Mubadala Investment Company",
+   "country": "United Arab Emirates",
+   "iso3": "ARE",
+   "place_slug": null,
+   "est": 2002,
+   "swf_rank": 12,
+   "blurb": "Abu Dhabi's state investment company, which invests in the UAE and abroad across private equity, public markets, real estate, infrastructure, credit and alternatives.",
+   "assets": {
+    "usd_bn": 385.0,
+    "basis": "official_converted",
+    "local": {
+     "code": "AED",
+     "amount_bn": 1414,
+     "label": "AED 1,414 billion"
+    },
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "Mubadala Annual Review 2025, assets under management",
+     "url": "https://annual2025.mubadala.com/performance-overview",
+     "published": "2026-04-09",
+     "locator": "Performance Overview: \"Assets Under Management 1,414 BN, US$385 BN\""
+    },
+    "fx": {
+     "rate": 0.272294,
+     "date": "2025-12-31",
+     "source": "Mubadala's own conversion in the same review (AED 1,414 billion = US$385 billion); the dirham is pegged at 3.6725 per US dollar",
+     "url": "https://annual2025.mubadala.com/performance-overview",
+     "quote": "AED 1,414 BN = US$385 BN"
+    },
+    "note": "Assets under management as Mubadala defines them. Mubadala has not published revenue or net income since 2021 and reports multi-year returns instead (5-year IRR 10.7%, 10-year IRR 10.3%)."
+   },
+   "quality": "full",
+   "pop": {
+    "value": 11346000,
+    "as_of": "mid-2025",
+    "source": "IMF World Economic Outlook, October 2026 (population estimate)",
+    "url": "https://www.imf.org/external/datamapper/LP@WEO",
+    "office": false,
+    "scope": "UAE total population (includes the large expatriate population)"
+   },
+   "alloc": {
+    "title": "By asset class",
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "Mubadala Annual Review 2025",
+     "url": "https://annual2025.mubadala.com/performance-overview",
+     "published": "2026-04-09",
+     "locator": "Performance Overview: Portfolio by Asset Class"
+    },
+    "unit": null,
+    "rows": [
+     {
+      "name": "Private markets",
+      "pct": 42
+     },
+     {
+      "name": "Public markets",
+      "pct": 20
+     },
+     {
+      "name": "Real estate and infrastructure",
+      "pct": 17
+     },
+     {
+      "name": "Alternatives",
+      "pct": 16
+     },
+     {
+      "name": "Credit",
+      "pct": 5
+     }
+    ],
+    "note": "Percentages are as published."
+   },
+   "regions": {
+    "title": "By geography",
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "Mubadala Annual Review 2025",
+     "url": "https://annual2025.mubadala.com/performance-overview",
+     "published": "2026-04-09",
+     "locator": "Performance Overview: Portfolio by Geography"
+    },
+    "rows": [
+     {
+      "name": "North America",
+      "pct": 44
+     },
+     {
+      "name": "United Arab Emirates",
+      "pct": 24
+     },
+     {
+      "name": "Europe",
+      "pct": 15
+     },
+     {
+      "name": "Asia-Pacific",
+      "pct": 13
+     },
+     {
+      "name": "Multi-geography",
+      "pct": 3
+     },
+     {
+      "name": "Latin America",
+      "pct": 1
+     }
+    ]
+   },
+   "holdings": null,
+   "notes": [],
+   "other_funds": "The UAE has several large sovereign funds, including Abu Dhabi's ADIA and L'imad, and Dubai's ICD. Mubadala is divided by the same UAE population as the others."
+  },
+  {
+   "slug": "future-fund",
+   "name": "Future Fund (Australia)",
+   "short": "Future Fund",
+   "nick": "Australia Future Fund",
+   "manager": "Future Fund Management Agency",
+   "country": "Australia",
+   "iso3": "AUS",
+   "place_slug": "australia",
+   "est": 2006,
+   "swf_rank": 14,
+   "blurb": "Australia's sovereign wealth fund, set up in 2006 to pre-fund public service pensions. It invests across listed shares, private equity, infrastructure, credit and alternatives.",
+   "assets": {
+    "usd_bn": 199.5,
+    "basis": "official_converted",
+    "local": {
+     "code": "AUD",
+     "amount_bn": 289.744,
+     "label": "A$289.7 billion"
+    },
+    "as_of": "2026-06-30",
+    "source": {
+     "name": "Future Fund Annual Report 2025-26, Future Fund portfolio",
+     "url": "https://content.futurefund.gov.au/FFMA-Annual-Report-2025-26.pdf",
+     "published": "dated 29 September 2026",
+     "locator": "Portfolio exposures: Asset allocation at 30 June 2026, total A$289,744 million"
+    },
+    "fx": {
+     "rate": 0.688709,
+     "date": "2026-06-30",
+     "source": "ECB euro reference rates (USD 1.1394 and AUD 1.6544 per EUR)",
+     "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.AUD+NZD+USD.EUR.SP00.A?startPeriod=2026-06-30&endPeriod=2026-06-30",
+     "quote": "AUD→USD via EUR"
+    },
+    "note": "This is the Future Fund itself. The Board of Guardians also manages six smaller funds (including the Medical Research Future Fund); all seven together are A$356 billion."
+   },
+   "quality": "full",
+   "pop": {
+    "value": 27921150,
+    "as_of": "2026-03-31",
+    "source": "Australian Bureau of Statistics, National, state and territory population, March 2026",
+    "url": "https://www.abs.gov.au/statistics/people/population/national-state-and-territory-population/latest-release",
+    "office": true,
+    "scope": "Estimated resident population of Australia at 31 March 2026"
+   },
+   "alloc": {
+    "title": "By asset class",
+    "as_of": "2026-06-30",
+    "source": {
+     "name": "Future Fund Annual Report 2025-26",
+     "url": "https://content.futurefund.gov.au/FFMA-Annual-Report-2025-26.pdf",
+     "published": "dated 29 September 2026",
+     "locator": "Portfolio exposures: Asset allocation at 30 June 2026"
+    },
+    "unit": "A$ m",
+    "rows": [
+     {
+      "name": "Developed markets equities",
+      "pct": 29.1,
+      "amount": 84380
+     },
+     {
+      "name": "Alternatives",
+      "pct": 14.9,
+      "amount": 43070
+     },
+     {
+      "name": "Private equity",
+      "pct": 12.1,
+      "amount": 35139
+     },
+     {
+      "name": "Infrastructure and timberland",
+      "pct": 11.5,
+      "amount": 33283
+     },
+     {
+      "name": "Australian equities",
+      "pct": 10.5,
+      "amount": 30428
+     },
+     {
+      "name": "Credit",
+      "pct": 8.1,
+      "amount": 23558
+     },
+     {
+      "name": "Cash",
+      "pct": 5.4,
+      "amount": 15716
+     },
+     {
+      "name": "Emerging markets equities",
+      "pct": 4.6,
+      "amount": 13282
+     },
+     {
+      "name": "Property",
+      "pct": 3.8,
+      "amount": 10887
+     }
+    ],
+    "note": "Percentages are as published."
+   },
+   "regions": {
+    "title": "Physical investments by geography",
+    "as_of": "2026-06-30",
+    "source": {
+     "name": "Future Fund Annual Report 2025-26",
+     "url": "https://content.futurefund.gov.au/FFMA-Annual-Report-2025-26.pdf",
+     "published": "dated 29 September 2026",
+     "locator": "Portfolio exposures: Physical investments by geography at 30 June 2026"
+    },
+    "rows": [
+     {
+      "name": "United States",
+      "pct": 42
+     },
+     {
+      "name": "Australia",
+      "pct": 24
+     },
+     {
+      "name": "Europe (excluding UK)",
+      "pct": 11
+     },
+     {
+      "name": "Emerging markets",
+      "pct": 8
+     },
+     {
+      "name": "Japan",
+      "pct": 7
+     },
+     {
+      "name": "United Kingdom",
+      "pct": 5
+     },
+     {
+      "name": "Developed (other)",
+      "pct": 4
+     }
+    ],
+    "note": "As published: the shares add to 101% because of rounding."
+   },
+   "holdings": null,
+   "notes": [],
+   "other_funds": null
+  },
+  {
+   "slug": "new-zealand-superannuation-fund",
+   "name": "New Zealand Superannuation Fund",
+   "short": "NZ Super Fund",
+   "nick": "New Zealand Super Fund",
+   "manager": "Guardians of New Zealand Superannuation",
+   "country": "New Zealand",
+   "iso3": "NZL",
+   "place_slug": null,
+   "est": 2001,
+   "swf_rank": 38,
+   "blurb": "New Zealand's sovereign fund, set up to help pay for future pensions. It is invested mostly in global listed shares, run against a reference portfolio of 80% equities and 20% bonds.",
+   "assets": {
+    "usd_bn": 53.4,
+    "basis": "official_converted",
+    "local": {
+     "code": "NZD",
+     "amount_bn": 94.352,
+     "label": "NZ$94.35 billion"
+    },
+    "as_of": "2026-06-30",
+    "source": {
+     "name": "NZ Super Fund Annual Report 2026, Fund size",
+     "url": "https://nzsuperfund.nz/assets/Publications/Annual-Reports/2026-Annual-Report/NZ-Super-Fund-Annual-Report-2026_web.pdf",
+     "published": "signed 30 September 2026",
+     "locator": "Fund size at 30 June 2026: NZ$94.35 billion (NZ$94,352 million), excluding NZ tax"
+    },
+    "fx": {
+     "rate": 0.565852,
+     "date": "2026-06-30",
+     "source": "ECB euro reference rates (USD 1.1394 and NZD 2.0136 per EUR)",
+     "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.NZD+USD.EUR.SP00.A?startPeriod=2026-06-30&endPeriod=2026-06-30",
+     "quote": "NZD→USD via EUR"
+    },
+    "note": "Fund size as the Guardians report it, excluding New Zealand tax. The Guardians' website shows a later provisional, unaudited NZ$95.6 billion at 30 September 2026; this page uses the audited 30 June figure so that it matches the allocation."
+   },
+   "quality": "full",
+   "pop": {
+    "value": 5357300,
+    "as_of": "2026-06-30",
+    "source": "Stats NZ, National population estimates: At 30 June 2026 (provisional)",
+    "url": "https://www.stats.govt.nz/information-releases/national-population-estimates-at-30-june-2026/",
+    "office": true,
+    "scope": "Provisional estimated resident population of Aotearoa New Zealand, released 18 August 2026"
+   },
+   "alloc": {
+    "title": "By asset class",
+    "as_of": "2026-06-30",
+    "source": {
+     "name": "NZ Super Fund Annual Report 2026",
+     "url": "https://nzsuperfund.nz/assets/Publications/Annual-Reports/2026-Annual-Report/NZ-Super-Fund-Annual-Report-2026_web.pdf",
+     "published": "signed 30 September 2026",
+     "locator": "Investment report: NZ Super Fund asset allocation as at 30 June 2026"
+    },
+    "unit": null,
+    "rows": [
+     {
+      "name": "Listed equities",
+      "pct": 57
+     },
+     {
+      "name": "Fixed income",
+      "pct": 17
+     },
+     {
+      "name": "Alternatives",
+      "pct": 8
+     },
+     {
+      "name": "Private equity",
+      "pct": 5
+     },
+     {
+      "name": "Rural and timber",
+      "pct": 5
+     },
+     {
+      "name": "Property",
+      "pct": 4
+     },
+     {
+      "name": "Infrastructure",
+      "pct": 4
+     },
+     {
+      "name": "Other (cash and miscellaneous)",
+      "pct": 0
+     }
+    ],
+    "note": "Listed equities are 49% developed markets, 4% New Zealand and 4% emerging markets. Fixed income is 8% Treasuries, 6% corporate debt and 3% other. Excludes the effect of strategic tilts. Percentages are as published."
+   },
+   "regions": {
+    "title": "By geography",
+    "as_of": "2026-06-30",
+    "source": {
+     "name": "NZ Super Fund Annual Report 2026, notes to the financial statements",
+     "url": "https://nzsuperfund.nz/assets/Publications/Annual-Reports/2026-Annual-Report/NZ-Super-Fund-Annual-Report-2026_web.pdf",
+     "published": "signed 30 September 2026",
+     "locator": "Concentration of risk by geography and industry, at 30 June 2026 (page 165)"
+    },
+    "rows": [
+     {
+      "name": "North America",
+      "pct": 60
+     },
+     {
+      "name": "Europe",
+      "pct": 18
+     },
+     {
+      "name": "New Zealand",
+      "pct": 8
+     },
+     {
+      "name": "Asia",
+      "pct": 8
+     },
+     {
+      "name": "Other",
+      "pct": 4
+     },
+     {
+      "name": "Australia",
+      "pct": 2
+     }
+    ],
+    "note": "Based on net financial assets at 30 June 2026, as published."
+   },
+   "holdings": null,
+   "notes": [
+    "The Fund's reference portfolio is 80% global equities and 20% bonds; it expects to return at least 7.2% a year over 20-year periods (NZ Super Fund website, 30 September 2026)."
+   ],
+   "other_funds": null,
+   "sectors": {
+    "title": "By industry",
+    "as_of": "2026-06-30",
+    "source": {
+     "name": "NZ Super Fund Annual Report 2026, notes to the financial statements",
+     "url": "https://nzsuperfund.nz/assets/Publications/Annual-Reports/2026-Annual-Report/NZ-Super-Fund-Annual-Report-2026_web.pdf",
+     "published": "signed 30 September 2026",
+     "locator": "Concentration of risk by geography and industry, at 30 June 2026 (page 165)"
+    },
+    "rows": [
+     {
+      "name": "Other",
+      "pct": 24
+     },
+     {
+      "name": "Technology",
+      "pct": 21
+     },
+     {
+      "name": "Financial",
+      "pct": 18
+     },
+     {
+      "name": "Government",
+      "pct": 10
+     },
+     {
+      "name": "Healthcare",
+      "pct": 7
+     },
+     {
+      "name": "Real estate",
+      "pct": 7
+     },
+     {
+      "name": "Industrial",
+      "pct": 6
+     },
+     {
+      "name": "Consumer, cyclical",
+      "pct": 4
+     },
+     {
+      "name": "Consumer, non-cyclical",
+      "pct": 3
+     }
+    ],
+    "note": "Based on net financial assets at 30 June 2026, as published."
+   }
   }
  ]
 }
