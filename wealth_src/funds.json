@@ -1448,6 +1448,183 @@
     ],
     "note": "Based on net financial assets at 30 June 2026, as published."
    }
+  },
+  {
+   "slug": "korea-investment-corporation",
+   "name": "Korea Investment Corporation",
+   "short": "KIC",
+   "nick": "Korea Investment Corporation",
+   "manager": "Korea Investment Corporation (KIC)",
+   "country": "South Korea",
+   "iso3": "KOR",
+   "place_slug": "south-korea",
+   "est": 2005,
+   "swf_rank": 15,
+   "blurb": "South Korea's sovereign wealth fund, set up in 2005 to invest part of the country's foreign-exchange reserves and entrusted public funds abroad. It started with US$1 billion and now holds US$232 billion.",
+   "assets": {
+    "usd_bn": 232.0,
+    "basis": "official",
+    "round": true,
+    "local": {
+     "code": "KRW",
+     "amount_bn": 333000,
+     "label": "about KRW 333 trillion"
+    },
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "KIC 2025 Annual Report, 2025 Key Figures",
+     "url": "https://www.kic.kr/annual-report/2025/eng/index.html",
+     "published": "2025 annual report (year-end 2025)",
+     "locator": "Key Performance Indicators: Total AUM USD 232.0 billion (about KRW 333 trillion)"
+    },
+    "note": "KIC reports its assets under management in US dollars as USD 232.0 billion, and gives the won figure as 'about KRW 333 trillion' at KRW 1,434.9 per USD (Seoul Money Brokerage Services, 31 December 2025). The figure is shown rounded as KIC publishes it."
+   },
+   "quality": "full",
+   "pop": {
+    "value": 51820000,
+    "as_of": "2025-11-01",
+    "source": "Statistics Korea (Ministry of Data and Statistics), 2025 Population and Housing Census (register-based)",
+    "url": "https://www.census.go.kr/",
+    "office": true,
+    "scope": "Total population at 1 November 2025, including foreign residents, rounded to ten thousand as published"
+   },
+   "alloc": {
+    "title": "By asset class",
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "KIC 2025 Annual Report, Portfolio Composition and Performance by Asset Class",
+     "url": "https://www.kic.kr/annual-report/2025/eng/index.html",
+     "published": "2025 annual report (year-end 2025)",
+     "locator": "2025 Asset Allocation"
+    },
+    "unit": null,
+    "rows": [
+     {
+      "name": "Equity",
+      "pct": 41.6
+     },
+     {
+      "name": "Fixed income",
+      "pct": 32.8
+     },
+     {
+      "name": "Alternative assets",
+      "pct": 21.9
+     },
+     {
+      "name": "Other",
+      "pct": 3.7
+     }
+    ],
+    "note": "Traditional assets (equity, fixed income, other) are 78.1% and alternative assets 21.9%. Within alternatives KIC lists private equity 7.6%, real estate 5.0%, infrastructure 4.5%, hedge funds 2.6% and private debt 2.0% (these add to 21.7%, as published). Percentages are as published."
+   },
+   "regions": null,
+   "sectors": null,
+   "holdings": null,
+   "notes": [
+    "KIC manages assets entrusted by the Korean government (including foreign-exchange reserves) and by the Bank of Korea; its 'entrusted principal' was USD 118.6 billion at the end of 2025, against cumulative net investment gains of USD 122.4 billion (KIC 2025 Annual Report).",
+    "South Korea's National Pension Service is a much larger public fund, but it is a pension fund and is not in this ranking."
+   ],
+   "other_funds": null
+  },
+  {
+   "slug": "alaska-permanent-fund",
+   "name": "Alaska Permanent Fund",
+   "short": "Alaska PFC",
+   "nick": "Alaska Permanent Fund",
+   "manager": "Alaska Permanent Fund Corporation (APFC)",
+   "country": "Alaska",
+   "iso3": "USA",
+   "place_slug": "alaska",
+   "est": 1976,
+   "swf_rank": 22,
+   "blurb": "A US state sovereign wealth fund, built from Alaska's oil royalties since 1976. It pays an annual dividend to Alaska residents and funds state government through a withdrawal rule.",
+   "assets": {
+    "usd_bn": 88.0454,
+    "basis": "official",
+    "local": null,
+    "local_note": "The fund reports in US dollars.",
+    "as_of": "2026-09-30",
+    "source": {
+     "name": "Alaska Permanent Fund Corporation, Fund Values & Returns",
+     "url": "https://apfc.org/the-fund/performance/",
+     "published": "unaudited, as of 30 October 2026",
+     "locator": "Total Fund Value as of September 30, 2026: $88,045,400,000"
+    },
+    "note": "Unaudited total fund value at 30 September 2026, as APFC shows it on its performance page; it matches 'total fund balances' of US$88,045.4 million on APFC's 30 September 2026 balance sheet. It is a state fund, so per person is per resident of Alaska (about 737,000), not per American."
+   },
+   "quality": "full",
+   "pop": {
+    "value": 737270,
+    "as_of": "2025-07-01",
+    "source": "US Census Bureau, Vintage 2025 state population estimates (NST-EST2025), Alaska",
+    "url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/state/totals/NST-EST2025-ALLDATA.csv",
+    "office": true,
+    "scope": "Resident population of Alaska at 1 July 2025; the state, not the United States as a whole"
+   },
+   "alloc": {
+    "title": "By asset class",
+    "as_of": "2026-09-30",
+    "source": {
+     "name": "Alaska Permanent Fund Balance Sheets (unaudited)",
+     "url": "https://apfc.org/the-fund/performance/",
+     "published": "unaudited, as of 30 October 2026",
+     "locator": "Balance sheet at 30 September 2026: investments by type (US$ m)"
+    },
+    "unit": "US$ m",
+    "rows": [
+     {
+      "name": "Preferred and common stock",
+      "pct": 37.3,
+      "amount": 32592.7,
+      "dp": 1
+     },
+     {
+      "name": "Marketable debt securities",
+      "pct": 20.4,
+      "amount": 17810.3,
+      "dp": 1
+     },
+     {
+      "name": "Private equity",
+      "pct": 17.1,
+      "amount": 14880.9,
+      "dp": 1
+     },
+     {
+      "name": "Real estate",
+      "pct": 9.4,
+      "amount": 8189.4,
+      "dp": 1
+     },
+     {
+      "name": "Absolute return",
+      "pct": 8.2,
+      "amount": 7138.8,
+      "dp": 1
+     },
+     {
+      "name": "Infrastructure",
+      "pct": 4.6,
+      "amount": 4015.1,
+      "dp": 1
+     },
+     {
+      "name": "Private credit",
+      "pct": 3.0,
+      "amount": 2649.0,
+      "dp": 1
+     }
+    ],
+    "note": "Dollar amounts are APFC's own. The percentages are our calculation: each line as a share of total investments of US$87,276.2 million, which leaves out cash and temporary investments (US$2,742.7 million) and receivables. Unaudited."
+   },
+   "regions": null,
+   "sectors": null,
+   "holdings": null,
+   "notes": [
+    "Per person here means per resident of Alaska. The fund is a state fund: the Alaska Permanent Fund Dividend is paid to eligible Alaska residents each year."
+   ],
+   "other_funds": null
   }
  ]
 }
