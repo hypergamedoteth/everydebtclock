@@ -209,7 +209,90 @@
    "notes": [
     "SAFE publishes China's official foreign exchange reserves, but not how much of them SAFE IC manages or what it holds."
    ],
-   "other_funds": "China has two large sovereign funds on this list: SAFE IC and China Investment Corporation (CIC)."
+   "other_funds": "China has two large sovereign funds on this list: SAFE IC and China Investment Corporation (CIC).",
+   "detail": {
+    "summary": "SAFE Investment Company publishes no accounts. Estimates run from about $1,000bn to about $2,050bn, a gap of roughly 2x.",
+    "range": [
+     {
+      "label": "Global SWF ranking",
+      "value": "$2,047bn",
+      "when": "Oct 2026",
+      "source": {
+       "name": "Global SWF ranking, October 2026",
+       "url": "https://globalswf.com/ranking"
+      }
+     },
+     {
+      "label": "Published estimate, sovereignwealthfunds.com",
+      "value": "$1,988bn",
+      "when": "2026",
+      "source": {
+       "name": "SAFE Investment Company profile, SovereignWealthFunds.com",
+       "url": "https://sovereignwealthfunds.com/funds/safe-investment-company-china/"
+      }
+     },
+     {
+      "label": "Press estimate: about a third of China's reserves",
+      "value": "about $1,000bn",
+      "when": "as of 15 Mar 2025",
+      "source": {
+       "name": "South China Morning Post: SAFE's plan for a US$1 trillion reserves fund",
+       "url": "https://www.scmp.com/business/banking-finance/article/3302431/safe-hands-chinas-secret-plan-us1-trillion-reserves-fund-hong-kong"
+      }
+     }
+    ],
+    "why": [
+     {
+      "text": "The only hard anchor is China's official foreign-exchange reserves, which SAFE publishes: $3,400.3bn at the end of September 2026. SAFE IC invests part of them, and nobody outside publishes how much.",
+      "sources": [
+       {
+        "name": "People's Daily / Xinhua: China's FX reserves, end-September 2026",
+        "url": "https://en.people.cn/n3/2026/1007/c90000-20505930.html"
+       }
+      ]
+     },
+     {
+      "text": "The two ends of the range are two different shares of that anchor. A third of reserves is about $1,133bn ($3,400.3bn ÷ 3); the press estimate quoted a third of the $3,227bn reserves of the time. Global SWF's $2,047bn is about 60% of today's reserves ($2,047bn ÷ $3,400.3bn). We could not find Global SWF's fund-level method, so we cannot show how it got there."
+     },
+     {
+      "text": "We could not use US filings. SAFE IC does not appear in SEC Form 13F filings: a full-text search of EDGAR for 13F-HR filings naming \"SAFE Investment\" returned no results. US Treasury data shows mainland China holding $590.7bn and Hong Kong $261.5bn of US Treasuries at the end of August 2026, but those are country totals, not SAFE IC's.",
+      "sources": [
+       {
+        "name": "SEC EDGAR full-text search",
+        "url": "https://www.sec.gov/edgar/search/#/q=%22SAFE%20Investment%22&forms=13F-HR"
+       },
+       {
+        "name": "US Treasury TIC: major foreign holders of Treasuries",
+        "url": "https://ticdata.treasury.gov/Publish/slt_table5.html"
+       }
+      ]
+     }
+    ],
+    "cant": "A 13F-based build-up (no filings), a current list of holdings, and any accounts for SAFE IC itself. The figure is a share of reserves, not a sum of assets.",
+    "owns": {
+     "rows": [
+      {
+       "name": "Rio Tinto, Shell, BP, Barclays, Tesco, Royal Bank of Scotland",
+       "stake": "Listed stakes bought through its Hong Kong arm from 2007; reported small, typically under 1% each",
+       "as_of": "reported March 2009",
+       "source": {
+        "name": "Council on Foreign Relations, citing the Financial Times",
+        "url": "https://www.cfr.org/articles/safe-seems-have-started-buying-us-equities-spring-2007-and-didnt-stop-until-july-2008"
+       }
+      },
+      {
+       "name": "Three Australian banks",
+       "stake": "About A$200m in total",
+       "as_of": "2008",
+       "source": {
+        "name": "SAFE Investment Company profile, SovereignWealthFunds.com",
+        "url": "https://sovereignwealthfunds.com/funds/safe-investment-company-china/"
+       }
+      }
+     ],
+     "note": "No current holdings list exists. These are the only stakes we could trace to SAFE IC, and both date from 2007-08. We do not know whether it still holds them."
+    }
+   }
   },
   {
    "slug": "china-investment-corporation",
@@ -375,7 +458,89 @@
    "notes": [
     "Annualised 20-year real return to 31 March 2026: 3.4% above global inflation (5.6% nominal, in US dollars)."
    ],
-   "other_funds": "Singapore's other large sovereign fund is Temasek."
+   "other_funds": "Singapore's other large sovereign fund is Temasek.",
+   "detail": {
+    "summary": "GIC does not publish its size. The two estimates we found are within 2% of each other.",
+    "range": [
+     {
+      "label": "Global SWF ranking",
+      "value": "$1,161bn",
+      "when": "Oct 2026",
+      "source": {
+       "name": "Global SWF ranking, October 2026",
+       "url": "https://globalswf.com/ranking"
+      }
+     },
+     {
+      "label": "Sovereign Wealth Fund Institute, as reported by Vulcan Post",
+      "value": "$1,180bn",
+      "when": "2026",
+      "source": {
+       "name": "Vulcan Post: Singapore's financial reserves",
+       "url": "https://vulcanpost.com/912561/singapore-financial-reserves-two-trillion/"
+      }
+     }
+    ],
+    "why": [
+     {
+      "text": "The Government declines to publish GIC's size. Its reason: with the figures for MAS and Temasek already public, GIC's number would give away the size of the reserves as a whole.",
+      "sources": [
+       {
+        "name": "Singapore MOF: what are Singapore's reserves?",
+        "url": "https://www.mof.gov.sg/policies/reserves/what-are-singapores-reserves/"
+       },
+       {
+        "name": "GIC FAQs",
+        "url": "https://www.gic.com.sg/who-we-are/faqs/"
+       }
+      ]
+     },
+     {
+      "text": "The budget gives a cross-check, and it fails for sizing GIC. The Net Investment Returns Contribution (NIRC) is S$28.5bn in FY2026. It is up to 50% of the expected long-term real return on the net assets of GIC, MAS and Temasek minus the Government's own liabilities, plus up to 50% of investment income on the remaining reserves. The expected return rate is not published. As an illustration only: if the whole NIRC were half of a 4% real return (our assumption), the net pool would be about S$1.4tn. MAS (S$551bn, June 2026) and Temasek (about S$518bn) are published and add up to about S$1.07tn, which would leave about S$0.36tn for GIC, far below the estimates above. The gap exists because the base is net of Government liabilities and the rate is assumed, so the budget cannot back GIC's size out.",
+      "sources": [
+       {
+        "name": "Singapore MOF: Net Investment Returns Contribution",
+        "url": "https://www.mof.gov.sg/policies/reserves/net-investment-returns-contribution/"
+       },
+       {
+        "name": "GIC FAQs",
+        "url": "https://www.gic.com.sg/who-we-are/faqs/"
+       },
+       {
+        "name": "Vulcan Post: MAS and Temasek figures",
+        "url": "https://vulcanpost.com/912561/singapore-financial-reserves-two-trillion/"
+       }
+      ]
+     },
+     {
+      "text": "So the figure stays a third-party estimate. We show the budget arithmetic so you can see why it cannot replace one."
+     }
+    ],
+    "cant": "GIC's actual assets under management, the expected return rate the Government uses, and the Government liabilities netted off in the NIRC base.",
+    "owns": {
+     "rows": [
+      {
+       "name": "Heathrow Airport (FGP Topco)",
+       "stake": "11.20%",
+       "as_of": "3 Jul 2025",
+       "source": {
+        "name": "Heathrow Funding Ltd supplemental prospectus, July 2025",
+        "url": "https://www.heathrow.com/content/dam/heathrow/web/common/documents/company/investor/offering-related-documents/funding/HFL-Supplemental-Prospectus-July-2025-final-308294089-15.pdf"
+       }
+      },
+      {
+       "name": "Spanish fibre-broadband venture",
+       "stake": "25%",
+       "as_of": "Aug 2025",
+       "source": {
+        "name": "Reuters: Singapore fund GIC buys 25% stake in Spain broadband venture",
+        "url": "https://www.reuters.com/markets/europe/singapore-fund-gic-buys-25-stake-spain-broadband-venture-2025-08-03/"
+       }
+      }
+     ],
+     "note": "GIC publishes its asset mix (shown below), not a holdings list. These are two stakes we could source to a primary document or a Reuters report."
+    }
+   }
   },
   {
    "slug": "adia",
@@ -513,7 +678,122 @@
    "notes": [
     "Annualised returns in US dollars: 6.6% over 20 years and 7.2% over 30 years (ADIA 2025 Review)."
    ],
-   "other_funds": "The UAE has several large sovereign funds, including Abu Dhabi's ADIA, Mubadala and L'imad, and Dubai's ICD."
+   "other_funds": "The UAE has several large sovereign funds, including Abu Dhabi's ADIA, Mubadala and L'imad, and Dubai's ICD.",
+   "detail": {
+    "summary": "ADIA does not publish its assets. Third-party estimates sit within about 7% of each other.",
+    "range": [
+     {
+      "label": "Global SWF ranking",
+      "value": "$1,128bn",
+      "when": "Oct 2026",
+      "source": {
+       "name": "Global SWF ranking, October 2026",
+       "url": "https://globalswf.com/ranking"
+      }
+     },
+     {
+      "label": "Global SWF January 2026 report",
+      "value": "$1,180bn",
+      "when": "Jan 2026",
+      "source": {
+       "name": "Khaleej Times: UAE wealth funds' asset jump",
+       "url": "https://www.khaleejtimes.com/business/uae-adia-icd-mubadala-asset-jump-wealth-fund-next-5-years"
+      }
+     },
+     {
+      "label": "Press estimate, The National",
+      "value": "about $1,100bn",
+      "when": "10 Sep 2026",
+      "source": {
+       "name": "ADIA profile, SovereignWealthFunds.com",
+       "url": "https://sovereignwealthfunds.com/funds/abu-dhabi-investment-authority"
+      }
+     }
+    ],
+    "why": [
+     {
+      "text": "ADIA is funded by Abu Dhabi's budget surpluses, historically from oil, and by deposits from ADNOC. There is no rule on how much is deposited or withdrawn, and neither flow is published.",
+      "sources": [
+       {
+        "name": "Natural Resource Governance Institute: Abu Dhabi profile (2013)",
+        "url": "https://resourcegovernance.org/sites/default/files/NRF_Abu_Dhabi_October2013.pdf"
+       }
+      ]
+     },
+     {
+      "text": "ADIA does publish returns: 6.6% a year over 20 years and 7.2% over 30 years. But a return rate says nothing about the amount it applies to. With no deposit series, we cannot build the fund up from oil revenue and returns without inventing numbers, so we have not.",
+      "sources": [
+       {
+        "name": "ADIA 2025 Review",
+        "url": "https://www.adia.ae/en/pr/2025/pdf/adia-annual-review-2025_final.pdf"
+       }
+      ]
+     },
+     {
+      "text": "So every figure here is a third-party estimate. It is not ADIA's number."
+     }
+    ],
+    "cant": "Any deposit or withdrawal history, and the actual weights inside its published allocation ranges. A return-plus-oil-revenue derivation cannot be done from public data.",
+    "owns": {
+     "rows": [
+      {
+       "name": "AlphaGen (US power company)",
+       "stake": "$500m minority stake",
+       "as_of": "13 Jan 2025",
+       "source": {
+        "name": "Reuters: ADIA invests $500m in AlphaGen",
+        "url": "https://www.reuters.com/markets/deals/sovereign-fund-adia-invests-500-mln-us-power-firm-alphagen-2025-01-13/"
+       }
+      },
+      {
+       "name": "Vantage APAC data-centre platform",
+       "stake": "$600m investment",
+       "as_of": "2025",
+       "source": {
+        "name": "ADIA: infrastructure, 2025 review",
+        "url": "https://www.adia.ae/en/pr/2025a/infrastructure.html"
+       }
+      },
+      {
+       "name": "US data-centre private credit",
+       "stake": "More than $200m",
+       "as_of": "2025",
+       "source": {
+        "name": "ADIA: infrastructure, 2025 review",
+        "url": "https://www.adia.ae/en/pr/2025a/infrastructure.html"
+       }
+      },
+      {
+       "name": "London master-planned residential development",
+       "stake": "Not stated; first homes completed Sep 2025",
+       "as_of": "2025",
+       "source": {
+        "name": "ADIA: real estate, 2025 review",
+        "url": "https://www.adia.ae/en/pr/2025a/real-estate.html"
+       }
+      },
+      {
+       "name": "US senior housing; Greater China logistics and digital assets",
+       "stake": "New 2025 investments; sizes not stated",
+       "as_of": "2025",
+       "source": {
+        "name": "ADIA: real estate, 2025 review",
+        "url": "https://www.adia.ae/en/pr/2025a/real-estate.html"
+       }
+      },
+      {
+       "name": "NIIF Infrastructure Fund II (India)",
+       "stake": "A wholly owned ADIA subsidiary is an investor; amount not stated",
+       "as_of": "31 Aug 2026",
+       "source": {
+        "name": "Reuters: India's state-backed infra fund secures $2bn commitment",
+        "url": "https://www.reuters.com/world/india/indias-state-backed-infra-fund-secures-2-bln-commitment-global-local-investors-2026-08-31/"
+       }
+      }
+     ],
+     "note": "The same review reports 2025 sales of a US student-housing portfolio, Singapore retail assets, Dutch residential assets and UK retail assets, and developments under way in the Bay Area, Stockholm and Sydney. Its allocation ranges are in the next section. We found no 13F filing for ADIA, so there is no US equity list to draw on."
+    }
+   }
   },
   {
    "slug": "kuwait-investment-authority",
@@ -553,7 +833,99 @@
    "regions": null,
    "holdings": null,
    "notes": [],
-   "other_funds": null
+   "other_funds": null,
+   "detail": {
+    "summary": "KIA does not publish its size; its law bars public statements about invested funds. Press estimates have risen from about $846bn to about $1,072bn in under two years.",
+    "range": [
+     {
+      "label": "Global SWF ranking",
+      "value": "$1,002bn",
+      "when": "Oct 2026",
+      "source": {
+       "name": "Global SWF ranking, October 2026",
+       "url": "https://globalswf.com/ranking"
+      }
+     },
+     {
+      "label": "Reuters: \"about $1 trillion\"",
+      "value": "about $1,000bn",
+      "when": "6 Mar 2026",
+      "source": {
+       "name": "Reuters: Gulf sovereign wealth funds were built for a rainy day",
+       "url": "https://www.reuters.com/business/energy/gulf-sovereign-wealth-funds-were-built-rainy-day-this-may-be-it-2026-03-06/"
+      }
+     },
+     {
+      "label": "Press estimates tracked by sovereignwealthfunds.com",
+      "value": "$846bn, $1,002bn, $1,072bn",
+      "when": "Jul 2024, Jul 2025, May 2026",
+      "source": {
+       "name": "KIA profile, SovereignWealthFunds.com",
+       "url": "https://sovereignwealthfunds.com/funds/kuwait-investment-authority"
+      }
+     }
+    ],
+    "why": [
+     {
+      "text": "KIA manages two pools: the General Reserve Fund and the Future Generations Fund. Article 8 of Law 47 of 1982 bars public statements on invested funds, so KIA reports to the Council of Ministers and to a closed session of the National Assembly, not to the public.",
+      "sources": [
+       {
+        "name": "KIA: investments",
+        "url": "https://www.kia.gov.kw/investments/"
+       },
+       {
+        "name": "KIA profile, SovereignWealthFunds.com",
+        "url": "https://sovereignwealthfunds.com/funds/kuwait-investment-authority"
+       }
+      ]
+     },
+     {
+      "text": "The budget route is the obvious one. The Future Generations Fund was seeded in 1976 with half of the reserve fund and, for decades, took at least 10% of state revenue each year, with its income reinvested and withdrawals needing a law. Since Law 18 of 2020 the transfer depends on a budget surplus. That is a rule, not a record: we found no published series of the actual yearly transfers to add up.",
+      "sources": [
+       {
+        "name": "KIA Santiago Principles self-assessment, 2022",
+        "url": "https://www.kia.gov.kw/wp-content/uploads/2022/11/ISFWF-Santiago-Principles-Self-Assessment-KIA-2022.pdf"
+       }
+      ]
+     },
+     {
+      "text": "Even with that series, transfers alone would understate the fund, because 50 years of reinvested returns sit on top. So the figure here stays a third-party estimate."
+     }
+    ],
+    "cant": "The yearly transfers into the Future Generations Fund, the split between the two funds, and any KIA-published total.",
+    "owns": {
+     "rows": [
+      {
+       "name": "Mercedes-Benz Group",
+       "stake": "5.33% of registered capital",
+       "as_of": "30 Jun 2026",
+       "source": {
+        "name": "Mercedes-Benz Group: shareholder structure",
+        "url": "https://group.mercedes-benz.com/investors/share/shareholder-structure/"
+       }
+      },
+      {
+       "name": "GEA Group",
+       "stake": "6.99% (cut after crossing a threshold on 2 Sep 2026)",
+       "as_of": "Sep 2026",
+       "source": {
+        "name": "Kalkine: KIA cuts GEA Group stake to 6.99%",
+        "url": "https://kalkine.co.uk/news/announcements/kuwait-investment-authority-cuts-gea-group-stake-to-699-after-crossing-threshold-on-2-september-2026"
+       }
+      },
+      {
+       "name": "Bank of America and AIA Group",
+       "stake": "Sold about $3.1bn of Bank of America and $3.4bn of AIA stock; remaining stakes not stated",
+       "as_of": "Jul 2025",
+       "source": {
+        "name": "Semafor, citing Bloomberg: Kuwait pares financial stock holdings",
+        "url": "https://www.semafor.com/article/07/09/2025/kuwait-pares-financial-stock-holdings-selling-65b"
+       }
+      }
+     ],
+     "note": "KIA publishes no holdings list. These are stakes disclosed through other companies' shareholder notices and press reports."
+    }
+   }
   },
   {
    "slug": "public-investment-fund",
@@ -787,7 +1159,104 @@
    "regions": null,
    "holdings": null,
    "notes": [],
-   "other_funds": null
+   "other_funds": null,
+   "detail": {
+    "summary": "QIA does not publish its assets. The two estimates we found are about two years apart and differ by about 10%.",
+    "range": [
+     {
+      "label": "Global SWF ranking",
+      "value": "$580bn",
+      "when": "Oct 2026",
+      "source": {
+       "name": "Global SWF ranking, October 2026",
+       "url": "https://globalswf.com/ranking"
+      }
+     },
+     {
+      "label": "Sovereign Wealth Fund Institute, as reported by Global Finance",
+      "value": "$526bn",
+      "when": "30 Oct 2024",
+      "source": {
+       "name": "Global Finance: QIA key investments",
+       "url": "https://gfmag.com/economics-policy-regulation/qia-key-investments/"
+      }
+     }
+    ],
+    "why": [
+     {
+      "text": "We tried the method of adding up known stakes. It does not work for QIA. The stakes below are sourced, but most of what QIA owns is not disclosed: QIA publishes no list of holdings. A sum of known stakes would only be a floor, and several are voting-rights percentages rather than values.",
+      "sources": [
+       {
+        "name": "QIA profile, SovereignWealthFunds.com",
+        "url": "https://sovereignwealthfunds.com/funds/qatar-investment-authority"
+       }
+      ]
+     },
+     {
+      "text": "So the total stays a third-party estimate. The older figure is from two years earlier, so part of the gap is time; we cannot say how much."
+     }
+    ],
+    "cant": "A full list of holdings, and the value of the stakes below at today's prices. Barclays and Sainsbury's have been cut since their dates here; later filings for Barclays were not checked.",
+    "owns": {
+     "rows": [
+      {
+       "name": "Volkswagen Group",
+       "stake": "17.0% of ordinary-share voting rights (third largest holder)",
+       "as_of": "31 Dec 2025",
+       "source": {
+        "name": "Volkswagen Group annual report 2025: shareholder structure",
+        "url": "https://annualreport2025.volkswagen-group.com/group-management-report/shares-and-bonds/shareholder-structure.html"
+       }
+      },
+      {
+       "name": "Heathrow Airport (FGP Topco)",
+       "stake": "20.00%",
+       "as_of": "3 Jul 2025",
+       "source": {
+        "name": "Heathrow Funding Ltd supplemental prospectus, July 2025",
+        "url": "https://www.heathrow.com/content/dam/heathrow/web/common/documents/company/investor/offering-related-documents/funding/HFL-Supplemental-Prospectus-July-2025-final-308294089-15.pdf"
+       }
+      },
+      {
+       "name": "Harrods",
+       "stake": "100%, held through Qatar Holding LLC; bought May 2010",
+       "as_of": "current",
+       "source": {
+        "name": "Harrods: governance",
+        "url": "https://www.harrods.com/en-gb/s/legal/governance"
+       }
+      },
+      {
+       "name": "Barclays",
+       "stake": "2.8% (420.1m shares), down from about 5% in 2022-23",
+       "as_of": "31 Dec 2023",
+       "source": {
+        "name": "Barclays SC 13G/A filed by QIA, SEC",
+        "url": "https://www.sec.gov/Archives/edgar/data/312069/000199937124001732/barclays-sc13ga_123123.htm"
+       }
+      },
+      {
+       "name": "J Sainsbury",
+       "stake": "6.82%, cut from 10.48%",
+       "as_of": "Dec 2025",
+       "source": {
+        "name": "Reuters: Qatar's wealth fund cuts Sainsbury's stake",
+        "url": "https://www.reuters.com/world/uk/qatars-wealth-fund-cut-down-stake-british-supermarket-chain-sainsburys-2025-12-02/"
+       }
+      },
+      {
+       "name": "RWE",
+       "stake": "Investment of EUR 2.4bn; stake not stated",
+       "as_of": "as listed Oct 2024",
+       "source": {
+        "name": "Global Finance: QIA key investments",
+        "url": "https://gfmag.com/economics-policy-regulation/qia-key-investments/"
+       }
+      }
+     ],
+     "note": "Stakes change. Each line carries the date of its source, so check the date before relying on a percentage."
+    }
+   }
   },
   {
    "slug": "turkiye-wealth-fund",
@@ -1752,7 +2221,86 @@
     "office": false,
     "scope": "Total UAE population, including the large expatriate population"
    },
-   "sectors": null
+   "sectors": null,
+   "detail": {
+    "summary": "ADQ's assets were consolidated under L'imad, and we found no combined accounts. The best audited anchor is ADQ's.",
+    "range": [
+     {
+      "label": "Global SWF ranking",
+      "value": "$300bn",
+      "when": "Oct 2026",
+      "source": {
+       "name": "Global SWF ranking, October 2026",
+       "url": "https://globalswf.com/ranking"
+      }
+     },
+     {
+      "label": "ADQ audited total assets, AED 996.8bn at the 3.6725 peg",
+      "value": "$271.4bn",
+      "when": "31 Dec 2025",
+      "source": {
+       "name": "ADQ consolidated financial statements FY2025",
+       "url": "https://www.adq.ae/cdn-assets/documents/ADQ-Group-consolidated-FY25-signed-FS.pdf"
+      }
+     },
+     {
+      "label": "Global SWF's figure for ADQ before the merger",
+      "value": "$251bn",
+      "when": "Jan 2026",
+      "source": {
+       "name": "Khaleej Times: UAE wealth funds' asset jump",
+       "url": "https://www.khaleejtimes.com/business/uae-adia-icd-mubadala-asset-jump-wealth-fund-next-5-years"
+      }
+     }
+    ],
+    "why": [
+     {
+      "text": "ADQ's audited accounts show total assets of AED 996,777m at the end of 2025 (AED 921,741m a year earlier). Divided by the 3.6725 dirham peg, that is about $271bn. The assets now sit under L'imad, so this is the closest audited anchor.",
+      "sources": [
+       {
+        "name": "ADQ consolidated financial statements FY2025",
+        "url": "https://www.adq.ae/cdn-assets/documents/ADQ-Group-consolidated-FY25-signed-FS.pdf"
+       }
+      ]
+     },
+     {
+      "text": "L'imad's own assets come on top. One is a 42.54% stake in Modon Holding, bought from IHC in October 2025. Global SWF's $300bn is about $29bn above ADQ's balance sheet, which is the right order of magnitude for that addition, but L'imad does not publish the value of its pre-merger assets, so we cannot reproduce the $300bn.",
+      "sources": [
+       {
+        "name": "The National: Abu Dhabi to consolidate ADQ's assets under L'imad",
+        "url": "https://www.thenationalnews.com/business/2026/01/30/abu-dhabi-to-consolidate-assets-of-adq-under-limad/"
+       }
+      ]
+     },
+     {
+      "text": "Caution: total assets of an operating group (airlines, ports, utilities) are not the same thing as assets under management, so the two are not strictly comparable."
+     }
+    ],
+    "cant": "A combined L'imad balance sheet, and the value of the assets L'imad held before the merger.",
+    "owns": {
+     "rows": [
+      {
+       "name": "25 investment companies and platforms; more than 250 subsidiaries",
+       "stake": "Includes TAQA, Modon Properties, Etihad Airways, PureHealth, Etihad Rail, Wio Bank, Abu Dhabi Ports, McLaren and Louis Dreyfus",
+       "as_of": "Abu Dhabi Government announcement",
+       "source": {
+        "name": "Abu Dhabi Media Office: consolidation of L'imad and ADQ",
+        "url": "https://www.mediaoffice.abudhabi/en/economy/supreme-council-for-financial-and-economic-affairs-issues-resolution-to-consolidate-the-assets-and-investments-of-limad-holding-and-abu-dhabi-developmental-holding-group/"
+       }
+      },
+      {
+       "name": "Modon Holding",
+       "stake": "42.54%, bought from IHC",
+       "as_of": "Oct 2025",
+       "source": {
+        "name": "The National",
+        "url": "https://www.thenationalnews.com/business/2026/01/30/abu-dhabi-to-consolidate-assets-of-adq-under-limad/"
+       }
+      }
+     ],
+     "note": "The Government names these as examples. Ownership percentages for the group companies are not published in the announcement."
+    }
+   }
   },
   {
    "place_slug": "indonesia",
@@ -1796,7 +2344,137 @@
     "office": false,
     "scope": "Total Indonesian population"
    },
-   "sectors": null
+   "sectors": null,
+   "detail": {
+    "h": [
+     "The figures",
+     "Why they differ",
+     "What it owns"
+    ],
+    "title": "The $1 trillion figure, explained",
+    "summary": "Danantara's official $1 trillion and Global SWF's $230bn measure different things. This page uses the official figure and shows the others.",
+    "range": [
+     {
+      "label": "Danantara, official headline (rounded)",
+      "value": "about $1,000bn",
+      "when": "23 Jan 2026",
+      "source": {
+       "name": "Danantara press release, President Prabowo at WEF 2026",
+       "url": "https://www.danantaraindonesia.co.id/media-center/press-releases/president-prabowo-at-wef-2026-danantara-indonesia-is-the-energy-to-power-the-future-of-indonesia"
+      }
+     },
+     {
+      "label": "Global SWF: assets under management",
+      "value": "$230bn",
+      "when": "Oct 2026",
+      "source": {
+       "name": "Global SWF: Danantara",
+       "url": "https://globalswf.com/fund/DANAN"
+      }
+     },
+     {
+      "label": "Global SWF: value of the stakes seeded into it",
+      "value": "$172bn",
+      "when": "Oct 2026",
+      "source": {
+       "name": "Global SWF: Danantara",
+       "url": "https://globalswf.com/fund/DANAN"
+      }
+     },
+     {
+      "label": "Total assets of the seven founding SOEs, from their published statements",
+      "value": "Rp9,353tn",
+      "when": "25 Feb 2025",
+      "source": {
+       "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
+       "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
+      }
+     }
+    ],
+    "why": [
+     {
+      "text": "The gap is about definition, not arithmetic. The official $1 trillion counts the assets of the state companies Danantara supervises. Global SWF counts what Danantara directly holds: it values the stakes handed to it at $172bn and says its figure contradicts media and government announcements. The Rp9,353tn figure is a third view: the combined total assets of the seven big SOEs first placed under Danantara.",
+      "sources": [
+       {
+        "name": "Global SWF: Danantara",
+        "url": "https://globalswf.com/fund/DANAN"
+       }
+      ]
+     },
+     {
+      "text": "We show the official figure as the headline because it is the only one published by Danantara, and we label it rounded. A direct-holdings figure would be the better measure of a fund's size, and Danantara has not published one."
+     }
+    ],
+    "cant": "Danantara's audited balance sheet, and the value of the stakes it directly holds. The Rp9,353tn total is company assets, not Danantara's stakes, and we have not converted it to dollars.",
+    "owns": {
+     "rows": [
+      {
+       "name": "Bank Mandiri",
+       "stake": "Reported total assets Rp2,427.22tn",
+       "as_of": "25 Feb 2025",
+       "source": {
+        "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
+        "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
+       }
+      },
+      {
+       "name": "Bank Rakyat Indonesia (BRI)",
+       "stake": "Reported total assets Rp1,992.98tn",
+       "as_of": "25 Feb 2025",
+       "source": {
+        "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
+        "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
+       }
+      },
+      {
+       "name": "PLN (state electricity)",
+       "stake": "Reported total assets Rp1,699.06tn",
+       "as_of": "25 Feb 2025",
+       "source": {
+        "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
+        "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
+       }
+      },
+      {
+       "name": "Pertamina",
+       "stake": "Reported total assets Rp1,526.98tn",
+       "as_of": "25 Feb 2025",
+       "source": {
+        "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
+        "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
+       }
+      },
+      {
+       "name": "Bank Negara Indonesia (BNI)",
+       "stake": "Reported total assets Rp1,129.8tn",
+       "as_of": "25 Feb 2025",
+       "source": {
+        "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
+        "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
+       }
+      },
+      {
+       "name": "MIND ID (mining holding)",
+       "stake": "Reported total assets Rp292.23tn",
+       "as_of": "25 Feb 2025",
+       "source": {
+        "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
+        "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
+       }
+      },
+      {
+       "name": "Telkom Indonesia",
+       "stake": "Reported total assets Rp285.13tn",
+       "as_of": "25 Feb 2025",
+       "source": {
+        "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
+        "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
+       }
+      }
+     ],
+     "note": "These are the seven state companies first placed under Danantara at launch. The rupiah figures are each company's total assets from its published statements, not the size of Danantara's stake. Danantara supervises many more SOEs."
+    }
+   }
   },
   {
    "place_slug": null,
@@ -1849,7 +2527,74 @@
     "office": true,
     "scope": "Resident population of the emirate of Dubai, not the whole UAE"
    },
-   "sectors": null
+   "sectors": null,
+   "detail": {
+    "h": [
+     "The figures",
+     "Why they differ",
+     "What it owns"
+    ],
+    "title": "Official figure, and how it compares",
+    "summary": "Dubai Holding reports AED 500bn in assets under management. Global SWF's January 2026 report had it at about half that.",
+    "range": [
+     {
+      "label": "Dubai Holding, official (Impact Report)",
+      "value": "AED 500bn, about $136bn",
+      "when": "2026, covering 2025",
+      "source": {
+       "name": "Dubai Holding Impact Report",
+       "url": "https://www.dubaiholding.com/en/impact-report"
+      }
+     },
+     {
+      "label": "Global SWF January 2026 report",
+      "value": "$72bn",
+      "when": "Jan 2026",
+      "source": {
+       "name": "Khaleej Times: UAE wealth funds' asset jump",
+       "url": "https://www.khaleejtimes.com/business/uae-adia-icd-mubadala-asset-jump-wealth-fund-next-5-years"
+      }
+     }
+    ],
+    "why": [
+     {
+      "text": "We use Dubai Holding's own figure, converted at the fixed 3.6725 dirham peg (AED 500bn ÷ 3.6725 = $136.1bn). The Global SWF number is about half of it, and we could not find Global SWF's method for this fund, so we cannot say why. An operating group's reported assets and a fund's assets under management are not always measured the same way."
+     }
+    ],
+    "cant": "The reason for the gap with Global SWF, and a balance-sheet date for the AED 500bn.",
+    "owns": {
+     "rows": [
+      {
+       "name": "Emaar Properties",
+       "stake": "29.73%, largest shareholder",
+       "as_of": "2026 (completed 12 May 2026)",
+       "source": {
+        "name": "Dubai Holding: our business",
+        "url": "https://www.dubaiholding.com/en/our-business"
+       }
+      },
+      {
+       "name": "Emirates NBD",
+       "stake": "14.8%, second-largest shareholder",
+       "as_of": "2023",
+       "source": {
+        "name": "Dubai Holding: our business",
+        "url": "https://www.dubaiholding.com/en/our-business"
+       }
+      },
+      {
+       "name": "Jumeirah (hospitality)",
+       "stake": "Owned; percentage not stated",
+       "as_of": "current",
+       "source": {
+        "name": "Dubai Holding: our business",
+        "url": "https://www.dubaiholding.com/en/our-business"
+       }
+      }
+     ],
+     "note": "Dubai Holding's site names further businesses, without percentages."
+    }
+   }
   },
   {
    "place_slug": null,
@@ -1890,7 +2635,63 @@
     "office": false,
     "scope": "Total UAE population, including the large expatriate population"
    },
-   "sectors": null
+   "sectors": null,
+   "detail": {
+    "summary": "EIA publishes no annual report, accounts or return figure. We found one estimate and nothing to check it against.",
+    "range": [
+     {
+      "label": "Global SWF ranking",
+      "value": "$116bn",
+      "when": "Oct 2026 (same figure in the Jan 2026 report)",
+      "source": {
+       "name": "Global SWF ranking, October 2026",
+       "url": "https://globalswf.com/ranking"
+      }
+     }
+    ],
+    "why": [
+     {
+      "text": "There is nothing to derive a size from. EIA publishes no accounts, no return figure and no allocation, so the $116bn is Global SWF's number alone. It was unchanged between the January and October 2026 Global SWF releases.",
+      "sources": [
+       {
+        "name": "EIA profile, SovereignWealthFunds.com",
+        "url": "https://sovereignwealthfunds.com/funds/emirates-investment-authority"
+       },
+       {
+        "name": "Khaleej Times: UAE wealth funds' asset jump",
+        "url": "https://www.khaleejtimes.com/business/uae-adia-icd-mubadala-asset-jump-wealth-fund-next-5-years"
+       }
+      ]
+     },
+     {
+      "text": "What is public is its two big telecom stakes, listed below. Valuing them would need market prices on a given day, and they are not the whole portfolio, so we have not turned them into a total."
+     }
+    ],
+    "cant": "Any size, return or asset-mix figure from EIA itself, and any cross-check of the $116bn.",
+    "owns": {
+     "rows": [
+      {
+       "name": "Emirates Integrated Telecommunications (du)",
+       "stake": "50.1% (2,271,728,899 shares)",
+       "as_of": "year-end 2025",
+       "source": {
+        "name": "du integrated annual report 2025",
+        "url": "https://feeds.dfm.ae/documents/2026/Mar/19/9569a4e2-7b46-4b32-86c1-d71e637ed2b6/Du%20Integrated%20Annual.pdf"
+       }
+      },
+      {
+       "name": "e& (Etisalat)",
+       "stake": "Holds the Federal Government's 60% stake, transferred 1 Jan 2008, plus the Special Share; the Government's articles allow the 60% to fall to 51%",
+       "as_of": "Q2 2026 report",
+       "source": {
+        "name": "e& Q2 2026 financial report",
+        "url": "https://www.eand.com/content/dam/eand/assets/docs/financial-quarterly-reports/2026/etisalat-group-financial-report-q2-2026.pdf"
+       }
+      }
+     ],
+     "note": "EIA's own portfolio page names Etisalat and du as its significant holdings, plus external fund managers. It publishes no full list."
+    }
+   }
   },
   {
    "place_slug": null,

@@ -107,7 +107,7 @@ def _invest(f):
     a, rg, sc, hd = f.get("alloc"), f.get("regions"), f.get("sectors"), f.get("holdings")
     if not (a or rg or sc or hd):
         return ('<div class="wnote">Not disclosed. ' + E(f["short"]) + ' does not publish its asset-class mix, regional mix or holdings, so none is shown here. '
-                'This page does not guess one.</div>')
+                'This page does not guess one.' + (' Stakes that filings and news have reported are listed above, under what it owns.' if f.get('detail') else '') + '</div>')
     def blk(title, b, tbl):
         return (f'<h3>{E(title)}</h3><p class="src">As of {E(_date(b["as_of"]))}. Source: {_src(b["source"])}.</p>' + tbl + (f'<p class="dnote">{E(b["note"])}</p>' if b.get("note") else ""))
     if a: out += blk(a.get("title", "By asset class"), a, _alloc_table(a))
@@ -118,6 +118,33 @@ def _invest(f):
     if hd: out += blk("Largest holdings", hd, _holdings_table(hd))
     else: out += '<h3>Notable holdings</h3><p class="dnote">No holdings table is shown. We only show one when every line can be checked against the fund\'s own report, and none has been for this fund. Any named investments are in its own report, linked under Sources.</p>'
     return out
+
+def _detail(f):
+    """Estimate / why / what it owns. Returns (html, [sources])."""
+    d = f.get("detail")
+    if not d: return "", []
+    srcs = []
+    def add(x):
+        if x and x.get("url") and x["url"] not in [y["url"] for y in srcs]: srcs.append(dict(name=x["name"], url=x["url"]))
+    h = d.get("h") or ["The estimate", "Why this estimate", "What it owns"]
+    rr = "".join(f'<tr><td class="c">{E(r["label"])}</td><td class="num" data-l="Value">{E(r["value"])}</td><td class="m" data-l="Source">{E(r["when"])} · {_src(r["source"])}</td></tr>' for r in d["range"])
+    for r in d["range"]: add(r["source"])
+    out = (f'<section id="estimate" class="wsec"><div class="sh"><span class="bar" style="background:var(--amber)"></span><h2>{E(d.get("title", "Size and holdings, in detail"))}</h2><span class="h2n">Every line sourced</span></div>'
+           f'<h3>{E(h[0])}</h3>' + (f'<p>{E(d["summary"])}</p>' if d.get("summary") else "")
+           + f'<div class="tw"><table class="wt wstk" style="min-width:560px"><tr class="hd"><th>Figure</th><th class="num">Value</th><th>Date and source</th></tr>{rr}</table></div>'
+           + f'<h3>{E(h[1])}</h3>')
+    for w in d["why"]:
+        for x in w.get("sources", []): add(x)
+        ss = " ".join(f'<a href="{E(x["url"])}" rel="noopener">{E(x["name"])}</a>' for x in w.get("sources", []))
+        out += f'<p>{E(w["text"])}' + (f' <span class="src">Sources: {ss}</span>' if ss else "") + '</p>'
+    if d.get("cant"): out += f'<p class="dnote"><b>What we could not source:</b> {E(d["cant"])}</p>'
+    o = d.get("owns")
+    if o:
+        orows = "".join(f'<tr><td class="c">{E(r["name"])}</td><td data-l="Stake">{E(r["stake"])}</td><td class="m" data-l="Date and source">{E(r["as_of"])} · {_src(r["source"])}</td></tr>' for r in o["rows"])
+        for r in o["rows"]: add(r["source"])
+        out += (f'<h3>{E(h[2])}</h3><div class="tw"><table class="wt wstk" style="min-width:560px"><tr class="hd"><th>Holding</th><th>Stake</th><th>Date and source</th></tr>{orows}</table></div>'
+                + (f'<p class="dnote">{E(o["note"])}</p>' if o.get("note") else ""))
+    return out + '</section>', srcs
 
 def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
     a, pop = f["assets"], f["pop"]
@@ -144,6 +171,8 @@ def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
     if a.get("fx"): add(dict(name="ECB euro reference rates" if "ECB" in a["fx"]["source"] else a["fx"]["source"], url=a["fx"]["url"]))
     for k in ("alloc", "regions", "sectors", "holdings"):
         if f.get(k): add(f[k]["source"])
+    det_html, det_srcs = _detail(f)
+    for x in det_srcs: add(x)
     ld = '<script type="application/ld+json">' + json.dumps({
         "@context": "https://schema.org", "@type": "Dataset", "name": f"{f['name']}: assets, assets per citizen and holdings", "description": desc, "url": url,
         "isAccessibleForFree": True, "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"},
@@ -160,10 +189,10 @@ def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
             f'<div class="trio"><div><span class="l">Assets, USD</span><span class="num">{usd(bn)}</span></div>{loc}'
             f'<div><span class="l">Per person</span><span class="num">{"≈ " if est else ""}${pp:,.0f}</span></div></div>'
             f'<div class="meta" style="margin-top:10px">{badge}<span class="bd pa">{E(qlabel)}</span></div></div>')
-    jump = [("assets", "Assets"), ("percitizen", "Per citizen"), ("invested", "Where it is invested"), ("disclosure", "Disclosure"), ("sources", "Sources")]
+    jump = [("assets", "Assets")] + ([("estimate", "Estimate and holdings")] if det_html else []) + [("percitizen", "Per citizen"), ("invested", "Where it is invested"), ("disclosure", "Disclosure"), ("sources", "Sources")]
     crumb = '<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../">All sovereign wealth funds</a>' + (f'<span>·</span><a href="../../{place_url}">{E(f["country"])} debt clock</a>' if place_url else "") + '</div>'
     intro_txt = f["blurb"]
-    if est: intro_txt += f' Its total is not published, so the figure on this page is a third-party estimate (Global SWF) and is labelled as one.'
+    if est: intro_txt += f' Its total is not published, so the figure on this page is a third-party estimate (Global SWF) and is labelled as one.' + (' Below: the range of estimates, how they are reached, and what the fund is known to own.' if f.get('detail') else '')
     intro = f'<section class="intro" id="intro">{crumb}<h1>{E(f["nick"])}: Assets, Per Citizen and Holdings</h1><p>{E(intro_txt)} Managed by {E(f["manager"])}. Figures do not tick: they are the latest disclosure, with the date shown.</p></section>'
     # ---- assets table
     srow = lambda k, v, m="": f'<tr><td class="c">{k}</td><td class="num" data-l="Value">{v}</td><td class="m" data-l="Detail">{m}</td></tr>'
@@ -196,7 +225,7 @@ def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
     why = {"full": f"{f['short']} publishes its total value and an allocation. Every number on this page is from its own report, except any dollar conversion, percentage or per-person figure, which we calculate and say so where it appears.",
            "total": f"{f['short']} publishes audited total assets but no asset-class mix, so only the total and the per-person figure are shown.",
            "partial": f"{f['short']} publishes an allocation or ranges and returns, but not its total assets. The total here is a labelled third-party estimate.",
-           "estimate": f"{f['short']} publishes neither its total assets nor an allocation. The only number here is a labelled third-party estimate, and nothing about its holdings is shown."}[f["quality"]]
+           "estimate": f"{f['short']} publishes neither its total assets nor an allocation. The only number here is a labelled third-party estimate, and no holdings table is shown. Stakes reported in filings and news are listed separately, each with its source."}[f["quality"]]
     disc = (f'<section id="disclosure" class="wsec"><div class="sh"><span class="bar" style="background:var(--amber)"></span><h2>How much it discloses</h2></div>'
             f'<p><span class="bd pa">{E(qlabel)}</span></p><p>{E(why)}</p>'
             f'<p class="dnote">Disclosure labels: Full = official total and allocation; Total only = official total, no allocation; Partial = official allocation or ranges, estimated total; Estimate only = nothing published by the fund. '
@@ -217,7 +246,7 @@ def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
     explore_html = f'<section class="explore" id="explore"><div class="sh"><h2>Explore more</h2></div>{xg}</section>'
     links = ('<section class="answers" id="answers"><ul><li><a href="../">Sovereign wealth funds ranked</a></li>' + (f'<li><a href="../../{place_url}">{E(f["country"])} debt clock</a></li>' if place_url else "") +
              '<li><a href="../../">US national debt clock</a></li><li><a href="../../api/wealth.json">Wealth funds as JSON</a></li></ul></section>')
-    page = (pb.meta_head(SITE, url, title, desc, img, 2, pb.PL_CSS + CSS, ld) + _header(places, 2, jump) + ex.search_box("../../") + intro + '<main id="app">' + hero + sect_assets + pc + inv + disc + srcsec + '</main>' + explore_html + links + _foot(2) + "</body></html>")
+    page = (pb.meta_head(SITE, url, title, desc, img, 2, pb.PL_CSS + CSS, ld) + _header(places, 2, jump) + ex.search_box("../../") + intro + '<main id="app">' + hero + sect_assets + det_html + pc + inv + disc + srcsec + '</main>' + explore_html + links + _foot(2) + "</body></html>")
     os.makedirs(f"{R}/wealth/{f['slug']}", exist_ok=True)
     open(f"{R}/wealth/{f['slug']}/index.html", "w").write(with_analytics(page))
     return url
@@ -291,5 +320,5 @@ def build(R, SITE, with_analytics, og, places, d, funds):
     json.dump({"_doc": "Sovereign wealth funds ranked by assets. basis: official | official_converted | estimate. Per-citizen = assets ÷ population (see population source). Figures do not tick.",
                "ranking_source": d["ranking"], "funds": [{"slug": f["slug"], "name": f["name"], "country": f["country"], "rank_global_swf": f["swf_rank"], "assets_usd": round(f["usd"]), "assets_basis": f["assets"]["basis"],
                 "assets_as_of": f["assets"]["as_of"], "assets_local": f["assets"].get("local"), "assets_source": f["assets"]["source"]["url"], "population": f["pop"]["value"], "population_as_of": f["pop"]["as_of"],
-                "population_source": f["pop"]["url"], "assets_per_person_usd": round(f["pp"], 2), "disclosure": f["quality"], "url": f"{SITE}/{f['url']}"} for f in funds]}, open(f"{R}/api/wealth.json", "w"), indent=1, ensure_ascii=False)
+                "population_source": f["pop"]["url"], "assets_per_person_usd": round(f["pp"], 2), "disclosure": f["quality"], "url": f"{SITE}/{f['url']}", **({"detail": f["detail"]} if f.get("detail") else {})} for f in funds]}, open(f"{R}/api/wealth.json", "w"), indent=1, ensure_ascii=False)
     return urls
