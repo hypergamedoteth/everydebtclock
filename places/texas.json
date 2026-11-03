@@ -302,12 +302,24 @@
    "url": "https://www.brb.texas.gov/wp-content/uploads/2026/02/2025LocalARFinal.pdf"
   }
  ],
- "legend": "Texas state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection from the latest Census year, shown here next to the official totals.",
+ "legend": "Texas state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the page shows the latest official figure without ticking it forward, because the 2023→2024 change (+8.7%) is too large to carry forward as a trend.",
  "notes": [
   "Census publishes Texas's state + local total as $389.33 billion for 2024 (coefficient of variation 0.89%) and $358.18 billion for 2023. State + local here is exactly Census's state figure plus its local figure.",
-  "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the live clock projects from June 30, 2024. The state's own report (Texas Bond Review Board, FY2025) is fresher and counted differently; it is shown separately and never added. For the same year the two agree closely: the board's FY2023 state + local total is $380.65 billion, against Census's $389.33 billion for survey year 2024, which holds Texas's FY2023.",
+  "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the page shows the official figure as of June 30, 2024. The state's own report (Texas Bond Review Board, FY2025) is fresher and counted differently; it is shown separately and never added. For the same year the two agree closely: the board's FY2023 state + local total is $380.65 billion, against Census's $389.33 billion for survey year 2024, which holds Texas's FY2023.",
+  "The 2023→2024 change (+$31.14 billion, +8.7%) is more than 5% of the 2023 level in one year. A move that size is more likely a one-off (a large bond issue or payoff, a reclassification, or Census sampling) than a trend, and a straight line carried a further two years past it would drift far from any plausible figure.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "Why the headline is lower than the Bond Review Board's newer figure: Census's $389.33 billion is as of June 30, 2024; the board's $445.94 billion is as of Aug 31, 2025, 14 months later, and counts differently (it includes $13.10 billion of conduit and related-organization debt, and its local total is $368.89 billion against Census's $319.28 billion). The two are not meant to match. The page does not extend Census's figure forward, so its headline is always a published number and never a projection that passes the board's own newer one. The board's figure is shown separately and never added.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "Why the headline is lower than the Bond Review Board's newer figure: Census's $389.33 billion is as of June 30, 2024; the board's $445.94 billion is as of Aug 31, 2025, 14 months later, and counts differently (it includes $13.10 billion of conduit and related-organization debt, and its local total is $368.89 billion against Census's $319.28 billion). The two are not meant to match. The page does not extend Census's figure forward, so its headline is always a published number and never a projection that passes the board's own newer one. The board's figure is shown separately and never added.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
   "About the Bond Review Board figure: The local report's summary bullet says $368.30 billion ($256.64B tax-supported, $111.66B revenue), but its own Tables 1.1 and 1.3 and its Chapter 1 text say $368.89 billion ($257.02B and $111.86B). We use the table figure.",
   "About the Bond Review Board figure: State and local totals come from separate Bond Review Board reports and are added as published; the board does not publish a combined total for the same date.",
   "Not included: unfunded pension and retiree-health liabilities, and the state's share of the federal debt."
- ]
+ ],
+ "total_cv": 0.89,
+ "hold_trend": true,
+ "trend_pct": 8.7,
+ "hold_why": "the 2023→2024 change (+8.7%) is too large to carry forward as a trend",
+ "reconcile_note": "Why the headline is lower than the Bond Review Board's newer figure: Census's $389.33 billion is as of June 30, 2024; the board's $445.94 billion is as of Aug 31, 2025, 14 months later, and counts differently (it includes $13.10 billion of conduit and related-organization debt, and its local total is $368.89 billion against Census's $319.28 billion). The two are not meant to match. The page does not extend Census's figure forward, so its headline is always a published number and never a projection that passes the board's own newer one. The board's figure is shown separately and never added."
 }

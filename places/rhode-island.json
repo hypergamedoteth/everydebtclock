@@ -158,9 +158,18 @@
  ],
  "notes": [
   "Census publishes Rhode Island's state + local total as $14.35 billion for 2024 (coefficient of variation 0.02%) and $13.43 billion for 2023. State + local here is exactly Census's state figure plus its local figure.",
-  "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the live clock projects from June 30, 2024. Rhode Island's own audited report is fresher but is not used here: it covers a narrower scope and would not be comparable with the other states.",
+  "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the page shows the official figure as of June 30, 2024. Rhode Island's own audited report is fresher but is not used here: it covers a narrower scope and would not be comparable with the other states.",
+  "The 2023→2024 change (+$0.92 billion, +6.8%) is more than 5% of the 2023 level in one year. A move that size is more likely a one-off (a large bond issue or payoff, a reclassification, or Census sampling) than a trend, and a straight line carried a further two years past it would drift far from any plausible figure.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "Large swings in Census's series for Rhode Island: 2021→2022: −$2.53 billion (-20%); 2022→2023: +$3.60 billion (+37%). Census's tables give no explanation for these moves and we have not found one, so read the history table with care: they may be real payoffs or issuance, or a change in how Census measured or classified debt. Census's 2022 local-government figures come from the full Census of Governments rather than the sample used in other years, so a shift around 2022 may partly reflect that change of method.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
   "Not included: unfunded pension and retiree-health liabilities, and the state's share of the federal debt."
  ],
- "hold_trend": false,
- "legend": "Rhode Island state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection from the latest Census year, shown here next to the official totals."
+ "hold_trend": true,
+ "legend": "Rhode Island state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the page shows the latest official figure without ticking it forward, because the 2023→2024 change (+6.8%) is too large to carry forward as a trend. Large year-over-year swings are flagged in the notes below: 2021→2022 (-20%), 2022→2023 (+37%).",
+ "total_cv": 0.02,
+ "trend_pct": 6.8,
+ "hold_why": "the 2023→2024 change (+6.8%) is too large to carry forward as a trend"
 }

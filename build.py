@@ -41,7 +41,6 @@ def ia(t=NOW):
 DER = {
     "debt_gdp_now": lambda: val("debt_total") / val("gdp") * 100,
     "deficit_gdp_now": lambda: (T["spending"]["ttm"] - T["revenue"]["ttm"]) / val("gdp") * 100,
-    "interest_share": lambda: val("out_interest") / val("revenue") * 100,
     "debt_per_household": lambda: val("debt_total") / T["households"]["base"],
     "interest_annual": ia, "interest_per_day": lambda: ia() / 365.25, "interest_per_sec": lambda: ia() / 31557600,
     "interest_since_open": lambda: ia() / 31557600 * 60,   # card shows "per minute"
@@ -104,7 +103,9 @@ def mode_txt(i):
     if i.get("historical"): return "HISTORICAL · fixed"
     if i.get("held_at_limit"): return f"HELD AT DEBT LIMIT · official {fdate(i.get('as_of'))}"
     if i.get("derived"): return "LIVE CALC · from official tickers"
+    if i.get("badge"): return i["badge"]
     if i.get("fixed"): return f"FIXED · official {fdate(i.get('as_of'))}"
+    if i.get("modeled"): return f"MODELED ESTIMATE · from {fdate(i.get('as_of'))}"
     return f"PROJECTED · from official {fdate(i.get('as_of'))}"
 GROUP_COL = {"debt": "#ff4d5e", "fytd": "#ffb547", "interest": "#ff8f5a", "spending": "#5aa9ff", "revenue": "#38d39f", "trust": "#a98bff",
              "money": "#2fd0d0", "economy": "#2fd0d0", "people": "#2fd0d0", "history": "#a98bff", "ratios": "#2fd0d0"}
@@ -232,14 +233,18 @@ def row(slug):
             v, asof = usd0(lim_["base"] - sl_["base"]), f"limit − debt subject to limit, official {fdate(sl_.get('as_of'))}"
         else: return ""
     else:
-        v = usd0(i["base"]) if i.get("kind") == "usd" else fmt(i, i["base"])
-        asof = (f"FY{i.get('fy')} to date through {fdate(i.get('as_of'))} (Daily Treasury Statement, converted to budget basis)" if i.get("mode") == "fytd"
-                else f"official, {fdate(i.get('as_of'))}")
+        if i.get("mode") == "fytd" and slug in ("deficit", "spending", "revenue"):   # budget-basis estimates: rounded, never to the dollar
+            v = ("−$" if i["base"] < 0 else "$") + f"{abs(i['base'])/1e9:,.0f} billion (est.)"
+            asof = (f"estimate: FY{i.get('fy')} to date through {fdate(i.get('as_of'))}, from the Daily Treasury Statement's cash flows converted to budget basis "
+                    f"(revenue within about ±4%, the deficit less certain); Treasury's official monthly figure replaces it when published")
+        else:
+            v = usd0(i["base"]) if i.get("kind") == "usd" else fmt(i, i["base"])
+            asof = (i["basis_txt"] if i.get("basis_txt") else f"official, {fdate(i.get('as_of'))}")
     return f'<tr><td><a href="t/{slug}.html">{html.escape(label(slug, i))}</a></td><td class="num">{v}</td><td>{html.escape(asof)}</td></tr>'
 ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="k">US national debt · official, {fdate(OFF_D)} close</div><div class="big num">{usd0(OFF_V)}</div>
 <div class="trio"><div><span class="l">Per person (Census, {fdate(POP_OFF_DATE)})</span><span class="num">{usd2(PP_OFF)}</span></div>
 <div><span class="l">Per tax return filed</span><span class="num">{usd2(OFF_V / TAX)}</span></div><div><span class="l">Per household</span><span class="num">{usd2(OFF_V / HH)}</span></div></div></div>
-<section><div class="sh"><h2>Latest official figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
+<section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
 {''.join(row(s_) for s_ in ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "spending", "revenue", "gdp"])}</table>
 <noscript><p>Turn on JavaScript to watch these figures tick in real time.</p></noscript></section></div><!--/SSR-->""")
 import places_build
@@ -277,7 +282,7 @@ else: idx = idx.replace("</header>", "</header>" + SEARCH, 1)
 if "<!--PLNAV-->" in idx: idx = re.sub(r"<!--PLNAV-->.*?<!--/PLNAV-->", lambda m: PLNAV, idx, flags=re.S)
 else: idx = idx.replace('<span class="live">', PLNAV + '<span class="live">', 1)
 # "Your state" card under the US hero: one compact card for the visitor's place (picked client-side in app.js from
-# /api/geo, a saved choice, or the default), driven by the same index as api/places.json. Server-rendered with the
+# a saved choice, or the default), driven by the same index as api/places.json. Server-rendered with the
 # default place so the card's height never changes when JS picks another place.
 PIX = places_build.index(PLACES_LIVE, NOW)
 def place_card(ix):
@@ -346,11 +351,12 @@ for slug, i in ALL.items():
     if x is None or slug in HIST: continue
     lab = label(slug, i); url = f"{SITE}/t/{slug}.html"
     usdpp = i.get("kind") == "usd" and slug != "debt_per_household"
-    d1 = (f"{lab}: {fmt(i, x, True)} projected to {build_ct.strftime('%b %-d, %Y')}" + (f" ({ppf(x/POP)} per person on projected population, {ppf(x/TAX)} per tax return filed)" if usdpp else "") +
+    d1 = (f"{lab}: {fmt(i, x, True)}" + ("" if i.get("fixed") else f" projected to {build_ct.strftime('%b %-d, %Y')}") + (f" ({ppf(x/POP)} per person on projected population, {ppf(x/TAX)} per tax return filed)" if usdpp else "") +
           (f". Official figure ({i.get('source_name')}), updated when the source publishes." if i.get("fixed") else
-           f". Live counter from official data ({i.get('source_name') or 'computed from official Treasury tickers'}), recalibrated and checked daily."))
+           f". Modeled estimate, not an official published figure: {i.get('source_name')}. Recalibrated daily." if i.get("modeled") else
+           f". Counter from official data ({i.get('source_name') or 'computed from official Treasury tickers'}), recalibrated and checked daily."))
     kt, kd = KEY_PAGES.get(slug, (None, None))
-    title = kt or f"{lab}: {'official figure' if i.get('fixed') else 'live calculation' if i.get('derived') else 'live counter'} | Every Debt Clock"
+    title = kt or f"{lab}: {'official figure' if i.get('fixed') else 'live calculation' if i.get('derived') else 'modeled estimate' if i.get('modeled') else 'live counter'} | Every Debt Clock"
     d1 = kd or d1
     sub = {k: T[k] for k in need if k in T}
     if not i.get("derived"): sub[slug] = T[slug]
@@ -380,7 +386,7 @@ for slug, i in ALL.items():
 {f'<div class="pp"><div><span class="l" title="Debt ÷ US population projected to now from Census Vintage 2025 (Jul 1, 2025 estimate) at the Census Bureau&#39;s stated growth rate">Per person (projected population)*</span><span class="n" id="p1">{ppf(x/POP)}</span></div><div><span class="l">Per tax return filed</span><span class="n" id="p2">{ppf(x/TAX)}</span></div></div>' if usdpp else ''}
 <span class="b">{html.escape(mode_txt(i))}</span>{'<span class="b">official source cached (last run failed)</span>' if i.get('stale') else ''}
 <p><b>How it's calculated.</b> {html.escape(i.get('method') or '')}</p>
-{f'<p><b>Source.</b> <a href="{html.escape(i["source"])}" rel="noopener">{html.escape(i.get("source_name") or i["source"])}</a>, official as of {fdate(i.get("as_of"))}.</p>' if i.get('source') else ''}
+{f'<p><b>Source.</b> <a href="{html.escape(i["source"])}" rel="noopener">{html.escape(i.get("source_name") or i["source"])}</a>, {"daily total as of" if i.get("modeled") else "official as of"} {fdate(i.get("as_of"))}.</p>' if i.get('source') else ''}
 {check}
 <p><b>* Per person (projected population)</b> divides by the US population projected to now: the official Census Vintage 2025 estimate for July 1, 2025 ({POP_OFF:,.0f}), projected forward at Census's stated growth rate ({POP:,.0f} at build time).{pp_off} <b>Per tax return filed</b> divides by {TAX:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2); a joint return counts once and returns with zero tax liability are included.</p>
 <a class="cta" href="../index.html#t={slug}">Open the full live clock →</a>
@@ -670,7 +676,7 @@ from Treasury's total (it includes some agency debt and nets out unamortized dis
         proj_rows = "<table><tr><th>Pace used</th><th>Per day</th><th>Projected $41T date (CT)</th></tr>"
         proj_rows += f"<tr><td>90-day least-squares trend ({cf.get('n', '—')} daily closes; the rate the live clock uses)</td><td class=\"num\">{bil(r_ols * 86400)}</td><td>{e1.strftime('%b %-d, %Y') if e1 else '—'}</td></tr>"
         if e2: proj_rows += f"<tr><td>Straight line from {fdate(cf['first'][0])} to {fdate(cf['last'][0])} (first and last close only)</td><td class=\"num\">{bil(r_ft * 86400)}</td><td>{e2.strftime('%b %-d, %Y')}</td></tr>"
-        proj_rows += "</table><p>The two paces bracket a reasonable range. Daily moves are lumpy (big jumps on auction settlement days, dips when trust-fund securities mature), so the actual crossing can land days or weeks either side.</p>"
+        proj_rows += "</table><p>The two paces give a rough range, not a forecast. Daily moves are lumpy (big jumps on auction settlement days, dips when trust-fund securities mature), so the actual crossing can land days or weeks either side.</p>"
     lim_par = ""
     if LIM and SUBJ.get("base"):
         lim_par = (f"<h2>The debt limit</h2><p>The statutory debt limit is <b>{usd0(LIM)}</b> ({tril(LIM, 3)}), per Treasury's Daily Treasury Statement. It applies to "
@@ -722,7 +728,7 @@ if OFF_V:
     td_ = T["debt_total"]; fd_ = M.get("debt_fetched_epoch")
     snap_rows = "".join(f'<tr><td>{html.escape(n)}</td><td class="num">{usd0(v)}</td><td class="num">{"+" if v - SNAP["treasury"] >= 0 else "−"}{bil(abs(v - SNAP["treasury"]))} ({(v - SNAP["treasury"]) / SNAP["treasury"] * 100:+.2f}%)</td><td>{html.escape(note)}</td></tr>' for n, v, note in SNAP["rows"])
     body = f"""<p class="k">Where every number comes from, how often it changes, and how close it is to Treasury</p>
-<p><b>Short version.</b> The national debt figure on this site starts from Treasury's official <i>Debt to the Penny</i> number for the latest business day, then ticks forward at the recent official pace until Treasury publishes the next day. Every other figure follows the same pattern from its own official source. Nothing is typed in by hand, and anything projected is labelled as a projection.</p>
+<p><b>Short version.</b> The national debt figure on this site starts from Treasury's official <i>Debt to the Penny</i> number for the latest business day, then ticks forward at the recent official pace until Treasury publishes the next day. Every other figure follows the same pattern from its own official source. Official figures are read from the cited source, not typed in by hand (a few reference inputs such as the household and tax-return counts are entered from their cited publications), and anything projected or modeled is labelled as such.</p>
 <h2>Where each number comes from</h2>
 <table><tr><th>Figure</th><th>Official source</th><th>How it is used</th></tr>
 <tr><td>National debt (total, public, intragovernmental)</td><td><a href="{DTP_URL}" rel="noopener">Treasury, Debt to the Penny</a></td><td>Latest close of business is the starting point; ticks at the 90-day trend until the next close.</td></tr>

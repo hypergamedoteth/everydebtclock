@@ -159,10 +159,19 @@
  "notes": [
   "Census publishes Alabama's state + local total as $42.78 billion for 2024 (coefficient of variation 29.45%) and $31.43 billion for 2023. State + local here is exactly Census's state figure plus its local figure.",
   "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the page shows the official figure as of June 30, 2024. Alabama's own audited report is fresher but is not used here: it covers a narrower scope and would not be comparable with the other states.",
-  "The 2023→2024 change ($+11.36 billion) is smaller than about two standard errors of the Census estimate (about $25.2 billion at a 29.45% coefficient of variation), so Census's data does not show which way the debt is moving. This page therefore shows the official figure as published and does not tick it forward.",
+  "The 2023→2024 change (+$11.36 billion) is smaller than about two standard errors of the Census estimate (about $25.20 billion at a 29.45% coefficient of variation), so Census's data does not show which way the debt is moving.",
+  "The 2023→2024 change (+$11.36 billion, +36.1%) is more than 5% of the 2023 level in one year. A move that size is more likely a one-off (a large bond issue or payoff, a reclassification, or Census sampling) than a trend, and a straight line carried a further two years past it would drift far from any plausible figure.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "Large swings in Census's series for Alabama: 2023→2024: +$11.36 billion (+36%). Census's tables give no explanation for these moves and we have not found one, so read the history table with care: they may be real payoffs or issuance, or a change in how Census measured or classified debt.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
   "Caution: Census's own sampling error on Alabama's local debt for 2024 is large (coefficient of variation 39.63%), so the local figure, and therefore the total, can be far from the true amount. The figures are shown exactly as Census published them.",
   "Not included: unfunded pension and retiree-health liabilities, and the state's share of the federal debt."
  ],
  "hold_trend": true,
- "legend": "Alabama state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the page shows the latest official figure without ticking it forward, because Census's own sampling error is larger than the change it measured."
+ "legend": "Alabama state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the page shows the latest official figure without ticking it forward, because the 2023→2024 change (+36.1%) is both within about two standard errors of the Census estimate and too large to carry forward as a trend. Large year-over-year swings are flagged in the notes below: 2023→2024 (+36%).",
+ "total_cv": 29.45,
+ "trend_pct": 36.1,
+ "hold_why": "the 2023→2024 change (+36.1%) is both within about two standard errors of the Census estimate and too large to carry forward as a trend"
 }

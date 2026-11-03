@@ -9,7 +9,6 @@ window.DC = function (D) {
   const DER = {
     debt_gdp_now: t => val('debt_total', t) / val('gdp', t) * 100,
     deficit_gdp_now: t => (T.spending.ttm - T.revenue.ttm) / val('gdp', t) * 100,
-    interest_share: t => val('out_interest', t) / val('revenue', t) * 100,
     debt_per_household: t => val('debt_total', t) / T.households.base,
     interest_annual: ia, interest_per_day: t => ia(t) / 365.25, interest_per_sec: t => ia(t) / 31557600,
     interest_since_open: t => ia(t) * (t - OPENED) / 31557600,

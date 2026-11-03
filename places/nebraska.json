@@ -158,9 +158,17 @@
  ],
  "notes": [
   "Census publishes Nebraska's state + local total as $17.14 billion for 2024 (coefficient of variation 0.88%) and $15.99 billion for 2023. State + local here is exactly Census's state figure plus its local figure.",
-  "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the live clock projects from June 30, 2024. Nebraska's own audited report is fresher but is not used here: it covers a narrower scope and would not be comparable with the other states.",
+  "Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the page shows the official figure as of June 30, 2024. Nebraska's own audited report is fresher but is not used here: it covers a narrower scope and would not be comparable with the other states.",
+  "The 2023→2024 change (+$1.15 billion, +7.2%) is more than 5% of the 2023 level in one year. A move that size is more likely a one-off (a large bond issue or payoff, a reclassification, or Census sampling) than a trend, and a straight line carried a further two years past it would drift far from any plausible figure.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
+  "This page therefore shows the official figure as published and does not tick it forward.",
   "Not included: unfunded pension and retiree-health liabilities, and the state's share of the federal debt."
  ],
- "hold_trend": false,
- "legend": "Nebraska state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection from the latest Census year, shown here next to the official totals."
+ "hold_trend": true,
+ "legend": "Nebraska state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the page shows the latest official figure without ticking it forward, because the 2023→2024 change (+7.2%) is too large to carry forward as a trend.",
+ "total_cv": 0.88,
+ "trend_pct": 7.2,
+ "hold_why": "the 2023→2024 change (+7.2%) is too large to carry forward as a trend"
 }
