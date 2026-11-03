@@ -367,7 +367,7 @@ for slug, i in ALL.items():
               if slug == "debt_total" and i.get("base") and POP_OFF else "")
     v = i.get("validation") or {}
     check = (f"<p><b>Daily check.</b> Yesterday's projection vs {html.escape(v.get('against',''))}: {v['last_error_pct']:+.3f}% (threshold ±{v.get('threshold_pct')}%)"
-             + (f"; average |error| over {v['n']} days {v['mean_abs_error_pct']:.3f}%" if v.get("mean_abs_error_pct") is not None else "") + ".</p>") if v.get("last_error_pct") is not None else ""
+             + (f"; average |error| over {v['n']} days {v['mean_abs_error_pct']:.3f}%" if v.get("mean_abs_error_pct") is not None else "") + "." + (" " + html.escape(v["note"]) if v.get("note") else "") + "</p>") if v.get("last_error_pct") is not None else ""
     ld = dataset_ld(lab, d1 if len(d1) >= 50 else d1 + " Every Debt Clock, from official US government data.", url,
                     based=[i.get("source") or "https://fiscaldata.treasury.gov/"], temporal=i.get("as_of") if re.match(r"^\d{4}-\d\d-\d\d$", i.get("as_of") or "") else None)
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

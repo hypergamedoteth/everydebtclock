@@ -115,7 +115,7 @@
     "as_of": "2026-06-30",
     "source": {
      "name": "NBIM, fund page: largest equity holdings",
-     "url": "https://www.nbim.no/en/",
+     "url": "https://www.nbim.no/en/investments/all-investments/",
      "published": "updated twice a year",
      "locator": "Largest equity holdings"
     },
@@ -1228,7 +1228,7 @@
       },
       {
        "name": "Barclays",
-       "stake": "2.8% (420.1m shares), down from about 5% in 2022-23",
+       "stake": "2.8% (420.1m shares), down from about 5% in 2022-23. The latest filing we could read; the stake may have changed since",
        "as_of": "31 Dec 2023",
        "source": {
         "name": "Barclays SC 13G/A filed by QIA, SEC",
@@ -1292,7 +1292,8 @@
      "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.TRY+USD.EUR.SP00.A?startPeriod=2025-12-31&endPeriod=2025-12-31",
      "quote": "TRY→USD via EUR"
     },
-    "note": "Consolidated total assets of the fund and its subsidiaries, including the balance sheets of banks it owns, so it is larger than the value of its equity stakes."
+    "note": "Consolidated total assets of the fund and its subsidiaries, including the balance sheets of banks it owns, so it is larger than the value of its equity stakes.",
+    "group_total": true
    },
    "quality": "total",
    "pop": {
@@ -1942,7 +1943,7 @@
     "as_of": "2025-12-31",
     "source": {
      "name": "KIC 2025 Annual Report, 2025 Key Figures",
-     "url": "https://www.kic.kr/annual-report/2025/eng/index.html",
+     "url": "https://www.kic.kr/annual-report/2025/en/sub0101.html",
      "published": "2025 annual report (year-end 2025)",
      "locator": "Key Performance Indicators: Total AUM USD 232.0 billion (about KRW 333 trillion)"
     },
@@ -1962,7 +1963,7 @@
     "as_of": "2025-12-31",
     "source": {
      "name": "KIC 2025 Annual Report, Portfolio Composition and Performance by Asset Class",
-     "url": "https://www.kic.kr/annual-report/2025/eng/index.html",
+     "url": "https://www.kic.kr/annual-report/2025/en/",
      "published": "2025 annual report (year-end 2025)",
      "locator": "2025 Asset Allocation"
     },
@@ -2134,7 +2135,7 @@
     "note": "This is the consolidated balance sheet by type, as published. Percentages are as published."
    },
    "notes": [
-    "The ICD annual report PDF could not be fetched directly from our server (blocked); the figures were read from the report text as returned by a search extract and match the figures on icd.gov.ae."
+    "The ICD annual report PDF blocks automated downloads from our server, so we could not open it directly. Total assets of AED 1,680,210 million at 31 Dec 2025 are in the report text and are repeated on icd.gov.ae/financial-information, and the two agree."
    ],
    "other_funds": null,
    "slug": "investment-corporation-of-dubai",
@@ -2169,7 +2170,8 @@
      "url": "https://www.centralbank.ae/en/our-operations/exchange-rates/",
      "quote": "AED 3.6725 = USD 1"
     },
-    "note": "Consolidated group total assets, not assets under management. They include the balance sheets of the group's companies, mainly banking: customer deposits were AED 772.8 billion of the AED 1,277.7 billion in liabilities."
+    "note": "Consolidated group total assets, not assets under management. They include the balance sheets of the group's companies, mainly banking: customer deposits were AED 772.8 billion of the AED 1,277.7 billion in liabilities.",
+    "group_total": true
    },
    "quality": "full",
    "pop": {
@@ -2320,22 +2322,21 @@
    "iso3": "IDN",
    "est": 2025,
    "swf_rank": 16,
-   "blurb": "Indonesia's sovereign fund, launched in February 2025. It holds and manages the state-owned enterprises. Its headline assets are mostly those companies' assets.",
+   "blurb": "Indonesia's sovereign fund, launched in February 2025. It holds and manages the state-owned enterprises. Its own \"US$1 trillion\" headline counts those companies' assets, so this page uses Global SWF's estimate of what the fund itself holds.",
    "assets": {
-    "usd_bn": 1000,
-    "basis": "official",
-    "round": true,
+    "usd_bn": 230,
+    "basis": "estimate",
     "local": null,
-    "as_of": "2026-01-23",
+    "as_of": "2026-10",
     "source": {
-     "name": "Danantara Indonesia press release, President Prabowo at WEF 2026",
-     "url": "https://www.danantaraindonesia.co.id/media-center/press-releases/president-prabowo-at-wef-2026-danantara-indonesia-is-the-energy-to-power-the-future-of-indonesia",
-     "published": "2026-01-23",
-     "locator": "\"Indonesia's sovereign fund managing US$1 trillion in assets\""
+     "name": "Global SWF, Danantara Indonesia (October 2026)",
+     "url": "https://globalswf.com/fund/DANAN",
+     "published": "October 2026",
+     "locator": "Assets under Management (AuM): US$ 230 bn"
     },
-    "note": "A rounded headline figure from Danantara's own press release, not an audited fund balance sheet. It counts the assets of the state-owned enterprises Danantara manages, so it is not comparable with the investment portfolios of other funds. Global SWF, which tracks investable assets, lists about US$230 billion."
+    "estimate_note": "Danantara publishes no audited fund balance sheet. Its own headline, 'US$1 trillion in assets' (23 Jan 2026), counts the assets of the state-owned companies it manages, not the fund's own investments. Global SWF estimates the fund's AuM at about $230bn, with the stakes handed to it valued at $172bn. This page uses the Global SWF figure."
    },
-   "quality": "total",
+   "quality": "estimate",
    "pop": {
     "value": 284670000,
     "as_of": "mid-2025",
@@ -2351,11 +2352,11 @@
      "Why they differ",
      "What it owns"
     ],
-    "title": "The $1 trillion figure, explained",
-    "summary": "Danantara's official $1 trillion and Global SWF's $230bn measure different things. This page uses the official figure and shows the others.",
+    "title": "The $1 trillion figure and the $230bn estimate",
+    "summary": "Danantara's own '$1 trillion' headline is the asset base of the companies it supervises. Global SWF's $230bn estimates what the fund itself holds. This page uses the $230bn and shows the $1 trillion for comparison.",
     "range": [
      {
-      "label": "Danantara, official headline (rounded)",
+      "label": "Danantara headline: assets of the companies it manages (rounded, not fund AuM)",
       "value": "about $1,000bn",
       "when": "23 Jan 2026",
       "source": {
@@ -2364,7 +2365,7 @@
       }
      },
      {
-      "label": "Global SWF: assets under management",
+      "label": "Global SWF: assets under management (used on this page)",
       "value": "$230bn",
       "when": "Oct 2026",
       "source": {
@@ -2384,7 +2385,7 @@
      {
       "label": "Total assets of the seven founding SOEs, from their published statements",
       "value": "Rp9,353tn",
-      "when": "25 Feb 2025",
+      "when": "Kontan page updated 25 Feb 2025; statement dates not given",
       "source": {
        "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
        "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
@@ -2402,16 +2403,16 @@
       ]
      },
      {
-      "text": "We show the official figure as the headline because it is the only one published by Danantara, and we label it rounded. A direct-holdings figure would be the better measure of a fund's size, and Danantara has not published one."
+      "text": "We headline the Global SWF estimate because it measures what the fund holds, which is what the other funds on this ranking report. It is a third-party estimate and is labelled as one. The $1 trillion is Danantara's own number, but it counts company assets, so it would put the fund ahead of funds it is not comparable with. Danantara has not published a direct-holdings figure."
      }
     ],
-    "cant": "Danantara's audited balance sheet, and the value of the stakes it directly holds. The Rp9,353tn total is company assets, not Danantara's stakes, and we have not converted it to dollars.",
+    "cant": "Danantara's audited balance sheet, and the value of the stakes it directly holds. The Rp9,353tn total is company assets, not Danantara's stakes, and we have not converted it to dollars. Kontan does not give the balance-sheet date of each company's total.",
     "owns": {
      "rows": [
       {
        "name": "Bank Mandiri",
        "stake": "Reported total assets Rp2,427.22tn",
-       "as_of": "25 Feb 2025",
+       "as_of": "Kontan page of 25 Feb 2025; balance-sheet date not stated",
        "source": {
         "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
         "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
@@ -2420,7 +2421,7 @@
       {
        "name": "Bank Rakyat Indonesia (BRI)",
        "stake": "Reported total assets Rp1,992.98tn",
-       "as_of": "25 Feb 2025",
+       "as_of": "Kontan page of 25 Feb 2025; balance-sheet date not stated",
        "source": {
         "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
         "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
@@ -2429,7 +2430,7 @@
       {
        "name": "PLN (state electricity)",
        "stake": "Reported total assets Rp1,699.06tn",
-       "as_of": "25 Feb 2025",
+       "as_of": "Kontan page of 25 Feb 2025; balance-sheet date not stated",
        "source": {
         "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
         "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
@@ -2438,7 +2439,7 @@
       {
        "name": "Pertamina",
        "stake": "Reported total assets Rp1,526.98tn",
-       "as_of": "25 Feb 2025",
+       "as_of": "Kontan page of 25 Feb 2025; balance-sheet date not stated",
        "source": {
         "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
         "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
@@ -2447,7 +2448,7 @@
       {
        "name": "Bank Negara Indonesia (BNI)",
        "stake": "Reported total assets Rp1,129.8tn",
-       "as_of": "25 Feb 2025",
+       "as_of": "Kontan page of 25 Feb 2025; balance-sheet date not stated",
        "source": {
         "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
         "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
@@ -2456,7 +2457,7 @@
       {
        "name": "MIND ID (mining holding)",
        "stake": "Reported total assets Rp292.23tn",
-       "as_of": "25 Feb 2025",
+       "as_of": "Kontan page of 25 Feb 2025; balance-sheet date not stated",
        "source": {
         "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
         "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
@@ -2465,7 +2466,7 @@
       {
        "name": "Telkom Indonesia",
        "stake": "Reported total assets Rp285.13tn",
-       "as_of": "25 Feb 2025",
+       "as_of": "Kontan page of 25 Feb 2025; balance-sheet date not stated",
        "source": {
         "name": "Kontan: 7 BUMN Danantara, from the companies' published financial statements",
         "url": "https://pusatdata.kontan.co.id/infografik/46/7-BUMN-Danantara"
@@ -2494,7 +2495,7 @@
    "swf_rank": 19,
    "blurb": "A Dubai-based investment company with stakes in real estate, hospitality, retail, media and investments. It is not a pool of savings. It publishes a rounded asset figure and no allocation.",
    "assets": {
-    "usd_bn": 136.15,
+    "usd_bn": 136.147,
     "basis": "official_converted",
     "round": true,
     "local": {
@@ -2516,7 +2517,8 @@
      "url": "https://www.centralbank.ae/en/our-operations/exchange-rates/",
      "quote": "AED 3.6725 = USD 1"
     },
-    "note": "A rounded figure from Dubai Holding's first Impact Report (covering 2025). The report gives no balance-sheet date or breakdown, and the group's homepage says \"over AED 500 billion\"."
+    "note": "A rounded figure from Dubai Holding's first Impact Report (covering 2025). The report gives no balance-sheet date or breakdown, and the group's homepage says \"over AED 500 billion\".",
+    "group_total": true
    },
    "quality": "total",
    "pop": {
@@ -2535,7 +2537,7 @@
      "What it owns"
     ],
     "title": "Official figure, and how it compares",
-    "summary": "Dubai Holding reports AED 500bn in assets under management. Global SWF's January 2026 report had it at about half that.",
+    "summary": "Dubai Holding reports AED 500bn in assets under management. Global SWF's October 2026 ranking lists $136bn, which agrees with it.",
     "range": [
      {
       "label": "Dubai Holding, official (Impact Report)",
@@ -2547,7 +2549,16 @@
       }
      },
      {
-      "label": "Global SWF January 2026 report",
+      "label": "Global SWF ranking, October 2026",
+      "value": "$136bn",
+      "when": "Oct 2026",
+      "source": {
+       "name": "Global SWF ranking",
+       "url": "https://globalswf.com/ranking"
+      }
+     },
+     {
+      "label": "Global SWF January 2026 report (superseded)",
       "value": "$72bn",
       "when": "Jan 2026",
       "source": {
@@ -2558,10 +2569,10 @@
     ],
     "why": [
      {
-      "text": "We use Dubai Holding's own figure, converted at the fixed 3.6725 dirham peg (AED 500bn ÷ 3.6725 = $136.1bn). The Global SWF number is about half of it, and we could not find Global SWF's method for this fund, so we cannot say why. An operating group's reported assets and a fund's assets under management are not always measured the same way."
+      "text": "We use Dubai Holding's own figure, converted at the fixed 3.6725 dirham peg (AED 500bn ÷ 3.6725 = $136.1bn). Global SWF's October 2026 ranking now shows $136bn for the same fund, so the two agree. Global SWF's January 2026 report had about $72bn, which is why this page used to flag a gap. It no longer applies. The figure is an operating group's reported assets, not a pool of savings, and it is not like-for-like with funds that report assets under management."
      }
     ],
-    "cant": "The reason for the gap with Global SWF, and a balance-sheet date for the AED 500bn.",
+    "cant": "A balance-sheet date and a breakdown for the AED 500bn. Dubai Holding's report gives neither.",
     "owns": {
      "rows": [
       {
@@ -2699,7 +2710,7 @@
    "holdings": null,
    "alloc": null,
    "notes": [
-    "QIC's infrastructure team manages A$40.9 billion across 21 direct investments, and its property portfolio is A$13.0 billion (Annual Report 2024-25). A full asset mix is not shown here."
+    "QIC's infrastructure team manages A$42.6 billion across 21 direct investments, and QIC Real Estate manages a portfolio valued at about A$13.3 billion (Annual Report 2025-26). A full asset mix is not shown here."
    ],
    "other_funds": null,
    "slug": "qic",
@@ -2713,35 +2724,35 @@
    "swf_rank": 23,
    "blurb": "The Queensland Government's investment company. It manages the state's portfolios and invests for other institutions in infrastructure, real estate, private equity and liquid markets.",
    "assets": {
-    "usd_bn": 85.93,
+    "usd_bn": 97.87,
     "basis": "official_converted",
     "local": {
      "code": "AUD",
-     "amount_bn": 131.6,
-     "label": "A$131.6 billion"
+     "amount_bn": 142.1,
+     "label": "A$142.1 billion"
     },
-    "as_of": "2025-06-30",
+    "as_of": "2026-06-30",
     "source": {
-     "name": "QIC Limited Annual Report 2024-25",
-     "url": "https://edge.sitecorecloud.io/giclimited1-qiccom-prod-94af/media/Project/QIC/QIC/About-QIC/Corporate-Governance/Annual-reports/2024-25/QIC-Limited-Annual-Report-2024-25.pdf",
-     "published": "2025",
-     "locator": "\"We have $131.6 billion in assets under management\" (gross AUM at 30 June 2025)"
+     "name": "QIC Limited Annual Report 2025-26",
+     "url": "https://edge.sitecorecloud.io/giclimited1-qiccom-prod-94af/media/Project/QIC/QIC/About-QIC/Corporate-Governance/Annual-reports/2025-26/QIC-Limited-Annual-Report-2025-26.pdf",
+     "published": "2026",
+     "locator": "\"We manage more than $142.1 billion in assets under management\" (footnote: as of 30 June 2026, gross AUM)"
     },
     "fx": {
-     "rate": 0.652998,
-     "date": "2025-06-30",
-     "source": "ECB euro foreign exchange reference rates, 30 June 2025: USD 1.1720 and AUD 1.7948 per euro",
-     "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.USD+AUD.EUR.SP00.A?startPeriod=2025-06-30&endPeriod=2025-06-30",
-     "quote": "EUR/USD 1.1720 ÷ EUR/AUD 1.7948"
+     "rate": 0.688709,
+     "date": "2026-06-30",
+     "source": "ECB euro foreign exchange reference rates, 30 June 2026: USD 1.1394 and AUD 1.6544 per euro",
+     "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.USD+AUD.EUR.SP00.A?startPeriod=2026-06-30&endPeriod=2026-06-30",
+     "quote": "EUR/USD 1.1394 ÷ EUR/AUD 1.6544"
     },
     "note": "Gross assets under management: market value of gross assets managed, plus undrawn commitments, excluding multi-asset derivative exposures. It includes money QIC invests for institutions outside Queensland's government, and the Queensland Government does not guarantee it."
    },
    "quality": "total",
    "pop": {
-    "value": 5669834,
-    "as_of": "2025-06-30",
-    "source": "Australian Bureau of Statistics, National, state and territory population, June 2025 (preliminary), Queensland",
-    "url": "https://www.abs.gov.au/statistics/people/population/national-state-and-territory-population/jun-2025",
+    "value": 5739461,
+    "as_of": "2026-03-31",
+    "source": "Australian Bureau of Statistics, National, state and territory population, March 2026 (preliminary), Queensland",
+    "url": "https://www.abs.gov.au/statistics/people/population/national-state-and-territory-population/latest-release",
     "office": true,
     "scope": "Estimated resident population of Queensland, not Australia as a whole"
    },
@@ -2799,7 +2810,8 @@
     "office": false,
     "scope": "Total Malaysian population"
    },
-   "sectors": null
+   "sectors": null,
+   "ownership_note": "PNB is government-owned, but most of these assets are unitholders' money in its unit trusts (16.8 million accounts), so this is not a state savings pool and the per-person figure is not a share anyone holds"
   },
   {
    "place_slug": null,
@@ -2842,7 +2854,8 @@
      "url": "https://banki24.kz/kurs/nbrk/dollar-na-31-12-2025",
      "quote": "KZT 502.57 = USD 1"
     },
-    "note": "Consolidated group total assets, not assets under management. They include the operating assets of the group's companies."
+    "note": "Consolidated group total assets, not assets under management. They include the operating assets of the group's companies.",
+    "group_total": true
    },
    "quality": "total",
    "pop": {

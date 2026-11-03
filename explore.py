@@ -72,6 +72,11 @@ SEC = {"state": "states", "country": "countries"}
 
 WEALTH = []  # set by wealth_build.prep(): [{name, slug, place_slug, country, short, name_long}]
 
+def _unapos(name, a):
+    """The page script turns an apostrophe into a space ("l'imad" -> "l imad"), so "limad" would miss it. Add the apostrophe-free spelling as an alias."""
+    s = name.replace("'", "").replace("\u2019", "")
+    return f"{a} {s.lower()}".strip() if s != name else a
+
 def search_index(places):
     out = [{"n": "United States", "u": "", "k": "country", "a": "usa us u.s. america national debt federal"},
            {"n": "World", "u": "world/", "k": "world", "a": "world debt global all countries"}]
@@ -80,11 +85,11 @@ def search_index(places):
         if p["kind"] == "country":      # ISO codes: "pt", "dk", "deu" jump to the right country
             a = " ".join(x for x in (p.get("country", "").lower(), (p.get("iso3") or "").lower(), a) if x)
         if p["kind"] == "state": a = (POSTAL.get(p["slug"], "").lower() + " " + a).strip()
-        out.append({"n": p["name"], "u": f'{SEC[p["kind"]]}/{p["slug"]}/', "k": p["kind"], "a": a})
+        out.append({"n": p["name"], "u": f'{SEC[p["kind"]]}/{p["slug"]}/', "k": p["kind"], "a": _unapos(p["name"], a)})
     if WEALTH:
         out.append({"n": "Sovereign wealth funds", "u": "wealth/", "k": "wealth", "a": "wealth fund funds sovereign swf ranking assets per citizen"})
         for w in WEALTH:
-            out.append({"n": w["name"], "u": f'wealth/{w["slug"]}/', "k": "wealth", "a": f'{w["name_long"]} {w["short"]} {w["country"]} wealth fund sovereign'.lower()})
+            out.append({"n": w["name"], "u": f'wealth/{w["slug"]}/', "k": "wealth", "a": _unapos(w["name"], f'{w["name_long"]} {w["short"]} {w["country"]} wealth fund sovereign'.lower())})
     return {"_doc": "Client-side search index for the clock pages: n name, u url relative to the site root, k kind, a extra search words.", "places": out}
 
 SEARCH_JS = """<script>(function(){var f=document.getElementById('qf'),q=document.getElementById('q'),ul=document.getElementById('qr'),up=f.dataset.up,ix=null,cur=-1,shown=[];
@@ -105,7 +110,7 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
 def search_box(up):
     """The search form. up = path from this page to the site root ('' , '../', '../../')."""
     return (f'<div class="srchrow"><form class="srch" id="qf" data-up="{up}" role="search" action="{up or "./"}states/" autocomplete="off">'
-            f'<label for="q">Find a clock</label><input id="q" type="search" placeholder="Type a country or state, e.g. Texas or Singapore" aria-expanded="false" aria-controls="qr" aria-autocomplete="list" enterkeyhint="go">'
+            f'<label for="q">Find a clock</label><input id="q" type="search" placeholder="Type a country, state or wealth fund, e.g. Texas, Singapore or Norway" aria-expanded="false" aria-controls="qr" aria-autocomplete="list" enterkeyhint="go">'
             f'<button type="submit" aria-label="Go">Go</button><ul id="qr" role="listbox" hidden></ul></form></div>' + SEARCH_JS)
 
 def _chips(items, up):
