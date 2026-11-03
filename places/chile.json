@@ -1,0 +1,96 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in CLP. The debt component and history are refreshed by pipeline/fetch_chile.py from the official source named below; edit wording here, not numbers.",
+ "slug": "chile",
+ "kind": "country",
+ "country": "CL",
+ "iso3": "CHL",
+ "name": "Chile",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Dirección de Presupuestos (DIPRES), Ministerio de Hacienda de Chile",
+ "currency": {
+  "code": "CLP",
+  "symbol": "CLP "
+ },
+ "frequency": "quarterly",
+ "title": "Chile Debt Clock: Live Central Government Gross Debt, Official Data",
+ "headline": "central government gross debt",
+ "headline_long": "central government gross debt",
+ "link_label": "central government gross debt, CLP",
+ "subject": "The Republic of Chile",
+ "hist_label": "Central Government Gross Debt",
+ "sum_note": "Chile's gross central government debt, quarter-end, in pesos, from DIPRES' quarterly debt report.",
+ "scope_note": "This is the \"deuda bruta del Gobierno Central\" in the quarterly report of DIPRES, the Budget Office of the Ministry of Finance: the stock of gross debt of the central government at quarter-end, in Chilean pesos, as stated in the report's summary. DIPRES follows Decree Law 1,263 (articles 39 and 40) and the IMF's 2014 Government Finance Statistics Manual, measures the debt at face value (outstanding principal) and values foreign-currency debt at the exchange rate on the last day of the quarter. It is gross: it is not reduced by the government's large sovereign wealth funds and financial assets. It does not include the debt of state-owned companies, the Central Bank or municipalities.",
+ "trend_why": "We use the change over the latest twelve months rather than the latest period alone, because changes between single reporting dates swing with the issuance calendar and short-term borrowing.",
+ "legend": "Chile's central government gross debt is reported at period-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Quarterly. DIPRES publishes the report about three months after each quarter ends.",
+ "after_text": ", about three months after each quarter-end",
+ "next_update": "DIPRES publishes the quarterly debt report about three months after each quarter-end; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 19859921,
+  "noun": "people",
+  "as_of": "2025-07-01",
+  "source_name": "World Bank, World Development Indicators, Population, total (SP.POP.TOTL), Chile, 2025 (UN Population Division and national statistical offices)",
+  "source_url": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=CL",
+  "publisher_short": "World Bank",
+  "tag": "WB",
+  "possessive": "the World Bank's",
+  "method_short": "World Bank 2025 population estimate, all ages",
+  "noun_full": "people in Chile"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Chile central government gross debt",
+   "short": "Public debt",
+   "value": 151925769000000,
+   "as_of": "2026-06-30",
+   "prior_value": 138751172000000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "DIPRES, Reporte trimestral de deuda bruta del Gobierno Central, stock in Chilean pesos (millions)",
+   "source_url": "https://www.dipres.gob.cl/598/w3-propertyvalue-15500.html",
+   "source_locator": "Section II of each quarterly report: \"El stock de deuda bruta del Gobierno Central totalizó $… millones al <date>\"",
+   "includes": "Gross debt of the central government in Chilean pesos (debt instruments and loans, domestic and external). The sovereign wealth funds' assets are not netted off; state companies, the Central Bank and municipalities are not included.",
+   "facts": [],
+   "history": [
+    [
+     "2025-06-30",
+     138751172000000
+    ],
+    [
+     "2025-09-30",
+     143399824000000
+    ],
+    [
+     "2025-12-31",
+     141214222000000
+    ],
+    [
+     "2026-03-31",
+     147388435000000
+    ],
+    [
+     "2026-06-30",
+     151925769000000
+    ]
+   ],
+   "breakdown": []
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "DIPRES, Estadísticas de deuda del Gobierno Central",
+   "url": "https://www.dipres.gob.cl/598/w3-propertyvalue-15500.html"
+  },
+  {
+   "name": "INE Chile, Instituto Nacional de Estadísticas",
+   "url": "https://www.ine.gob.cl/"
+  }
+ ],
+ "notes": [
+  "Why the DIPRES report: it is the Budget Office's own quarterly publication of gross central government debt. The fetcher reads the stock stated in each of the latest reports, newest first, and compares with the quarter a year earlier.",
+  "Gross: Chile holds large sovereign wealth funds (the Economic and Social Stabilization Fund and the Pension Reserve Fund); none of that is subtracted here.",
+  "Currency: Chilean pesos, as stated in the report. The World Debt Clock converts at the US Treasury's quarter-end rate for the peso."
+ ],
+ "world_measure": "Central government, gross"
+}

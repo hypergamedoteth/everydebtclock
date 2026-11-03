@@ -1,0 +1,107 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in MYR. The debt component and history are refreshed by pipeline/fetch_malaysia.py from the official source named below; edit wording here, not numbers.",
+ "slug": "malaysia",
+ "kind": "country",
+ "country": "MY",
+ "iso3": "MYS",
+ "name": "Malaysia",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Ministry of Finance Malaysia (via the national open-data portal, data.gov.my)",
+ "currency": {
+  "code": "MYR",
+  "symbol": "RM "
+ },
+ "frequency": "quarterly",
+ "title": "Malaysia Debt Clock: Live Federal Government Debt, Official Data",
+ "headline": "federal government debt",
+ "headline_long": "federal government debt",
+ "link_label": "federal government debt, RM",
+ "subject": "The Government of Malaysia",
+ "hist_label": "Federal Government Debt",
+ "sum_note": "Malaysia's outstanding federal government debt (domestic and external), quarter-end, from the Ministry of Finance's quarterly series on the national open-data portal. Gross.",
+ "scope_note": "This is the Ministry of Finance's quarterly series of federal government debt on data.gov.my: government securities (MGS, MGII, treasury bills and others) and loans, domestic plus external, in ringgit at each quarter-end. It is the gross debt of the federal government. It does not include the debt guaranteed by the government, the liabilities under public-private financing arrangements, or the debt of state governments and statutory bodies. Domestic and external parts add up to the total.",
+ "trend_why": "We use the change over the latest twelve months rather than the latest period alone, because changes between single reporting dates swing with the issuance calendar and short-term borrowing.",
+ "legend": "Malaysia's federal government debt is reported at period-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Quarterly. The Ministry of Finance adds each quarter-end position to the open-data portal some weeks after the quarter ends.",
+ "after_text": ", some weeks after each quarter-end",
+ "next_update": "The Ministry of Finance adds each quarter-end position to the open-data portal some weeks after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 35977838,
+  "noun": "people",
+  "as_of": "2025-07-01",
+  "source_name": "World Bank, World Development Indicators, Population, total (SP.POP.TOTL), Malaysia, 2025 (UN Population Division and national statistical offices)",
+  "source_url": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=MY",
+  "publisher_short": "World Bank",
+  "tag": "WB",
+  "possessive": "the World Bank's",
+  "method_short": "World Bank 2025 population estimate, all ages",
+  "noun_full": "people in Malaysia"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Malaysia federal government debt",
+   "short": "Public debt",
+   "value": 1378895000000,
+   "as_of": "2026-06-30",
+   "prior_value": 1304176000000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Ministry of Finance Malaysia, Federal government debt by instrument (quarterly), data.gov.my, RM million",
+   "source_url": "https://data.gov.my/data-catalogue/federal_finance_qtr_debt_mat",
+   "source_locator": "Dataset federal_finance_qtr_debt_mat, rows type=total, maturity=total, sector=total (also domestic, external); each row is dated the first day of the quarter, the position is the quarter-end",
+   "includes": "Federal government debt, gross: domestic securities and loans plus external debt, in ringgit. Government-guaranteed debt, PFI commitments and state and statutory-body debt are not included.",
+   "facts": [],
+   "history": [
+    [
+     "2025-06-30",
+     1304176000000
+    ],
+    [
+     "2025-09-30",
+     1315514000000
+    ],
+    [
+     "2025-12-31",
+     1320776000000
+    ],
+    [
+     "2026-03-31",
+     1341432000000
+    ],
+    [
+     "2026-06-30",
+     1378895000000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Domestic debt",
+     "value": 1082626000000,
+     "group": "Domestic"
+    },
+    {
+     "label": "External debt",
+     "value": 296269000000,
+     "group": "External"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Ministry of Finance Malaysia, Fiscal outlook and federal government revenue estimates",
+   "url": "https://www.mof.gov.my/portal/en"
+  },
+  {
+   "name": "Department of Statistics Malaysia",
+   "url": "https://www.dosm.gov.my/"
+  }
+ ],
+ "notes": [
+  "Why the open-data series: it is the Ministry of Finance's own quarterly publication, machine-readable, and the fetcher checks that the domestic and external parts add up to the total.",
+  "Federal government only: Malaysia also has government-guaranteed debt and other commitments, which the Ministry reports separately and which are not added here.",
+  "Currency: Malaysian ringgit. The World Debt Clock converts at the ECB's daily reference rate for the ringgit."
+ ],
+ "world_measure": "Federal government, gross"
+}

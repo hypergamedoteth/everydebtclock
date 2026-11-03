@@ -1,0 +1,96 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in PEN. The debt component and history are refreshed by pipeline/fetch_peru.py from the official source named below; edit wording here, not numbers.",
+ "slug": "peru",
+ "kind": "country",
+ "country": "PE",
+ "iso3": "PER",
+ "name": "Peru",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Banco Central de Reserva del Perú (BCRP)",
+ "currency": {
+  "code": "PEN",
+  "symbol": "S/ "
+ },
+ "frequency": "quarterly",
+ "title": "Peru Debt Clock: Live Public Sector Debt, Official Data",
+ "headline": "non-financial public sector debt",
+ "headline_long": "non-financial public sector debt",
+ "link_label": "non-financial public sector debt, S/",
+ "subject": "The Republic of Peru",
+ "hist_label": "Non-Financial Public Sector Debt",
+ "sum_note": "Peru's gross debt of the non-financial public sector (central, regional and local government, and non-financial public companies), quarter-end, from the Central Reserve Bank's statistics.",
+ "scope_note": "This is the BCRP's series \"Saldo de la deuda del sector público no financiero\": the outstanding public debt of the non-financial public sector, domestic and external, in soles at each quarter-end. It covers the central government, regional and local governments and the non-financial public companies, and is gross. The BCRP publishes it quarterly in its statistical database, alongside the ministry's own public debt bulletin.",
+ "trend_why": "We use the change over the latest twelve months rather than the latest period alone, because changes between single reporting dates swing with the issuance calendar and short-term borrowing.",
+ "legend": "Peru's non-financial public sector debt is reported at period-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Quarterly. The BCRP adds each quarter-end position to its statistical database a few weeks after the quarter ends.",
+ "after_text": ", a few weeks after each quarter-end",
+ "next_update": "The BCRP adds each quarter-end position to its statistical database a few weeks after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 34576665,
+  "noun": "people",
+  "as_of": "2025-07-01",
+  "source_name": "World Bank, World Development Indicators, Population, total (SP.POP.TOTL), Peru, 2025 (UN Population Division and national statistical offices)",
+  "source_url": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=PE",
+  "publisher_short": "World Bank",
+  "tag": "WB",
+  "possessive": "the World Bank's",
+  "method_short": "World Bank 2025 population estimate, all ages",
+  "noun_full": "people in Peru"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Peru non-financial public sector debt",
+   "short": "Public debt",
+   "value": 363367907543,
+   "as_of": "2026-06-30",
+   "prior_value": 365744263624,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Banco Central de Reserva del Perú, Saldo de la deuda del sector público no financiero (PN03371FQ), million soles",
+   "source_url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/trimestrales/resultados/PN03371FQ/html",
+   "source_locator": "BCRP statistical database series PN03371FQ, quarterly; machine-readable through the BCRP series API",
+   "includes": "Gross debt of the non-financial public sector, domestic and external, in soles: central, regional and local government and non-financial public companies. Public financial institutions and the Central Bank are not included.",
+   "facts": [],
+   "history": [
+    [
+     "2025-06-30",
+     365744263624
+    ],
+    [
+     "2025-09-30",
+     364697043126
+    ],
+    [
+     "2025-12-31",
+     365603861006
+    ],
+    [
+     "2026-03-31",
+     366661275291
+    ],
+    [
+     "2026-06-30",
+     363367907543
+    ]
+   ],
+   "breakdown": []
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Ministerio de Economía y Finanzas del Perú, Deuda pública",
+   "url": "https://www.mef.gob.pe/"
+  },
+  {
+   "name": "INEI, Instituto Nacional de Estadística e Informática",
+   "url": "https://www.inei.gob.pe/"
+  }
+ ],
+ "notes": [
+  "Why the BCRP series: it is an official quarterly stock series with an open API, covering the whole non-financial public sector, so it is broader than central government alone.",
+  "Scope: this is the non-financial public sector, not only the central government, so it can differ from the Ministry of Economy and Finance's central-government figures.",
+  "Currency: Peruvian soles. The World Debt Clock converts at the US Treasury's quarter-end rate for the sol."
+ ],
+ "world_measure": "Non-financial public sector, gross"
+}

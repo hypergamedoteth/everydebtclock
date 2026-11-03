@@ -1,0 +1,98 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in THB. The debt component and history are refreshed by pipeline/fetch_thailand.py from the official source named below; edit wording here, not numbers.",
+ "slug": "thailand",
+ "kind": "country",
+ "country": "TH",
+ "iso3": "THA",
+ "name": "Thailand",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Public Debt Management Office (PDMO), Ministry of Finance of Thailand",
+ "currency": {
+  "code": "THB",
+  "symbol": "THB "
+ },
+ "frequency": "monthly",
+ "title": "Thailand Debt Clock: Live Public Debt, Official Data",
+ "headline": "public debt",
+ "headline_long": "public debt",
+ "link_label": "public debt, THB",
+ "subject": "The Kingdom of Thailand",
+ "hist_label": "Public Debt",
+ "sum_note": "Thailand's total public debt outstanding (government, state-owned enterprise, government-guaranteed financial SOE and government agency debt), month-end, from the PDMO's monthly summary.",
+ "scope_note": "This is the \"public debt\" that the PDMO states in its monthly Public Debt Status Summary: government debt plus the debt of state-owned enterprises, government-guaranteed financial SOE debt and government agency debt, in baht at month-end. It is the PDMO's own headline total, the one it quotes as a share of GDP. Government debt alone is about nine-tenths of it. It is gross and domestic plus foreign currency debt together.",
+ "trend_why": "The PDMO page lists only the latest few monthly summaries, so we use the change since the earliest one we could read (end of May 2026) rather than a full year. The window lengthens as new months are read.",
+ "legend": "Thailand's public debt is reported at period-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
+ "cadence": "Monthly. The PDMO publishes each month-end summary at the end of the following month.",
+ "after_text": ", about a month after each month-end",
+ "next_update": "The PDMO publishes the Public Debt Status Summary at the end of the following month; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 71619863,
+  "noun": "people",
+  "as_of": "2025-07-01",
+  "source_name": "World Bank, World Development Indicators, Population, total (SP.POP.TOTL), Thailand, 2025 (UN Population Division and national statistical offices)",
+  "source_url": "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=TH",
+  "publisher_short": "World Bank",
+  "tag": "WB",
+  "possessive": "the World Bank's",
+  "method_short": "World Bank 2025 population estimate, all ages",
+  "noun_full": "people in Thailand"
+ },
+ "components": [
+  {
+   "key": "cgdebt",
+   "label": "Thailand public debt",
+   "short": "Public debt",
+   "value": 13363491400000,
+   "as_of": "2026-09-30",
+   "prior_value": 12868850860000,
+   "prior_as_of": "2026-05-31",
+   "source_name": "PDMO, Public Debt Status Summary (monthly), total public debt outstanding, THB million",
+   "source_url": "https://www.pdmo.go.th/en/monthly-public-debt-report",
+   "source_locator": "First paragraph of each monthly summary: \"At the end of <month> <year>, Thailand's public debt amounted to … million Baht\"",
+   "includes": "Total public debt outstanding as the PDMO defines it: government debt, state-owned enterprise debt, government-guaranteed financial SOE debt and government agency debt, in baht.",
+   "facts": [],
+   "history": [
+    [
+     "2026-05-31",
+     12868850860000
+    ],
+    [
+     "2026-06-30",
+     12928973010000
+    ],
+    [
+     "2026-07-31",
+     13054699150000
+    ],
+    [
+     "2026-08-31",
+     13191837860000
+    ],
+    [
+     "2026-09-30",
+     13363491400000
+    ]
+   ],
+   "breakdown": []
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "PDMO, Public debt statistics",
+   "url": "https://www.pdmo.go.th/en"
+  },
+  {
+   "name": "Bank of Thailand, Government debt statistics",
+   "url": "https://app.bot.or.th/BTWS_STAT/statistics/BOTWEBSTAT.aspx?reportID=42&language=ENG"
+  }
+ ],
+ "notes": [
+  "Why the PDMO summary: it is the debt office's own monthly total, and the number Thailand's official debt-to-GDP ratio is built on. Government debt alone is a smaller figure; the Bank of Thailand also publishes a government-debt table.",
+  "The PDMO page lists only the latest few monthly summaries, so the trend starts from the earliest of those and the page keeps every month it has read; the window grows toward twelve months as the daily build collects them.",
+  "Currency: Thai baht. The World Debt Clock converts at the ECB's daily reference rate for the baht."
+ ],
+ "world_measure": "Public debt, gross",
+ "trend_pace": "the pace since the end of May 2026, the earliest month the PDMO page lets us use as a base",
+ "trend_period": "four months"
+}
