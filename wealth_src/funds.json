@@ -1625,6 +1625,434 @@
     "Per person here means per resident of Alaska. The fund is a state fund: the Alaska Permanent Fund Dividend is paid to eligible Alaska residents each year."
    ],
    "other_funds": null
+  },
+  {
+   "place_slug": null,
+   "regions": null,
+   "holdings": null,
+   "alloc": {
+    "title": "Group assets by type",
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "ICD Annual Report 2025, Assets Composition",
+     "url": "https://reporting.icd.gov.ae/2025/ICD-AR2025-Full-Report.pdf",
+     "published": "2026-05",
+     "locator": "ICD at a Glance: Assets Composition (as at 31 December 2025)"
+    },
+    "unit": null,
+    "rows": [
+     {
+      "name": "Loans and receivables",
+      "pct": 36
+     },
+     {
+      "name": "Cash and deposits with banks",
+      "pct": 22
+     },
+     {
+      "name": "Property, plant and equipment, investment and development properties",
+      "pct": 16
+     },
+     {
+      "name": "Investment securities",
+      "pct": 14
+     },
+     {
+      "name": "Other assets",
+      "pct": 12
+     }
+    ],
+    "note": "This is the consolidated balance sheet by type, as published. Percentages are as published."
+   },
+   "notes": [
+    "The ICD annual report PDF could not be fetched directly from our server (blocked); the figures were read from the report text as returned by a search extract and match the figures on icd.gov.ae."
+   ],
+   "other_funds": null,
+   "slug": "investment-corporation-of-dubai",
+   "name": "Investment Corporation of Dubai",
+   "short": "ICD",
+   "nick": "Investment Corporation of Dubai (ICD)",
+   "manager": "Investment Corporation of Dubai",
+   "country": "Dubai",
+   "iso3": "ARE",
+   "est": 2006,
+   "swf_rank": 9,
+   "blurb": "The Government of Dubai's investment company. It holds the government's stakes in major Dubai companies, including banks. Its reported total assets are a consolidated group balance sheet, not a pool of savings.",
+   "assets": {
+    "usd_bn": 457.51,
+    "basis": "official_converted",
+    "local": {
+     "code": "AED",
+     "amount_bn": 1680.21,
+     "label": "AED 1,680.21 billion"
+    },
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "ICD Annual Report 2025, Statement of Financial Position",
+     "url": "https://reporting.icd.gov.ae/2025/ICD-AR2025-Full-Report.pdf",
+     "published": "2026-05",
+     "locator": "Key Financial Highlights: Assets 1.68Tn; Total Assets AED 1,680,210 million at 31 Dec 2025"
+    },
+    "fx": {
+     "rate": 0.272294,
+     "date": "2025-12-31",
+     "source": "The dirham is pegged at 3.6725 per US dollar",
+     "url": "https://www.centralbank.ae/en/our-operations/exchange-rates/",
+     "quote": "AED 3.6725 = USD 1"
+    },
+    "note": "Consolidated group total assets, not assets under management. They include the balance sheets of the group's companies, mainly banking: customer deposits were AED 772.8 billion of the AED 1,277.7 billion in liabilities."
+   },
+   "quality": "full",
+   "pop": {
+    "value": 4580300,
+    "as_of": "2025-12-31",
+    "source": "Dubai Data and Statistics Establishment (Digital Dubai), Dubai resident population, end of 2025",
+    "url": "https://www.digitaldubai.ae/newsroom/news/dubai-digital-dubai's-population-tops-4.580-million-by-the-end-of-2025-recording-7.5-growth",
+    "office": true,
+    "scope": "Resident population of the emirate of Dubai, not the whole UAE"
+   },
+   "sectors": null
+  },
+  {
+   "place_slug": null,
+   "regions": null,
+   "holdings": null,
+   "alloc": null,
+   "notes": [],
+   "other_funds": null,
+   "slug": "limad-holding",
+   "name": "L'imad Holding",
+   "short": "L'imad",
+   "nick": "L'imad Holding",
+   "manager": "L'imad Holding",
+   "country": "United Arab Emirates",
+   "iso3": "ARE",
+   "est": 2026,
+   "swf_rank": 13,
+   "blurb": "Abu Dhabi's newest sovereign fund. In January 2026 it took over ADQ and other state holdings. We found no total published by the fund.",
+   "assets": {
+    "usd_bn": 300,
+    "basis": "estimate",
+    "local": null,
+    "as_of": "2026-10",
+    "source": {
+     "name": "Global SWF, Ranking of sovereign and public pension funds (October 2026)",
+     "url": "https://globalswf.com/ranking",
+     "published": "October 2026",
+     "locator": "AuM ($b) column"
+    },
+    "estimate_note": "We found no total published by L'imad for the combined group. This is Global SWF's estimate, not an official figure."
+   },
+   "quality": "estimate",
+   "pop": {
+    "value": 11346000,
+    "as_of": "mid-2025",
+    "source": "IMF World Economic Outlook, October 2026 (population estimate)",
+    "url": "https://www.imf.org/external/datamapper/LP@WEO",
+    "office": false,
+    "scope": "Total UAE population, including the large expatriate population"
+   },
+   "sectors": null
+  },
+  {
+   "place_slug": "indonesia",
+   "regions": null,
+   "holdings": null,
+   "alloc": null,
+   "notes": [
+    "Danantara manages around 1,044 state-owned enterprises, to be reduced to around 300 (Danantara press release, 23 Jan 2026). No asset allocation is published."
+   ],
+   "other_funds": null,
+   "slug": "danantara-indonesia",
+   "name": "Danantara Indonesia",
+   "short": "Danantara",
+   "nick": "Danantara Indonesia",
+   "manager": "BPI Danantara (Badan Pengelola Investasi Daya Anagata Nusantara)",
+   "country": "Indonesia",
+   "iso3": "IDN",
+   "est": 2025,
+   "swf_rank": 16,
+   "blurb": "Indonesia's sovereign fund, launched in February 2025. It holds and manages the state-owned enterprises. Its headline assets are mostly those companies' assets.",
+   "assets": {
+    "usd_bn": 1000,
+    "basis": "official",
+    "round": true,
+    "local": null,
+    "as_of": "2026-01-23",
+    "source": {
+     "name": "Danantara Indonesia press release, President Prabowo at WEF 2026",
+     "url": "https://www.danantaraindonesia.co.id/media-center/press-releases/president-prabowo-at-wef-2026-danantara-indonesia-is-the-energy-to-power-the-future-of-indonesia",
+     "published": "2026-01-23",
+     "locator": "\"Indonesia's sovereign fund managing US$1 trillion in assets\""
+    },
+    "note": "A rounded headline figure from Danantara's own press release, not an audited fund balance sheet. It counts the assets of the state-owned enterprises Danantara manages, so it is not comparable with the investment portfolios of other funds. Global SWF, which tracks investable assets, lists about US$230 billion."
+   },
+   "quality": "total",
+   "pop": {
+    "value": 284670000,
+    "as_of": "mid-2025",
+    "source": "IMF World Economic Outlook, October 2026 (population estimate)",
+    "url": "https://www.imf.org/external/datamapper/LP@WEO",
+    "office": false,
+    "scope": "Total Indonesian population"
+   },
+   "sectors": null
+  },
+  {
+   "place_slug": null,
+   "regions": null,
+   "holdings": null,
+   "alloc": null,
+   "notes": [],
+   "other_funds": null,
+   "slug": "dubai-holding",
+   "name": "Dubai Holding",
+   "short": "Dubai Holding",
+   "nick": "Dubai Holding",
+   "manager": "Dubai Holding",
+   "country": "Dubai",
+   "iso3": "ARE",
+   "est": 2004,
+   "swf_rank": 19,
+   "blurb": "A Dubai-based investment company with stakes in real estate, hospitality, retail, media and investments. It is not a pool of savings. It publishes a rounded asset figure and no allocation.",
+   "assets": {
+    "usd_bn": 136.15,
+    "basis": "official_converted",
+    "round": true,
+    "local": {
+     "code": "AED",
+     "amount_bn": 500,
+     "label": "AED 500 billion"
+    },
+    "as_of": "2025",
+    "source": {
+     "name": "Dubai Holding, Impact Report: A Legacy of Growth",
+     "url": "https://www.dubaiholding.com/en/impact-report",
+     "published": "2026",
+     "locator": "\"Total assets under management: AED 500bn in assets\""
+    },
+    "fx": {
+     "rate": 0.272294,
+     "date": "2025",
+     "source": "The dirham is pegged at 3.6725 per US dollar",
+     "url": "https://www.centralbank.ae/en/our-operations/exchange-rates/",
+     "quote": "AED 3.6725 = USD 1"
+    },
+    "note": "A rounded figure from Dubai Holding's first Impact Report (covering 2025). The report gives no balance-sheet date or breakdown, and the group's homepage says \"over AED 500 billion\"."
+   },
+   "quality": "total",
+   "pop": {
+    "value": 4580300,
+    "as_of": "2025-12-31",
+    "source": "Dubai Data and Statistics Establishment (Digital Dubai), Dubai resident population, end of 2025",
+    "url": "https://www.digitaldubai.ae/newsroom/news/dubai-digital-dubai's-population-tops-4.580-million-by-the-end-of-2025-recording-7.5-growth",
+    "office": true,
+    "scope": "Resident population of the emirate of Dubai, not the whole UAE"
+   },
+   "sectors": null
+  },
+  {
+   "place_slug": null,
+   "regions": null,
+   "holdings": null,
+   "alloc": null,
+   "notes": [],
+   "other_funds": null,
+   "slug": "emirates-investment-authority",
+   "name": "Emirates Investment Authority",
+   "short": "EIA",
+   "nick": "Emirates Investment Authority (EIA)",
+   "manager": "Emirates Investment Authority",
+   "country": "United Arab Emirates",
+   "iso3": "ARE",
+   "est": 2007,
+   "swf_rank": 20,
+   "blurb": "The UAE federal government's sovereign fund. We found no assets or allocation published by the fund.",
+   "assets": {
+    "usd_bn": 116,
+    "basis": "estimate",
+    "local": null,
+    "as_of": "2026-10",
+    "source": {
+     "name": "Global SWF, Ranking of sovereign and public pension funds (October 2026)",
+     "url": "https://globalswf.com/ranking",
+     "published": "October 2026",
+     "locator": "AuM ($b) column"
+    },
+    "estimate_note": "We found no total published by EIA. This is Global SWF's estimate, not an official figure."
+   },
+   "quality": "estimate",
+   "pop": {
+    "value": 11346000,
+    "as_of": "mid-2025",
+    "source": "IMF World Economic Outlook, October 2026 (population estimate)",
+    "url": "https://www.imf.org/external/datamapper/LP@WEO",
+    "office": false,
+    "scope": "Total UAE population, including the large expatriate population"
+   },
+   "sectors": null
+  },
+  {
+   "place_slug": null,
+   "regions": null,
+   "holdings": null,
+   "alloc": null,
+   "notes": [
+    "QIC's infrastructure team manages A$40.9 billion across 21 direct investments, and its property portfolio is A$13.0 billion (Annual Report 2024-25). A full asset mix is not shown here."
+   ],
+   "other_funds": null,
+   "slug": "qic",
+   "name": "QIC (Queensland Investment Corporation)",
+   "short": "QIC",
+   "nick": "QIC (Queensland)",
+   "manager": "QIC Limited",
+   "country": "Queensland",
+   "iso3": "AUS",
+   "est": 1991,
+   "swf_rank": 23,
+   "blurb": "The Queensland Government's investment company. It manages the state's portfolios and invests for other institutions in infrastructure, real estate, private equity and liquid markets.",
+   "assets": {
+    "usd_bn": 85.93,
+    "basis": "official_converted",
+    "local": {
+     "code": "AUD",
+     "amount_bn": 131.6,
+     "label": "A$131.6 billion"
+    },
+    "as_of": "2025-06-30",
+    "source": {
+     "name": "QIC Limited Annual Report 2024-25",
+     "url": "https://edge.sitecorecloud.io/giclimited1-qiccom-prod-94af/media/Project/QIC/QIC/About-QIC/Corporate-Governance/Annual-reports/2024-25/QIC-Limited-Annual-Report-2024-25.pdf",
+     "published": "2025",
+     "locator": "\"We have $131.6 billion in assets under management\" (gross AUM at 30 June 2025)"
+    },
+    "fx": {
+     "rate": 0.652998,
+     "date": "2025-06-30",
+     "source": "ECB euro foreign exchange reference rates, 30 June 2025: USD 1.1720 and AUD 1.7948 per euro",
+     "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.USD+AUD.EUR.SP00.A?startPeriod=2025-06-30&endPeriod=2025-06-30",
+     "quote": "EUR/USD 1.1720 ÷ EUR/AUD 1.7948"
+    },
+    "note": "Gross assets under management: market value of gross assets managed, plus undrawn commitments, excluding multi-asset derivative exposures. It includes money QIC invests for institutions outside Queensland's government, and the Queensland Government does not guarantee it."
+   },
+   "quality": "total",
+   "pop": {
+    "value": 5669834,
+    "as_of": "2025-06-30",
+    "source": "Australian Bureau of Statistics, National, state and territory population, June 2025 (preliminary), Queensland",
+    "url": "https://www.abs.gov.au/statistics/people/population/national-state-and-territory-population/jun-2025",
+    "office": true,
+    "scope": "Estimated resident population of Queensland, not Australia as a whole"
+   },
+   "sectors": null
+  },
+  {
+   "place_slug": null,
+   "regions": null,
+   "holdings": null,
+   "alloc": null,
+   "notes": [
+    "PNB is a fund manager with 16.8 million accounts and 294.8 billion units in circulation (Integrated Report 2025). Global SWF classes it as a sovereign wealth fund. No allocation is shown here."
+   ],
+   "other_funds": null,
+   "slug": "permodalan-nasional-berhad",
+   "name": "Permodalan Nasional Berhad",
+   "short": "PNB",
+   "nick": "Permodalan Nasional Berhad (PNB)",
+   "manager": "Permodalan Nasional Berhad",
+   "country": "Malaysia",
+   "iso3": "MYS",
+   "est": 1978,
+   "swf_rank": 24,
+   "blurb": "Malaysia's government-owned fund manager. It runs the ASNB unit trusts for 16.8 million accounts and holds large stakes in Malaysian companies.",
+   "assets": {
+    "usd_bn": 90.02,
+    "basis": "official_converted",
+    "local": {
+     "code": "MYR",
+     "amount_bn": 365.3,
+     "label": "RM365.3 billion"
+    },
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "PNB Integrated Report 2025",
+     "url": "https://www.pnb.com.my/sites/default/files/2026-08/1_PNB%20IAR%2025_EN.pdf",
+     "published": "2026-06-19",
+     "locator": "Assets Under Management RM365.3 billion (2024: RM348.3 billion)"
+    },
+    "fx": {
+     "rate": 0.246424,
+     "date": "2025-12-31",
+     "source": "ECB euro foreign exchange reference rates, 31 December 2025: USD 1.1750 and MYR 4.7682 per euro",
+     "url": "https://data-api.ecb.europa.eu/service/data/EXR/D.USD+MYR.EUR.SP00.A?startPeriod=2025-12-31&endPeriod=2025-12-31",
+     "quote": "EUR/USD 1.1750 ÷ EUR/MYR 4.7682"
+    },
+    "note": "Assets under management as PNB defines them. Most of this is unitholders' money in PNB's unit trusts, not government reserves."
+   },
+   "quality": "total",
+   "pop": {
+    "value": 33852000,
+    "as_of": "mid-2025",
+    "source": "IMF World Economic Outlook, October 2026 (population estimate)",
+    "url": "https://www.imf.org/external/datamapper/LP@WEO",
+    "office": false,
+    "scope": "Total Malaysian population"
+   },
+   "sectors": null
+  },
+  {
+   "place_slug": null,
+   "regions": null,
+   "holdings": null,
+   "alloc": null,
+   "notes": [
+    "The group's equity was KZT 27.18 trillion and revenue KZT 18.77 trillion in 2025 (audited statements). No investment allocation is published."
+   ],
+   "other_funds": null,
+   "slug": "samruk-kazyna",
+   "name": "Samruk-Kazyna",
+   "short": "Samruk-Kazyna",
+   "nick": "Samruk-Kazyna",
+   "manager": "Sovereign Wealth Fund Samruk-Kazyna JSC",
+   "country": "Kazakhstan",
+   "iso3": "KAZ",
+   "est": 2008,
+   "swf_rank": 25,
+   "blurb": "Kazakhstan's state holding company. It owns major oil and gas, transport and communications companies. Its reported assets are the consolidated assets of those companies.",
+   "assets": {
+    "usd_bn": 88.03,
+    "basis": "official_converted",
+    "local": {
+     "code": "KZT",
+     "amount_bn": 44242.913,
+     "label": "KZT 44.24 trillion"
+    },
+    "as_of": "2025-12-31",
+    "source": {
+     "name": "Samruk-Kazyna consolidated financial statements for 2025 (audited, PwC, IFRS)",
+     "url": "https://sk.kz/upload/iblock/001/KFO_SK_31.12.2025_ENG.pdf",
+     "published": "2026-06-09",
+     "locator": "Total assets KZT 44,242,913 million at 31 Dec 2025 (also in the KASE release of 9 June 2026 and Annual Report 2025: KZT 44,243 billion)"
+    },
+    "fx": {
+     "rate": 0.00198977,
+     "date": "2025-12-31",
+     "source": "National Bank of Kazakhstan official rate, 31 December 2025: KZT 502.57 per USD (as republished by banki24.kz)",
+     "url": "https://banki24.kz/kurs/nbrk/dollar-na-31-12-2025",
+     "quote": "KZT 502.57 = USD 1"
+    },
+    "note": "Consolidated group total assets, not assets under management. They include the operating assets of the group's companies."
+   },
+   "quality": "total",
+   "pop": {
+    "value": 20392000,
+    "as_of": "mid-2025",
+    "source": "IMF World Economic Outlook, October 2026 (population estimate)",
+    "url": "https://www.imf.org/external/datamapper/LP@WEO",
+    "office": false,
+    "scope": "Total Kazakhstan population"
+   },
+   "sectors": null
   }
  ]
 }
