@@ -34,7 +34,7 @@ def apply(p):
     why = {"both": f"{n_noise}; and {n_large}", "noise": n_noise, "large": n_large}.get("both" if noise and large else "noise" if noise else "large" if large else "", "")
     if noise and large: why = f"the {prev}→{last} change is both within about two standard errors of the Census estimate and more than {MAX_TICK:.0%} of the {prev} level in one year"
     p["hold_why"] = ""  # set below to the short reason
-    notes = [n for n in p["notes"] if not re.match(r"The \d{4}→\d{4} change", n) and not n.startswith("Large swings")]
+    notes = [n for n in p["notes"] if not re.match(r"The \d{4}→\d{4} change", n) and not n.startswith(("Large swings", "This page therefore shows the official figure as published")) and n != p.get("reconcile_note")]
     notes[1] = re.sub(r"so the (page shows the official figure as of|live clock projects from) June 30", "so the " + ("page shows the official figure as of" if p["hold_trend"] else "live clock projects from") + " June 30", notes[1])
     new = []
     if noise: new.append(f"The {prev}→{last} change ({'+' if ch >= 0 else '−'}{_b(ch)}) is smaller than about two standard errors of the Census estimate (about {_b(2 * se)} at a {cv:g}% coefficient of variation), so Census's data does not show which way the debt is moving.")

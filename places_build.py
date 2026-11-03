@@ -376,7 +376,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                 + f'{_usd0(yr_change)} over {days} days = {_usd2(rate)} per second. {E(p.get("trend_why", "")) + " " if p.get("trend_why") else ""}The actual path is lumpy (bonds are sold in batches and repaid on schedules), so the projection will drift; '
                 f'when new {T["report"]} come out, the clock re-bases to the new official figures.</p>')
     else:
-        meth = "<p><b>Why this number doesn't tick.</b> Only one official year is available, so there is no defensible trend to project. The figure shown is the official total.</p>"
+        meth = "<p><b>Why this number doesn't tick.</b> " + (f"Earlier official years are in the history table, but {E(p['hold_why'])}, so there is no defensible trend to project. The figure shown is the official total.</p>" if p.get("hold_trend") and p.get("hold_why") else "Only one official year is available, so there is no defensible trend to project. The figure shown is the official total.</p>")
     meth += (f'<p><b>How often it\'s published.</b> {E(p.get("cadence", ""))} {E(p.get("next_update", ""))}</p>'
              f'<p><b>Per {E(dem)}</b> divides by {E(T["pop_pos"])} estimate of {pop["value"]:,} {T["noun"]} on {_fd(pop["as_of"])}. It is not projected forward, so the live per-{E(dem)} figure {"rises" if (rate or 0) >= 0 else "falls"} only with the debt.</p>'
              + "".join(f"<p><b>Note.</b> {E(n)}</p>" for n in p.get("notes", []) + [p.get("fiscal_year_end_note", "")] if n)
