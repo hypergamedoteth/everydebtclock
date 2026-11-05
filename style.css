@@ -147,3 +147,17 @@ main .intro{max-width:none;margin:2px 0 18px;padding:0 2px}
 .explore{max-width:1280px;margin:0 auto;padding:0 14px 26px}.explore .xg{margin:0 0 14px}.explore h3{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;margin:0 0 7px;font-weight:600}
 .explore .xc{display:flex;flex-wrap:wrap;gap:7px}.explore .xc a{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--txt);background:var(--panel)}.explore .xc a:hover{border-color:var(--blue);color:var(--blue)}
 .answers .explore{padding:0}@media (max-width:640px){.srch ul{right:0}}
+/* Embed-this-clock control (below the page) and the /embed/ directory. The clock widgets themselves are standalone. */
+.embedbox{max-width:1280px;margin:0 auto;padding:0 14px 18px}
+.embedbtn,.embedcopy{background:var(--panel);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.embedbtn:hover,.embedcopy:hover{border-color:var(--blue);color:var(--blue)}
+.embedbtn:focus-visible,.embedcopy:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.embedpanel{margin-top:8px}.embedpanel p{margin:0 0 8px;color:var(--mut);font-size:13px}
+.embedpanel textarea,.embcard textarea{display:block;width:100%;max-width:720px;margin:8px 0;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:8px;font:12px/1.45 var(--mono)}
+.embwrap{max-width:1280px;margin:0 auto;padding:4px 14px 48px}
+.embsec{margin:8px 0 22px}.embsec h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}
+.embgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.embcard{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px;min-width:0}
+.embcard h3{margin:0;font-size:16px}.embcard .sub{margin:2px 0 8px;color:var(--mut);font-size:12px}
+.embcard iframe{display:block;width:100%;height:160px;border:0;border-radius:10px;background:#0e131b}
+.embcard textarea{max-width:none}

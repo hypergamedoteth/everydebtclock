@@ -5,6 +5,7 @@
  3) t/<slug>.html real, indexable, live-ticking share pages (one per ticker)
  4) sitemap.xml + robots.txt
  5) dist/debtclock-standalone.html (everything inlined, works offline)
+ 6) embed/ widgets (one noindex page per US, state and country clock) and the indexable /embed/ directory
 Site URL defaults to https://everydebtclock.com; override with DEBTCLOCK_SITE_URL for previews."""
 import json, os, html, time, datetime as dt, re
 from zoneinfo import ZoneInfo
@@ -787,17 +788,23 @@ PLACE_URLS += wealth_build.build(R, SITE, with_analytics, og, PLACES_LIVE, WEALT
 
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()
-urls = ([(f"{SITE}/", "1.0", "hourly")] + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
+# /embed/ is indexable. Per-clock pages under /embed/us|states|countries/ are noindex and stay out of this list.
+urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/embed/", "0.5", "weekly")] + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
         [(u, "0.8", "weekly") for u in PLACE_URLS] +
         [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None] +
         ([(f"{SITE}/privacy.html", "0.2", "yearly")] if os.path.exists(f"{R}/privacy.html") else []))
 open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     "".join(f"<url><loc>{u}</loc><lastmod>{lm}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
+# GitHub Pages does not send X-Frame-Options. Leave it that way so /embed/ clocks can be iframed.
 open(f"{R}/robots.txt", "w").write(f"User-agent: *\nAllow: /\nDisallow: /cache/\nDisallow: /pipeline/\nDisallow: /widget.html\nSitemap: {SITE}/sitemap.xml\n")
 
-# ---------------------------------------------------------------- standalone
+# ---------------------------------------------------------------- embeddable clocks (after pages exist; patches the US, state and country pages)
+import embed_build
+embed_build.apply(R, SITE, with_analytics, require_pages=True)
+
+# ---------------------------------------------------------------- standalone (read index.html back so the embed control is in the offline copy)
 css, js = open(f"{R}/style.css").read(), open(f"{R}/app.js").read()
-idx_ = re.sub(r'(href|src)="(style\.css|app\.js)\?v=[^"]*"', r'\1="\2"', idx)
+idx_ = re.sub(r'(href|src)="(style\.css|app\.js)\?v=[^"]*"', r'\1="\2"', open(f"{R}/index.html").read())
 single = (idx_.replace('<link rel="stylesheet" href="style.css">', f"<style>{css}</style>")
              .replace("<!--DATA-->", "<script>window.DEBTCLOCK_DATA=" + json.dumps(D, separators=(",", ":")).replace("</", "<\\/") + ";</script>")
              .replace('<script src="app.js"></script>', f"<script>{js}</script>"))
@@ -811,7 +818,7 @@ import hashlib, glob as _glob
 AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in ("style.css", "app.js", "core.js") if os.path.exists(f"{R}/{a}")}
 _vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
 _pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html")] + _glob.glob(f"{R}/t/*.html")
-          + [f for d in ["states", "countries", "world"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
+          + [f for d in ["states", "countries", "world", "embed"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
 # Every page gets the homepage's inline icon, so browsers never fall back to requesting /favicon.ico (a 404).
 _icon = (re.search(r'<link rel="icon"[^>]*>', open(f"{R}/index.html").read()) or [None])[0]
 for f in _pages:
