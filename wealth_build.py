@@ -250,7 +250,7 @@ def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
     explore_html = f'<section class="explore" id="explore"><div class="sh"><h2>Explore more</h2></div>{xg}</section>'
     links = ('<section class="answers" id="answers"><ul><li><a href="../">Sovereign wealth funds ranked</a></li>' + (f'<li><a href="../../{place_url}">{E(f["country"])} debt clock</a></li>' if place_url else "") +
              '<li><a href="../../">US national debt clock</a></li><li><a href="../../api/wealth.json">Wealth funds as JSON</a></li></ul></section>')
-    page = (pb.meta_head(SITE, url, title, desc, img, 2, pb.PL_CSS + CSS, ld) + _header(places, 2, jump) + ex.search_box("../../") + intro + '<main id="app">' + hero + sect_assets + det_html + pc + inv + disc + srcsec + '</main>' + explore_html + links + _foot(2) + "</body></html>")
+    page = (pb.meta_head(SITE, url, title, desc, img, 2, pb.PL_CSS + CSS, ld) + _header(places, 2, jump) + ex.search_box("../../") + '<main id="app">' + hero + intro + sect_assets + det_html + pc + inv + disc + srcsec + '</main>' + explore_html + links + _foot(2) + "</body></html>")
     os.makedirs(f"{R}/wealth/{f['slug']}", exist_ok=True)
     open(f"{R}/wealth/{f['slug']}/index.html", "w").write(with_analytics(page))
     return url

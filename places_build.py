@@ -441,7 +441,7 @@ dlg.addEventListener('close',()=>mt=null);document.querySelectorAll('[data-d]').
 ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);k.ppx.forEach(e=>e.textContent=usd(v/+e.dataset.pp,2))}})}}if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
 
     explore_html = ex.explore("../../", places, calc, cur=p, gdp=GDP_BY_SLUG)
-    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + ex.search_box("../../") + intro + '<main id="app">' + hero + wc + debt_sec + comp_secs + people + hist + details + method
+    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + ex.search_box("../../") + '<main id="app">' + hero + intro + wc + debt_sec + comp_secs + people + hist + details + method
             + '</main><dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))
