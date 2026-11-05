@@ -215,7 +215,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
 const H=document.getElementById('total'),B=+H.dataset.b,R=+H.dataset.r,T0=+H.dataset.t,hv=document.getElementById('hv'),hs=document.getElementById('hs'),hpp=document.getElementById('hpp'),OPENED=Date.now()/1000;
 const tot=t=>B+R*(t-T0);(function f(){const t=Date.now()/1000,x=tot(t);hv.textContent='$'+nf0.format(x);hs.textContent='$'+nf0.format(R*(t-OPENED));hpp.textContent='$'+nf2.format(x/+hpp.dataset.pp);requestAnimationFrame(f)})()})()</script>"""
     explore_html = ex.explore("../", places, pb.calc, cur=None, gdp=pb.GDP_BY_SLUG, usd={x["slug"]: x["usd"] for x in rows}, kind_hint="world")
-    page = (pb.meta_head(SITE, url, title, desc, img, 1, pb.PL_CSS + CSS, ld) + header + ex.search_box("../") + intro + '<main id="app">' + hero + covsent + table + meas + rates + method + '</main>' + explore_html + links
+    page = (pb.meta_head(SITE, url, title, desc, img, 1, pb.PL_CSS + CSS, ld) + header + ex.search_box("../") + '<main id="app">' + hero + intro + covsent + table + meas + rates + method + '</main>' + explore_html + links
             + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>' + script + "</body></html>")
     os.makedirs(f"{R}/world", exist_ok=True)
     open(f"{R}/world/index.html", "w").write(with_analytics(page))

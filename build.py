@@ -244,6 +244,7 @@ def row(slug):
 ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="k">US national debt · official, {fdate(OFF_D)} close</div><div class="big num">{usd0(OFF_V)}</div>
 <div class="trio"><div><span class="l">Per person (Census, {fdate(POP_OFF_DATE)})</span><span class="num">{usd2(PP_OFF)}</span></div>
 <div><span class="l">Per tax return filed</span><span class="num">{usd2(OFF_V / TAX)}</span></div><div><span class="l">Per household</span><span class="num">{usd2(OFF_V / HH)}</span></div></div></div>
+<section class="intro" id="intro">{intro}</section>
 <section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
 {''.join(row(s_) for s_ in ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "spending", "revenue", "gdp"])}</table>
 <noscript><p>Turn on JavaScript to watch these figures tick in real time.</p></noscript></section></div><!--/SSR-->""")
@@ -269,9 +270,15 @@ links = (f"""<!--LINKS-->""" + HOME_EXPLORE + ("" if not PLACES_LIVE else '<div 
          + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (sum of the countries, in US dollars)</li>' if WORLD else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
 <div class="sh"><h2>Popular counters</h2></div><ul>{''.join(f'<li><a href="t/{k}.html">{html.escape(label(k, ALL[k]))}</a></li>' for k in KEY_TICKERS if k in ALL)}</ul><!--/LINKS-->""")
 if "<!--INTRO-->" in idx: idx = re.sub(r"<!--INTRO-->.*?<!--/INTRO-->", lambda m: intro, idx, flags=re.S)
-else: idx = idx.replace('<main id="app">', f'<section class="intro" id="intro">{intro}</section>\n<main id="app">', 1)
 if "<!--SSR-->" in idx: idx = re.sub(r"<!--SSR-->.*?<!--/SSR-->", lambda m: ssr, idx, flags=re.S)
 else: idx = idx.replace('<main id="app"></main>', f'<main id="app">{ssr}</main>', 1)
+# The lead ticker is first. Drop a copy of the summary that an older homepage left above it;
+# the SSR block already carries the summary directly under the ticker.
+_hero_at = idx.find('<div class="hero lead"')
+_intro_at = idx.find('<section class="intro"')
+if _intro_at != -1 and _hero_at != -1 and _intro_at < _hero_at:
+    _intro_end = idx.find('</section>', _intro_at)
+    if _intro_end != -1: idx = idx[:_intro_at] + idx[_intro_end + len('</section>'):]
 if "<!--LINKS-->" in idx: idx = re.sub(r"<!--LINKS-->.*?<!--/LINKS-->", lambda m: links, idx, flags=re.S)
 else: idx = idx.replace('<dialog id="dlg"></dialog>', f'<dialog id="dlg"></dialog>\n<section class="answers" id="answers">{links}</section>', 1)
 PLNAV = ("<!--PLNAV-->" + ('<nav class="plnav"><a href="./" class="on">United States</a>' + "".join(f'<a href="{d}/">{lab}</a>' for k, d, lab, _ in places_build.SECTIONS
