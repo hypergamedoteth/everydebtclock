@@ -48,7 +48,7 @@ def apply(p):
     if p.get("reconcile_note"): new.append(p["reconcile_note"])  # hand-written note tying the page to a newer state-published figure
     notes[2:2] = new
     p["notes"] = notes
-    lg = BASE.format(name=name)
+    lg = (BASE if len(cs) > 1 else BASE.replace("state + local debt", "debt")).format(name=name)  # DC has no state government: one component
     sw = f"{'+' if ch >= 0 else '−'}{abs(pct):.1%}"
     sh = ("the " + f"{prev}→{last} change ({sw}) is within about two standard errors of the Census estimate" if noise and not large else
           f"the {prev}→{last} change ({sw}) is too large to carry forward as a trend" if large and not noise else

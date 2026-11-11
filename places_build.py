@@ -80,6 +80,7 @@ def _gap(T, d0, d1):
 
 def _when(p, d_):
     """How a figure date is labelled: FY2025 (annual, fiscal year-end) or Sep 2026 (monthly, month-end)."""
+    if p.get("year_label"): return f"{p['year_label']} {_d(d_).year}"  # e.g. District of Columbia: "Survey year 2024" (Census survey year, not DC's own fiscal year)
     return _d(d_).strftime("%b %Y") if p.get("frequency") in ("weekly", "monthly", "quarterly") else f"FY{_d(d_).year}"
 
 def comp_rate(c):
@@ -201,8 +202,10 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     ticks = bool(rate)  # "Live" only where the number really ticks
     lv = "Live " if ticks else ""
     title = (f"{name} State & Local Debt Clock: {lv}Debt, Official Census Data" if is_state else f"{name} National Debt Clock: {lv}Debt, Official Data")
-    h1 = f"{name} State & Local Debt Clock" if is_state else f"{name} National Debt Clock"
-    desc = (f"{name} {'state and local debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, {'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
+    if p.get("seo_title"): title = p["seo_title"].format(lv=lv)  # optional per-place override (District of Columbia: no state level)
+    h1 = p.get("h1") or (f"{name} State & Local Debt Clock" if is_state else f"{name} National Debt Clock")
+    _dn = p.get("seo_desc_noun")  # optional: full noun phrase for the description's opening
+    desc = ((f"{_dn[0].upper() + _dn[1:]}: {_b(c['total'])}, " if _dn else f"{name} {'state and local debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, ") + f"{'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
             f"{'Live ' if rate else 'Official '}{name} debt clock, {'about ' if rate else ''}{_usd0(proj / pop['value'])} per {dem}{' (projected)' if rate else ''}, with sources.")
     img = f"og/places/{p['slug']}.png"
     if og:
@@ -260,7 +263,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
              f'<a href="../../{sec_dir}/">All {"US state" if is_state else "country"} debt clocks</a>' + ('<span>·</span><a href="../../world/">World debt clock</a>' if WORLD else "") + '</div>')
     intro = (f'<section class="intro" id="intro">{crumb}<h1>{E(h1)}</h1>'
              f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
-             + (f'on <b>{as_of}</b>' if T["periodic"] else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
+             + (f'on <b>{as_of}</b>' if T["periodic"] else f'in Census survey year {fy} (dated <b>{as_of}</b>)' if p.get("year_label") else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
              + " and ".join(("" if n_.startswith("Eurostat") else "the ") + f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
              + (f': {parts}' if len(cs) > 1 else '') + f'. {E(p.get("scope_note", ""))}{" " if p.get("scope_note") else ""}That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by {E(T["pop_pos"])} estimate of {pop["value"]:,} {E(T['noun_full'])} on {_fd(pop["as_of"])}. {proj_txt}</p></section>')
 
@@ -376,12 +379,12 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
             prev = ds[len(ds) - 2 - k] if len(ds) - 2 - k >= 0 else None
             ch = sum(HV[d_]) - sum(HV[prev]) if prev else None
             gap = _gap(T, prev, d_) if prev else ""   # "over 2 months" when a month is missing between two rows
-            rows += (f"<tr><td>{_fd(d_)}</td>" + "".join(f'<td class="num">{_usd0(v)}</td>' for v in HV[d_]) + f'<td class="num">{_usd0(sum(HV[d_]))}</td>'
+            rows += (f"<tr><td>{_fd(d_)}</td>" + "".join(f'<td class="num">{_usd0(v)}</td>' for v in HV[d_]) + (f'<td class="num">{_usd0(sum(HV[d_]))}</td>' if len(cs) > 1 else "") +
                      f'<td class="num">{"—" if ch is None else ("+" if ch >= 0 else "−") + _short(abs(ch)) + gap}</td></tr>')
         # a weekly dataset whose stored history is month-end rows is labelled for what the rows are
         month_rows = T["unit"] == "week" and len(ds) > 2 and (_d(ds[-1]) - _d(ds[0])).days / (len(ds) - 1) > 20
         det_hist = (f'<h3>{"By month-end (and the latest weekly figure)" if month_rows else "By " + T["unit"]} (official)</h3><table class="v"><tr><th>{"Date" if month_rows else T["end"].capitalize()}</th>' + "".join(f"<th>{E(x['short'])}</th>" for x in cs)
-                    + f"<th>Combined</th><th>Change</th></tr>{rows}</table>")
+                    + ("<th>Combined</th>" if len(cs) > 1 else "") + f"<th>Change</th></tr>{rows}</table>")
 
     # ---- Details: the long tables, below the fold (like the US detail sections)
     def comp_table(x):
@@ -474,7 +477,7 @@ def index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, kind, sec_dir, lab, d
                  f'<span class="h2n">{len(items)} live</span></div><div class="grid hub">{tiles}</div></section>')
     ns, nc = sum(1 for x in ix if x["kind"] == "state"), sum(1 for x in ix if x["kind"] == "country")
     if kind == "state":
-        title, h1, desc = "US State Debt Clocks: Debt of Every State, Official Data", "US State Debt Clocks", f"State and local debt of {ns} US states, from official Census figures, with sources. Each state ticks forward only where its trend is reliable; otherwise the official figure is shown as published. Also {nc} country national debt clocks."
+        title, h1, desc = "US State Debt Clocks: Debt of Every State, Official Data", "US State Debt Clocks", f"State and local debt of {ns - 1} US states and DC, from official Census figures, with sources. Each state ticks forward only where its trend is reliable; otherwise the official figure is shown as published. Also {nc} country national debt clocks."
     else:
         title, h1, desc = "Country Debt Clocks: National Debt by Country, Official Data", "Country Debt Clocks: National Debt by Country", f"National debt of {nc} countries: a live debt clock for each, projected from official government and central-bank figures, with sources and as-of dates. Also {ns} US state debt clocks."
     header = (f'<header class="top"><div class="topin"><a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>{nav_html(places, 1, kind, "plnav")}'
