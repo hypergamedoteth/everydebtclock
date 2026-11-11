@@ -811,12 +811,13 @@ import hashlib, glob as _glob
 AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in ("style.css", "app.js", "core.js") if os.path.exists(f"{R}/{a}")}
 _vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
 _pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html")] + _glob.glob(f"{R}/t/*.html")
-          + [f for d in ["states", "countries", "world"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
-# Every page gets the homepage's inline icon, so browsers never fall back to requesting /favicon.ico (a 404).
-_icon = (re.search(r'<link rel="icon"[^>]*>', open(f"{R}/index.html").read()) or [None])[0]
+          + [f for d in ["states", "countries", "world", "wealth"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
+# Every page gets real icon files (favicon.ico, a 32px PNG and the SVG), replacing the old inline data-URI icon. Made by pipeline/make_favicon.py.
+ICON_LINKS = '<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg">'
+_icon_re = re.compile(r'<link rel="icon"[^>]*>')
 for f in _pages:
     if not os.path.exists(f): continue
     s_ = open(f).read(); n_ = _vre.sub(lambda m: f'{m.group(1)}{m.group(2)}{m.group(3)}?v={AV[m.group(3)]}"', s_)
-    if _icon and 'rel="icon"' not in n_ and "</head>" in n_: n_ = n_.replace("</head>", _icon + "</head>", 1)
+    if "/favicon.ico" not in n_ and "</head>" in n_: n_ = _icon_re.sub("", n_).replace("</head>", ICON_LINKS + "</head>", 1)
     if n_ != s_: open(f, "w").write(n_)
 print("asset versions:", AV)

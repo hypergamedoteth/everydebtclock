@@ -6,16 +6,16 @@ import json, os, html
 
 E = html.escape
 
-# Land borders between the 50 states (Four Corners points count: AZ-CO, NM-UT). Checked for symmetry at build time (check()).
+# Land borders between the 50 states and the District of Columbia (Four Corners points count: AZ-CO, NM-UT). Checked for symmetry at build time (check()).
 NEIGHBORS = {
  "alabama": "florida georgia mississippi tennessee", "alaska": "", "arizona": "california colorado nevada new-mexico utah",
  "arkansas": "louisiana missouri mississippi oklahoma tennessee texas", "california": "arizona nevada oregon",
  "colorado": "arizona kansas nebraska new-mexico oklahoma utah wyoming", "connecticut": "massachusetts new-york rhode-island",
- "delaware": "maryland new-jersey pennsylvania", "florida": "alabama georgia", "georgia": "alabama florida north-carolina south-carolina tennessee",
+ "delaware": "maryland new-jersey pennsylvania", "district-of-columbia": "maryland virginia", "florida": "alabama georgia", "georgia": "alabama florida north-carolina south-carolina tennessee",
  "hawaii": "", "idaho": "montana nevada oregon utah washington wyoming", "illinois": "indiana iowa kentucky missouri wisconsin",
  "indiana": "illinois kentucky michigan ohio", "iowa": "illinois minnesota missouri nebraska south-dakota wisconsin",
  "kansas": "colorado missouri nebraska oklahoma", "kentucky": "illinois indiana missouri ohio tennessee virginia west-virginia",
- "louisiana": "arkansas mississippi texas", "maine": "new-hampshire", "maryland": "delaware pennsylvania virginia west-virginia",
+ "louisiana": "arkansas mississippi texas", "maine": "new-hampshire", "maryland": "delaware district-of-columbia pennsylvania virginia west-virginia",
  "massachusetts": "connecticut new-hampshire new-york rhode-island vermont", "michigan": "indiana ohio wisconsin",
  "minnesota": "iowa north-dakota south-dakota wisconsin", "mississippi": "alabama arkansas louisiana tennessee",
  "missouri": "arkansas illinois iowa kansas kentucky nebraska oklahoma tennessee", "montana": "idaho north-dakota south-dakota wyoming",
@@ -29,14 +29,14 @@ NEIGHBORS = {
  "south-dakota": "iowa minnesota montana nebraska north-dakota wyoming",
  "tennessee": "alabama arkansas georgia kentucky mississippi missouri north-carolina virginia", "texas": "arkansas louisiana new-mexico oklahoma",
  "utah": "arizona colorado idaho nevada new-mexico wyoming", "vermont": "massachusetts new-hampshire new-york",
- "virginia": "kentucky maryland north-carolina tennessee west-virginia", "washington": "idaho oregon",
+ "virginia": "district-of-columbia kentucky maryland north-carolina tennessee west-virginia", "washington": "idaho oregon",
  "west-virginia": "kentucky maryland ohio pennsylvania virginia", "wisconsin": "illinois iowa michigan minnesota",
  "wyoming": "colorado idaho montana nebraska south-dakota utah"}
 # US Census Bureau regions
 STATE_REGION = {}
 for _r, _s in {"Northeast": "connecticut maine massachusetts new-hampshire rhode-island vermont new-jersey new-york pennsylvania",
                "Midwest": "illinois indiana michigan ohio wisconsin iowa kansas minnesota missouri nebraska north-dakota south-dakota",
-               "South": "delaware florida georgia maryland north-carolina south-carolina virginia west-virginia alabama kentucky mississippi tennessee arkansas louisiana oklahoma texas",
+               "South": "delaware district-of-columbia florida georgia maryland north-carolina south-carolina virginia west-virginia alabama kentucky mississippi tennessee arkansas louisiana oklahoma texas",
                "West": "arizona colorado idaho montana nevada new-mexico utah wyoming alaska california hawaii oregon washington"}.items():
     for _x in _s.split(): STATE_REGION[_x] = _r
 # Country regions (hand-kept; a new country needs one line here, otherwise it falls back to "Other regions" and still gets the largest-economies links)
@@ -52,7 +52,7 @@ ALIASES = {"united-kingdom": "uk u.k. britain great britain england scotland", "
            "united-arab-emirates": "uae emirates dubai", "czechia": "czech republic czech", "denmark": "danmark", "hungary": "magyarorszag", "finland": "suomi", "portugal": "portuguese", "romania": "romanian", "netherlands": "holland dutch", "russia": "russian federation",
            "taiwan": "chinese taipei roc", "turkey": "turkiye türkiye", "china": "prc", "hong-kong": "hk", "egypt": "arab republic of egypt",
            "new-york": "ny nyc", "district-of-columbia": "dc washington dc"}
-POSTAL = {"alabama": "AL", "alaska": "AK", "arizona": "AZ", "arkansas": "AR", "california": "CA", "colorado": "CO", "connecticut": "CT", "delaware": "DE", "florida": "FL",
+POSTAL = {"alabama": "AL", "alaska": "AK", "arizona": "AZ", "arkansas": "AR", "california": "CA", "colorado": "CO", "connecticut": "CT", "delaware": "DE", "district-of-columbia": "DC", "florida": "FL",
           "georgia": "GA", "hawaii": "HI", "idaho": "ID", "illinois": "IL", "indiana": "IN", "iowa": "IA", "kansas": "KS", "kentucky": "KY", "louisiana": "LA", "maine": "ME",
           "maryland": "MD", "massachusetts": "MA", "michigan": "MI", "minnesota": "MN", "mississippi": "MS", "missouri": "MO", "montana": "MT", "nebraska": "NE", "nevada": "NV",
           "new-hampshire": "NH", "new-jersey": "NJ", "new-mexico": "NM", "new-york": "NY", "north-carolina": "NC", "north-dakota": "ND", "ohio": "OH", "oklahoma": "OK",
@@ -142,9 +142,10 @@ def explore(up, places, calc, cur=None, gdp=None, usd=None, kind_hint=None):
     if cur and cur["kind"] == "state":
         nb = [by[s] for s in NEIGHBORS.get(cur["slug"], "").split() if s in by]
         reg = STATE_REGION.get(cur["slug"], "")
-        groups.append(_group(f'Neighbouring states of {cur["name"]}', take(sorted(nb, key=lambda p: p["name"]), 10), up))
+        dc = cur["slug"] == "district-of-columbia"  # DC is not a state: keep its headings accurate
+        groups.append(_group("States next to DC" if dc else f'Neighbouring states of {cur["name"]}', take(sorted(nb, key=lambda p: p["name"]), 10), up))
         peers = [p for p in states if STATE_REGION.get(p["slug"]) == reg]
-        groups.append(_group(f"More {reg} states", take(sorted(peers, key=lambda p: -calc(p)["total"]), 6), up))
+        groups.append(_group(f"More states in the {reg}" if dc else f"More {reg} states", take(sorted(peers, key=lambda p: -calc(p)["total"]), 6), up))
         groups.append(_group("Largest state debt clocks", take(big_states, 6), up))
         groups.append(_group("Largest economies", take(big_c, 6), up))
         groups.insert(0, _group(f'Sovereign wealth funds of {cur["name"]}', [(w["name"], f'wealth/{w["slug"]}/') for w in WEALTH if w["place_slug"] == cur["slug"]], up))
