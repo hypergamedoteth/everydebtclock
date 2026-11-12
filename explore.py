@@ -1,7 +1,7 @@
-"""Search box and 'Explore more clocks' links for every clock page (places, hubs, world, US homepage).
-Static and light: the search is client-side over api/search.json (names, aliases, urls; ~10 KB); the explore links are plain
-server-rendered anchors (neighbouring states, same region, largest by debt or GDP), so they are crawlable and need no JS.
-Called from build.py / places_build.py / world_build.py."""
+"""Search box and a 'Related clocks' block of exactly 3 links for every clock page (places, hubs, world, US homepage, wealth, topics).
+Static and light: the search is client-side over api/search.json (names, aliases, urls; ~10 KB); the related links are plain
+server-rendered anchors (neighbouring or similar-size states, regional or GDP peers, high-traffic pages), so they are crawlable and need no JS.
+Called from build.py / places_build.py / world_build.py / wealth_build.py."""
 import json, os, html
 
 E = html.escape
@@ -113,57 +113,188 @@ def search_box(up):
             f'<label for="q">Find a clock</label><input id="q" type="search" placeholder="Type a country, state or wealth fund, e.g. Texas, Singapore or Norway" aria-expanded="false" aria-controls="qr" aria-autocomplete="list" enterkeyhint="go">'
             f'<button type="submit" aria-label="Go">Go</button><ul id="qr" role="listbox" hidden></ul></form></div>' + SEARCH_JS)
 
-def _chips(items, up):
-    return "".join(f'<a href="{up}{u}">{E(n)}</a>' for n, u in items)
 
-def _group(title, items, up):
-    items = [x for x in items if x]
-    return f'<div class="xg"><h3>{E(title)}</h3><div class="xc">{_chips(items, up)}</div></div>' if items else ""
 
-def explore(up, places, calc, cur=None, gdp=None, usd=None, kind_hint=None):
-    """'Explore more clocks' section. cur = the page's own place dict (or None for US/world/hub pages). gdp = {slug: GDP bn} from data/world_gdp.json
-    (ranks countries by economy size); usd = {slug: USD debt} for ranking countries by debt on the world page."""
-    gdp = gdp or {}
+
+def _used_urls(items):
+    return {u for _, u, _ in items}
+
+def _fill(items, skip, n=3):
+    """Pad to exactly n links from a short default list, never linking to the current page."""
+    for name, url, why in (
+        ("US national debt clock", "", "Federal debt, live"),
+        ("World debt clock", "world/", "Sum of the country clocks, in dollars"),
+        ("Country debt clocks", "countries/", "National debt by country"),
+        ("US state debt clocks", "states/", "Every state and DC"),
+        ("US national debt by year", "national-debt-by-year/", "Official totals by fiscal year"),
+        ("How much is the national debt?", "how-much-is-the-national-debt/", "The official Treasury total"),
+    ):
+        if len(items) >= n: break
+        if url in skip or url in _used_urls(items): continue
+        items.append((name, url, why))
+    if len(items) != n:
+        raise SystemExit(f"related clocks: could not pick {n} links (got {items!r}, skip={skip!r})")
+    return items[:n]
+
+def pick_related(places, calc, cur=None, gdp=None, usd=None, kind_hint=None, topic=None, funds=None, fund=None):
+    """Exactly 3 related links (name, site-root-relative url, one-line reason) for a clock page."""
+    gdp, usd, funds = gdp or {}, usd or {}, funds or []
     by = {p["slug"]: p for p in places}
-    link = lambda p: (p["name"], f'{SEC[p["kind"]]}/{p["slug"]}/')
     states = [p for p in places if p["kind"] == "state"]
     countries = [p for p in places if p["kind"] == "country"]
-    big_states = sorted(states, key=lambda p: -calc(p)["total"])
+    def debt(p): return calc(p)["total"]
     def g(p): return gdp.get(p["slug"], 0) or 0
-    big_c = sorted(countries, key=lambda p: -(usd or {}).get(p["slug"], 0) if usd else -g(p))
-    groups, used = [], set()
-    def take(ps, n):
-        out = []
-        for p in ps:
-            if len(out) >= n: break
-            if cur and p["slug"] == cur["slug"] or p["slug"] in used: continue
-            used.add(p["slug"]); out.append(link(p))
-        return out
+    items, skip = [], set()
+
+    if cur:
+        skip.add(f'{SEC[cur["kind"]]}/{cur["slug"]}/')
+    if topic:
+        skip.add(f"{topic}/" if not topic.endswith("/") else topic)
+    if fund:
+        skip.add(f'wealth/{fund["slug"]}/')
+    if kind_hint == "us":
+        skip.add("")
+    elif kind_hint == "world":
+        skip.add("world/")
+    elif kind_hint == "states":
+        skip.add("states/")
+    elif kind_hint == "countries":
+        skip.add("countries/")
+    elif kind_hint == "wealth":
+        skip.add("wealth/")
+
+    if topic:
+        by_topic = {
+            "how-much-is-the-national-debt": [
+                ("US national debt clock", "", "Live official total"),
+                ("National debt per person", "national-debt-per-person/", "The same total, per resident"),
+                ("US national debt by year", "national-debt-by-year/", "Official totals by fiscal year"),
+            ],
+            "national-debt-per-person": [
+                ("US national debt clock", "", "Live official total"),
+                ("How much is the national debt?", "how-much-is-the-national-debt/", "The official Treasury total"),
+                ("US national debt by year", "national-debt-by-year/", "Official totals by fiscal year"),
+            ],
+            "national-debt-by-year": [
+                ("US national debt clock", "", "Live official total"),
+                ("How much is the national debt?", "how-much-is-the-national-debt/", "The official Treasury total"),
+                ("When will US debt hit $41 trillion?", "when-will-debt-hit-41-trillion/", "A projection from the official trend"),
+            ],
+            "when-will-debt-hit-41-trillion": [
+                ("US national debt clock", "", "Live official total"),
+                ("US national debt by year", "national-debt-by-year/", "Official totals by fiscal year"),
+                ("How much is the national debt?", "how-much-is-the-national-debt/", "The official Treasury total"),
+            ],
+            "methodology": [
+                ("US national debt clock", "", "Live official total"),
+                ("How much is the national debt?", "how-much-is-the-national-debt/", "The official Treasury total"),
+                ("US national debt by year", "national-debt-by-year/", "Official totals by fiscal year"),
+            ],
+        }
+        items = list(by_topic.get(topic, []))
+        return _fill(items, skip)
+
+    if fund:
+        others_same = [x for x in funds if x["country"] == fund["country"] and x["slug"] != fund["slug"]]
+        others_all = [x for x in funds if x["slug"] != fund["slug"]]
+        # Closest in assets after same-country peers
+        def near(xs):
+            return sorted(xs, key=lambda x: abs((x.get("usd") or 0) - (fund.get("usd") or 0)))
+        picked = []
+        for x in others_same + near(others_all):
+            if x["slug"] in {p["slug"] for p in picked}: continue
+            picked.append(x)
+            if len(picked) == 2: break
+        for x in picked:
+            why = f'Also in {x["country"]}' if x["country"] == fund["country"] else "A similar-size fund"
+            items.append((x.get("nick") or x["name"], f'wealth/{x["slug"]}/', why))
+        place = fund.get("place_slug")
+        if place and place in by:
+            p = by[place]
+            items.append((f'{p["name"]} debt clock', f'{SEC[p["kind"]]}/{p["slug"]}/', f'{p["name"]} government debt'))
+        elif place == "united-states":
+            items.append(("US national debt clock", "", "Federal debt, live"))
+        return _fill(items, skip)
+
     if cur and cur["kind"] == "state":
         nb = [by[s] for s in NEIGHBORS.get(cur["slug"], "").split() if s in by]
-        reg = STATE_REGION.get(cur["slug"], "")
-        dc = cur["slug"] == "district-of-columbia"  # DC is not a state: keep its headings accurate
-        groups.append(_group("States next to DC" if dc else f'Neighbouring states of {cur["name"]}', take(sorted(nb, key=lambda p: p["name"]), 10), up))
-        peers = [p for p in states if STATE_REGION.get(p["slug"]) == reg]
-        groups.append(_group(f"More states in the {reg}" if dc else f"More {reg} states", take(sorted(peers, key=lambda p: -calc(p)["total"]), 6), up))
-        groups.append(_group("Largest state debt clocks", take(big_states, 6), up))
-        groups.append(_group("Largest economies", take(big_c, 6), up))
-        groups.insert(0, _group(f'Sovereign wealth funds of {cur["name"]}', [(w["name"], f'wealth/{w["slug"]}/') for w in WEALTH if w["place_slug"] == cur["slug"]], up))
-    elif cur and cur["kind"] == "country":
+        # Prefer neighbours closest in total debt; fill with similar-size states if fewer than 2 neighbours (Alaska, Hawaii, Maine).
+        nb_sorted = sorted(nb, key=lambda p: abs(debt(p) - debt(cur)))
+        similar = sorted((p for p in states if p["slug"] != cur["slug"] and p not in nb), key=lambda p: abs(debt(p) - debt(cur)))
+        for p in (nb_sorted + similar)[:2]:
+            why = f'Borders {"DC" if cur["slug"]=="district-of-columbia" else cur["name"]}' if p in nb else "Similar total debt"
+            items.append((f'{p["name"]} debt clock', f'states/{p["slug"]}/', why))
+        items.append(("US national debt clock", "", "Federal debt, live"))
+        return _fill(items, skip)
+
+    if cur and cur["kind"] == "country":
         reg = COUNTRY_REGION.get(cur["slug"], "")
-        peers = [p for p in countries if COUNTRY_REGION.get(p["slug"]) == reg] if reg else []
-        groups.append(_group(f"More in {reg}" if reg else "More countries", take(sorted(peers, key=lambda p: -g(p)), 8), up))
-        groups.append(_group("Largest economies", take(big_c, 8), up))
-        groups.append(_group("US state debt clocks", take(big_states, 5), up))
-        groups.insert(0, _group(f'Sovereign wealth funds of {cur["name"]}', [(w["name"], f'wealth/{w["slug"]}/') for w in WEALTH if w["place_slug"] == cur["slug"]], up))
-    else:
-        groups.append(_group("Largest countries" if usd else "Largest economies", take(big_c, 10), up))
-        groups.append(_group("Largest US states", take(big_states, 10), up))
-    base = [("US national debt clock", ""), ("World debt clock", "world/"), ("All country debt clocks", "countries/"), ("All US state debt clocks", "states/")]
-    skip = {"us": "", "world": "world/"}.get(kind_hint)
-    if WEALTH: base.append(("Sovereign wealth funds ranked", "wealth/"))
-    groups.append(_group("Browse", [b for b in base if b[1] != skip], up))
-    return ('<section class="explore" id="explore"><div class="sh"><h2>Explore more clocks</h2></div>' + "".join(groups) + '</section>')
+        peers = [p for p in countries if p["slug"] != cur["slug"] and COUNTRY_REGION.get(p["slug"]) == reg] if reg else []
+        peers = sorted(peers, key=lambda p: abs(g(p) - g(cur)))
+        global_peers = sorted((p for p in countries if p["slug"] != cur["slug"]), key=lambda p: abs(g(p) - g(cur)))
+        for p in (peers + global_peers)[:2]:
+            why = f"Also in {reg}" if p in peers and reg else "Similar-size economy"
+            items.append((f'{p["name"]} debt clock', f'countries/{p["slug"]}/', why))
+        items.append(("World debt clock", "world/", "Sum of the country clocks, in dollars"))
+        return _fill(items, skip)
+
+    if kind_hint == "us":
+        items = [
+            ("World debt clock", "world/", "Sum of the country clocks, in dollars"),
+            ("US national debt by year", "national-debt-by-year/", "Official totals, FY1940 to now"),
+            ("Country debt clocks", "countries/", "National debt by country"),
+        ]
+        return _fill(items, skip)
+
+    if kind_hint == "world":
+        ranked = sorted(countries, key=lambda p: -((usd or {}).get(p["slug"], 0) or g(p)))
+        items.append(("US national debt clock", "", "Federal debt, live"))
+        for p in ranked[:2]:
+            items.append((f'{p["name"]} debt clock', f'countries/{p["slug"]}/', "One of the largest in the sum"))
+        return _fill(items, skip)
+
+    if kind_hint == "states":
+        big = sorted(states, key=lambda p: -debt(p))
+        items.append(("US national debt clock", "", "Federal debt, live"))
+        for p in big[:2]:
+            items.append((f'{p["name"]} debt clock', f'states/{p["slug"]}/', "One of the largest state clocks"))
+        return _fill(items, skip)
+
+    if kind_hint == "countries":
+        ranked = sorted(countries, key=lambda p: -g(p))
+        items = [("World debt clock", "world/", "Sum of the country clocks, in dollars"), ("US national debt clock", "", "Federal debt, live")]
+        if ranked:
+            p = ranked[0]
+            items.append((f'{p["name"]} debt clock', f'countries/{p["slug"]}/', "Largest economy with a clock"))
+        return _fill(items, skip)
+
+    if kind_hint == "wealth":
+        items.append(("US national debt clock", "", "Federal debt, live"))
+        for x in funds[:2]:
+            items.append((x.get("nick") or x["name"], f'wealth/{x["slug"]}/', "Largest funds on this list"))
+        return _fill(items, skip)
+
+    return _fill(items, skip)
+
+def related_html(up, items):
+    cards = "".join(f'<a href="{up}{u}"><span class="rn">{E(n)}</span><span class="rw">{E(w)}</span></a>' for n, u, w in items)
+    return f'<section class="related" id="related"><div class="sh"><h2>Related clocks</h2></div><div class="rg">{cards}</div></section>'
+
+def explore(up, places, calc, cur=None, gdp=None, usd=None, kind_hint=None, topic=None, funds=None, fund=None):
+    """'Related clocks' block: exactly 3 relevant, crawlable links. Replaces the older chip groups from PR #9."""
+    items = pick_related(places, calc, cur=cur, gdp=gdp, usd=usd, kind_hint=kind_hint, topic=topic, funds=funds, fund=fund)
+    return related_html(up, items)
+
+def check_related(places, calc, gdp=None, funds=None):
+    """Build-time: every live state and country page gets exactly 3 links, none pointing at itself, none repeated."""
+    gdp = gdp or {}
+    for p in places:
+        items = pick_related(places, calc, cur=p, gdp=gdp)
+        urls = [u for _, u, _ in items]
+        self = f'{SEC[p["kind"]]}/{p["slug"]}/'
+        if len(items) != 3: raise SystemExit(f"related clocks: {p['slug']} has {len(items)}")
+        if self in urls: raise SystemExit(f"related clocks: {p['slug']} links to itself")
+        if len(set(urls)) != 3: raise SystemExit(f"related clocks: {p['slug']} has a repeated link: {urls}")
 
 CSS = """.srchrow{max-width:1280px;margin:0 auto;padding:10px 14px 0}.srch{position:relative;display:flex;gap:8px;align-items:center;max-width:560px}
 .srch label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -172,6 +303,11 @@ CSS = """.srchrow{max-width:1280px;margin:0 auto;padding:10px 14px 0}.srch{posit
 .srch ul{position:absolute;top:100%;left:0;right:56px;z-index:30;list-style:none;margin:4px 0 0;padding:4px;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px #000a}
 .srch ul[hidden]{display:none}.srch li a,.srch li.none{display:flex;justify-content:space-between;gap:12px;padding:9px 10px;border-radius:8px;color:var(--txt);font-size:14px}
 .srch li.none{color:var(--mut)}.srch li a em{font-style:normal;color:var(--dim);font-size:12px}.srch li a:hover,.srch li a.on{background:var(--panel2)}
-.explore{max-width:1280px;margin:0 auto;padding:0 14px 26px}.explore .xg{margin:0 0 14px}.explore h3{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;margin:0 0 7px;font-weight:600}
-.explore .xc{display:flex;flex-wrap:wrap;gap:7px}.explore .xc a{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--txt);background:var(--panel)}.explore .xc a:hover{border-color:var(--blue);color:var(--blue)}
+.related{max-width:1280px;margin:0 auto;padding:8px 14px 28px}.related .sh{margin:0 0 10px}.related h2{font-size:17px;margin:0}
+.related .rg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.related .rg a{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:1px solid var(--line,#1c2533);border-radius:12px;background:var(--panel,#121925);color:var(--txt,#e8edf5);text-decoration:none}
+.related .rg a:hover{border-color:var(--blue,#5aa9ff)}.related .rn{font-size:15px;font-weight:600}.related .rw{font-size:13px;color:var(--mut,#8a97ab)}
+@media (max-width:700px){.related .rg{grid-template-columns:1fr}}
 @media (max-width:640px){.srch ul{right:0}}"""
+
+RELATED_CSS = CSS[CSS.index(".related"):CSS.index("@media (max-width:640px){.srch")]

@@ -238,16 +238,7 @@ def fund_page(R, SITE, with_analytics, og, places, f, funds, place_url):
     srcsec = (f'<section id="sources" class="wsec"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>Sources</h2></div><div class="sk foot"><ul>{sl}</ul>'
               f'<p>Ranking: <a href="https://globalswf.com/ranking" rel="noopener">Global SWF</a>, October 2026 (fund #{f["swf_rank"]} among sovereign wealth funds by assets under management). '
               f'Machine-readable: <a href="../../api/wealth.json">/api/wealth.json</a>.</p></div></section>')
-    others = [g for g in funds if g["country"] == f["country"] and g["slug"] != f["slug"]]
-    near = [g for g in funds if g["slug"] != f["slug"] and g not in others]
-    chips = lambda items: "".join(f'<a href="../../{u}">{E(n)}</a>' for n, u in items)
-    xg = ""
-    if others: xg += f'<div class="xg"><h3>Other funds in {E(f["country"])}</h3><div class="xc">{chips([(g["nick"], g["url"]) for g in others])}</div></div>'
-    xg += f'<div class="xg"><h3>Other sovereign wealth funds</h3><div class="xc">{chips([(g["nick"], g["url"]) for g in near[:8]])}</div></div>'
-    br = [("All sovereign wealth funds ranked", "wealth/"), ("US national debt clock", ""), ("World debt clock", "world/"), ("All country debt clocks", "countries/")]
-    if place_url: br.insert(1, (f'{f["country"]} debt clock', place_url))
-    xg += f'<div class="xg"><h3>Debt clocks</h3><div class="xc">{chips(br)}</div></div>'
-    explore_html = f'<section class="explore" id="explore"><div class="sh"><h2>Explore more</h2></div>{xg}</section>'
+    explore_html = ex.explore("../../", places, pb.calc, funds=funds, fund=f, gdp=pb.GDP_BY_SLUG)
     links = ('<section class="answers" id="answers"><ul><li><a href="../">Sovereign wealth funds ranked</a></li>' + (f'<li><a href="../../{place_url}">{E(f["country"])} debt clock</a></li>' if place_url else "") +
              '<li><a href="../../">US national debt clock</a></li><li><a href="../../api/wealth.json">Wealth funds as JSON</a></li></ul></section>')
     page = (pb.meta_head(SITE, url, title, desc, img, 2, pb.PL_CSS + CSS, ld) + _header(places, 2, jump) + ex.search_box("../../") + '<main id="app">' + hero + intro + sect_assets + det_html + pc + inv + disc + srcsec + '</main>' + explore_html + links + _foot(2) + "</body></html>")
@@ -309,8 +300,7 @@ def hub_page(R, SITE, with_analytics, og, places, funds, d, place_urls):
               f'<p>Machine-readable: <a href="../api/wealth.json">/api/wealth.json</a>.</p></div></section>')
     fl = '<section class="answers" id="funds"><div class="sh"><h2>All funds</h2></div><ul>' + "".join(f'<li><a href="{f["slug"]}/">{E(f["nick"])}</a></li>' for f in funds) + '</ul>' \
          '<div class="sh"><h2>Debt clocks</h2></div><ul><li><a href="../">US national debt clock</a></li><li><a href="../world/">World debt clock</a></li><li><a href="../countries/">All country debt clocks</a></li><li><a href="../states/">All US state debt clocks</a></li></ul></section>'
-    xg = ("".join(f'<a href="../{pu}">{E(c)} debt clock</a>' for pu, c in {pu: f["country"] for f in funds for pu in [place_urls.get(f["slug"])] if pu}.items()))
-    explore_html = f'<section class="explore" id="explore"><div class="sh"><h2>Explore more clocks</h2></div><div class="xg"><h3>Debt clocks of fund countries</h3><div class="xc">{xg}</div></div></section>' if xg else ""
+    explore_html = ex.explore("../", places, pb.calc, kind_hint="wealth", funds=funds, gdp=pb.GDP_BY_SLUG)
     page = (pb.meta_head(SITE, url, title, desc, img, 1, pb.PL_CSS + CSS, ld) + _header(places, 1, jump) + ex.search_box("../") + intro + '<main id="app">' + table + method + '</main>' + explore_html + fl + _foot(1) + SORT_JS + "</body></html>")
     os.makedirs(f"{R}/wealth", exist_ok=True)
     open(f"{R}/wealth/index.html", "w").write(with_analytics(page))

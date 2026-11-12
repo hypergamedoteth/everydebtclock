@@ -157,9 +157,12 @@ jobs:
       - name: Stage Pages artifact (public files only)
         run: |
           mkdir -p _site
-          cp -r index.html 404.html privacy.html privacy favicon.ico favicon-32.png icon.svg CNAME robots.txt sitemap.xml style.css app.js core.js widget.html \
+          cp -r index.html 404.html privacy.html privacy favicon.ico favicon-32.png icon.svg CNAME robots.txt llms.txt sitemap.xml style.css app.js core.js widget.html \
                 apple-touch-icon.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person national-debt-by-year when-will-debt-hit-41-trillion methodology states countries world wealth _site/
           rm -f _site/data/validation_log.csv
+          # IndexNow key file must be at the site root for verification.
+          KEY=$(tr -d ' \n' < pipeline/indexnow.key)
+          if [ -f "$KEY.txt" ]; then cp "$KEY.txt" _site/; fi
 
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -167,6 +170,12 @@ jobs:
 
       - id: deploy
         uses: actions/deploy-pages@v4
+
+      # Instant indexing for Bing/Yandex. The key file must already be on the live site, so this waits
+      # for GitHub Pages to serve it, then posts every sitemap URL. A failure here does not roll back the deploy.
+      - name: Submit sitemap to IndexNow
+        continue-on-error: true
+        run: python3 pipeline/submit_indexnow.py --sitemap _site/sitemap.xml --wait --tries 8 --delay 20
 
       # Runs after deploy so a flagged figure is still published with its ⚠ badge, but the run goes red and GitHub emails you.
       - name: Fail on validation flags or unavailable tickers

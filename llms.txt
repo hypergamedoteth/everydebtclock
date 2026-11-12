@@ -1,0 +1,28 @@
+# Every Debt Clock
+https://everydebtclock.com/
+
+Live US, state, country and wealth-fund clocks built from official figures. The US national debt was $40,559,796,589,243.37 ($40.56 trillion) at Treasury's Nov 9, 2026 close.
+
+## Key pages
+- / : US national debt clock. Official total $40,559,796,589,243.37 as of Nov 9, 2026 (Treasury, Debt to the Penny). The live projection is re-based every business day.
+- /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.
+- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ($118,670.55 per person).
+- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.
+- /when-will-debt-hit-41-trillion/ : A projection from Treasury's recent trend, labelled as a projection.
+- /world/ : Sum of the country clocks, converted to US dollars.
+- /countries/ : National debt clocks by country, each from that government's official figures.
+- /states/ : State and local debt clocks for every US state and Washington, DC, from official Census figures.
+- /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.
+- /methodology/ : Sources, how the live ticker is calculated, and how it is checked against Treasury.
+
+## Data
+US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.
+
+## Machine-readable
+- https://everydebtclock.com/api/daily.json — latest official US total and daily changes
+- https://everydebtclock.com/data/data.json — all US tickers, official bases and rates
+- https://everydebtclock.com/api/places.json — state and country clocks
+- https://everydebtclock.com/api/world.json — world sum in US dollars
+- https://everydebtclock.com/api/wealth.json — wealth-fund ranking
+- https://everydebtclock.com/sitemap.xml
+- https://everydebtclock.com/llms.txt
