@@ -26,7 +26,7 @@ def load(R):
 
 def _d(s): return dt.date.fromisoformat(s)
 def _fd(s): return _d(s).strftime("%b %-d, %Y")
-GDP_BY_SLUG = {}  # slug -> IMF GDP (US$ bn), set by build.py; ranks countries in the Explore links
+GDP_BY_SLUG = {}  # slug -> IMF GDP (US$ bn), set by build.py; used to pick peer-country related clocks
 WEALTH = False  # set by wealth_build.prep() when the Wealth tab is built
 WORLD = False  # set by build.py when the World Debt Clock page is built, so every nav/link to /world/ is only emitted when it exists
 CUR = "$"  # currency symbol for the page being rendered ("$" for US places, "C$" for Canada); set by _cur(p)
@@ -491,9 +491,11 @@ ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='
 (function f(){T.forEach(k=>{if(!k.r)return;const v=val(k);k.v.textContent=usd(v,0,k.c);k.p.textContent=usd(v/k.pop,2,k.c)});requestAnimationFrame(f)})()})()</script>"""
     WL1 = '<li><a href="../world/">World debt clock</a></li>' if WORLD else ""
     WTXT = ' The <a href="../world/">World Debt Clock</a> adds the countries up in US dollars.' if WORLD else ""
+    explore_html = ex.explore("../", places, calc, kind_hint=("states" if kind == "state" else "countries"), gdp=GDP_BY_SLUG)
     body = (f'{header}{ex.search_box("../")}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>{E(h1)}</h1><p>Every place with a debt clock, built from figures its own government publishes. A clock ticks only where the official trend is reliable; otherwise the official figure is shown as published. Each clock shows who publishes the numbers and how often, '
             f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p></section>'
             f'<main id="app">{sort}{secs}</main>'
+            + explore_html +
             f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')
     hub_css = PL_CSS + ".hubsort{display:flex;justify-content:flex-end;margin:4px 2px -14px;font-size:12px;color:var(--mut)}.hubsort select{margin-left:6px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit;font-size:12px}.tile.hubt .lab span:last-child{font-size:11px;color:var(--dim)}"
     page = meta_head(SITE, url, title, desc, "og/home.png", 1, hub_css) + body

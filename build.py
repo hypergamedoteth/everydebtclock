@@ -82,6 +82,12 @@ def dataset_ld(name, desc, url, based=None, temporal=None, kw=None):
     if temporal: ld["temporalCoverage"] = temporal
     return '<script type="application/ld+json">' + json.dumps(ld).replace("</", "<\\/") + "</script>"
 
+def faq_ld(pairs):
+    """FAQPage JSON-LD. pairs = [(question, plain-text answer), ...]."""
+    ld = {"@context": "https://schema.org", "@type": "FAQPage",
+          "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in pairs]}
+    return '<script type="application/ld+json">' + json.dumps(ld).replace("</", "<\\/") + "</script>"
+
 def fmt(i, x, short=False):
     if x is None: return "—"
     if i.get("kind") == "pct": return f"{x:.2f}%"
@@ -203,6 +209,12 @@ meta = f"""<!--META--><title>{HOME_TITLE}</title>
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Every Debt Clock: US national debt, live and verified daily">
 <meta name="twitter:description" content="{html.escape(desc)}"><meta name="twitter:image" content="{SITE}/og/home.png">
 {home_ld}
+{faq_ld([
+    ("How much is the US national debt?",
+     f"The US national debt was {usd2(OFF_V)} ({tril(OFF_V)}) at Treasury's {fdate(OFF_D)} close, according to Debt to the Penny."),
+    ("How much is the national debt per person?",
+     f"{usd2(PP_OFF)}. That is the official total divided by the Census Bureau's estimate of {POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}."),
+])}
 <!--/META-->"""
 idx = re.sub(r"<!--META-->.*?<!--/META-->", lambda m: meta, idx, flags=re.S)
 idx = re.sub(r'<meta property="og:title" content="US Debt Clock — live &amp; verified"><meta property="og:type" content="website">\n?', "", idx)
@@ -221,9 +233,10 @@ if held:
 else:
     proj_txt = (f"The clock below starts from that official figure and projects forward at the 90-day trend (about {bil(rate_day)} a day). "
                 "It is re-based to Treasury's new figure every business day and never projects past the debt limit.")
+answer_s = f"The US national debt was <b>{usd2(OFF_V)}</b> ({tril(OFF_V)}) at Treasury's <b>{fdate(OFF_D)}</b> close."
 intro = (f"""<!--INTRO--><h1>US National Debt Clock</h1>
-<p>The US national debt was <b>{usd2(OFF_V)}</b> ({tril(OFF_V)}) at the close of business on <b>{fdate(OFF_D)}</b>, according to Treasury's
-<a href="{DTP_URL}" rel="noopener">Debt to the Penny</a>. That is <b>{usd2(PP_OFF)} per person</b>: the debt divided by the Census Bureau's estimate of
+<p class="answer">{answer_s} The figure is from <a href="{DTP_URL}" rel="noopener">Treasury's Debt to the Penny</a>.</p>
+<p>That is <b>{usd2(PP_OFF)} per person</b>: the debt divided by the Census Bureau's estimate of
 {POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}. {proj_txt}</p><!--/INTRO-->""")
 def row(slug):
     i = ALL.get(slug)
@@ -260,10 +273,12 @@ explore.check(PLACES_LIVE)
 # Wealth tab (wealth_build.py): sets the flags/lists that nav, search and country-page links read, before any page is built
 import wealth_build
 WEALTH_D, WEALTH_FUNDS = wealth_build.prep(PLACES_LIVE)
-# IMF GDP by place slug, used to rank countries in the "Explore more clocks" links (US included as "united-states")
+# IMF GDP by place slug, used to pick peer-country related clocks (US included as "united-states")
 _gdp = json.load(open(f"{R}/data/world_gdp.json")).get("countries", {}) if os.path.exists(f"{R}/data/world_gdp.json") else {}
 places_build.GDP_BY_SLUG = {p["slug"]: _gdp.get(p.get("iso3") or world_build.ISO3.get(p.get("country", ""), ""), 0) for p in PLACES_LIVE if p["kind"] == "country"}
 places_build.GDP_BY_SLUG["united-states"] = _gdp.get("USA", 0)
+if PLACES_LIVE:
+    explore.check_related(PLACES_LIVE, places_build.calc, gdp=places_build.GDP_BY_SLUG, funds=WEALTH_FUNDS)
 HOME_EXPLORE = explore.explore("", PLACES_LIVE, places_build.calc, cur=None, gdp=places_build.GDP_BY_SLUG, kind_hint="us") if PLACES_LIVE else ""
 links = (f"""<!--LINKS-->""" + HOME_EXPLORE + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
          f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> ({html.escape(p.get("link_label", "state + local"))})</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
@@ -523,12 +538,13 @@ def answer_page(slug, title, desc, h1, body, ld="", og_img="og/debt_total.png"):
 <meta property="og:image" content="{SITE}/{og_img}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{html.escape(title)}">
 <meta name="twitter:description" content="{html.escape(desc)}"><meta name="twitter:image" content="{SITE}/{og_img}">
-<meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><style>{PAGE_CSS}{ANS_CSS}</style>
+<meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><style>{PAGE_CSS}{ANS_CSS}{explore.RELATED_CSS}</style>
 {ld}</head><body><main>
 <a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>
 <h1>{html.escape(h1)}</h1>
 {held_note}{body}
 <a class="cta" href="../">Open the live national debt clock →</a>
+{explore.explore("../", PLACES_LIVE, places_build.calc, topic=slug, gdp=places_build.GDP_BY_SLUG) if PLACES_LIVE else ""}
 <div class="rel"><b>More answers:</b><br>{more}<a href="../t/debt_total.html">US national debt, live</a></div>
 <footer>Every figure on this page is an official published number unless it is labelled "projected". Page built {STAMP} from data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT; it is rebuilt after every Treasury update. · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main></body></html>"""
@@ -578,7 +594,13 @@ if OFF_V:
                 f"{usd0(DI.get('base'))} intragovernmental. Daily changes, the debt limit and recent official closes.",
                 "How much is the national debt?", body,
                 ld=dataset_ld("US national debt, latest official close", f"Total public debt outstanding, debt held by the public and intragovernmental holdings from Treasury's Debt to the Penny, latest close {fdate(OFF_D)}.",
-                              f"{SITE}/how-much-is-the-national-debt/", temporal=f"{CLOSES[-1][0]}/{CLOSES[0][0]}" if CLOSES else None))
+                              f"{SITE}/how-much-is-the-national-debt/", temporal=f"{CLOSES[-1][0]}/{CLOSES[0][0]}" if CLOSES else None)
+                    + faq_ld([
+                        ("How much is the US national debt?",
+                         f"The US national debt was {usd2(OFF_V)} ({tril(OFF_V)}) at Treasury's {fdate(OFF_D)} close, according to Debt to the Penny."),
+                        ("How much of that is held by the public?",
+                         f"{usd0(DP.get('base'))} was held by the public and {usd0(DI.get('base'))} was intragovernmental as of {fdate(DP.get('as_of'))}."),
+                    ]))
 
     # 2) National debt per person
     pp = OFF_V / POP_OFF
@@ -793,7 +815,48 @@ urls = ([(f"{SITE}/", "1.0", "hourly")] + [(f"{SITE}/{a}/", "0.9", "daily") for 
         ([(f"{SITE}/privacy.html", "0.2", "yearly")] if os.path.exists(f"{R}/privacy.html") else []))
 open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     "".join(f"<url><loc>{u}</loc><lastmod>{lm}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
-open(f"{R}/robots.txt", "w").write(f"User-agent: *\nAllow: /\nDisallow: /cache/\nDisallow: /pipeline/\nDisallow: /widget.html\nSitemap: {SITE}/sitemap.xml\n")
+AI_BOTS = ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User",
+           "PerplexityBot", "Google-Extended", "Applebot-Extended", "Bingbot")
+robots = "".join(f"User-agent: {b}\nAllow: /\n\n" for b in AI_BOTS)
+robots += f"User-agent: *\nAllow: /\nDisallow: /cache/\nDisallow: /pipeline/\nDisallow: /widget.html\n\nSitemap: {SITE}/sitemap.xml\n"
+open(f"{R}/robots.txt", "w").write(robots)
+open(f"{R}/llms.txt", "w").write("\n".join([
+    "# Every Debt Clock",
+    f"{SITE}/",
+    "",
+    f"Live US, state, country and wealth-fund clocks built from official figures. The US national debt was {usd2(OFF_V)} ({tril(OFF_V)}) at Treasury's {fdate(OFF_D)} close.",
+    "",
+    "## Key pages",
+    f"- / : US national debt clock. Official total {usd2(OFF_V)} as of {fdate(OFF_D)} (Treasury, Debt to the Penny). The live projection is re-based every business day.",
+    "- /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.",
+    f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
+    "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
+    "- /when-will-debt-hit-41-trillion/ : A projection from Treasury's recent trend, labelled as a projection.",
+    "- /world/ : Sum of the country clocks, converted to US dollars.",
+    "- /countries/ : National debt clocks by country, each from that government's official figures.",
+    "- /states/ : State and local debt clocks for every US state and Washington, DC, from official Census figures.",
+    "- /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.",
+    "- /methodology/ : Sources, how the live ticker is calculated, and how it is checked against Treasury.",
+    "",
+    "## Data",
+    "US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.",
+    "",
+    "## Machine-readable",
+    f"- {SITE}/api/daily.json — latest official US total and daily changes",
+    f"- {SITE}/data/data.json — all US tickers, official bases and rates",
+    f"- {SITE}/api/places.json — state and country clocks",
+    f"- {SITE}/api/world.json — world sum in US dollars",
+    f"- {SITE}/api/wealth.json — wealth-fund ranking",
+    f"- {SITE}/sitemap.xml",
+    f"- {SITE}/llms.txt",
+    "",
+]))
+# IndexNow verification file: the key is both the filename and the file body.
+_idx_key_path = f"{R}/pipeline/indexnow.key"
+if os.path.exists(_idx_key_path):
+    _idx_key = open(_idx_key_path).read().strip()
+    if _idx_key:
+        open(f"{R}/{_idx_key}.txt", "w").write(_idx_key + "\n")
 
 # ---------------------------------------------------------------- standalone
 css, js = open(f"{R}/style.css").read(), open(f"{R}/app.js").read()
