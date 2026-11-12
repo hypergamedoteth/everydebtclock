@@ -9,6 +9,15 @@ from pathlib import Path
 
 API = "https://api.indexnow.org/indexnow"
 ROOT = Path(__file__).resolve().parents[1]
+# Cloudflare (and some other edges) return 403 to Python's default urllib User-Agent.
+UA = "EveryDebtClock-IndexNow/1.0 (+https://everydebtclock.com/)"
+
+def open_url(url, timeout, data=None, headers=None, method=None):
+    hdrs = {"User-Agent": UA}
+    if headers:
+        hdrs.update(headers)
+    req = urllib.request.Request(url, data=data, headers=hdrs, method=method)
+    return urllib.request.urlopen(req, timeout=timeout)
 
 def load_key(path):
     key = Path(path).read_text().strip()
@@ -18,7 +27,7 @@ def load_key(path):
 
 def urls_from_sitemap(src):
     if src.startswith("http://") or src.startswith("https://"):
-        with urllib.request.urlopen(src, timeout=30) as r:
+        with open_url(src, timeout=30) as r:
             data = r.read()
     else:
         data = Path(src).read_bytes()
@@ -40,7 +49,7 @@ def key_url(site, key, key_location):
 def wait_for_key(url, key, tries=8, delay=15):
     for i in range(1, tries + 1):
         try:
-            with urllib.request.urlopen(url, timeout=20) as r:
+            with open_url(url, timeout=20) as r:
                 body = r.read().decode("utf-8", "replace").strip()
                 if r.status == 200 and body == key:
                     return True, r.status
@@ -55,11 +64,9 @@ def wait_for_key(url, key, tries=8, delay=15):
 
 def submit(host, key, key_location, url_list):
     payload = {"host": host, "key": key, "keyLocation": key_location, "urlList": url_list}
-    req = urllib.request.Request(
-        API, data=json.dumps(payload).encode(),
-        headers={"Content-Type": "application/json; charset=utf-8"}, method="POST")
     try:
-        with urllib.request.urlopen(req, timeout=60) as r:
+        with open_url(API, timeout=60, data=json.dumps(payload).encode(),
+                      headers={"Content-Type": "application/json; charset=utf-8"}, method="POST") as r:
             return r.status, r.read()
     except urllib.error.HTTPError as e:
         return e.code, e.read()
