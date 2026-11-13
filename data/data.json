@@ -1,8 +1,8 @@
 {
  "meta": {
-  "generated_epoch": 1794510100.3832474,
-  "generated_iso": "2026-11-12T14:01:40.383247-05:00",
-  "debt_fetched_epoch": 1794510100.3832474,
+  "generated_epoch": 1794527995.273681,
+  "generated_iso": "2026-11-12T18:59:55.273681-05:00",
+  "debt_fetched_epoch": 1794527995.273681,
   "fy": 2027,
   "fy_start_epoch": 1790827200.0,
   "fy_end_epoch": 1822363200.0,
@@ -22,9 +22,18 @@
     "backtest_err_pct": 1.033
    }
   },
-  "dts_latest": "2026-11-09",
-  "mts_latest": "2026-09-30",
+  "dts_latest": "2026-11-10",
+  "mts_latest": "2026-10-31",
   "recent_closes": [
+   {
+    "date": "2026-11-10",
+    "total": 40584130080272.89,
+    "public": 32800204226578.75,
+    "intragov": 7783925853694.14,
+    "d_total": 24333491029.523438,
+    "d_public": 36430812566.25,
+    "d_intragov": -12097321536.730469
+   },
    {
     "date": "2026-11-09",
     "total": 40559796589243.37,
@@ -105,18 +114,13 @@
     "d_total": -31219402481.164062,
     "d_public": -5454726583.660156,
     "d_intragov": -25764675897.5
-   },
-   {
-    "date": "2026-10-27",
-    "total": 40582274254843.57,
-    "public": 32677379585770.57,
-    "intragov": 7904894669073.0,
-    "d_total": 53915315427.71875,
-    "d_public": 42084771476.08984,
-    "d_intragov": 11830543951.629883
    }
   ],
   "debt_closes": [
+   [
+    "2026-11-10",
+    40584130080272.89
+   ],
    [
     "2026-11-09",
     40559796589243.37
@@ -292,23 +296,19 @@
    [
     "2026-09-08",
     40084090785446.35
-   ],
-   [
-    "2026-09-04",
-    40094590636301.7
    ]
   ],
   "debt_closes_stale": false,
   "debt_limit_status": {
    "at_limit": false,
    "limit": 41103996000000.0,
-   "subject_to_limit": 40364228000000.0,
-   "headroom": 739768000000.0,
-   "as_of": "2026-11-09",
-   "last5_range": 13985000000.0,
+   "subject_to_limit": 40387197000000.0,
+   "headroom": 716799000000.0,
+   "as_of": "2026-11-10",
+   "last5_range": 33306000000.0,
    "margin": 25000000000.0,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit",
-   "freeze_t": 1803487877.244671
+   "freeze_t": 1803236190.182753
   },
   "debt_by_fy": [
    [
@@ -1565,7 +1565,7 @@
    "kind": "count",
    "base": 134790000,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "2025",
    "source": "https://www2.census.gov/programs-surveys/demo/tables/families/time-series/households/hh1.xls",
    "source_name": "Census CPS ASEC 2025, Table HH-1",
@@ -1588,7 +1588,7 @@
    "kind": "count",
    "base": 162754810,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY2025",
    "source": "https://www.irs.gov/statistics/soi-tax-stats-numbers-of-returns-filed-by-type-of-return-irs-data-book-table-1-2",
    "source_name": "IRS Data Book FY2025, Table 1-2",
@@ -1609,148 +1609,148 @@
    "label": "US national debt",
    "group": "debt",
    "kind": "usd",
-   "base": 40559796589243.37,
-   "t0": 1794286799.0,
-   "rate": 82467.35524549814,
-   "as_of": "2026-11-09",
+   "base": 40584130080272.89,
+   "t0": 1794373199.0,
+   "rate": 82877.86277822635,
+   "as_of": "2026-11-10",
    "source": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
    "source_name": "Treasury, Debt to the Penny",
-   "method": "Starts at Treasury's official figure for 2026-11-09 (close of business). Rate: 90-day least-squares trend (62 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day. Backtested against the next Treasury close over the last 20 business days: average error 0.070%.",
+   "method": "Starts at Treasury's official figure for 2026-11-10 (close of business). Rate: 90-day least-squares trend (62 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day. Backtested against the next Treasury close over the last 20 business days: average error 0.070%.",
    "stale": false,
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-08-12 to 2026-11-09)",
+    "window": "trailing 90 days (2026-08-13 to 2026-11-10)",
     "n": 62,
-    "slope": 82467.35524549783,
+    "slope": 82877.86277822607,
     "first": [
-     "2026-08-12",
-     39913529319464.71
+     "2026-08-13",
+     39934816207844.37
     ],
     "last": [
-     "2026-11-09",
-     40559796589243.37
+     "2026-11-10",
+     40584130080272.89
     ],
     "context_1y": {
      "from": [
-      "2025-11-07",
-      38117224885993.65
+      "2025-11-10",
+      38125731687631.03
      ],
      "to": [
-      "2026-11-09",
-      40559796589243.37
+      "2026-11-10",
+      40584130080272.89
      ],
-     "rate": 77031.35102084339
+     "rate": 77955.30164389458
     }
    },
    "status": "ok",
    "slug": "debt_total",
    "validation": {
-    "last_error_pct": 0.035,
-    "mean_abs_error_pct": 0.0698,
+    "last_error_pct": -0.0424,
+    "mean_abs_error_pct": 0.0704,
     "n": 20,
-    "against": "Debt to the Penny (next business day)",
+    "against": "Treasury, Debt to the Penny",
     "threshold_pct": 0.25,
     "flag": false
    },
-   "freeze_t": 1803487877.244671
+   "freeze_t": 1803236190.182753
   },
   "debt_public": {
    "label": "Debt held by the public",
    "group": "debt",
    "kind": "usd",
-   "base": 32763773414012.5,
-   "t0": 1794286799.0,
-   "rate": 64469.14312269312,
-   "as_of": "2026-11-09",
+   "base": 32800204226578.75,
+   "t0": 1794373199.0,
+   "rate": 65263.17530169395,
+   "as_of": "2026-11-10",
    "source": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
    "source_name": "Treasury, Debt to the Penny",
-   "method": "Starts at Treasury's official figure for 2026-11-09 (close of business). Rate: 90-day least-squares trend (62 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
+   "method": "Starts at Treasury's official figure for 2026-11-10 (close of business). Rate: 90-day least-squares trend (62 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
    "stale": false,
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-08-12 to 2026-11-09)",
+    "window": "trailing 90 days (2026-08-13 to 2026-11-10)",
     "n": 62,
-    "slope": 64469.14312269312,
+    "slope": 65263.17530169395,
     "first": [
-     "2026-08-12",
-     32180112234304.32
+     "2026-08-13",
+     32200971487306.14
     ],
     "last": [
-     "2026-11-09",
-     32763773414012.5
+     "2026-11-10",
+     32800204226578.75
     ],
     "context_1y": {
      "from": [
-      "2025-11-07",
-      30611508844516.16
+      "2025-11-10",
+      30613346931589.27
      ],
      "to": [
-      "2026-11-09",
-      32763773414012.5
+      "2026-11-10",
+      32800204226578.75
      ],
-     "rate": 67875.9388402065
+     "rate": 69344.78992229454
     }
    },
    "status": "ok",
    "slug": "debt_public",
    "validation": {
-    "last_error_pct": 0.0485,
-    "mean_abs_error_pct": 0.0577,
+    "last_error_pct": -0.0941,
+    "mean_abs_error_pct": 0.0616,
     "n": 20,
-    "against": "Debt to the Penny (next business day)",
+    "against": "Treasury, Debt to the Penny",
     "threshold_pct": 0.25,
     "flag": false
    },
-   "freeze_t": 1803487877.244671
+   "freeze_t": 1803236190.182753
   },
   "debt_intragov": {
    "label": "Intragovernmental debt",
    "group": "debt",
    "kind": "usd",
-   "base": 7796023175230.87,
-   "t0": 1794286799.0,
-   "rate": 17998.212122805016,
-   "as_of": "2026-11-09",
+   "base": 7783925853694.14,
+   "t0": 1794373199.0,
+   "rate": 17614.687476532406,
+   "as_of": "2026-11-10",
    "source": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
    "source_name": "Treasury, Debt to the Penny",
-   "method": "Starts at Treasury's official figure for 2026-11-09 (close of business). Rate: 90-day least-squares trend (62 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
+   "method": "Starts at Treasury's official figure for 2026-11-10 (close of business). Rate: 90-day least-squares trend (62 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
    "stale": false,
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-08-12 to 2026-11-09)",
+    "window": "trailing 90 days (2026-08-13 to 2026-11-10)",
     "n": 62,
-    "slope": 17998.212122805016,
+    "slope": 17614.687476532406,
     "first": [
-     "2026-08-12",
-     7733417085160.39
+     "2026-08-13",
+     7733844720538.23
     ],
     "last": [
-     "2026-11-09",
-     7796023175230.87
+     "2026-11-10",
+     7783925853694.14
     ],
     "context_1y": {
      "from": [
-      "2025-11-07",
-      7505716041477.49
+      "2025-11-10",
+      7512384756041.76
      ],
      "to": [
-      "2026-11-09",
-      7796023175230.87
+      "2026-11-10",
+      7783925853694.14
      ],
-     "rate": 9155.412180636917
+     "rate": 8610.511721600073
     }
    },
    "status": "ok",
    "slug": "debt_intragov",
    "validation": {
-    "last_error_pct": -0.0216,
-    "mean_abs_error_pct": 0.1725,
+    "last_error_pct": 0.1754,
+    "mean_abs_error_pct": 0.1774,
     "n": 20,
-    "against": "Debt to the Penny (next business day)",
+    "against": "Treasury, Debt to the Penny",
     "threshold_pct": 1.0,
     "flag": false
    },
-   "freeze_t": 1803487877.244671
+   "freeze_t": 1803236190.182753
   },
   "gdp": {
    "label": "GDP (annual rate)",
@@ -1758,7 +1758,7 @@
    "kind": "usd",
    "base": 33010036000000.0,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "fixed": true,
    "as_of": "2026-Q3",
    "badge": "FIXED \u00b7 BEA advance estimate, 2026-Q3",
@@ -1783,16 +1783,16 @@
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 484205841987.6024,
-   "t0": 1794286799.0,
-   "rate": 3489.6021315618254,
-   "as_of": "2026-11-09",
+   "base": 490857160606.7565,
+   "t0": 1794373199.0,
+   "rate": 158966.33040026962,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 5403326758960.81,
-   "ttm": 5403207188116.35,
+   "ttm": 5367775957745.42,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
    "source_name": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement",
-   "method": "FY2027 to date, budget basis, re-based every business day: DTS FYTD cash through 2026-11-09 ($587.8B) \u00d7 0.8238 budget-to-cash ratio from FY2026. Ticks toward the projected close for 2026-11-10: expected cash $0.4B \u00d7 0.8238 (non-customs receipts from the same weekdays a year earlier, scaled by the trailing-year growth, plus customs duties from the same business day last month, since tariffs arrive in one monthly lump). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $5,403.3B. Resets to $0 every Oct 1.",
+   "method": "FY2027 to date, budget basis, re-based every business day: official MTS FYTD through 2026-10-31 + DTS cash since then \u00d7 0.8238. Ticks toward the projected close for 2026-11-12: expected cash $33.3B \u00d7 0.8238 (non-customs receipts from the same weekdays a year earlier, scaled by the trailing-year growth, plus customs duties from the same business day last month, since tariffs arrive in one monthly lump). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $5,403.3B. Resets to $0 every Oct 1.",
    "stale": false,
    "basis": "dts",
    "calc": {
@@ -1805,28 +1805,31 @@
      6559227000000.0
     ],
     "cash_from": [
-     "2026-08-11",
-     5633831000000.0
+     "2026-08-12",
+     5649302000000.0
     ],
     "cash_to": [
-     "2026-11-09",
-     587789000000.0
+     "2026-11-10",
+     596249000000.0
     ],
-    "cash_flow_90d": 1513185000000.0,
+    "cash_flow_90d": 1506174000000.0,
     "seconds": 7779600.0,
     "base_parts": {
-     "dts_cash_latest": 587789000000.0
+     "mts_month": "2026-10-31",
+     "mts_fytd": 368940118602.77,
+     "dts_cash_at_month_end": 448251000000.0,
+     "dts_cash_latest": 596249000000.0
     },
-    "next_bday": "2026-11-10",
-    "cash_flow_next": 366000000.0,
-    "seconds_next": 86400.0,
+    "next_bday": "2026-11-12",
+    "cash_flow_next": 33345736696.03909,
+    "seconds_next": 172800.0,
     "pace_parts": {
-     "non_customs_same_window_last_year": 0.0,
-     "growth": 1.0482,
-     "customs_same_bday_last_month": 366000000.0
+     "non_customs_same_window_last_year": 33012736696.03909,
+     "growth": 1.0391,
+     "customs_same_bday_last_month": 333000000.0
     }
    },
-   "anchor": "dts",
+   "anchor": "2026-10-31",
    "status": "ok",
    "slug": "revenue"
   },
@@ -1835,16 +1838,16 @@
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 848408190335.7944,
-   "t0": 1794286799.0,
-   "rate": 51.919577136958964,
-   "as_of": "2026-11-09",
+   "base": 987256006963.8806,
+   "t0": 1794373199.0,
+   "rate": 388000.8599019019,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 7395799983313.23,
-   "ttm": 7395735355671.811,
+   "ttm": 7480017622395.67,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
    "source_name": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement",
-   "method": "FY2027 to date, budget basis, re-based every business day: DTS FYTD cash through 2026-11-09 ($945.6B) \u00d7 0.8972 budget-to-cash ratio from FY2026. Ticks toward the projected close for 2026-11-10: expected cash $0.0B \u00d7 0.8972 (non-interest outlays on the same weekdays a year earlier, scaled by the trailing-year growth, plus interest from the Treasury coupon calendar, which settles on the 15th and month-end rather than on a fixed weekday). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $7,395.8B. Resets to $0 every Oct 1.",
+   "method": "FY2027 to date, budget basis, re-based every business day: official MTS FYTD through 2026-10-31 + DTS cash since then \u00d7 0.8972. Ticks toward the projected close for 2026-11-12: expected cash $74.7B \u00d7 0.8972 (non-interest outlays on the same weekdays a year earlier, scaled by the trailing-year growth, plus interest from the Treasury coupon calendar, which settles on the 15th and month-end rather than on a fixed weekday). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $7,395.8B. Resets to $0 every Oct 1.",
    "stale": false,
    "basis": "dts",
    "calc": {
@@ -1857,45 +1860,48 @@
      8243474000000.0
     ],
     "cash_from": [
-     "2026-08-11",
-     7094909000000.0
+     "2026-08-12",
+     7146793000000.0
     ],
     "cash_to": [
-     "2026-11-09",
-     945649000000.0
+     "2026-11-10",
+     998498000000.0
     ],
-    "cash_flow_90d": 2094214000000.0,
+    "cash_flow_90d": 2095179000000.0,
     "seconds": 7779600.0,
     "base_parts": {
-     "dts_cash_latest": 945649000000.0
+     "mts_month": "2026-10-31",
+     "mts_fytd": 773003666480.36,
+     "dts_cash_at_month_end": 759689000000.0,
+     "dts_cash_latest": 998498000000.0
     },
-    "next_bday": "2026-11-10",
-    "cash_flow_next": 5000000.0,
-    "seconds_next": 86400.0,
+    "next_bday": "2026-11-12",
+    "cash_flow_next": 74731128660.46504,
+    "seconds_next": 172800.0,
     "pace_parts": {
-     "non_interest_same_window_last_year": 0.0,
+     "non_interest_same_window_last_year": 74726128660.46504,
      "interest_coupon_calendar": 5000000.0,
-     "growth": 1.0785
+     "growth": 1.0815
     }
    },
-   "anchor": "dts",
+   "anchor": "2026-10-31",
    "status": "ok",
    "slug": "spending"
   },
   "rev_individual": {
    "label": "Individual income taxes",
-   "base": 247671740291.44238,
-   "rate": -3588.5601040357305,
-   "share": 0.5266366376654805,
+   "base": 249536548264.84836,
+   "rate": 80487.39809993196,
+   "share": 0.5244164572166549,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish individual income taxes day by day, so we take 52.66% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $2,845.5B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish individual income taxes day by day, so we take 52.44% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $2,845.5B.",
    "calc": {
     "type": "share",
     "parent": "revenue",
-    "share": 0.5266366376654805,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.5244164572166549,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "20"
     ]
@@ -1903,8 +1909,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 2845526866159.55,
    "lines": [
@@ -1916,18 +1922,18 @@
   },
   "rev_payroll": {
    "label": "Payroll / social insurance taxes",
-   "base": 157696707496.53494,
-   "rate": -2284.8957753272216,
-   "share": 0.3353182874605152,
+   "base": 160936340657.2489,
+   "rate": 51909.61969017091,
+   "share": 0.3382176526514696,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish payroll / social insurance taxes day by day, so we take 33.53% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $1,811.8B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish payroll / social insurance taxes day by day, so we take 33.82% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $1,811.8B.",
    "calc": {
     "type": "share",
     "parent": "revenue",
-    "share": 0.3353182874605152,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.3382176526514696,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "50",
      "60",
@@ -1937,8 +1943,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 1811794721160.9202,
    "lines": [
@@ -1952,18 +1958,18 @@
   },
   "rev_corporate": {
    "label": "Corporate income taxes",
-   "base": 33197943387.93756,
-   "rate": -481.0109342220575,
-   "share": 0.0705904244976006,
+   "base": 34074878864.41462,
+   "rate": 10990.768123698697,
+   "share": 0.07161046098624829,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish corporate income taxes day by day, so we take 7.06% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $381.4B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish corporate income taxes day by day, so we take 7.16% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $381.4B.",
    "calc": {
     "type": "share",
     "parent": "revenue",
-    "share": 0.0705904244976006,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.07161046098624829,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "30"
     ]
@@ -1971,8 +1977,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 381414689057.62,
    "lines": [
@@ -1984,10 +1990,10 @@
   },
   "rev_customs": {
    "label": "Customs duties (tariffs), gross deposits",
-   "base": 28993000000.0,
-   "rate": 10085.262345679012,
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "base": 29300000000.0,
+   "rate": 10092.206790123457,
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
@@ -1999,10 +2005,10 @@
    "stale": false,
    "share": null,
    "basis": "dts_gross",
-   "badge": "DTS GROSS \u00b7 through 2026-11-09",
+   "badge": "DTS GROSS \u00b7 through 2026-11-10",
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
    "source_name": "Treasury Daily Treasury Statement, customs deposits (gross, before refunds)",
-   "method": "FY2027 to date customs duties deposited, through 2026-11-09: $28.99B, summed from the Daily Treasury Statement lines 'DHS - Customs Duties, Taxes, and Fees' and 'DHS - Customs and Certain Excise Taxes'. This is gross cash deposited, before refunds; the Monthly Treasury Statement reports customs net of refunds, so it is lower: net customs in the latest MTS months: 2026-06 \u2212$25.6B, 2026-07 \u2212$8.5B, 2026-08 $12.8B, 2026-09 $5.9B. Ticks at the average daily deposit pace of the last 90 days. FY2026 final (MTS, net): $173.2B.",
+   "method": "FY2027 to date customs duties deposited, through 2026-11-10: $29.30B, summed from the Daily Treasury Statement lines 'DHS - Customs Duties, Taxes, and Fees' and 'DHS - Customs and Certain Excise Taxes'. This is gross cash deposited, before refunds; the Monthly Treasury Statement reports customs net of refunds, so it is lower: net customs in the latest MTS months: 2026-07 \u2212$8.5B, 2026-08 $12.8B, 2026-09 $5.9B, 2026-10 $19.2B. Ticks at the average daily deposit pace of the last 90 days. FY2026 final (MTS, net): $173.2B.",
    "calc": {
     "type": "share",
     "parent": "revenue",
@@ -2013,22 +2019,28 @@
     ]
    },
    "status": "ok",
-   "slug": "rev_customs"
+   "slug": "rev_customs",
+   "validation": {
+    "last_error_pct": 1.9262,
+    "threshold_pct": 5.0,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement, customs deposits (gross, before refunds)"
+   }
   },
   "rev_excise": {
    "label": "Excise taxes",
-   "base": 9225661466.644182,
-   "rate": -133.67225761639705,
-   "share": 0.0196169790276285,
+   "base": 9391372840.13631,
+   "rate": 3029.1641434691587,
+   "share": 0.01973654964561666,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish excise taxes day by day, so we take 1.96% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $106.0B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish excise taxes day by day, so we take 1.97% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $106.0B.",
    "calc": {
     "type": "share",
     "parent": "revenue",
-    "share": 0.0196169790276285,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.01973654964561666,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "80"
     ]
@@ -2036,8 +2048,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 105995126578.38,
    "lines": [
@@ -2049,18 +2061,18 @@
   },
   "rev_estate": {
    "label": "Estate and gift taxes",
-   "base": 3370161830.6296315,
-   "rate": -48.83087701208919,
-   "share": 0.007166141332001837,
+   "base": 3436417611.491196,
+   "rate": 1108.408023822423,
+   "share": 0.007221843701318008,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish estate and gift taxes day by day, so we take 0.72% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $38.7B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish estate and gift taxes day by day, so we take 0.72% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $38.7B.",
    "calc": {
     "type": "share",
     "parent": "revenue",
-    "share": 0.007166141332001837,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.007221843701318008,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "90"
     ]
@@ -2068,8 +2080,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 38720146356.13,
    "lines": [
@@ -2081,18 +2093,18 @@
   },
   "rev_misc": {
    "label": "Miscellaneous receipts (incl. Fed earnings)",
-   "base": 4050627514.4137216,
-   "rate": -58.69026590369036,
-   "share": 0.008613049079058908,
+   "base": 4181602368.617075,
+   "rate": 1348.765529053013,
+   "share": 0.008787895460153112,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish miscellaneous receipts (incl. fed earnings) day by day, so we take 0.86% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $46.7B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish miscellaneous receipts (incl. fed earnings) day by day, so we take 0.88% of federal revenue (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $46.7B.",
    "calc": {
     "type": "share",
     "parent": "revenue",
-    "share": 0.008613049079058908,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.008787895460153112,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "110"
     ]
@@ -2100,8 +2112,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 46656595004.81,
    "lines": [
@@ -2113,18 +2125,18 @@
   },
   "out_socsec": {
    "label": "Social Security",
-   "base": 191242507452.98672,
-   "rate": 11.703364289353301,
-   "share": 0.2254133206532273,
+   "base": 221161868496.97308,
+   "rate": 86918.6862870882,
+   "share": 0.224016736223378,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish social security day by day, so we take 22.54% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $1,667.1B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish social security day by day, so we take 22.40% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $1,667.1B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.2254133206532273,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.224016736223378,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "270"
     ]
@@ -2132,8 +2144,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 1667097265194.46,
    "lines": [
@@ -2145,18 +2157,18 @@
   },
   "out_medicare": {
    "label": "Medicare",
-   "base": 123047223272.72523,
-   "rate": 7.5300543688390364,
-   "share": 0.1450330450299212,
+   "base": 144143608424.44473,
+   "rate": 56649.78852855311,
+   "share": 0.14600428602883986,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish medicare day by day, so we take 14.50% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $1,072.6B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish medicare day by day, so we take 14.60% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $1,072.6B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.1450330450299212,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.14600428602883986,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "250"
     ]
@@ -2164,8 +2176,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 1072626018868.53,
    "lines": [
@@ -2177,18 +2189,18 @@
   },
   "out_health": {
    "label": "Health (incl. Medicaid)",
-   "base": 117651128369.68729,
-   "rate": 7.199832467697626,
-   "share": 0.13867278712045641,
+   "base": 136078378100.39044,
+   "rate": 53480.07745162223,
+   "share": 0.137834945688377,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish health (incl. medicaid) day by day, so we take 13.87% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $1,025.6B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish health (incl. medicaid) day by day, so we take 13.78% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $1,025.6B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.13867278712045641,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.137834945688377,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "240"
     ]
@@ -2196,8 +2208,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 1025587234576.31,
    "lines": [
@@ -2209,18 +2221,18 @@
   },
   "out_defense": {
    "label": "National defense",
-   "base": 110722088267.58884,
-   "rate": 6.775799748348707,
-   "share": 0.13050568055426923,
+   "base": 131209776415.26613,
+   "rate": 51566.67137759143,
+   "share": 0.1329034976639717,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish national defense day by day, so we take 13.05% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $965.2B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish national defense day by day, so we take 13.29% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $965.2B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.13050568055426923,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.1329034976639717,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "140"
     ]
@@ -2228,8 +2240,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 965160356821.48,
    "lines": [
@@ -2241,18 +2253,18 @@
   },
   "out_interest": {
    "label": "Net interest",
-   "base": 120652896658.8696,
-   "rate": 7.383530058094289,
-   "share": 0.14221090511999415,
+   "base": 140427516761.50467,
+   "rate": 55189.32969059764,
+   "share": 0.14224022520092128,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish net interest day by day, so we take 14.22% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $1,051.8B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish net interest day by day, so we take 14.22% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $1,051.8B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.14221090511999415,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.14224022520092128,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "320"
     ]
@@ -2260,8 +2272,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 1051753969311.11,
    "lines": [
@@ -2273,18 +2285,18 @@
   },
   "out_income": {
    "label": "Income security",
-   "base": 79638561372.17348,
-   "rate": 4.873597965387951,
-   "share": 0.09386821376707014,
+   "base": 91141638129.09764,
+   "rate": 35819.51765045238,
+   "share": 0.09231813986058848,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish income security day by day, so we take 9.39% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $694.2B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish income security day by day, so we take 9.23% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $694.2B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.09386821376707014,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.09231813986058848,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "260"
     ]
@@ -2292,8 +2304,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 694224470394.36,
    "lines": [
@@ -2305,18 +2317,18 @@
   },
   "out_veterans": {
    "label": "Veterans benefits",
-   "base": 47744920086.56822,
-   "rate": 2.921820050265415,
-   "share": 0.05627588303652643,
+   "base": 55533983807.56242,
+   "rate": 21825.375909716633,
+   "share": 0.05625084417399161,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish veterans benefits day by day, so we take 5.63% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $416.2B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish veterans benefits day by day, so we take 5.63% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $416.2B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.05627588303652643,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.05625084417399161,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "280"
     ]
@@ -2324,8 +2336,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 416204104589.87,
    "lines": [
@@ -2337,18 +2349,18 @@
   },
   "out_education": {
    "label": "Education, training, employment",
-   "base": 12337852438.129744,
-   "rate": 0.7550328823586188,
-   "share": 0.014542354233103882,
+   "base": 13211879873.224054,
+   "rate": 5192.392566439062,
+   "share": 0.013382425409448452,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish education, training, employment day by day, so we take 1.45% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $107.6B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish education, training, employment day by day, so we take 1.34% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $107.6B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.014542354233103882,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.013382425409448452,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "230"
     ]
@@ -2356,8 +2368,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 107551403356.47,
    "lines": [
@@ -2369,18 +2381,18 @@
   },
   "out_transport": {
    "label": "Transportation",
-   "base": 16388835187.297283,
-   "rate": 1.0029386825638815,
-   "share": 0.019317158148615572,
+   "base": 19127834073.005726,
+   "rate": 7517.417990912913,
+   "share": 0.01937474569724804,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish transportation day by day, so we take 1.93% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $142.9B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish transportation day by day, so we take 1.94% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $142.9B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.019317158148615572,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.01937474569724804,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "210"
     ]
@@ -2388,8 +2400,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 142864249326.25,
    "lines": [
@@ -2401,18 +2413,18 @@
   },
   "out_agri": {
    "label": "Agriculture",
-   "base": 6028650392.950099,
-   "rate": 0.3689320573209522,
-   "share": 0.007105837097781904,
+   "base": 8625694915.43198,
+   "rate": 3389.9789120873033,
+   "share": 0.008737039688376955,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish agriculture day by day, so we take 0.71% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $52.6B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish agriculture day by day, so we take 0.87% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $52.6B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.007105837097781904,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.008737039688376955,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "190"
     ]
@@ -2420,8 +2432,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 52566167744.02,
    "lines": [
@@ -2433,18 +2445,18 @@
   },
   "out_intl": {
    "label": "International affairs",
-   "base": 5508033414.593528,
-   "rate": 0.33707214168777555,
-   "share": 0.006492197361288419,
+   "base": 6670997008.43929,
+   "rate": 2621.7643219385914,
+   "share": 0.006757109565688723,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish international affairs day by day, so we take 0.65% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $48.0B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish international affairs day by day, so we take 0.68% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $48.0B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.006492197361288419,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.006757109565688723,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "150"
     ]
@@ -2452,8 +2464,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 48014568338.42,
    "lines": [
@@ -2465,18 +2477,18 @@
   },
   "out_justice": {
    "label": "Administration of justice",
-   "base": 12592808369.536697,
-   "rate": 0.7706352825923662,
-   "share": 0.014842865159696945,
+   "base": 15019773027.298897,
+   "rate": 5902.911513342227,
+   "share": 0.015213655750233795,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish administration of justice day by day, so we take 1.48% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $109.9B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish administration of justice day by day, so we take 1.52% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $109.9B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.014842865159696945,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.015213655750233795,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "290"
     ]
@@ -2484,8 +2496,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 109915442478.9,
    "lines": [
@@ -2497,18 +2509,18 @@
   },
   "out_science": {
    "label": "Science, space and technology",
-   "base": 4574496973.6408615,
-   "rate": 0.27994301704198393,
-   "share": 0.005391858572028054,
+   "base": 5277319433.260729,
+   "rate": 2074.0359781443126,
+   "share": 0.005345441705125835,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish science, space and technology day by day, so we take 0.54% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $39.9B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish science, space and technology day by day, so we take 0.53% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $39.9B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.005391858572028054,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.005345441705125835,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "160"
     ]
@@ -2516,8 +2528,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 39876759073.93,
    "lines": [
@@ -2529,18 +2541,18 @@
   },
   "out_nature": {
    "label": "Natural resources and environment",
-   "base": 6550062185.2484,
-   "rate": 0.4008406127530219,
-   "share": 0.007720413663917987,
+   "base": 7660120314.940522,
+   "rate": 3010.499048052576,
+   "share": 0.007759000969260015,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish natural resources and environment day by day, so we take 0.77% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $57.1B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish natural resources and environment day by day, so we take 0.78% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $57.1B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.007720413663917987,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.007759000969260015,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "180"
     ]
@@ -2548,8 +2560,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 57098136028.25,
    "lines": [
@@ -2561,18 +2573,18 @@
   },
   "out_community": {
    "label": "Community and regional development",
-   "base": 7161654601.31735,
-   "rate": 0.4382679030410885,
-   "share": 0.008441284139987869,
+   "base": 8217545059.772896,
+   "rate": 3229.572195037715,
+   "share": 0.008323621230773164,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish community and regional development day by day, so we take 0.84% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $62.4B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish community and regional development day by day, so we take 0.83% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $62.4B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.008441284139987869,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.008323621230773164,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "220"
     ]
@@ -2580,8 +2592,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 62429584486.16,
    "lines": [
@@ -2593,18 +2605,18 @@
   },
   "out_govt": {
    "label": "General government",
-   "base": 3720399745.6889806,
-   "rate": 0.22767529094711997,
-   "share": 0.004385153029011272,
+   "base": 4842129399.33535,
+   "rate": 1903.002217708594,
+   "share": 0.004904634021145543,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish general government day by day, so we take 0.44% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $32.3B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish general government day by day, so we take 0.49% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $32.3B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.004385153029011272,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.004904634021145543,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "300"
     ]
@@ -2612,8 +2624,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 32343463387.61,
    "lines": [
@@ -2625,18 +2637,18 @@
   },
   "out_energy": {
    "label": "Energy",
-   "base": 2405707483.0665736,
-   "rate": 0.14722077964216548,
-   "share": 0.002835554289161695,
+   "base": 2705732113.0141153,
+   "rate": 1063.3780692226017,
+   "share": 0.002740659052898633,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish energy day by day, so we take 0.28% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $21.0B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish energy day by day, so we take 0.27% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $21.0B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": 0.002835554289161695,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": 0.002740659052898633,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "170"
     ]
@@ -2644,8 +2656,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 20970860009.28,
    "lines": [
@@ -2657,18 +2669,18 @@
   },
   "out_commerce": {
    "label": "Commerce and housing credit (net)",
-   "base": -1776522421.1773415,
-   "rate": -0.1087168817233454,
-   "share": -0.0020939477499317934,
+   "base": -2112035105.970586,
+   "rate": -830.0495833696891,
+   "share": -0.002139298308719084,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish commerce and housing credit (net) day by day, so we take -0.21% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $-15.5B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish commerce and housing credit (net) day by day, so we take -0.21% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $-15.5B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": -0.0020939477499317934,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": -0.002139298308719084,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "200"
     ]
@@ -2676,8 +2688,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": -15465292145.92,
    "lines": [
@@ -2689,18 +2701,18 @@
   },
   "out_offsets": {
    "label": "Undistributed offsetting receipts",
-   "base": -17783113515.0972,
-   "rate": -1.0882635792529933,
-   "share": -0.02096056322612675,
+   "base": -21687753283.111504,
+   "rate": -8523.49022323591,
+   "share": -0.021967709621548006,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury MTS Table 9 (share) \u00d7 daily total: modeled estimate",
-   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish undistributed offsetting receipts day by day, so we take -2.10% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-10 to 2026-09)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $-155.0B.",
+   "method": "MODELED ESTIMATE, not an official published figure. Treasury does not publish undistributed offsetting receipts day by day, so we take -2.20% of federal spending (its share of the monthly Treasury statements over trailing 12 months of MTS (2025-11 to 2026-10)) and apply it to the daily re-based FY2027 total. Real monthly figures can differ a lot from this, especially early in the fiscal year and in months where payments shift by a weekend. The official figure is the MTS Table 9 line when Treasury publishes the month. FY2026 final (MTS): $-155.0B.",
    "calc": {
     "type": "share",
     "parent": "spending",
-    "share": -0.02096056322612675,
-    "basis": "trailing 12 months of MTS (2025-10 to 2026-09)",
+    "share": -0.021967709621548006,
+    "basis": "trailing 12 months of MTS (2025-11 to 2026-10)",
     "mts_lines": [
      "330"
     ]
@@ -2708,8 +2720,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": -155018778526.26,
    "lines": [
@@ -2723,23 +2735,23 @@
    "label": "Net interest as share of revenue",
    "group": "ratios",
    "kind": "pct",
-   "base": 19.465369036212905,
+   "base": 19.821233216359975,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "fixed": true,
-   "as_of": "2026-09",
-   "badge": "FIXED \u00b7 official, 12 months to 2026-09",
-   "basis_txt": "official, 12 months to 2026-09",
+   "as_of": "2026-10",
+   "badge": "FIXED \u00b7 official, 12 months to 2026-10",
+   "basis_txt": "official, 12 months to 2026-10",
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
    "source_name": "Treasury Monthly Statement, Table 9 (net interest \u00f7 total receipts)",
-   "method": "Net interest ($1,051.8B) \u00f7 total federal receipts ($5,403.2B) over the 12 monthly Treasury statements 2025-10 to 2026-09. Official figures only; it changes when Treasury publishes a new month. It is not a fiscal-year-to-date ratio: early in a fiscal year one month of interest over one month of receipts overstates the share.",
+   "method": "Net interest ($1,064.0B) \u00f7 total federal receipts ($5,367.8B) over the 12 monthly Treasury statements 2025-11 to 2026-10. Official figures only; it changes when Treasury publishes a new month. It is not a fiscal-year-to-date ratio: early in a fiscal year one month of interest over one month of receipts overstates the share.",
    "status": "ok",
    "slug": "interest_share",
    "calc": {
     "type": "fixed",
     "base_src": [
-     "2026-09",
-     19.465369036212905,
+     "2026-10",
+     19.821233216359975,
      "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government"
     ]
    }
@@ -2749,10 +2761,10 @@
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 364202348348.192,
-   "t0": 1794286799.0,
-   "rate": -3437.6825544248663,
-   "as_of": "2026-11-09",
+   "base": 496398846357.12415,
+   "t0": 1794373199.0,
+   "rate": 229034.5295016323,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 1992473224352.421,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
@@ -2760,7 +2772,7 @@
    "method": "Spending minus revenue, both re-based daily and ticking.",
    "stale": false,
    "basis": "dts",
-   "anchor": "dts",
+   "anchor": "2026-10-31",
    "calc": {
     "type": "difference",
     "of": [
@@ -2776,15 +2788,15 @@
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 45126000000.0,
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "base": 45127000000.0,
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fy": 2027,
    "prev_fy_total": 709302000000.0,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
    "source_name": "Treasury Daily Treasury Statement (Interest on Treasury Securities)",
    "stale": false,
-   "rate": 57.870370370370374,
+   "rate": 28.935185185185187,
    "steps": [
     [
      1794837600.0,
@@ -2829,12 +2841,12 @@
      "2027-02-16"
     ]
    ],
-   "method": "Cash interest paid on Treasury securities FY2027 to date, official through 2026-11-09 and re-based every business day. Treasury pays coupons in lumps on the 15th and at month-end (next business day if that is a holiday or weekend), so the projection follows that calendar: each upcoming payment is estimated from the payment for the same coupon date six months earlier (notes and bonds pay every six months), adjusted for half of its six-month growth; other business days add the median ordinary day ($5.0M). Next projected payment: $84.5B on 2026-11-16. Projected amounts are estimates until Treasury's statement for that day is published.",
+   "method": "Cash interest paid on Treasury securities FY2027 to date, official through 2026-11-10 and re-based every business day. Treasury pays coupons in lumps on the 15th and at month-end (next business day if that is a holiday or weekend), so the projection follows that calendar: each upcoming payment is estimated from the payment for the same coupon date six months earlier (notes and bonds pay every six months), adjusted for half of its six-month growth; other business days add the median ordinary day ($5.0M). Next projected payment: $84.5B on 2026-11-16. Projected amounts are estimates until Treasury's statement for that day is published.",
    "calc": {
     "type": "coupon_calendar",
     "drip_per_bday": 5000000.0,
-    "next_bday": "2026-11-10",
-    "seconds_next": 86400.0,
+    "next_bday": "2026-11-12",
+    "seconds_next": 172800.0,
     "coupons": [
      [
       "2026-11-16",
@@ -2886,10 +2898,16 @@
       88020543662.39226
      ]
     ],
-    "flow_90d": 186551000000.0
+    "flow_90d": 186529000000.0
    },
    "status": "ok",
-   "slug": "interest_cash"
+   "slug": "interest_cash",
+   "validation": {
+    "last_error_pct": 0.0089,
+    "threshold_pct": 10.0,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement (Interest on Treasury Securities)"
+   }
   },
   "interest_gross": {
    "label": "Gross interest expense on Treasury debt",
@@ -2970,7 +2988,7 @@
    "kind": "pct",
    "base": 3.57,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "2026-10-31",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -2994,7 +3012,7 @@
    "kind": "pct",
    "base": 3.58,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "2026-10-31",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -3015,32 +3033,38 @@
   "debt_subject_limit": {
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-08-12 to 2026-11-09)",
+    "window": "trailing 90 days (2026-08-13 to 2026-11-10)",
     "n": 62,
-    "slope": 80400.14227989383,
+    "slope": 80875.51766889395,
     "first": [
-     "2026-08-12",
-     39730505000000.0
+     "2026-08-13",
+     39749559000000.0
     ],
     "last": [
-     "2026-11-09",
-     40364228000000.0
+     "2026-11-10",
+     40387197000000.0
     ]
    },
    "label": "Debt subject to the limit",
    "group": "debt",
    "kind": "usd",
-   "base": 40364228000000.0,
-   "t0": 1794286799.0,
-   "rate": 80400.14227989383,
-   "as_of": "2026-11-09",
+   "base": 40387197000000.0,
+   "t0": 1794373199.0,
+   "rate": 80875.51766889395,
+   "as_of": "2026-11-10",
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit",
    "source_name": "Treasury Daily Treasury Statement, Table III-C",
-   "method": "Total debt minus debt not subject to limit (unamortized discount, FFB, other). Official close 2026-11-09; ticks at the 90-day trend (62 records).",
+   "method": "Total debt minus debt not subject to limit (unamortized discount, FFB, other). Official close 2026-11-10; ticks at the 90-day trend (62 records).",
    "stale": false,
    "status": "ok",
    "slug": "debt_subject_limit",
-   "freeze_t": 1803487877.244671
+   "freeze_t": 1803236190.182753,
+   "validation": {
+    "last_error_pct": -0.0397,
+    "threshold_pct": 0.25,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement, Table III-C"
+   }
   },
   "debt_limit": {
    "label": "Statutory debt limit",
@@ -3048,8 +3072,8 @@
    "kind": "usd",
    "base": 41103996000000.0,
    "rate": 0,
-   "t0": 1794286799.0,
-   "as_of": "2026-11-09",
+   "t0": 1794373199.0,
+   "as_of": "2026-11-10",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit",
    "source_name": "Treasury Daily Treasury Statement, Table III-C",
@@ -3060,7 +3084,7 @@
    "calc": {
     "type": "fixed",
     "base_src": [
-     "2026-11-09",
+     "2026-11-10",
      41103996000000.0,
      "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit"
     ]
@@ -3071,20 +3095,16 @@
     "type": "ols",
     "window": "last 13 weekly reports",
     "n": 13,
-    "slope": 5568.438934222926,
+    "slope": 5721.335625596511,
     "first": [
-     "2026-08-12",
-     4538288010267.88
+     "2026-08-19",
+     4542228170480.56
     ],
     "last": [
-     "2026-11-04",
-     4578776937713.54
+     "2026-11-10",
+     4586606968304.0
     ],
     "points": [
-     [
-      "2026-08-12",
-      4538288010267.88
-     ],
      [
       "2026-08-19",
       4542228170480.56
@@ -3132,22 +3152,32 @@
      [
       "2026-11-04",
       4578776937713.54
+     ],
+     [
+      "2026-11-10",
+      4586606968304.0
      ]
     ]
    },
    "label": "Fed holdings of Treasuries",
    "group": "money",
    "kind": "usd",
-   "base": 4578776937713.54,
-   "t0": 1793854799.0,
-   "rate": 5568.438934222926,
-   "as_of": "2026-11-04",
+   "base": 4586606968304.0,
+   "t0": 1794373199.0,
+   "rate": 5721.335625596511,
+   "as_of": "2026-11-10",
    "source": "https://www.newyorkfed.org/markets/soma-holdings",
    "source_name": "Federal Reserve Bank of New York, SOMA holdings (H.4.1 basis)",
    "method": "Bills + notes/bonds + FRNs + TIPS incl. inflation compensation, par value, weekly (Wednesday). Ticks at the 13-week trend.",
    "stale": false,
    "status": "ok",
-   "slug": "fed_treasuries"
+   "slug": "fed_treasuries",
+   "validation": {
+    "last_error_pct": -0.1078,
+    "threshold_pct": 5.0,
+    "flag": false,
+    "against": "Federal Reserve Bank of New York, SOMA holdings (H.4.1 basis)"
+   }
   },
   "m2": {
    "calc": {
@@ -3708,7 +3738,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3732,7 +3762,7 @@
    "kind": "pct",
    "base": -0.1,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3756,7 +3786,7 @@
    "kind": "pct",
    "base": 32.6,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3780,7 +3810,7 @@
    "kind": "pct",
    "base": 2.6,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3804,7 +3834,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3828,7 +3858,7 @@
    "kind": "pct",
    "base": 3.7,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3852,7 +3882,7 @@
    "kind": "pct",
    "base": 55.6,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3876,7 +3906,7 @@
    "kind": "pct",
    "base": -2.3,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3900,7 +3930,7 @@
    "kind": "pct",
    "base": 90.9,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3924,7 +3954,7 @@
    "kind": "pct",
    "base": 8.7,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3948,7 +3978,7 @@
    "kind": "pct",
    "base": 126.1,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -3972,7 +4002,7 @@
    "kind": "pct",
    "base": 14.5,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -3996,7 +4026,7 @@
    "kind": "pct",
    "base": 123.3,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
@@ -4020,7 +4050,7 @@
    "kind": "pct",
    "base": 5.9,
    "rate": 0,
-   "t0": 1794510100.3832474,
+   "t0": 1794527995.273681,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
