@@ -168,6 +168,8 @@ def compute(R, places, us, now):
         e = by_iso.get(x.get("iso3") or "")
         x["imf_debt_2026"] = e["debt_2026_usd"] if e else None
         x["imf_ratio_2026"] = e["ratio_2026"] if e else None
+        if x.get("iso3") == "BRA":
+            x["published_ratio"] = _pctgdp(by_place.get("BRA"))
         if x["tier"] == "imf":
             x["ratio"] = e["ratio_2026"] if e else None
         elif e and e.get("gdp_2026_usd"):
@@ -244,11 +246,51 @@ th[data-k]{cursor:pointer}th[data-dir="desc"]::after{content:" ↓"}th[data-dir=
 .wt.wstk td{display:flex;justify-content:space-between;gap:14px;border:0;padding:3px 8px;text-align:right;white-space:normal;min-width:0!important}.wt.wstk td:before{content:attr(data-l);color:var(--mut);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;text-align:left;flex:none}
 .wt.wstk td.c{display:block;text-align:left;font-size:15px;padding-bottom:5px}.wt.wstk td.c:before,.wt.wstk td.nm{display:none}.wt.wstk td.m{color:var(--mut)}}"""
 
+def _pctgdp(p):
+    if not p:
+        return None
+    for c in p.get("components") or []:
+        for f in c.get("facts") or []:
+            if f.get("key") == "pctgdp" and isinstance(f.get("value"), (int, float)):
+                return f["value"]
+    return None
+
+def _driver_why(x):
+    """Why a non-IMF headline differs from the IMF stock. Date and FX only when that is the reason."""
+    if x.get("iso3") == "NOR":
+        gap = x.get("imf_gap")
+        pct = f" ({gap * 100:+.1f}%)" if isinstance(gap, (int, float)) else ""
+        return f"Eurostat gov_10q_ggdebt sector S13. The official stock differs from the IMF figure{pct}"
+    if x.get("iso3") == "BRA":
+        own = x.get("published_ratio")
+        imf = x.get("imf_ratio_2026")
+        own_s = f"{own:.2f}% of GDP" if isinstance(own, (int, float)) else "its published ratio"
+        imf_s = f"{imf:.2f}%" if isinstance(imf, (int, float)) else "the IMF ratio"
+        return (f"Banco Central do Brasil SGS 13761/13762 (DBGG) is {own_s}; the IMF ratio is {imf_s}. "
+                "The official stock differs from the IMF figure")
+    return ("General-government stock on a different date, converted at the exchange rate on this page, "
+            "so the dollar figure differs from the IMF end-2026 stock")
+
+def _named_differences(W):
+    by = {x["iso3"]: x for x in W["rows"]}
+    bits = []
+    nor = by.get("NOR")
+    if nor and isinstance(nor.get("imf_gap"), (int, float)):
+        bits.append(f"Norway's headline is Eurostat gov_10q_ggdebt sector S13 and differs from the IMF figure by {nor['imf_gap'] * 100:+.1f}%.")
+    bra = by.get("BRA")
+    if bra:
+        own, imf = bra.get("published_ratio"), bra.get("imf_ratio_2026")
+        if isinstance(own, (int, float)) and isinstance(imf, (int, float)):
+            bits.append(f"Brazil's headline is Banco Central do Brasil SGS 13761/13762 (DBGG), {own:.2f}% of GDP, against an IMF ratio of {imf:.2f}%. The official stock differs from the IMF figure.")
+        else:
+            bits.append("Brazil's headline is Banco Central do Brasil SGS 13761/13762 (DBGG). The official stock differs from the IMF figure.")
+    return " ".join(bits)
+
 def _faqs(W):
     n = len(W["rows"]); c = W["counts"]; panel = (W.get("weo") or {}).get("panel_2026_usd")
     panel_s = _usd0(panel) if panel else "the IMF panel"
     gap = W.get("gap_vs_imf")
-    gap_s = (f" The headline sum differs from that IMF total by {_usd0(gap)} ({gap / panel * 100:+.2f}%)." if panel and gap is not None else "")
+    gap_s = (f" The headline sum differs from that IMF total by {_sgn(gap, ',.0f', plus=False)} ({gap / panel * 100:+.2f}%)." if panel and gap is not None else "")
     top = sorted(W["rows"], key=lambda x: -x["usd"])[:5]
     top_s = "; ".join(f"{x['name']}, {_usd0(x['usd'])}" for x in top)
     return [
@@ -268,14 +310,14 @@ def _faqs(W):
         ("Why does a headline differ from the IMF number?",
          "A general-government stock from Eurostat, a national statistics office or QPSD can use a different date and a different exchange rate from the IMF's end-2026 dollars. "
          "A QPSD general-government stock more than 25% from the IMF figure is not used, because that gap is large enough to be a unit or perimeter problem. "
-         "Norway's Eurostat stock is general government and is used even though it sits further from the IMF figure; the loan component in that stock is large."),
+         + _named_differences(W)),
     ]
 
 def build(R, SITE, with_analytics, og, stamp, now, places, W):
     if not W: return []
     rows, cv = W["rows"], W["cov"]; n = len(rows); c = W["counts"]
     url = f"{SITE}/world/"
-    title = f"World Debt Clock: General Government Debt of {n} Countries"
+    title = f"World Debt Clock: Government Debt of {n} Countries"
     desc = (f"World Debt Clock: general government gross debt of {n} economies, {_tn(W['total'])}. "
             f"{c['official']} national general-government stocks, {c['harmonized']} Eurostat or QPSD stocks, and {c['imf']} IMF estimates.")
     big_now = W["now_total"]
@@ -309,7 +351,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
                + '.</p>' if True else '')
     crumb = '<div class="crumb"><a href="../">← US national debt clock</a><span>·</span><a href="../countries/">All country debt clocks</a><span>·</span><a href="#imf">IMF comparison</a></div>'
     gap = W.get("gap_vs_imf")
-    gap_txt = (f' The pure IMF end-2026 sum for the same {n} economies is <b>{_usd0(panel)}</b> ({_tn(panel)}), a difference of {_usd0(gap)} ({gap / panel * 100:+.2f}%).' if panel and gap is not None else "")
+    gap_txt = (f' The pure IMF end-2026 sum for the same {n} economies is <b>{_usd0(panel)}</b> ({_tn(panel)}), a difference of {_sgn(gap, ",.0f", plus=False)} ({gap / panel * 100:+.2f}%).' if panel and gap is not None else "")
     intro = (f'<section class="intro" id="intro">{crumb}<h1>World Debt Clock</h1>'
              f'<p><b>What this page counts.</b> General government gross debt for each of {n} economies, in US dollars. '
              f'The latest sum is <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}). '
@@ -353,7 +395,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
     drv = ""
     for x in W.get("drivers") or []:
         delta = x["usd"] - x["imf_debt_2026"]
-        why = "general-government stock at a different date and exchange rate"
+        why = _driver_why(x)
         if x["tier"] == "imf":
             continue
         drv += (f'<tr><td class="c"><b>{E(x["name"])}</b></td><td data-l="Headline basis">{TIER[x["tier"]]}</td>'

@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Inputs for the World Debt Clock (/world/) and the World Government Debt Clock (/world-government-debt/).
-  data/world_fx.json       ECB euro foreign exchange reference rates (daily, keyless XML), and the Bank of Russia official
-                           USD/RUB rate (neither the ECB nor the Fed H.10 publishes a rouble rate any more)
-                           and the Federal Reserve Board H.10 weekly release, for currencies the ECB does not publish (Taiwan dollar),
-                           and the US Treasury's quarterly Reporting Rates of Exchange (Egyptian pound, Ghanaian cedi, Kenyan shilling, Nigerian naira)
+"""Inputs for the World Debt Clock (/world/).
+/world-government-debt/ and /global-debt-clock/ are redirects to /world/, not separate clocks.
+  data/world_fx.json       ECB euro foreign exchange reference rates (daily, keyless XML), the Bank of Russia official
+                           USD/RUB rate (neither the ECB nor the Fed H.10 publishes a rouble rate any more),
+                           the Federal Reserve Board H.10 weekly release for currencies the ECB does not publish
+                           (Taiwan dollar, Sri Lankan rupee),
+                           and the US Treasury's quarterly Reporting Rates of Exchange, stored as the latest quarter
+                           plus a label index (ust_broad) for currencies neither the ECB nor H.10 publishes
+                           (Egyptian pound, Ghanaian cedi, Kenyan shilling, Nigerian naira, and the other Treasury labels)
   data/world_gdp.json      IMF World Economic Outlook NGDPD (GDP, current US dollars, billions) for the current calendar year,
                            every country plus the world aggregate: https://www.imf.org/external/datamapper/api/v1/NGDPD
   data/world_weo_debt.json General government gross debt for every IMF economy with both series:

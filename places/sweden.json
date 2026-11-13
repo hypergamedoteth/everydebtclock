@@ -3,6 +3,7 @@
  "slug": "sweden",
  "kind": "country",
  "country": "SE",
+ "iso3": "SWE",
  "name": "Sweden",
  "demonym": "person",
  "status": "live",

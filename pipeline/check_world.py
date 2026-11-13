@@ -71,6 +71,42 @@ def main():
     m = re.search(r'id="total"[^>]*data-r="([^"]+)"', page)
     if not m or float(m.group(1)) == 0:
         fail("world ticker is missing or zero")
+    # A US dollar stock must not be printed with another currency symbol (¥, €, ₹, kr, …).
+    foreign = ("¥", "€", "₹", "£", "₩", "₽", "₺", "kr", "Kč", "Ft", "zł", "lei", "R$", "C$", "A$", "NZ$", "S$", "HK$", "NT$")
+    pages = {"world": page}
+    for r in rows:
+        if r.get("iso3") == "USA":
+            path = os.path.join(ROOT, "index.html")
+        else:
+            path = os.path.join(ROOT, "countries", r["slug"], "index.html")
+        if os.path.exists(path):
+            pages[r["iso3"]] = open(path).read()
+        token = f"{int(round(r['debt_usd'])):,}"
+        for label, html in pages.items():
+            if label not in ("world", r["iso3"]):
+                continue
+            start = 0
+            while True:
+                i = html.find(token, start)
+                if i < 0:
+                    break
+                pre = re.sub(r"<[^>]+>", "", html[max(0, i - 16):i]).replace("&nbsp;", " ").rstrip()
+                if any(pre.endswith(sym) for sym in foreign):
+                    fail(f"{r['iso3']} prints the USD stock {token} with a non-$ symbol on {label}: {pre[-10:]}{token}")
+                start = i + len(token)
+    dollar_minus = []
+    for dirpath, _, files in os.walk(ROOT):
+        parts = set(dirpath.split(os.sep))
+        if parts & {".git", "dist", "t", "node_modules", ".venv", "og"}:
+            continue
+        for name in files:
+            if not name.endswith(".html"):
+                continue
+            fp = os.path.join(dirpath, name)
+            if "$-" in open(fp).read():
+                dollar_minus.append(os.path.relpath(fp, ROOT))
+    if dollar_minus:
+        fail("$- appears in built HTML: " + ", ".join(dollar_minus[:20]))
     review = api.get("review_over_25pct") or []
     print(f"world ok: {len(rows)} economies, ${total/1e12:.2f}T latest, "
           f"{ratio:.2%} of the IMF ${weo['panel_2026_usd']/1e12:.2f}T, "

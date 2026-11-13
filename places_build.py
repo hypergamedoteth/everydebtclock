@@ -32,19 +32,43 @@ WORLD = False  # set by build.py when the World Debt Clock page is built, so eve
 WEO = False  # set by build.py when data/world_weo_debt.json is present
 HEADLINE_BY_SLUG = {}  # set by build.py from the World Debt Clock rows
 
+def _usd_plain(x):
+    """A US dollar amount. Independent of the page currency symbol."""
+    return ("−" if x < 0 else "") + f"${abs(x):,.0f}"
+
+def _usd_words(x):
+    ax = abs(x)
+    sign = "−" if x < 0 else ""
+    if ax >= 1e12:
+        return sign + f"${ax/1e12:,.2f} trillion"
+    if ax >= 1e9:
+        return sign + f"${ax/1e9:,.2f} billion"
+    return _usd_plain(x)
+
+def _headline_amount(p, h):
+    """Dollar headline. A local-currency stock is shown in that currency and in dollars."""
+    code = h.get("code") or "USD"
+    if code != "USD" and h.get("local"):
+        page_code = (p.get("currency") or {}).get("code")
+        sym = CUR if page_code == code else ""
+        local = (sym + f"{h['local']:,.0f}") if sym else f"{code} {h['local']:,.0f}"
+        return f"{local}, {_usd_words(h['usd'])}"
+    return _usd_plain(h["usd"])
+
 def _world_line(p, name, pub, as_of):
     """How this clock relates to the general-government headline on /world/."""
     h = HEADLINE_BY_SLUG.get(p["slug"])
     if not h:
         return ""
+    amount = _headline_amount(p, h)
     ol = h.get("official_line")
     if ol:
         return (f'<p><b>World Debt Clock.</b> The headline for {E(name)} is general government gross debt, '
-                f'{_usd0(h["usd"])} as of {_fd(h["as_of"])} ({E(h.get("source") or "IMF")}). '
+                f'{amount} as of {_fd(h["as_of"])} ({E(h.get("source") or "IMF")}). '
                 f'This page\'s clock is narrower and is not in that total: {E(ol["measure"])}, {E(pub)}, as of {as_of}.</p>')
     if h.get("tier") == "imf":
-        return (f'<p><b>World Debt Clock.</b> This IMF estimate of general government gross debt is the headline for {E(name)}.</p>')
-    return (f'<p><b>World Debt Clock.</b> This general-government gross debt stock is the headline for {E(name)}.</p>')
+        return (f'<p><b>World Debt Clock.</b> This IMF estimate of general government gross debt, {amount}, is the headline for {E(name)}.</p>')
+    return (f'<p><b>World Debt Clock.</b> This general-government gross debt stock, {amount}, is the headline for {E(name)}.</p>')
 CUR = "$"  # currency symbol for the page being rendered ("$" for US places, "C$" for Canada); set by _cur(p)
 def _cur(p): global CUR; CUR = (p.get("currency") or {}).get("symbol", "$"); return CUR
 def _usd0(x): return ("−" if x < 0 else "") + CUR + f"{abs(x):,.0f}"
@@ -515,7 +539,7 @@ ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='
     WL1 = '<li><a href="../world/">World debt clock</a> (general government gross debt)</li>' if WORLD else ""
     if kind == "country" and WORLD and WEO:
         WTXT = (' What this list counts: the first section is each country\'s own published figure, in its own currency. '
-                'Harmonized rows are a quarterly public-sector debt stock. The IMF section is the World Economic Outlook estimate where no general-government stock is on this site. '
+                'Harmonized rows are Eurostat Maastricht general-government debt or a World Bank/IMF QPSD general-government stock. The IMF section is the World Economic Outlook estimate where no general-government stock is on this site. '
                 'The <a href="../world/">World Debt Clock</a> adds general government gross debt once per economy. A narrower series on a country page is not added again.')
     elif WORLD:
         WTXT = ' The <a href="../world/">World Debt Clock</a> adds one stock per economy in US dollars, using the best source available.'
