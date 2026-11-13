@@ -130,6 +130,8 @@ jobs:
           # World Debt Clock inputs: ECB + Bank of Russia daily FX, IMF WEO GDP weights, and the IMF general-government debt panel
           # (GGXWDG_NGDP x NGDPD -> data/world_weo_debt.json). Keeps the last good file on any failure. Never fails the run.
           python3 pipeline/fetch_world.py || echo "world fetch skipped"
+          # Quarterly public-sector debt (World Bank / IMF QPSD, keyless). Keeps the last good file on failure.
+          python3 pipeline/fetch_qpsd.py || echo "qpsd fetch skipped"
 
       - name: Build site
         env:
@@ -138,6 +140,9 @@ jobs:
 
       - name: Check IMF world government debt totals and new clocks
         run: python3 pipeline/check_weo.py
+
+      - name: Check the best-source world debt clock
+        run: python3 pipeline/check_world.py
 
       - name: Guard against placeholder URLs
         run: |

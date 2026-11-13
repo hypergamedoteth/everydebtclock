@@ -12,6 +12,7 @@ Never invents a figure: it only reads data/world_weo_debt.json and the built HTM
 import glob, html, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
 TOL_USD = 0.03e12          # $0.03 trillion
 TOL_RATIO = 0.05           # percentage points (API rounding is 0.1; 126.8 is inside 0.05 of 126.79)
 
@@ -56,6 +57,24 @@ def main():
     near_ratio(usa["ratio_2026"], 126.79, "US debt/GDP")
     near_usd(chn["debt_2026_usd"], 22.49e12, "China debt")
     near_ratio(chn["ratio_2026"], 104.37, "China debt/GDP")
+    # The data file's clock field is from the last fetch. A country added since then is still marked "weo" in the file.
+    # The build uses the live place files, so the check does too.
+    import world_build
+    live = {}
+    for f in glob.glob(os.path.join(ROOT, "places", "*.json")):
+        p = json.load(open(f))
+        if p.get("kind") == "country" and p.get("status") == "live":
+            iso = p.get("iso3") or world_build.ISO3.get(p.get("country") or "")
+            if iso:
+                live[iso] = p["slug"]
+    for e in economies:
+        if e["iso3"] == "USA":
+            e["clock"] = "us"
+        elif e["iso3"] in live:
+            e["clock"] = "official"
+            e["slug"] = live[e["iso3"]]
+        else:
+            e["clock"] = "weo"
     if usa["clock"] != "us" or chn["clock"] != "official":
         fail("US must stay on the Treasury clock and China on its official clock")
     for e in economies:
@@ -81,38 +100,29 @@ def main():
           f"China {chn['ratio_2026']}% ${chn['debt_2026_usd']/1e12:.3f}T, "
           f"skipped {len(skipped)}")
 
-    page_path = os.path.join(ROOT, "world-government-debt", "index.html")
-    if not os.path.exists(page_path):
-        fail("world-government-debt/index.html is missing; run build.py")
-    page = open(page_path).read()
-    _page_checks(page, D, usa, economies)
-    redir = open(os.path.join(ROOT, "global-debt-clock", "index.html")).read()
-    if 'rel="canonical" href="https://everydebtclock.com/world-government-debt/"' not in redir and "world-government-debt/" not in redir:
-        fail("global-debt-clock redirect is missing its target")
-    if "noindex" not in redir:
-        fail("global-debt-clock should be noindex")
     sm = open(os.path.join(ROOT, "sitemap.xml")).read()
-    if "https://everydebtclock.com/world-government-debt/" not in sm:
-        fail("sitemap is missing /world-government-debt/")
-    if "global-debt-clock" in sm:
-        fail("sitemap should not list the redirect")
+    for folder in ("world-government-debt", "global-debt-clock"):
+        redir = open(os.path.join(ROOT, folder, "index.html")).read()
+        if 'rel="canonical" href="https://everydebtclock.com/world/"' not in redir:
+            fail(f"{folder} redirect canonical is not /world/")
+        if "noindex" not in redir or 'url=../world/' not in redir:
+            fail(f"{folder} redirect is missing noindex or the refresh to /world/")
+        if f"https://everydebtclock.com/{folder}/" in sm:
+            fail(f"sitemap should not list the /{folder}/ redirect")
     llms = open(os.path.join(ROOT, "llms.txt")).read()
-    if "/world-government-debt/" not in llms:
-        fail("llms.txt is missing /world-government-debt/")
+    if "Redirects to /world/" not in llms:
+        fail("llms.txt does not say the old world URLs redirect to /world/")
     world = open(os.path.join(ROOT, "world", "index.html")).read()
-    if "What this page counts" not in world or "world-government-debt/" not in world:
-        fail("the official /world/ page does not say what it counts or link to the IMF page")
-    m = re.search(r"Government debt of (\d+) countries", world)
-    n_official = 0
-    for f in glob.glob(os.path.join(ROOT, "places", "*.json")):
-        p = json.load(open(f))
-        if p.get("kind") == "country" and p.get("status") == "live":
-            n_official += 1
-    if not m or int(m.group(1)) != n_official + 1:
-        fail(f"official world clock country count changed: page={m.group(1) if m else None} places={n_official}+US")
+    for phrase in ("What this page counts", "General government gross debt", 'id="imf"', "GGXWDG_NGDP",
+                   "How much is world government debt?", "IMF estimate", "harmonized"):
+        if phrase not in world and phrase.lower() not in world.lower():
+            fail(f"the /world/ page is missing {phrase!r}")
+    if "coming soon" in world.lower():
+        fail("world page contains coming soon")
     weo_pages = [e for e in economies if e["clock"] == "weo"]
-    if len(weo_pages) < 100:
-        fail(f"only {len(weo_pages)} new country pages in the data file")
+    n_clock = sum(e["clock"] in ("weo", "official", "us") for e in economies)
+    if n_clock != 186:
+        fail(f"clock labels cover {n_clock} economies, expected 186")
     noindex = []
     for e in weo_pages:
         doc = open(os.path.join(ROOT, "countries", e["slug"], "index.html")).read()
@@ -131,7 +141,7 @@ def _page_checks(page, D, usa, economies):
     if "coming soon" in page.lower():
         fail("world government debt page contains coming soon")
     for phrase in ("What this page counts", "not a live ledger", "exchange-rate effects", "IMF World Economic Outlook", "GGXWDG_NGDP",
-                   "World Debt Clock: Government Debt of 186 Countries", "FAQPage",
+                   "World Government Debt Clock: IMF Estimate for 186 Economies", "FAQPage",
                    "How much is world government debt?", "Which countries owe the most?", "What share of world GDP?",
                    "How is this estimated?", "How is this different from the World Debt Clock?"):
         if phrase not in page:
@@ -158,6 +168,17 @@ def _country_checks(doc, e):
         fail(f"{e['slug']} contains coming soon")
     if "does not publish a daily debt stock" in doc:
         fail(f"{e['slug']} still claims the country publishes no daily debt stock")
+    if "source tier: harmonized" in doc:
+        for phrase in ("Quarterly Public Sector Debt", "As of", 'id="path"', "FAQPage", 'id="t-total"',
+                       f"<title>{html.escape(e['name'])} National Debt Clock</title>"):
+            if phrase not in doc:
+                fail(f"{e['slug']} upgraded page is missing {phrase!r}")
+        if "This site has no official-source clock" in doc:
+            fail(f"{e['slug']} still says it has no official-source clock")
+        rel = re.search(r'<section class="related".*?</section>', doc, re.S)
+        if not rel or len(re.findall(r"<a ", rel.group(0))) != 3:
+            fail(f"{e['slug']} does not have exactly 3 related links")
+        return
     for phrase in ("This site has no official-source clock", 'id="path"', 'id="peers"', "ranks "):
         if phrase not in doc:
             fail(f"{e['slug']} is missing {phrase!r}")

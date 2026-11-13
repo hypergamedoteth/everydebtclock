@@ -9,9 +9,9 @@ Live US, state, country and wealth-fund clocks built from official figures. The 
 - /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ($118,741.74 per person).
 - /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.
 - /when-will-debt-hit-41-trillion/ : A projection from Treasury's recent trend, labelled as a projection.
-- /world/ : Sum of the official country clocks only, converted to US dollars. Not an IMF world total.
-- /world-government-debt/ : IMF World Economic Outlook general government gross debt (GGXWDG_NGDP times NGDPD) for every economy with both series. An interpolated estimate, not a live ledger, and not the Treasury US total.
-- /global-debt-clock/ : Alias of /world-government-debt/.
+- /world/ : World Debt Clock. General government gross debt for every IMF economy. A national or Eurostat or QPSD stock is used only when it is general government gross debt; otherwise the row is the IMF World Economic Outlook estimate. Narrower official series are labeled and not added.
+- /world-government-debt/ : Redirects to /world/. GitHub Pages serves this as an HTML refresh with a canonical link, not an HTTP 301.
+- /global-debt-clock/ : Redirects to /world/ the same way.
 - /countries/ : National debt clocks by country. Economies with an official source keep that source; the rest are IMF World Economic Outlook estimates.
 - /states/ : State and local debt clocks for every US state and Washington, DC, from official Census figures.
 - /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.
@@ -24,7 +24,7 @@ US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Sta
 - https://everydebtclock.com/api/daily.json — latest official US total and daily changes
 - https://everydebtclock.com/data/data.json — all US tickers, official bases and rates
 - https://everydebtclock.com/api/places.json — state and country clocks
-- https://everydebtclock.com/api/world.json — official country-clock sum in US dollars
+- https://everydebtclock.com/api/world.json — best-source world total, with source tier and as-of date for each economy
 - https://everydebtclock.com/api/world_government_debt.json — IMF general-government estimate
 - https://everydebtclock.com/api/wealth.json — wealth-fund ranking
 - https://everydebtclock.com/sitemap.xml

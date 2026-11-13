@@ -50,7 +50,36 @@ C = {
             [("Ministry of Finance of Slovenia, Public debt", "https://www.gov.si/en/state-authorities/ministries/ministry-of-finance/"), ("Statistical Office of the Republic of Slovenia, Government finance", "https://www.stat.si/StatWeb/en")],
             "Cross-check: the Ministry of Finance publishes the central government debt on a national basis, which differs from the Maastricht central government sector used here.",
             "In Slovenia this is the central government (the State and the central-government bodies classified with it); the municipalities and the social security funds are separate sectors."),
+ "bulgaria": ("Bulgaria", "BG", "BGR", "EUR", "€", "euros",
+            [("Ministry of Finance of Bulgaria, Government debt", "https://www.minfin.bg/en/statistics/"), ("National Statistical Institute of Bulgaria", "https://www.nsi.bg/en")],
+            "Cross-check: the Ministry of Finance publishes government debt on the national definition as well. Eurostat's euro and national-currency units for Bulgaria are the same figures.",
+            ""),
+ "estonia": ("Estonia", "EE", "EST", "EUR", "€", "euros",
+            [("Statistics Estonia, Government finance", "https://www.stat.ee/en"), ("Ministry of Finance of Estonia", "https://www.fin.ee/en")],
+            "Cross-check: Statistics Estonia and the Ministry of Finance publish the same EDP debt that is reported to Eurostat.",
+            ""),
+ "latvia": ("Latvia", "LV", "LVA", "EUR", "€", "euros",
+            [("Treasury of Latvia, Debt management", "https://www.kase.gov.lv/en"), ("Official statistics of Latvia", "https://stat.gov.lv/en")],
+            "Cross-check: the Treasury of Latvia publishes central government debt; the clock uses the general government total Eurostat compiles from the national accounts.",
+            ""),
+ "luxembourg": ("Luxembourg", "LU", "LUX", "EUR", "€", "euros",
+            [("STATEC, Public finances", "https://statistiques.public.lu/en.html"), ("Ministry of Finance of Luxembourg", "https://mfin.gouvernement.lu/en.html")],
+            "Cross-check: STATEC publishes the government finance figures that feed the Eurostat table.",
+            ""),
+ "malta": ("Malta", "MT", "MLT", "EUR", "€", "euros",
+            [("National Statistics Office of Malta, Government finance", "https://nso.gov.mt/"), ("Malta Treasury", "https://treasury.gov.mt/")],
+            "Cross-check: the National Statistics Office publishes the EDP debt reported to Eurostat.",
+            ""),
+ "cyprus": ("Cyprus", "CY", "CYP", "EUR", "€", "euros",
+            [("Public Debt Management Office, Cyprus", "https://www.mof.gov.cy/"), ("Statistical Service of Cyprus", "https://www.cystat.gov.cy/")],
+            "Cross-check: the Public Debt Management Office publishes central government debt. The general government total used here consolidates debt held between government units, so it can be lower than the central government figure.",
+            ""),
+ "norway": ("Norway", "NO", "NOR", "NOK", "kr", "kroner",
+            [("Statistics Norway, Gross public debt, table 11559", "https://www.ssb.no/en/statbank/table/11559"), ("Statistics Norway, General government", "https://www.ssb.no/en/offentlig-sektor")],
+            "Cross-check: Statistics Norway table 11559 publishes the same general-government gross debt, face value, in million kroner. The 2026Q2 total matches this Eurostat figure. The stock includes a large loan component, so it moves more than a securities-only measure and sits above the IMF general-government estimate.",
+            ""),
 }
+GENERAL = {"bulgaria", "estonia", "latvia", "luxembourg", "malta", "cyprus", "norway"}
 def main(slug):
     name, a2, a3, code, sym, noun, extra, note_x, scope = C[slug]
     tpl_slug = "spain" if code == "EUR" else "poland"
@@ -78,7 +107,54 @@ def main(slug):
         notes.append(f"Currency: {name} reports to Eurostat in {noun} (million {code}, national currency, as published in table gov_10q_ggdebt, unit MIO_NAC). The world page converts to US dollars at the ECB's daily reference rate for {code}.")
     notes.append(note_x)
     p["notes"] = notes
+    p["iso3"] = a3
     p["title"] = f"{name} National Debt Clock: Live Debt, Official Data"
+    if slug in GENERAL:
+        sym = p["currency"]["symbol"]
+        p["source_tier"] = "harmonized"
+        p["headline"] = "general government debt"
+        p["headline_long"] = "general government gross debt"
+        p["world_measure"] = "General government, gross"
+        p["link_label"] = f"general government debt, {sym}"
+        p["subject"] = f"The general government of {name}"
+        p["hist_label"] = "General government gross debt"
+        p["sum_note"] = (f"{name} general government gross debt (Maastricht definition, quarter-end), from Eurostat's quarterly government debt statistics, "
+                         "which are compiled from national data.")
+        p["scope_note"] = ("This is general government gross debt in the EU Maastricht (excessive deficit procedure) definition, from Eurostat's quarterly table: "
+                           "currency and deposits, debt securities and loans of central government, local government and social security funds, at nominal value, consolidated. "
+                           f"Figures are in {noun}. Central government is shown below as a fact and is not added on top.")
+        c = p["components"][0]
+        c["label"] = f"{name} general government gross debt"
+        c["short"] = "General government debt"
+        c["key"] = "ggdebt"
+        c["value"] = 1
+        c["as_of"] = "2000-01-01"
+        c["prior_value"] = 1
+        c["prior_as_of"] = "1999-01-01"
+        c["source_name"] = f"Eurostat, Quarterly government debt (gov_10q_ggdebt), general government (S13), Maastricht debt, million {noun}"
+        c["source_locator"] = f"geo={a2}, sector S13, na_item GD, unit {'MIO_NAC' if code != 'EUR' else 'MIO_EUR'}; machine-readable: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt"
+        c["includes"] = "General government gross debt at nominal value in the Maastricht (EDP) definition: currency and deposits, short- and long-term debt securities and loans, consolidated across general government."
+        c["facts"] = [{
+            "key": "cg", "label": f"{name} central government gross debt (Maastricht)", "value": 1, "kind": "usd", "as_of": "2000-01-01",
+            "note": "Central government (Eurostat sector S.1311) in the same table. It is not added to the headline.",
+            "source_name": "Eurostat, gov_10q_ggdebt (sector S1311, GD)",
+            "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+            "source_locator": f"geo={a2}, sector S1311, na_item GD, unit {'MIO_NAC' if code != 'EUR' else 'MIO_EUR'}",
+        }]
+        c["breakdown"] = []
+        c["history"] = []
+        p["notes"] = [
+            "Why Eurostat: it publishes quarterly government debt for EU and EFTA countries on one Maastricht definition, compiled from the figures national statistical institutes and central banks report. The fetcher reads the public API directly.",
+            "What this page counts: general government gross debt (sector S.13), not central government alone. The central government figure is a fact and is not added again.",
+            "Provisional data: Eurostat flags the latest quarters as provisional and revises them. The page re-bases to each new release.",
+            "Source tier: harmonized official dataset (Eurostat gov_10q_ggdebt). As-of date is the quarter-end of the latest published stock.",
+            note_x,
+        ]
+        if code != "EUR":
+            p["notes"].insert(4, f"Currency: {name} is published in million {code}. The world page converts to US dollars at the ECB daily reference rate.")
+        p["population"]["value"] = 1
+        p["population"]["as_of"] = "2000-01-01"
+        p["population"]["noun_full"] = f"people in {name}"
     out = os.path.join(ROOT, "places", slug + ".json")
     json.dump(p, open(out, "w"), indent=1, ensure_ascii=False); open(out, "a").write("\n")
     print("wrote", out)

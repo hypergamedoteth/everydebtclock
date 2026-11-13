@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Quarterly re-base of the Eurostat-sourced places (see PLACES: Germany, France, Italy, Spain, Netherlands, Belgium, Austria, Ireland, Poland, Sweden) from Eurostat's official dissemination API,
-table gov_10q_ggdebt "Quarterly government debt" (national accounts, Maastricht definition, million euro, or million national currency for Poland and Sweden; quarter-end).
+"""Quarterly re-base of the Eurostat-sourced places (see PLACES) from Eurostat's official dissemination API,
+table gov_10q_ggdebt "Quarterly government debt" (national accounts, Maastricht definition, million euro, or million national currency where noted; quarter-end).
 
 Series used per country:
-  sector S1311 (central government), na_item GD  <- the ticking hero: consolidated gross debt of central government
-  sector S13   (general government), na_item GD  <- shown as a fact (all levels of government)
+  sector S1311 (central government), na_item GD  <- the ticking hero, except HEADLINE_GENERAL which ticks S13
+  sector S13   (general government), na_item GD  <- the ticking hero for HEADLINE_GENERAL; otherwise shown as a fact
   sector S1311, na_item F2, F31, F32, F41, F42   <- the breakdown by instrument; it must add up to the S1311 total
 Also refreshes the population (demo_pjan, population on 1 January) if a newer year is published.
 The trend is the official change over the latest four quarters.
@@ -18,8 +18,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 API = "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/"
 PLACES = {"germany": "DE", "france": "FR", "italy": "IT", "spain": "ES", "netherlands": "NL", "belgium": "BE", "austria": "AT", "ireland": "IE",
           "poland": "PL", "sweden": "SE", "denmark": "DK", "czechia": "CZ", "romania": "RO", "portugal": "PT", "finland": "FI", "hungary": "HU",
-          "greece": "EL", "slovakia": "SK", "slovenia": "SI", "croatia": "HR", "lithuania": "LT"}
-NAC = {"PL", "SE", "DK", "CZ", "RO", "HU"}   # reported in national currency (MIO_NAC: zloty, krona, krone, koruna, leu); the rest are euro (MIO_EUR)
+          "greece": "EL", "slovakia": "SK", "slovenia": "SI", "croatia": "HR", "lithuania": "LT",
+          "bulgaria": "BG", "estonia": "EE", "latvia": "LV", "luxembourg": "LU", "malta": "MT", "cyprus": "CY", "norway": "NO"}
+NAC = {"PL", "SE", "DK", "CZ", "RO", "HU", "NO"}   # reported in national currency (MIO_NAC); the rest are euro (MIO_EUR). Bulgaria's euro and national-currency units match.
+# These use general government (S13) as the ticking stock. The other places keep central government (S1311), which is the closer match to a federal Treasury total.
+HEADLINE_GENERAL = {"BG", "EE", "LV", "LU", "MT", "CY", "NO"}
 CONSOLIDATION = {"NL", "IE", "CZ", "RO", "PT", "HU", "EL", "SK"}   # central government debt can exceed the general government total (intra-government holdings netted only in S13)
 PARTS = [("F2", "Currency and deposits", "Deposits"), ("F31", "Short-term debt securities", "Debt securities"),
          ("F32", "Long-term debt securities", "Debt securities"), ("F41", "Short-term loans", "Loans"), ("F42", "Long-term loans", "Loans")]
@@ -58,8 +61,9 @@ def fetch_debt():
     return ser
 
 def rebase(p, geo, ser):
-    q = sorted({t for (g, s, n, t) in ser if g == geo and s == "S1311" and n == "GD"})
-    need = [("S1311", "GD"), ("S13", "GD")] + [("S1311", n) for n, _, _ in PARTS]
+    hero = "S13" if geo in HEADLINE_GENERAL else "S1311"
+    q = sorted({t for (g, s, n, t) in ser if g == geo and s == hero and n == "GD"})
+    need = [("S1311", "GD"), ("S13", "GD")] + ([("S1311", n) for n, _, _ in PARTS] if hero == "S1311" else [])
     q = [t for t in q if all((geo, s, n, t) in ser for s, n in need)]
     if len(q) < 9: raise RuntimeError(f"need 9 complete quarters, got {len(q)}")
     q = q[-9:]
@@ -69,24 +73,42 @@ def rebase(p, geo, ser):
     last, prior = q[-1], q[-5]
     v = lambda t, s, n: int(round(ser[(geo, s, n, t)] * M))   # million with one decimal -> whole currency unit (exact to 100k)
     sym = p["currency"]["symbol"]
-    tot = v(last, "S1311", "GD")
-    if abs(sum(v(last, "S1311", n) for n, _, _ in PARTS) - tot) > 1 * M: raise RuntimeError("instruments do not add up to the total")
-    if v(last, "S13", "GD") < tot and geo not in CONSOLIDATION: raise RuntimeError("general government debt below central government debt")
+    tot = v(last, hero, "GD")
+    if tot <= 0: raise RuntimeError("non-positive debt stock")
+    if hero == "S1311":
+        if abs(sum(v(last, "S1311", n) for n, _, _ in PARTS) - tot) > 1 * M: raise RuntimeError("instruments do not add up to the total")
+        if v(last, "S13", "GD") < tot and geo not in CONSOLIDATION: raise RuntimeError("general government debt below central government debt")
     c = p["components"][0]; as_of = qend(last)
     if as_of < c["as_of"]: raise RuntimeError(f"Eurostat quarter {as_of} older than file {c['as_of']}")
-    c.update(value=tot, as_of=as_of, prior_value=v(prior, "S1311", "GD"), prior_as_of=qend(prior),
-             history=[[qend(t), v(t, "S1311", "GD")] for t in q])
-    c["breakdown"] = [{"label": lab, "value": v(last, "S1311", n), "group": g} for n, lab, g in PARTS if v(last, "S1311", n)]
+    c.update(value=tot, as_of=as_of, prior_value=v(prior, hero, "GD"), prior_as_of=qend(prior),
+             history=[[qend(t), v(t, hero, "GD")] for t in q])
+    part_sector = hero if hero == "S13" and all((geo, "S13", n, last) in ser for n, _, _ in PARTS) else "S1311"
+    if part_sector == hero or hero == "S1311":
+        parts = [(n, lab, g) for n, lab, g in PARTS if (geo, part_sector, n, last) in ser]
+        part_sum = sum(v(last, part_sector, n) for n, _, _ in parts)
+        if hero == "S1311" or (parts and abs(part_sum - tot) <= 1 * M):
+            c["breakdown"] = [{"label": lab, "value": v(last, part_sector, n), "group": g} for n, lab, g in parts if v(last, part_sector, n)]
+        else:
+            c["breakdown"] = []
+    else:
+        c["breakdown"] = []
     EXC = next((n for n in (json.load(open(os.path.join(ROOT, "places", "czechia.json"))).get("notes", [])) if n.startswith("Why central government can exceed")), None)
-    if EXC:   # the explanation is on the page exactly when the central government figure is the larger one
+    if EXC and hero == "S1311":   # the explanation is on the page exactly when the central government figure is the larger one
         p["notes"] = [n for n in p.get("notes", []) if n != EXC] + ([EXC] if tot > v(last, "S13", "GD") else [])
     for f in c.get("facts", []):
-        if f.get("key") == "gg":
+        if f.get("key") == "gg" and hero == "S1311":
             gg, gg0 = v(last, "S13", "GD"), v(prior, "S13", "GD")
-            f.update(value=gg, as_of=as_of)
+            f.update(value=gg, as_of=as_of, prior_value=gg0, prior_as_of=qend(prior))
             f["note"] = (f["note"].split(" A year earlier")[0].strip() + f" A year earlier ({qend(prior)}) it was {sym}{gg0 / 1e9:,.1f} billion. "
                          + (f"Central government is {100 * tot / gg:.1f}% of it." if tot <= gg else
                             "Central government debt here is larger than the general government total because the general government figure nets out debt held between government units, which the central government figure does not."))
+        if f.get("key") == "cg" and hero == "S13":
+            cg, cg0 = v(last, "S1311", "GD"), v(prior, "S1311", "GD")
+            f.update(value=cg, as_of=as_of)
+            extra = (f" Central government is {100 * cg / tot:.1f}% of the general government total." if cg <= tot else
+                     " Central government is larger than the general government total because the general government figure nets out debt held between government units.")
+            f["note"] = (f"Central government (Eurostat sector S.1311) in the same table, on the same Maastricht definition. "
+                         f"It is not added to the headline. A year earlier ({qend(prior)}) it was {sym}{cg0 / 1e9:,.1f} billion.{extra}")
     y, qq = int(last[:4]), int(last[6]); ny, nq = (y + (qq == 4), qq % 4 + 1)
     p["next_update"] = (f"The Q{nq} {ny} quarter-end figure is expected from Eurostat roughly three months after the quarter ends; "
                         "this page re-bases to it automatically on the next daily build after it appears.")

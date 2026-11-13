@@ -60,7 +60,9 @@
      "note": "All levels of government (central, state, local and social security) in the same Eurostat table, the measure used in EU fiscal rules. It covers more levels of government than the one ticking on this page. A year earlier (2025-06-30) it was Ft63,981.9 billion. Central government debt here is larger than the general government total because the general government figure nets out debt held between government units, which the central government figure does not.",
      "source_name": "Eurostat, gov_10q_ggdebt (sector S13, GD)",
      "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
-     "source_locator": "geo=HU, sector S13, na_item GD, unit MIO_NAC"
+     "source_locator": "geo=HU, sector S13, na_item GD, unit MIO_NAC",
+     "prior_value": 63981921000000,
+     "prior_as_of": "2025-06-30"
     }
    ],
    "history": [

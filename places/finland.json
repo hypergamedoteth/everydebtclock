@@ -60,7 +60,9 @@
      "note": "All levels of government (central, state, local and social security) in the same Eurostat table, the measure used in EU fiscal rules. It covers more levels of government than the one ticking on this page. A year earlier (2025-06-30) it was €246.0 billion. Central government is 84.8% of it.",
      "source_name": "Eurostat, gov_10q_ggdebt (sector S13, GD)",
      "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
-     "source_locator": "geo=FI, sector S13, na_item GD, unit MIO_EUR"
+     "source_locator": "geo=FI, sector S13, na_item GD, unit MIO_EUR",
+     "prior_value": 245967000000,
+     "prior_as_of": "2025-06-30"
     }
    ],
    "history": [

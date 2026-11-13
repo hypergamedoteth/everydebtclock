@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Inputs for the World Debt Clock (/world/) and the World Government Debt Clock (/world-government-debt/).
-  data/world_fx.json       ECB euro foreign exchange reference rates (daily, keyless XML), and the Bank of Russia official
-                           USD/RUB rate (neither the ECB nor the Fed H.10 publishes a rouble rate any more)
-                           and the Federal Reserve Board H.10 weekly release, for currencies the ECB does not publish (Taiwan dollar),
-                           and the US Treasury's quarterly Reporting Rates of Exchange (Egyptian pound, Ghanaian cedi, Kenyan shilling, Nigerian naira)
+"""Inputs for the World Debt Clock (/world/).
+/world-government-debt/ and /global-debt-clock/ are redirects to /world/, not separate clocks.
+  data/world_fx.json       ECB euro foreign exchange reference rates (daily, keyless XML), the Bank of Russia official
+                           USD/RUB rate (neither the ECB nor the Fed H.10 publishes a rouble rate any more),
+                           the Federal Reserve Board H.10 weekly release for currencies the ECB does not publish
+                           (Taiwan dollar, Sri Lankan rupee),
+                           and the US Treasury's quarterly Reporting Rates of Exchange, stored as the latest quarter
+                           plus a label index (ust_broad) for currencies neither the ECB nor H.10 publishes
+                           (Egyptian pound, Ghanaian cedi, Kenyan shilling, Nigerian naira, and the other Treasury labels)
   data/world_gdp.json      IMF World Economic Outlook NGDPD (GDP, current US dollars, billions) for the current calendar year,
                            every country plus the world aggregate: https://www.imf.org/external/datamapper/api/v1/NGDPD
   data/world_weo_debt.json General government gross debt for every IMF economy with both series:
@@ -25,7 +29,7 @@ ECB = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
 CBR = "https://www.cbr.ru/scripts/XML_daily.asp"
 IMF = "https://www.imf.org/external/datamapper/api/v1/NGDPD"
 H10 = "https://www.federalreserve.gov/releases/h10/current/"
-H10_ROWS = {"TWD": "TAIWAN DOLLAR"}      # H.10 row label per currency code we use (units of currency per US dollar)
+H10_ROWS = {"TWD": "TAIWAN DOLLAR", "LKR": "SRI LANKA RUPEE"}      # H.10 row label per currency code (units of currency per US dollar)
 UA = {"User-Agent": "Mozilla/5.0 (compatible; everydebtclock.com data refresh)", "Accept": "*/*"}
 
 def get(url, tries=3):
@@ -89,6 +93,28 @@ def fed():
 UST = "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange"
 UST_ROWS = {"EGP": "Egypt-Pound", "GHS": "Ghana-Cedi", "KES": "Kenya-Shilling", "NGN": "Nigeria-Naira",
             "CLP": "Chile-Peso", "PEN": "Peru-Sol", "BDT": "Bangladesh-Taka"}   # US Treasury label per currency code (units per US dollar)
+
+def ust_broad():
+    """Every Treasury Reporting Rate at the latest quarter-end, keyed by the Treasury's own currency label.
+    Used for currencies the ECB and Fed H.10 do not publish. A label with two different rates on the same day is dropped."""
+    q = UST + "?fields=record_date,country_currency_desc,exchange_rate&sort=-record_date&page%5Bsize%5D=300"
+    rows = json.loads(get(q))["data"]
+    if not rows: raise RuntimeError("US Treasury rates: empty")
+    date = max(r["record_date"] for r in rows)
+    latest = [r for r in rows if r["record_date"] == date]
+    per, bad = {}, set()
+    for r in latest:
+        label, v = r["country_currency_desc"], float(r["exchange_rate"])
+        if not v > 0: continue
+        if label in per and abs(per[label] - v) > 1e-9:
+            bad.add(label)
+        per[label] = v
+    for label in bad:
+        per.pop(label, None)
+    if len(per) < 100: raise RuntimeError("US Treasury rates: too few currencies")
+    return {"date": date, "per_usd": per, "ambiguous": sorted(bad),
+            "source": "US Treasury, Treasury Reporting Rates of Exchange (quarterly, as of quarter-end)",
+            "source_url": "https://fiscaldata.treasury.gov/datasets/treasury-reporting-rates-exchange/treasury-reporting-rates-of-exchange", "feed": UST}
 
 def ust():
     """US Treasury Reporting Rates of Exchange (quarterly, as of quarter-end; currency units per US dollar) for currencies the ECB and Fed H.10 do not publish."""
@@ -414,7 +440,7 @@ def newer_or_same(new, old, key="date"): return not old.get(key) or new[key] >= 
 
 def main():
     fx = load(FX); changed = False
-    for name, fn in (("ecb", ecb), ("cbr", cbr), ("fed", fed), ("ust", ust)):
+    for name, fn in (("ecb", ecb), ("cbr", cbr), ("fed", fed), ("ust", ust), ("ust_broad", ust_broad)):
         try:
             new = fn(); old = fx.get(name, {})
             if not newer_or_same(new, old): raise RuntimeError(f"{name} date {new['date']} older than stored {old['date']}")
