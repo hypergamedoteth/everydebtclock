@@ -165,6 +165,9 @@ for _reg, _codes in {
 # 2026 is not a leap year. The clock runs from 2026-01-01 00:00 UTC to 2027-01-01 00:00 UTC.
 SECONDS_2026 = 365 * 24 * 60 * 60
 ANCHOR = "2026-01-01T00:00:00+00:00"
+# Debt-to-GDP path shown on each country page. 2025 and 2026 are inside this window; the ticker still uses only those two.
+PATH_YEARS = tuple(str(y) for y in range(2020, 2032))
+WORLD_CODES = {"WEOWORLD", "WLD", "WORLD"}
 
 def _slugify(name):
     s = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode().lower()
@@ -202,38 +205,49 @@ def _economy_name(code, label):
 def _row(code, label, ratio, gdp_usd):
     return {"iso3": code, "name": _economy_name(code, label), "ratio": ratio, "gdp_usd": gdp_usd}
 
+def _year_map(raw, scale=1.0):
+    out = {}
+    for y in PATH_YEARS:
+        v = _num((raw or {}).get(y))
+        if v is None: continue
+        out[y] = v * scale
+    return out
+
 def _from_api():
     """DataMapper values. NGDPD is billions of current US dollars. GGXWDG_NGDP is rounded to 0.1 percentage point."""
     countries = json.loads(get(IMF_COUNTRIES))["countries"]
     ratio = json.loads(get(IMF_RATIO))["values"]["GGXWDG_NGDP"]
     gdp = json.loads(get(IMF_GDP))["values"]["NGDPD"]
+    world = _year_map(gdp.get("WEOWORLD"), 1e9)
     rows = {}
     for raw, meta in countries.items():
         code = ISO_ALIAS.get(raw, raw)
         if len(code) != 3 or code in AGGREGATES: continue
         rv, gv = ratio.get(raw) or {}, gdp.get(raw) or {}
-        r = {y: _num(rv.get(y)) for y in ("2025", "2026")}
-        g = {y: (None if _num(gv.get(y)) is None else _num(gv.get(y)) * 1e9) for y in ("2025", "2026")}
+        r, g = _year_map(rv), _year_map(gv, 1e9)
         if not any(v is not None for v in list(r.values()) + list(g.values())): continue
         if code in rows: continue
         rows[code] = _row(code, (meta or {}).get("label"), r, g)
-    return rows
+    return rows, world
 
 def _from_wb():
     """World Bank Data360 mirror of the WEO. OBS_VALUE for NGDPD is current US dollars; GGXWDG_NGDP is unrounded."""
     text = io.TextIOWrapper(urllib.request.urlopen(urllib.request.Request(WB_WEO, headers=UA), timeout=180), encoding="utf-8", newline="")
-    ratio, gdp, names = {}, {}, {}
+    ratio, gdp, names, world_raw = {}, {}, {}, {}
     for row in csv.DictReader(text):
         ind = row.get("INDICATOR")
         if ind not in ("IMF_WEO_GGXWDG_NGDP", "IMF_WEO_NGDPD"): continue
         if row.get("COMP_BREAKDOWN_1") not in (None, "", "V_LST"): continue
         year = row.get("TIME_PERIOD")
-        if year not in ("2025", "2026"): continue
+        if year not in PATH_YEARS: continue
         raw = row.get("REF_AREA") or ""
         code = ISO_ALIAS.get(raw, raw)
-        if len(code) != 3 or code in AGGREGATES: continue
         val = _num(row.get("OBS_VALUE"))
         if val is None: continue
+        if code in WORLD_CODES and ind == "IMF_WEO_NGDPD":
+            world_raw[year] = val
+            continue
+        if len(code) != 3 or code in AGGREGATES: continue
         names[code] = (row.get("REF_AREA_LABEL") or "").strip()
         (ratio if ind == "IMF_WEO_GGXWDG_NGDP" else gdp).setdefault(code, {})[year] = val
     # If the mirror ever reports NGDPD in billions, the US figure falls near 3e4 instead of 3e13.
@@ -241,16 +255,17 @@ def _from_wb():
     scale = 1e9 if usa is not None and usa < 1e9 else 1.0
     rows = {}
     for code in set(ratio) | set(gdp):
-        r = {y: ratio.get(code, {}).get(y) for y in ("2025", "2026")}
-        g = {y: (None if gdp.get(code, {}).get(y) is None else gdp[code][y] * scale) for y in ("2025", "2026")}
+        r = {y: ratio.get(code, {}).get(y) for y in PATH_YEARS if y in ratio.get(code, {})}
+        g = {y: gdp[code][y] * scale for y in PATH_YEARS if y in gdp.get(code, {})}
         rows[code] = _row(code, names.get(code), r, g)
-    return rows
+    world = {y: v * scale for y, v in world_raw.items()}
+    return rows, world
 
 def _debt(ratio, gdp):
     if ratio is None or gdp is None or not (ratio > 0 and gdp > 0): return None
     return int(round(ratio / 100.0 * gdp))
 
-def _assemble(rows, source):
+def _assemble(rows, source, world=None):
     """Keep economies with a positive 2026 ratio and GDP and a positive 2025 pair (the ticker needs both ends)."""
     official = _official_slugs()
     economies, year_2025_only, skipped = [], [], []
@@ -296,6 +311,7 @@ def _assemble(rows, source):
             "ratio_2025": r["2025"], "ratio_2026": r["2026"],
             "gdp_2025_usd": int(round(g["2025"])), "gdp_2026_usd": int(round(g["2026"])),
             "debt_2025_usd": d25, "debt_2026_usd": d26, "rate_usd_per_sec": rate,
+            "ratio_path": {y: round(v, 6) for y, v in sorted((r or {}).items()) if v is not None and y in PATH_YEARS},
         })
     if len(economies) < 170: raise RuntimeError(f"only {len(economies)} economies with both years; not trusted")
     panel_2026 = sum(e["debt_2026_usd"] for e in economies)
@@ -330,6 +346,7 @@ def _assemble(rows, source):
         "broader_2025_count": len(economies) + len(year_2025_only),
         "broader_2025_usd": broader_2025,
         "rate_usd_per_sec": (panel_2026 - panel_2025) / SECONDS_2026,
+        "world_gdp_2026_usd": (int(round(world["2026"])) if world and world.get("2026") else None),
         "usa": {"debt_2026_usd": usa["debt_2026_usd"], "ratio_2026": usa["ratio_2026"]},
         "china": {"debt_2026_usd": chn["debt_2026_usd"], "ratio_2026": chn["ratio_2026"]},
         "economies": economies,
@@ -342,10 +359,10 @@ def _close(a, b, tol):
 
 def weo():
     """Write data/world_weo_debt.json. Leaves the previous file in place if this fetch cannot be checked."""
-    api = wb = None
-    try: api = _from_api()
+    api = api_world = wb = wb_world = None
+    try: api, api_world = _from_api()
     except Exception as e: print("world weo api:", e)
-    try: wb = _from_wb()
+    try: wb, wb_world = _from_wb()
     except Exception as e: print("world weo world bank mirror:", e)
     chosen = None
     # The DataMapper rounds GGXWDG_NGDP to 0.1 percentage point (US 126.790% arrives as 126.8), so the dollar
@@ -353,7 +370,7 @@ def weo():
     # it agrees with the API on the US ratio within 0.2 percentage points and on the 2026 panel within 1%.
     if wb and api and "USA" in wb and "USA" in api:
         try:
-            a, b = _assemble(api, "imf_api"), _assemble(wb, "worldbank")
+            a, b = _assemble(api, "imf_api", api_world), _assemble(wb, "worldbank", wb_world)
             if abs(a["usa"]["ratio_2026"] - b["usa"]["ratio_2026"]) <= 0.2 and _close(a["panel_2026_usd"], b["panel_2026_usd"], 0.01):
                 chosen = b
                 print(f"world weo: unrounded mirror kept (API US ratio {a['usa']['ratio_2026']}, mirror {b['usa']['ratio_2026']})")
@@ -363,11 +380,16 @@ def weo():
         except Exception as e:
             print("world weo assemble:", e)
     if chosen is None and wb:
-        try: chosen = _assemble(wb, "worldbank")
+        try: chosen = _assemble(wb, "worldbank", wb_world)
         except Exception as e: print("world weo mirror assemble:", e)
     if chosen is None and api:
-        try: chosen = _assemble(api, "imf_api")
+        try: chosen = _assemble(api, "imf_api", api_world)
         except Exception as e: print("world weo api assemble:", e)
+    if chosen and not chosen.get("world_gdp_2026_usd") and api_world and api_world.get("2026"):
+        chosen["world_gdp_2026_usd"] = int(round(api_world["2026"]))
+        chosen["world_gdp_source"] = "imf_api"
+    elif chosen and chosen.get("world_gdp_2026_usd"):
+        chosen["world_gdp_source"] = chosen.get("precision_source")
     if not chosen:
         print("world weo: not updated")
         return

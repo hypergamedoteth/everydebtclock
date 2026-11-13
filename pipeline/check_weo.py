@@ -59,6 +59,9 @@ def main():
     if usa["clock"] != "us" or chn["clock"] != "official":
         fail("US must stay on the Treasury clock and China on its official clock")
     for e in economies:
+        path = e.get("ratio_path") or {}
+        if "2025" not in path or "2026" not in path:
+            fail(f"{e['iso3']} is missing a 2025–2026 point on the debt-to-GDP path")
         if not e["rate_usd_per_sec"]:
             fail(f"{e['iso3']} has a zero ticker")
         if e["debt_2026_usd"] <= 0 or e["debt_2025_usd"] <= 0:
@@ -110,19 +113,31 @@ def main():
     weo_pages = [e for e in economies if e["clock"] == "weo"]
     if len(weo_pages) < 100:
         fail(f"only {len(weo_pages)} new country pages in the data file")
+    noindex = []
     for e in weo_pages:
-        html = open(os.path.join(ROOT, "countries", e["slug"], "index.html")).read()
-        _country_checks(html, e)
-        if f"https://everydebtclock.com/countries/{e['slug']}/" not in sm:
+        doc = open(os.path.join(ROOT, "countries", e["slug"], "index.html")).read()
+        _country_checks(doc, e)
+        loc = f"https://everydebtclock.com/countries/{e['slug']}/"
+        if 'name="robots" content="noindex"' in doc:
+            noindex.append(e["slug"])
+            if loc in sm:
+                fail(f"noindex page is in the sitemap: {e['slug']}")
+        elif loc not in sm:
             fail(f"sitemap missing {e['slug']}")
+    print("noindex:", ", ".join(noindex) if noindex else "none")
     print(f"pages ok: world government debt, {len(weo_pages)} new country clocks, redirect, sitemap, llms.txt")
 
 def _page_checks(page, D, usa, economies):
     if "coming soon" in page.lower():
         fail("world government debt page contains coming soon")
-    for phrase in ("What this page counts", "not a live ledger", "exchange-rate effects", "IMF World Economic Outlook", "GGXWDG_NGDP"):
+    for phrase in ("What this page counts", "not a live ledger", "exchange-rate effects", "IMF World Economic Outlook", "GGXWDG_NGDP",
+                   "World Debt Clock: Government Debt of 186 Countries", "FAQPage",
+                   "How much is world government debt?", "Which countries owe the most?", "What share of world GDP?",
+                   "How is this estimated?", "How is this different from the World Debt Clock?"):
         if phrase not in page:
             fail(f"world government debt page is missing {phrase!r}")
+    if "Page built from IMF data read " not in page:
+        fail("world government debt page is missing the stable data-read line")
     if 'href="../world/"' not in page:
         fail("world government debt page does not link to the official world clock")
     if page.count('data-iso="') != 186:
@@ -141,6 +156,11 @@ def _page_checks(page, D, usa, economies):
 def _country_checks(doc, e):
     if "coming soon" in doc.lower():
         fail(f"{e['slug']} contains coming soon")
+    if "does not publish a daily debt stock" in doc:
+        fail(f"{e['slug']} still claims the country publishes no daily debt stock")
+    for phrase in ("This site has no official-source clock", 'id="path"', 'id="peers"', "ranks "):
+        if phrase not in doc:
+            fail(f"{e['slug']} is missing {phrase!r}")
     if f"<title>{html.escape(e['name'])} National Debt Clock</title>" not in doc:
         fail(f"{e['slug']} title is not the search title")
     for phrase in ("not a live ledger", "exchange-rate effects", "IMF World Economic Outlook", "GGXWDG_NGDP", 'class="src"', "FAQPage"):
