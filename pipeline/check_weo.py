@@ -100,29 +100,25 @@ def main():
           f"China {chn['ratio_2026']}% ${chn['debt_2026_usd']/1e12:.3f}T, "
           f"skipped {len(skipped)}")
 
-    page_path = os.path.join(ROOT, "world-government-debt", "index.html")
-    if not os.path.exists(page_path):
-        fail("world-government-debt/index.html is missing; run build.py")
-    page = open(page_path).read()
-    _page_checks(page, D, usa, economies)
-    redir = open(os.path.join(ROOT, "global-debt-clock", "index.html")).read()
-    if 'rel="canonical" href="https://everydebtclock.com/world-government-debt/"' not in redir and "world-government-debt/" not in redir:
-        fail("global-debt-clock redirect is missing its target")
-    if "noindex" not in redir:
-        fail("global-debt-clock should be noindex")
     sm = open(os.path.join(ROOT, "sitemap.xml")).read()
-    if "https://everydebtclock.com/world-government-debt/" not in sm:
-        fail("sitemap is missing /world-government-debt/")
-    if "global-debt-clock" in sm:
-        fail("sitemap should not list the redirect")
+    for folder in ("world-government-debt", "global-debt-clock"):
+        redir = open(os.path.join(ROOT, folder, "index.html")).read()
+        if 'rel="canonical" href="https://everydebtclock.com/world/"' not in redir:
+            fail(f"{folder} redirect canonical is not /world/")
+        if "noindex" not in redir or 'url=../world/' not in redir:
+            fail(f"{folder} redirect is missing noindex or the refresh to /world/")
+        if f"https://everydebtclock.com/{folder}/" in sm:
+            fail(f"sitemap should not list the /{folder}/ redirect")
     llms = open(os.path.join(ROOT, "llms.txt")).read()
-    if "/world-government-debt/" not in llms:
-        fail("llms.txt is missing /world-government-debt/")
+    if "Redirects to /world/" not in llms:
+        fail("llms.txt does not say the old world URLs redirect to /world/")
     world = open(os.path.join(ROOT, "world", "index.html")).read()
-    if "What this page counts" not in world or "world-government-debt/" not in world:
-        fail("the /world/ page does not say what it counts or link to the IMF page")
-    if "IMF estimate" not in world or "harmonized" not in world.lower():
-        fail("the /world/ page does not disclose the mix of official, harmonized and IMF rows")
+    for phrase in ("What this page counts", "General government gross debt", 'id="imf"', "GGXWDG_NGDP",
+                   "How much is world government debt?", "IMF estimate", "harmonized"):
+        if phrase not in world and phrase.lower() not in world.lower():
+            fail(f"the /world/ page is missing {phrase!r}")
+    if "coming soon" in world.lower():
+        fail("world page contains coming soon")
     weo_pages = [e for e in economies if e["clock"] == "weo"]
     n_clock = sum(e["clock"] in ("weo", "official", "us") for e in economies)
     if n_clock != 186:

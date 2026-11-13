@@ -157,7 +157,7 @@ def pick_related(places, calc, cur=None, gdp=None, usd=None, kind_hint=None, top
     elif kind_hint == "world":
         skip.add("world/")
     elif kind_hint == "weo-world":
-        skip.add("world-government-debt/")
+        skip.add("world/")
     elif kind_hint == "states":
         skip.add("states/")
     elif kind_hint == "countries":
@@ -243,7 +243,7 @@ def pick_related(places, calc, cur=None, gdp=None, usd=None, kind_hint=None, top
             why = f"Also in {reg}" if p in peers and reg else "Similar-size economy"
             items.append((f'{p["name"]} debt clock', f'countries/{p["slug"]}/', why))
             if len(items) == 2: break
-        items.append(("World government debt clock", "world-government-debt/", "IMF general-government total these estimates add up to"))
+        items.append(("World debt clock", "world/", "General-government total, with the IMF comparison"))
         return _fill(items, skip)
 
     if cur and cur["kind"] == "country":

@@ -29,7 +29,22 @@ def _fd(s): return _d(s).strftime("%b %-d, %Y")
 GDP_BY_SLUG = {}  # slug -> IMF GDP (US$ bn), set by build.py; used to pick peer-country related clocks
 WEALTH = False  # set by wealth_build.prep() when the Wealth tab is built
 WORLD = False  # set by build.py when the World Debt Clock page is built, so every nav/link to /world/ is only emitted when it exists
-WEO = False  # set by build.py when data/world_weo_debt.json is present, so the IMF world page is linked only once it can be built
+WEO = False  # set by build.py when data/world_weo_debt.json is present
+HEADLINE_BY_SLUG = {}  # set by build.py from the World Debt Clock rows
+
+def _world_line(p, name, pub, as_of):
+    """How this clock relates to the general-government headline on /world/."""
+    h = HEADLINE_BY_SLUG.get(p["slug"])
+    if not h:
+        return ""
+    ol = h.get("official_line")
+    if ol:
+        return (f'<p><b>World Debt Clock.</b> The headline for {E(name)} is general government gross debt, '
+                f'{_usd0(h["usd"])} as of {_fd(h["as_of"])} ({E(h.get("source") or "IMF")}). '
+                f'This page\'s clock is narrower and is not in that total: {E(ol["measure"])}, {E(pub)}, as of {as_of}.</p>')
+    if h.get("tier") == "imf":
+        return (f'<p><b>World Debt Clock.</b> This IMF estimate of general government gross debt is the headline for {E(name)}.</p>')
+    return (f'<p><b>World Debt Clock.</b> This general-government gross debt stock is the headline for {E(name)}.</p>')
 CUR = "$"  # currency symbol for the page being rendered ("$" for US places, "C$" for Canada); set by _cur(p)
 def _cur(p): global CUR; CUR = (p.get("currency") or {}).get("symbol", "$"); return CUR
 def _usd0(x): return ("−" if x < 0 else "") + CUR + f"{abs(x):,.0f}"
@@ -105,7 +120,6 @@ def nav_html(places, depth, current=None, cls="pl"):
     items = [(up or "./", "United States", current == "us")]
     items += [(f"{up}{d}/", lab, current == k) for k, d, lab, _ in SECTIONS if k in kinds]
     if WORLD and "country" in kinds: items.append((f"{up}world/", "World", current == "world"))
-    if WEO: items.append((f"{up}world-government-debt/", "IMF world", current == "weo"))
     if WEALTH: items.append((f"{up}wealth/", "Wealth", current == "wealth"))
     return f'<nav class="{cls}">' + "".join(f'<a href="{h}"{" class=on" if on else ""}>{lab}</a>' for h, lab, on in items) + "</nav>"
 
@@ -268,7 +282,9 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
              + (f'on <b>{as_of}</b>' if T["periodic"] else f'in Census survey year {fy} (dated <b>{as_of}</b>)' if p.get("year_label") else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
              + " and ".join(("" if n_.startswith("Eurostat") else "the ") + f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
              + (f': {parts}' if len(cs) > 1 else '') + f'. {E(p.get("scope_note", ""))}{" " if p.get("scope_note") else ""}That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by {E(T["pop_pos"])} estimate of {pop["value"]:,} {E(T['noun_full'])} on {_fd(pop["as_of"])}. {proj_txt}</p>'
-             + ("" if is_state else f'<p>Source tier: {"harmonized official dataset" if ("Eurostat" in pub or p.get("source_tier") == "harmonized") else "official national series"}. As of {as_of}.</p>')
+             + ("" if is_state else f'<p>Source tier: {"harmonized official dataset" if ("Eurostat" in pub or p.get("source_tier") == "harmonized") else "official national series"}. As of {as_of}. Coverage: {E(p.get("world_measure") or p.get("headline_long") or T["head"])}.</p>')
+             + (f'<p>{E(p["intro_extra"])}</p>' if p.get("intro_extra") else "")
+             + (_world_line(p, name, pub, as_of) if not is_state else "")
              + '</section>')
 
     # ---- hero (same block and labels as the US hero)
@@ -496,13 +512,11 @@ const usd=(v,d,c)=>(v<0?'−':'')+(c||'$')+(d?nf2:nf0).format(Math.abs(v)),T=[..
 const val=k=>k.b+k.r*(Date.now()/1000-k.t);document.getElementById('hsort').onchange=ev=>{const m=ev.target.value;document.querySelectorAll('.grid.hub').forEach(g=>{const ts=T.filter(k=>k.e.parentNode===g);
 ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='total'?val(b)-val(a):val(b)/b.pop-val(a)/a.pop);ts.forEach(k=>g.appendChild(k.e))})};
 (function f(){T.forEach(k=>{if(!k.r)return;const v=val(k);k.v.textContent=usd(v,0,k.c);k.p.textContent=usd(v/k.pop,2,k.c)});requestAnimationFrame(f)})()})()</script>"""
-    WL1 = '<li><a href="../world/">World debt clock</a> (best source for every economy)</li>' if WORLD else ""
-    if WEO: WL1 += '<li><a href="../world-government-debt/">World government debt clock</a> (IMF estimate)</li>'
+    WL1 = '<li><a href="../world/">World debt clock</a> (general government gross debt)</li>' if WORLD else ""
     if kind == "country" and WORLD and WEO:
-        WTXT = (' What this list counts: the first section is each country\'s own official or Eurostat figure, in its own currency. '
-                'Harmonized rows use a quarterly public-sector debt stock. The IMF section is the World Economic Outlook estimate for everyone else. '
-                'The <a href="../world/">World Debt Clock</a> adds one stock per economy, using the best of those sources. '
-                'The <a href="../world-government-debt/">World Government Debt Clock</a> is the IMF total on one measure.')
+        WTXT = (' What this list counts: the first section is each country\'s own published figure, in its own currency. '
+                'Harmonized rows are a quarterly public-sector debt stock. The IMF section is the World Economic Outlook estimate where no general-government stock is on this site. '
+                'The <a href="../world/">World Debt Clock</a> adds general government gross debt once per economy. A narrower series on a country page is not added again.')
     elif WORLD:
         WTXT = ' The <a href="../world/">World Debt Clock</a> adds one stock per economy in US dollars, using the best source available.'
     else:

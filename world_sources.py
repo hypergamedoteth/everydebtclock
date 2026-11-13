@@ -30,6 +30,35 @@ def tier_of(p):
         return "harmonized"
     return "official"
 
+def is_gg_text(s):
+    """General government gross debt, the IMF headline perimeter. Central, federal, net and public-sector totals do not match."""
+    t = (s or "").lower()
+    return "general government" in t and "gross" in t
+
+def gg_from_place(p):
+    """A general-government gross stock on this place, in local currency, or None.
+
+    The place's own clock counts when that clock is already general government gross.
+    Otherwise a fact explicitly labeled general government gross (Eurostat S.13, Swiss GFS) counts.
+    """
+    tier = tier_of(p)
+    if is_gg_text(p.get("world_measure")) or is_gg_text(p.get("headline_long")):
+        c = p["components"][0]
+        return {"use_clock": True, "measure": p.get("world_measure") or "General government, gross",
+                "source": p.get("publisher") or "", "source_url": c.get("source_url") or "",
+                "tier": tier, "as_of": c.get("as_of"), "prior_as_of": c.get("prior_as_of"), "prior_local": c.get("prior_value")}
+    for comp in p.get("components") or []:
+        for f in comp.get("facts") or []:
+            if not is_gg_text(f.get("label")) or not f.get("value") or not f.get("as_of"):
+                continue
+            src = f.get("source_name") or ""
+            fact_tier = "harmonized" if "eurostat" in src.lower() else ("official" if tier == "official" else tier)
+            return {"use_clock": False, "local": f["value"], "as_of": f["as_of"],
+                    "prior_local": f.get("prior_value"), "prior_as_of": f.get("prior_as_of"),
+                    "measure": "General government, gross", "source": src or (p.get("publisher") or ""),
+                    "source_url": f.get("source_url") or comp.get("source_url") or "", "tier": fact_tier}
+    return None
+
 def _days(a, b):
     return (dt.date.fromisoformat(b) - dt.date.fromisoformat(a)).days
 
@@ -115,6 +144,7 @@ def qpsd_choice(R, places, fx, economies):
                 prior_as_of, prior_local = None, None
             used[iso] = {
                 "iso3": iso, "name": e["name"], "slug": e["slug"], "sector": rec["sector"],
+                "for_headline": rec["sector"] == "general",
                 "measure": SECTOR[rec["sector"]], "currency": rec["currency"], "local": rec["local"],
                 "as_of": rec["as_of"], "prior_local": prior_local, "prior_as_of": prior_as_of,
                 "history": [[d, v] for d, v in rec["history"] if d <= rec["as_of"]][-8:],

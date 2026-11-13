@@ -98,7 +98,7 @@ def rebase(p, geo, ser):
     for f in c.get("facts", []):
         if f.get("key") == "gg" and hero == "S1311":
             gg, gg0 = v(last, "S13", "GD"), v(prior, "S13", "GD")
-            f.update(value=gg, as_of=as_of)
+            f.update(value=gg, as_of=as_of, prior_value=gg0, prior_as_of=qend(prior))
             f["note"] = (f["note"].split(" A year earlier")[0].strip() + f" A year earlier ({qend(prior)}) it was {sym}{gg0 / 1e9:,.1f} billion. "
                          + (f"Central government is {100 * tot / gg:.1f}% of it." if tot <= gg else
                             "Central government debt here is larger than the general government total because the general government figure nets out debt held between government units, which the central government figure does not."))

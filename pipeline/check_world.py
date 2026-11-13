@@ -46,8 +46,17 @@ def main():
     if abs(summed - total) > len(rows):
         fail(f"row sum {summed} does not match total_latest_usd {total}")
     ratio = total / weo["panel_2026_usd"]
+    explained = sum((r["debt_usd"] - r["imf_debt_2026_usd"]) for r in rows if r.get("imf_debt_2026_usd"))
+    gap = total - weo["panel_2026_usd"]
+    if abs(gap - explained) > 1_000_000 * len(rows):
+        fail(f"country differences sum to {explained/1e9:.1f}B but the total differs from the IMF panel by {gap/1e9:.1f}B")
+    drivers = [d for d in (api.get("gap_drivers") or []) if d.get("tier") != "imf"]
     if not LO <= ratio <= HI:
-        fail(f"world total ${total/1e12:.2f}T is {ratio:.2f}x the IMF panel ${weo['panel_2026_usd']/1e12:.2f}T")
+        fail(f"world total ${total/1e12:.2f}T is {ratio:.2%} of the IMF panel ${weo['panel_2026_usd']/1e12:.2f}T")
+    if abs(ratio - 1) > 0.03:
+        print(f"NOTE: headline total is {ratio - 1:+.2%} from the IMF panel. Drivers:")
+        for d in drivers:
+            print(f"  {d['iso3']} {d['name']} {d['difference_usd']/1e9:+.1f}B {d['tier']} {d.get('measure')}")
     counts = api["counts"]
     if sum(counts.values()) != len(rows):
         fail(f"tier counts {counts} do not add up to {len(rows)} rows")
