@@ -127,13 +127,17 @@ jobs:
           python3 pipeline/fetch_kenya.py || echo "kenya fetch skipped"
           python3 pipeline/fetch_egypt.py || echo "egypt fetch skipped"
           python3 pipeline/fetch_south_africa.py || echo "south-africa fetch skipped"
-          # World Debt Clock inputs: ECB + Bank of Russia daily FX, IMF WEO GDP weights. Keeps the last good file on any failure. Never fails the run.
+          # World Debt Clock inputs: ECB + Bank of Russia daily FX, IMF WEO GDP weights, and the IMF general-government debt panel
+          # (GGXWDG_NGDP x NGDPD -> data/world_weo_debt.json). Keeps the last good file on any failure. Never fails the run.
           python3 pipeline/fetch_world.py || echo "world fetch skipped"
 
       - name: Build site
         env:
           DEBTCLOCK_SITE_URL: https://everydebtclock.com
         run: python3 build.py
+
+      - name: Check IMF world government debt totals and new clocks
+        run: python3 pipeline/check_weo.py
 
       - name: Guard against placeholder URLs
         run: |
@@ -158,7 +162,7 @@ jobs:
         run: |
           mkdir -p _site
           cp -r index.html 404.html privacy.html privacy favicon.ico favicon-32.png icon.svg CNAME robots.txt llms.txt sitemap.xml style.css app.js core.js widget.html \
-                apple-touch-icon.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person national-debt-by-year when-will-debt-hit-41-trillion methodology states countries world wealth _site/
+                apple-touch-icon.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person national-debt-by-year when-will-debt-hit-41-trillion methodology states countries world world-government-debt global-debt-clock wealth _site/
           rm -f _site/data/validation_log.csv
           # IndexNow key file must be at the site root for verification.
           KEY=$(tr -d ' \n' < pipeline/indexnow.key)

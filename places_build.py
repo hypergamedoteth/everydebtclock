@@ -29,6 +29,7 @@ def _fd(s): return _d(s).strftime("%b %-d, %Y")
 GDP_BY_SLUG = {}  # slug -> IMF GDP (US$ bn), set by build.py; used to pick peer-country related clocks
 WEALTH = False  # set by wealth_build.prep() when the Wealth tab is built
 WORLD = False  # set by build.py when the World Debt Clock page is built, so every nav/link to /world/ is only emitted when it exists
+WEO = False  # set by build.py when data/world_weo_debt.json is present, so the IMF world page is linked only once it can be built
 CUR = "$"  # currency symbol for the page being rendered ("$" for US places, "C$" for Canada); set by _cur(p)
 def _cur(p): global CUR; CUR = (p.get("currency") or {}).get("symbol", "$"); return CUR
 def _usd0(x): return ("−" if x < 0 else "") + CUR + f"{abs(x):,.0f}"
@@ -104,6 +105,7 @@ def nav_html(places, depth, current=None, cls="pl"):
     items = [(up or "./", "United States", current == "us")]
     items += [(f"{up}{d}/", lab, current == k) for k, d, lab, _ in SECTIONS if k in kinds]
     if WORLD and "country" in kinds: items.append((f"{up}world/", "World", current == "world"))
+    if WEO: items.append((f"{up}world-government-debt/", "IMF world", current == "weo"))
     if WEALTH: items.append((f"{up}wealth/", "Wealth", current == "wealth"))
     return f'<nav class="{cls}">' + "".join(f'<a href="{h}"{" class=on" if on else ""}>{lab}</a>' for h, lab, on in items) + "</nav>"
 
@@ -479,7 +481,10 @@ def index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, kind, sec_dir, lab, d
     if kind == "state":
         title, h1, desc = "US State Debt Clocks: Debt of Every State, Official Data", "US State Debt Clocks", f"State and local debt of {ns - 1} US states and DC, from official Census figures, with sources. Each state ticks forward only where its trend is reliable; otherwise the official figure is shown as published. Also {nc} country national debt clocks."
     else:
-        title, h1, desc = "Country Debt Clocks: National Debt by Country, Official Data", "Country Debt Clocks: National Debt by Country", f"National debt of {nc} countries: a live debt clock for each, projected from official government and central-bank figures, with sources and as-of dates. Also {ns} US state debt clocks."
+        if WEO:
+            title, h1, desc = "Country Debt Clocks: National Debt by Country", "Country Debt Clocks: National Debt by Country", f"National debt of {nc} countries from official sources, plus IMF World Economic Outlook estimates for economies without an official clock here. Also {ns} US state debt clocks."
+        else:
+            title, h1, desc = "Country Debt Clocks: National Debt by Country, Official Data", "Country Debt Clocks: National Debt by Country", f"National debt of {nc} countries: a live debt clock for each, projected from official government and central-bank figures, with sources and as-of dates. Also {ns} US state debt clocks."
     header = (f'<header class="top"><div class="topin"><a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>{nav_html(places, 1, kind, "plnav")}'
               f'<span class="live"><span class="dot"></span><span>official data</span></span></div></header>')
     sort = ('<div class="hubsort"><label>Sort <select id="hsort"><option value="name">A–Z</option><option value="total">Total debt</option>'
@@ -489,12 +494,21 @@ const usd=(v,d,c)=>(v<0?'−':'')+(c||'$')+(d?nf2:nf0).format(Math.abs(v)),T=[..
 const val=k=>k.b+k.r*(Date.now()/1000-k.t);document.getElementById('hsort').onchange=ev=>{const m=ev.target.value;document.querySelectorAll('.grid.hub').forEach(g=>{const ts=T.filter(k=>k.e.parentNode===g);
 ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='total'?val(b)-val(a):val(b)/b.pop-val(a)/a.pop);ts.forEach(k=>g.appendChild(k.e))})};
 (function f(){T.forEach(k=>{if(!k.r)return;const v=val(k);k.v.textContent=usd(v,0,k.c);k.p.textContent=usd(v/k.pop,2,k.c)});requestAnimationFrame(f)})()})()</script>"""
-    WL1 = '<li><a href="../world/">World debt clock</a></li>' if WORLD else ""
-    WTXT = ' The <a href="../world/">World Debt Clock</a> adds the countries up in US dollars.' if WORLD else ""
+    WL1 = '<li><a href="../world/">World debt clock</a> (official clocks only)</li>' if WORLD else ""
+    if WEO: WL1 += '<li><a href="../world-government-debt/">World government debt clock</a> (IMF estimate)</li>'
+    if kind == "country" and WORLD and WEO:
+        WTXT = (' What this list counts: the first section is each country\'s own official figure, in its own currency. '
+                'The IMF estimate section is a separate World Economic Outlook measure, in US dollars, for economies without an official clock here. '
+                'The <a href="../world/">World Debt Clock</a> adds up only the official clocks. '
+                'The <a href="../world-government-debt/">World Government Debt Clock</a> is the IMF total.')
+    elif WORLD:
+        WTXT = ' The <a href="../world/">World Debt Clock</a> adds the countries up in US dollars. That sum is the official clocks only, not an IMF world total.'
+    else:
+        WTXT = ""
     explore_html = ex.explore("../", places, calc, kind_hint=("states" if kind == "state" else "countries"), gdp=GDP_BY_SLUG)
     body = (f'{header}{ex.search_box("../")}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>{E(h1)}</h1><p>Every place with a debt clock, built from figures its own government publishes. A clock ticks only where the official trend is reliable; otherwise the official figure is shown as published. Each clock shows who publishes the numbers and how often, '
             f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p></section>'
-            f'<main id="app">{sort}{secs}</main>'
+            f'<main id="app">{sort}{secs}' + ('<!--WEOCOUNTRIES-->' if WEO and kind == "country" else '') + '</main>'
             + explore_html +
             f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')
     hub_css = PL_CSS + ".hubsort{display:flex;justify-content:flex-end;margin:4px 2px -14px;font-size:12px;color:var(--mut)}.hubsort select{margin-left:6px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit;font-size:12px}.tile.hubt .lab span:last-child{font-size:11px;color:var(--dim)}"

@@ -268,6 +268,7 @@ import world_build
 WORLD = world_build.compute(R, PLACES_LIVE, {"official": OFF_V, "date": OFF_D, "base": val("debt_total", NOW), "rate": (val("debt_total", NOW + 3600) - val("debt_total", NOW)) / 3600,
                                              "pop": POP_OFF, "pop_date": POP_OFF_DATE}, NOW) if PLACES_LIVE else None
 places_build.WORLD = bool(WORLD)
+places_build.WEO = os.path.exists(f"{R}/data/world_weo_debt.json")
 import explore
 explore.check(PLACES_LIVE)
 # Wealth tab (wealth_build.py): sets the flags/lists that nav, search and country-page links read, before any page is built
@@ -282,7 +283,7 @@ if PLACES_LIVE:
 HOME_EXPLORE = explore.explore("", PLACES_LIVE, places_build.calc, cur=None, gdp=places_build.GDP_BY_SLUG, kind_hint="us") if PLACES_LIVE else ""
 links = (f"""<!--LINKS-->""" + HOME_EXPLORE + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
          f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> ({html.escape(p.get("link_label", "state + local"))})</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
-         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (sum of the countries, in US dollars)</li>' if WORLD else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
+         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (official clocks only, in US dollars)</li>' if WORLD else "") + ('<li><a href="world-government-debt/">World government debt clock</a> (IMF general-government estimate)</li>' if places_build.WEO else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
 <div class="sh"><h2>Popular counters</h2></div><ul>{''.join(f'<li><a href="t/{k}.html">{html.escape(label(k, ALL[k]))}</a></li>' for k in KEY_TICKERS if k in ALL)}</ul><!--/LINKS-->""")
 if "<!--INTRO-->" in idx: idx = re.sub(r"<!--INTRO-->.*?<!--/INTRO-->", lambda m: intro, idx, flags=re.S)
 if "<!--SSR-->" in idx: idx = re.sub(r"<!--SSR-->.*?<!--/SSR-->", lambda m: ssr, idx, flags=re.S)
@@ -297,7 +298,7 @@ if _intro_at != -1 and _hero_at != -1 and _intro_at < _hero_at:
 if "<!--LINKS-->" in idx: idx = re.sub(r"<!--LINKS-->.*?<!--/LINKS-->", lambda m: links, idx, flags=re.S)
 else: idx = idx.replace('<dialog id="dlg"></dialog>', f'<dialog id="dlg"></dialog>\n<section class="answers" id="answers">{links}</section>', 1)
 PLNAV = ("<!--PLNAV-->" + ('<nav class="plnav"><a href="./" class="on">United States</a>' + "".join(f'<a href="{d}/">{lab}</a>' for k, d, lab, _ in places_build.SECTIONS
-         if any(p["kind"] == k for p in PLACES_LIVE)) + ('<a href="world/">World</a>' if WORLD else "") + ('<a href="wealth/">Wealth</a>' if WEALTH_FUNDS else "") + "</nav>" if PLACES_LIVE else "") + "<!--/PLNAV-->")
+         if any(p["kind"] == k for p in PLACES_LIVE)) + ('<a href="world/">World</a>' if WORLD else "") + ('<a href="world-government-debt/">IMF world</a>' if places_build.WEO else "") + ('<a href="wealth/">Wealth</a>' if WEALTH_FUNDS else "") + "</nav>" if PLACES_LIVE else "") + "<!--/PLNAV-->")
 SEARCH = "<!--SEARCH-->" + (explore.search_box("") if PLACES_LIVE else "") + "<!--/SEARCH-->"
 if "<!--SEARCH-->" in idx: idx = re.sub(r"<!--SEARCH-->.*?<!--/SEARCH-->", lambda m: SEARCH, idx, flags=re.S)
 else: idx = idx.replace("</header>", "</header>" + SEARCH, 1)
@@ -805,6 +806,8 @@ if OFF_V:
 import places_build
 PLACE_URLS = places_build.build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, STAMP, NOW)
 PLACE_URLS += world_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE, WORLD) if WORLD else []
+import weo_build
+PLACE_URLS += weo_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE)
 PLACE_URLS += wealth_build.build(R, SITE, with_analytics, og, PLACES_LIVE, WEALTH_D, WEALTH_FUNDS) if WEALTH_FUNDS else []
 
 # ---------------------------------------------------------------- sitemap + robots
@@ -832,8 +835,10 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
     "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
     "- /when-will-debt-hit-41-trillion/ : A projection from Treasury's recent trend, labelled as a projection.",
-    "- /world/ : Sum of the country clocks, converted to US dollars.",
-    "- /countries/ : National debt clocks by country, each from that government's official figures.",
+    "- /world/ : Sum of the official country clocks only, converted to US dollars. Not an IMF world total.",
+    "- /world-government-debt/ : IMF World Economic Outlook general government gross debt (GGXWDG_NGDP times NGDPD) for every economy with both series. An interpolated estimate, not a live ledger, and not the Treasury US total.",
+    "- /global-debt-clock/ : Alias of /world-government-debt/.",
+    "- /countries/ : National debt clocks by country. Economies with an official source keep that source; the rest are IMF World Economic Outlook estimates.",
     "- /states/ : State and local debt clocks for every US state and Washington, DC, from official Census figures.",
     "- /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.",
     "- /methodology/ : Sources, how the live ticker is calculated, and how it is checked against Treasury.",
@@ -845,7 +850,8 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- {SITE}/api/daily.json — latest official US total and daily changes",
     f"- {SITE}/data/data.json — all US tickers, official bases and rates",
     f"- {SITE}/api/places.json — state and country clocks",
-    f"- {SITE}/api/world.json — world sum in US dollars",
+    f"- {SITE}/api/world.json — official country-clock sum in US dollars",
+    f"- {SITE}/api/world_government_debt.json — IMF general-government estimate",
     f"- {SITE}/api/wealth.json — wealth-fund ranking",
     f"- {SITE}/sitemap.xml",
     f"- {SITE}/llms.txt",
@@ -874,7 +880,7 @@ import hashlib, glob as _glob
 AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in ("style.css", "app.js", "core.js") if os.path.exists(f"{R}/{a}")}
 _vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
 _pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html")] + _glob.glob(f"{R}/t/*.html")
-          + [f for d in ["states", "countries", "world", "wealth"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
+          + [f for d in ["states", "countries", "world", "world-government-debt", "wealth"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
 # Every page gets real icon files (favicon.ico, a 32px PNG and the SVG), replacing the old inline data-URI icon. Made by pipeline/make_favicon.py.
 ICON_LINKS = '<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg">'
 _icon_re = re.compile(r'<link rel="icon"[^>]*>')

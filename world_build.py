@@ -142,13 +142,19 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
               f'<span class="live"><span class="dot"></span><span>official data</span></span></div>'
               f'<nav class="jump">' + "".join(f'<a href="#{i}">{E(t)}</a>' for i, t in jump) + "</nav></header>")
     covsent = (f'<p class="cvl" id="coverage"><b>{cv["n"]} countries covering {cv["pct"]:.1f}% of world GDP.</b> Their {cv["year"]} GDP is {_tn(cv["gdp_bn"] * 1e9)} of an estimated {_tn(cv["world_bn"] * 1e9)} for the world '
-               f'(<a href="{E(cv["source_url"])}" rel="noopener">IMF World Economic Outlook</a>, current US dollars, estimates). Not every country is included, so this is not the total debt of the world.</p>'
+               f'(<a href="{E(cv["source_url"])}" rel="noopener">IMF World Economic Outlook</a>, current US dollars, estimates). Not every country is included, so this is not the total debt of the world. '
+               f'The GDP weights are only a coverage check; the debt figures above are the official clocks, not the IMF debt series.'
+               + (' The <a href="../world-government-debt/">World Government Debt Clock</a> is the IMF debt estimate.' if pb.WEO else '') + '</p>'
                if cv else '<p class="cvl" id="coverage"><b>GDP coverage is unavailable right now.</b> The IMF figures could not be read on the last refresh.</p>')
     crumb = '<div class="crumb"><a href="../">← US national debt clock</a><span>·</span><a href="../countries/">All country debt clocks</a><span>·</span><a href="../states/">All US state debt clocks</a></div>'
+    imf_link = (' The <a href="../world-government-debt/">World Government Debt Clock</a> is a different page. It estimates general government gross debt for the IMF economies that have both series, from the World Economic Outlook, and it does not use these official figures.'
+                if pb.WEO else '')
     intro = (f'<section class="intro" id="intro">{crumb}<h1>World Debt Clock</h1>'
-             f'<p>This adds up the latest published government debt of {n} countries that have a clock on this site, in US dollars: <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}). '
-             f'It is the US national debt plus {n - 1} other countries. Each country reports a different measure on a different date, so the sum is a comparison of what is published, not one agreed worldwide figure. '
-             f'Each figure is converted at an official reference rate (daily where the central banks publish one; see Exchange rates). The live number below projects each country\'s own debt forward at the trend its own page uses.</p></section>')
+             f'<p><b>What this page counts.</b> The latest official government-debt figure on each of {n} clocks on this site: the US Treasury total plus {n - 1} other countries, converted to US dollars. '
+             f'The latest official sum is <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}). '
+             f'Each country reports a different measure on a different date, so the sum is a comparison of what those governments publish, not one agreed worldwide figure and not an IMF total. '
+             f'Each figure is converted at an official reference rate (daily where the central banks publish one; see Exchange rates). The live number above projects each country\'s own debt forward at the trend its own page uses.</p>'
+             + (f'<p>{imf_link.strip()}</p>' if imf_link else '') + '</section>')
     hero_dlg = ""
     hero = (f'<div class="hero lead" id="total" data-b="{big_now:.2f}" data-r="{W["rate_s"]:.6f}" data-t="{now:.0f}" style="cursor:default">'
             f'<div class="k">Government debt of {n} countries · in US dollars · live</div><div class="big num" id="hv">{_usd0(big_now)}</div>'
@@ -199,7 +205,8 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
     unm = (f'<p><b>GDP.</b> No IMF GDP figure matched: ' + ", ".join(E(u) for u in cv["unmatched"]) + '. They are left out of the coverage percentage.</p>' if cv and cv["unmatched"] else "")
     method = (f'<section id="method" class="wsec"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>How it works</h2><span class="h2n">Official figures · projection labelled · sources linked</span></div><div class="sk foot">'
               f'<p><b>The sum.</b> For each country, its latest official debt figure in local currency × the USD exchange rate on the rate date. The United States uses Treasury\'s Debt to the Penny, and every other country uses the figure on its own page. The sum is {_usd0(W["total"])}. '
-              f'It is not the total debt of the world: only the {n} countries listed are included, they use different measures, and the dates differ.</p>'
+              f'It is not the total debt of the world: only the {n} countries listed are included, they use different measures, and the dates differ. '
+              + (' It is also not the IMF general-government total on the <a href="../world-government-debt/">World Government Debt Clock</a>.' if pb.WEO else '') + '</p>'
               f'<p><b>The live number</b> = Σ (official figure + that country\'s trend × seconds since its figure) × exchange rate. Each trend is the one that country\'s own clock uses: the official change over the window shown on its own page (usually the latest 12 months, shorter where a country has less history), spread evenly (the US uses Treasury\'s 90-day trend). '
               f'Governments report once a month, once a quarter or daily, so the live number is a projection, not an official figure, and it re-bases whenever a country publishes a new one. '
               f'The combined rate is {_sgn(W["rate_s"], ",.2f", plus=False)} per second. Exchange rates are held fixed.</p>'
@@ -208,7 +215,9 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
               + f'<p><b>Per person</b> = USD equivalent ÷ each country\'s official population estimate on the date shown (not projected). The total row divides the sum by the sum of those populations.</p>'
               + skipped + unm + f'<div class="tw"><div style="min-width:0">{mt}</div></div>'
               f'<p>Machine-readable: <a href="../api/world.json">/api/world.json</a>. Page built {E(stamp)}.</p></div></section>')
-    links = ('<section class="answers" id="answers"><div class="sh"><h2>More clocks</h2></div><ul><li><a href="../">US national debt clock</a></li><li><a href="../countries/">All country debt clocks</a></li>'
+    links = ('<section class="answers" id="answers"><div class="sh"><h2>More clocks</h2></div><ul><li><a href="../">US national debt clock</a></li>'
+             + ('<li><a href="../world-government-debt/">World government debt clock</a> (IMF estimate, one measure)</li>' if pb.WEO else '')
+             + '<li><a href="../countries/">All country debt clocks</a></li>'
              '<li><a href="../states/">All US state debt clocks</a></li><li><a href="../api/world.json">World debt clock as JSON</a></li></ul><div class="sh"><h2>Countries in the sum</h2></div><ul>'
              + "".join(f'<li><a href="../{x["url"]}">{E(x["name"])} debt clock</a></li>' for x in sorted(rows, key=lambda r: r["name"])) + '</ul></section>')
     script = """<script>(function(){const nf0=new Intl.NumberFormat('en-US',{maximumFractionDigits:0}),nf2=new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
