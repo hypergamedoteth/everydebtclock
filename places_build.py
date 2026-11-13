@@ -267,7 +267,9 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
              f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
              + (f'on <b>{as_of}</b>' if T["periodic"] else f'in Census survey year {fy} (dated <b>{as_of}</b>)' if p.get("year_label") else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
              + " and ".join(("" if n_.startswith("Eurostat") else "the ") + f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
-             + (f': {parts}' if len(cs) > 1 else '') + f'. {E(p.get("scope_note", ""))}{" " if p.get("scope_note") else ""}That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by {E(T["pop_pos"])} estimate of {pop["value"]:,} {E(T['noun_full'])} on {_fd(pop["as_of"])}. {proj_txt}</p></section>')
+             + (f': {parts}' if len(cs) > 1 else '') + f'. {E(p.get("scope_note", ""))}{" " if p.get("scope_note") else ""}That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by {E(T["pop_pos"])} estimate of {pop["value"]:,} {E(T['noun_full'])} on {_fd(pop["as_of"])}. {proj_txt}</p>'
+             + ("" if is_state else f'<p>Source tier: {"harmonized official dataset" if ("Eurostat" in pub or p.get("source_tier") == "harmonized") else "official national series"}. As of {as_of}.</p>')
+             + '</section>')
 
     # ---- hero (same block and labels as the US hero)
     hero_d = dlg(f'{name} {T["head"]}', T["sum_note"], pub, cs[0]['source_url'], cs[0].get("source_locator", "") if len(cs) == 1 else "", base=c['total'], r=rate, official=f"{_usd0(c['total'])} official, {as_of}")
@@ -494,15 +496,15 @@ const usd=(v,d,c)=>(v<0?'−':'')+(c||'$')+(d?nf2:nf0).format(Math.abs(v)),T=[..
 const val=k=>k.b+k.r*(Date.now()/1000-k.t);document.getElementById('hsort').onchange=ev=>{const m=ev.target.value;document.querySelectorAll('.grid.hub').forEach(g=>{const ts=T.filter(k=>k.e.parentNode===g);
 ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='total'?val(b)-val(a):val(b)/b.pop-val(a)/a.pop);ts.forEach(k=>g.appendChild(k.e))})};
 (function f(){T.forEach(k=>{if(!k.r)return;const v=val(k);k.v.textContent=usd(v,0,k.c);k.p.textContent=usd(v/k.pop,2,k.c)});requestAnimationFrame(f)})()})()</script>"""
-    WL1 = '<li><a href="../world/">World debt clock</a> (official clocks only)</li>' if WORLD else ""
+    WL1 = '<li><a href="../world/">World debt clock</a> (best source for every economy)</li>' if WORLD else ""
     if WEO: WL1 += '<li><a href="../world-government-debt/">World government debt clock</a> (IMF estimate)</li>'
     if kind == "country" and WORLD and WEO:
-        WTXT = (' What this list counts: the first section is each country\'s own official figure, in its own currency. '
-                'The IMF estimate section is a separate World Economic Outlook measure, in US dollars, for economies without an official clock here. '
-                'The <a href="../world/">World Debt Clock</a> adds up only the official clocks. '
-                'The <a href="../world-government-debt/">World Government Debt Clock</a> is the IMF total.')
+        WTXT = (' What this list counts: the first section is each country\'s own official or Eurostat figure, in its own currency. '
+                'Harmonized rows use a quarterly public-sector debt stock. The IMF section is the World Economic Outlook estimate for everyone else. '
+                'The <a href="../world/">World Debt Clock</a> adds one stock per economy, using the best of those sources. '
+                'The <a href="../world-government-debt/">World Government Debt Clock</a> is the IMF total on one measure.')
     elif WORLD:
-        WTXT = ' The <a href="../world/">World Debt Clock</a> adds the countries up in US dollars. That sum is the official clocks only, not an IMF world total.'
+        WTXT = ' The <a href="../world/">World Debt Clock</a> adds one stock per economy in US dollars, using the best source available.'
     else:
         WTXT = ""
     explore_html = ex.explore("../", places, calc, kind_hint=("states" if kind == "state" else "countries"), gdp=GDP_BY_SLUG)

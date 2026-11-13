@@ -283,7 +283,7 @@ if PLACES_LIVE:
 HOME_EXPLORE = explore.explore("", PLACES_LIVE, places_build.calc, cur=None, gdp=places_build.GDP_BY_SLUG, kind_hint="us") if PLACES_LIVE else ""
 links = (f"""<!--LINKS-->""" + HOME_EXPLORE + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
          f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> ({html.escape(p.get("link_label", "state + local"))})</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
-         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (official clocks only, in US dollars)</li>' if WORLD else "") + ('<li><a href="world-government-debt/">World government debt clock</a> (IMF general-government estimate)</li>' if places_build.WEO else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
+         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (best source for every IMF economy, in US dollars)</li>' if WORLD else "") + ('<li><a href="world-government-debt/">World government debt clock</a> (IMF general-government estimate)</li>' if places_build.WEO else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
 <div class="sh"><h2>Popular counters</h2></div><ul>{''.join(f'<li><a href="t/{k}.html">{html.escape(label(k, ALL[k]))}</a></li>' for k in KEY_TICKERS if k in ALL)}</ul><!--/LINKS-->""")
 if "<!--INTRO-->" in idx: idx = re.sub(r"<!--INTRO-->.*?<!--/INTRO-->", lambda m: intro, idx, flags=re.S)
 if "<!--SSR-->" in idx: idx = re.sub(r"<!--SSR-->.*?<!--/SSR-->", lambda m: ssr, idx, flags=re.S)
@@ -835,7 +835,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
     "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
     "- /when-will-debt-hit-41-trillion/ : A projection from Treasury's recent trend, labelled as a projection.",
-    "- /world/ : Sum of the official country clocks only, converted to US dollars. Not an IMF world total.",
+    "- /world/ : World Debt Clock. Every IMF economy once, using an official national series, a harmonized quarterly dataset (Eurostat or QPSD), or the IMF estimate. Not one accounting definition.",
     "- /world-government-debt/ : IMF World Economic Outlook general government gross debt (GGXWDG_NGDP times NGDPD) for every economy with both series. An interpolated estimate, not a live ledger, and not the Treasury US total.",
     "- /global-debt-clock/ : Alias of /world-government-debt/.",
     "- /countries/ : National debt clocks by country. Economies with an official source keep that source; the rest are IMF World Economic Outlook estimates.",
@@ -850,7 +850,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- {SITE}/api/daily.json — latest official US total and daily changes",
     f"- {SITE}/data/data.json — all US tickers, official bases and rates",
     f"- {SITE}/api/places.json — state and country clocks",
-    f"- {SITE}/api/world.json — official country-clock sum in US dollars",
+    f"- {SITE}/api/world.json — best-source world total, with source tier and as-of date for each economy",
     f"- {SITE}/api/world_government_debt.json — IMF general-government estimate",
     f"- {SITE}/api/wealth.json — wealth-fund ranking",
     f"- {SITE}/sitemap.xml",
