@@ -99,7 +99,7 @@ function score(p,t){var n=norm(p.n),a=norm(p.a||'');if(n===t)return 0;if(n.index
 function render(){var t=norm(q.value);ul.innerHTML='';shown=[];cur=-1;if(!t){ul.hidden=true;q.setAttribute('aria-expanded','false');return}
 shown=ix.map(function(p){return[score(p,t),p]}).filter(function(x){return x[0]<9}).sort(function(a,b){return a[0]-b[0]||a[1].n.localeCompare(b[1].n)}).slice(0,8).map(function(x){return x[1]});
 if(!shown.length){ul.innerHTML='<li class="none">No clock for that yet</li>'}else shown.forEach(function(p,i){var li=document.createElement('li'),a=document.createElement('a');a.href=up+p.u;a.setAttribute('role','option');a.id='qr'+i;
-a.innerHTML='<span></span><em></em>';a.firstChild.textContent=p.n;a.lastChild.textContent=p.k==='state'?'US state':p.k==='world'?'All countries':p.k==='wealth'?'Wealth fund':'Country';li.appendChild(a);ul.appendChild(li)});
+a.innerHTML='<span></span><em></em>';a.firstChild.textContent=p.n;a.lastChild.textContent=p.k==='state'?'US state':p.k==='world'?'Official country sum':p.k==='worldgov'?'IMF world total':p.k==='wealth'?'Wealth fund':'Country';li.appendChild(a);ul.appendChild(li)});
 ul.hidden=false;q.setAttribute('aria-expanded','true')}
 function mark(d){var as=ul.querySelectorAll('a');if(!as.length)return;cur=(cur+d+as.length)%as.length;as.forEach(function(a,i){a.classList.toggle('on',i===cur)});q.setAttribute('aria-activedescendant',as[cur].id)}
 q.addEventListener('focus',function(){load(function(){if(q.value)render()})});q.addEventListener('input',function(){load(render)});
@@ -156,6 +156,8 @@ def pick_related(places, calc, cur=None, gdp=None, usd=None, kind_hint=None, top
         skip.add("")
     elif kind_hint == "world":
         skip.add("world/")
+    elif kind_hint == "weo-world":
+        skip.add("world-government-debt/")
     elif kind_hint == "states":
         skip.add("states/")
     elif kind_hint == "countries":
@@ -227,6 +229,23 @@ def pick_related(places, calc, cur=None, gdp=None, usd=None, kind_hint=None, top
         items.append(("US national debt clock", "", "Federal debt, live"))
         return _fill(items, skip)
 
+    if cur and cur.get("weo"):
+        def region_of(p): return p.get("region") or COUNTRY_REGION.get(p["slug"], "")
+        reg = region_of(cur)
+        pool = [p for p in countries if p["slug"] != cur["slug"]]
+        peers = [p for p in pool if reg and region_of(p) == reg]
+        peers = sorted(peers, key=lambda p: abs(g(p) - g(cur)))
+        global_peers = sorted(pool, key=lambda p: abs(g(p) - g(cur)))
+        seen = set()
+        for p in peers + global_peers:
+            if p["slug"] in seen: continue
+            seen.add(p["slug"])
+            why = f"Also in {reg}" if p in peers and reg else "Similar-size economy"
+            items.append((f'{p["name"]} debt clock', f'countries/{p["slug"]}/', why))
+            if len(items) == 2: break
+        items.append(("World government debt clock", "world-government-debt/", "IMF general-government total these estimates add up to"))
+        return _fill(items, skip)
+
     if cur and cur["kind"] == "country":
         reg = COUNTRY_REGION.get(cur["slug"], "")
         peers = [p for p in countries if p["slug"] != cur["slug"] and COUNTRY_REGION.get(p["slug"]) == reg] if reg else []
@@ -243,6 +262,14 @@ def pick_related(places, calc, cur=None, gdp=None, usd=None, kind_hint=None, top
             ("World debt clock", "world/", "Sum of the country clocks, in dollars"),
             ("US national debt by year", "national-debt-by-year/", "Official totals, FY1940 to now"),
             ("Country debt clocks", "countries/", "National debt by country"),
+        ]
+        return _fill(items, skip)
+
+    if kind_hint == "weo-world":
+        items = [
+            ("World debt clock", "world/", "Official figures from the country clocks, in dollars"),
+            ("US national debt clock", "", "Treasury total, a different measure"),
+            ("Country debt clocks", "countries/", "Official clocks and IMF estimate clocks"),
         ]
         return _fill(items, skip)
 
