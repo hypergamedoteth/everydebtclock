@@ -19,12 +19,14 @@ Live US, state, country and wealth-fund clocks built from official figures. The 
 - /states/ : State and local debt clocks for every US state and Washington, DC, from official Census figures.
 - /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.
 - /methodology/ : Sources, how the live ticker is calculated, and how it is checked against Treasury.
+- /data/ : Free CSV files and charts of the US and world series this site publishes. Free to use with credit: Source: EveryDebtClock.com.
 - /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.
 
 ## Data
 US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.
 
 ## Machine-readable
+- https://everydebtclock.com/data/ — CSV downloads (debt by year, by president, per person, interest, states, countries) and chart images
 - https://everydebtclock.com/api/daily.json — latest official US total and daily changes
 - https://everydebtclock.com/data/data.json — all US tickers, official bases and rates
 - https://everydebtclock.com/api/places.json — state and country clocks
