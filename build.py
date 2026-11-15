@@ -223,8 +223,12 @@ idx = idx.replace('<meta property="og:title" content="US Debt Clock — live & v
 idx = re.sub(r'<script type="application/ld\+json">\{"@context":"https://schema.org","@type":"Dataset","name":"Every Debt Clock: US live tickers".*?</script>\n?', "", idx, flags=re.S)
 
 ANSWERS = [("how-much-is-the-national-debt", "How much is the national debt?"), ("national-debt-per-person", "National debt per person"),
-           ("national-debt-by-year", "US national debt by year"), ("when-will-debt-hit-41-trillion", "When will US debt hit $41 trillion?"),
+           ("national-debt-by-year", "US national debt by year"), ("41-trillion", "When will the US debt hit $41 trillion?"),
+           ("national-debt-by-president", "National debt by president"), ("interest-on-the-national-debt", "Interest on the national debt"),
+           ("when-will-debt-hit-41-trillion", "When will US debt hit $41 trillion?"),
            ("methodology", "Methodology and accuracy")]
+# The live countdown replaces the older projection page in the homepage list. The old URL stays in the sitemap.
+HOME_ANSWERS = [a for a in ANSWERS if a[0] != "when-will-debt-hit-41-trillion"]
 KEY_TICKERS = ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "interest_annual", "debt_per_household", "debt_gdp_now"]
 sl_, lim_ = T.get("debt_subject_limit") or {}, T.get("debt_limit") or {}
 rate_day = (T["debt_total"].get("rate_trend", T["debt_total"]["rate"])) * 86400
@@ -293,7 +297,7 @@ if PLACES_LIVE:
 HOME_EXPLORE = explore.explore("", PLACES_LIVE, places_build.calc, cur=None, gdp=places_build.GDP_BY_SLUG, kind_hint="us") if PLACES_LIVE else ""
 links = (f"""<!--LINKS-->""" + HOME_EXPLORE + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
          f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> ({html.escape(p.get("link_label", "state + local"))})</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
-         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (general government gross debt of every IMF economy)</li>' if WORLD else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
+         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (general government gross debt of every IMF economy)</li>' if WORLD else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in HOME_ANSWERS)}</ul>
 <div class="sh"><h2>Popular counters</h2></div><ul>{''.join(f'<li><a href="t/{k}.html">{html.escape(label(k, ALL[k]))}</a></li>' for k in KEY_TICKERS if k in ALL)}</ul><!--/LINKS-->""")
 if "<!--INTRO-->" in idx: idx = re.sub(r"<!--INTRO-->.*?<!--/INTRO-->", lambda m: intro, idx, flags=re.S)
 if "<!--SSR-->" in idx: idx = re.sub(r"<!--SSR-->.*?<!--/SSR-->", lambda m: ssr, idx, flags=re.S)
@@ -673,6 +677,9 @@ from Treasury's total (it includes some agency debt and nets out unamortized dis
 <table><tr><th>Fiscal year</th><th>Total debt (Treasury)</th><th>Record date</th><th>Gross debt % GDP (OMB)</th><th>Held by public % GDP (OMB)</th><th>Deficit % GDP (OMB)</th></tr>{''.join(rows)}</table>
 <details><summary>Earlier years, FY{older[0] if older else ''} back to FY{older[-1] if older else ''} (Treasury totals only)</summary>
 <table><tr><th>Fiscal year</th><th>Total debt</th><th>Record date</th></tr>{orows}</table></details>
+<p>The same totals at the start and end of each term are on <a href="../national-debt-by-president/">national debt by president</a>.
+Debt divided by Census population, including a by-year table, is on <a href="../national-debt-per-person/">national debt per person</a>.
+The next trillion is the <a href="../41-trillion/">$41 trillion countdown</a>.</p>
 <p>Today's figure: {usd0(OFF_V)} at Treasury's {fdate(OFF_D)} close (<a href="../how-much-is-the-national-debt/">details</a>).</p>
 {src_links([("Treasury, Historical Debt Outstanding", M.get("debt_by_fy_source") or "https://fiscaldata.treasury.gov/datasets/historical-debt-outstanding/historical-debt-outstanding"),
             ("OMB Historical Tables (FY2027 Budget)", "https://www.govinfo.gov/app/collection/budget/2027/BUDGET-2027-TAB")])}"""
@@ -734,7 +741,8 @@ from Treasury's total (it includes some agency debt and nets out unamortized dis
     _h40 = next((r for r in _rows if float(r["tot_pub_debt_out_amt"]) >= 40e12), None)
     m40 = (f"<p>For comparison, the previous trillion: total debt first closed above $40 trillion on {fdate(_h40['record_date'])} "
            f"({usd0(float(_h40['tot_pub_debt_out_amt']))}, Debt to the Penny).</p>") if _h40 and _h40 is not _rows[0] else ""
-    body = f"""<p><b>Answer.</b> {ans}</p>{proj_rows}{lim_par}
+    body = f"""<p><b>Answer.</b> {ans}</p>
+<p>The <a href="../41-trillion/">live $41 trillion countdown</a> uses this same pace and lists every trillion crossing in Debt to the Penny.</p>{proj_rows}{lim_par}
 <h2>Recent official closes</h2>{closes_table(5)}
 {m40}<p>This page is rebuilt after each Treasury release.</p>
 {src_links([SRC_DTP, SRC_DSL])}"""
@@ -813,6 +821,23 @@ if OFF_V:
                 f"How Every Debt Clock calculates the US national debt: Treasury Debt to the Penny, record dates, the live ticker, update times, and a dated check against Treasury's {fdate(OFF_D)} figure.",
                 "Methodology and accuracy", body, ld='<script type="application/ld+json">' + json.dumps(_ld).replace("</", "<\\/") + "</script>", og_img="og/home.png")
 
+# ---------------------------------------------------------------- milestone, president, per-person, and interest pages
+if OFF_V:
+    import importlib.util
+    _spec = importlib.util.spec_from_file_location("debtclock_series", f"{R}/pipeline/series.py")
+    _series = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_series)
+    import topics_build
+    topics_build.build({
+        "R": R, "SITE": SITE, "NOW": NOW, "STAMP": STAMP, "T": T, "M": M, "val": val,
+        "fdate": fdate, "usd0": usd0, "usd2": usd2, "bil": bil, "tril": tril,
+        "OFF_D": OFF_D, "OFF_V": OFF_V, "POP_OFF": POP_OFF, "POP_OFF_DATE": POP_OFF_DATE,
+        "HH": HH, "TAX": TAX, "HH_URL": SRC_HH[1], "IRS_URL": SRC_IRS[1], "DTP": DTP_URL,
+        "ANSWERS": ANSWERS, "places": PLACES_LIVE, "calc": places_build.calc, "gdp": places_build.GDP_BY_SLUG,
+        "with_analytics": with_analytics, "dataset_ld": dataset_ld, "faq_ld": faq_ld, "src": src_links,
+        "terms": _series.TERMS, "hdo": M.get("debt_by_fy") or [],
+    })
+
 # ---------------------------------------------------------------- place pages: /states/<slug>/, /countries/<slug>/ from places/*.json
 import places_build
 PLACE_URLS = places_build.build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, STAMP, NOW)
@@ -846,7 +871,10 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.",
     f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
     "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
-    "- /when-will-debt-hit-41-trillion/ : A projection from Treasury's recent trend, labelled as a projection.",
+    "- /41-trillion/ : Live countdown to the next trillion, using the homepage clock's Debt to the Penny base and per-second rate, plus each trillion crossing in that daily series.",
+    "- /national-debt-by-president/ : Debt at the start and end of each term. Debt to the Penny on or before the date from 1993; Historical Debt Outstanding annual records before that.",
+    "- /interest-on-the-national-debt/ : Cash interest paid this fiscal year, MTS net interest by fiscal year, and Treasury's interest-expense dataset by fiscal year.",
+    "- /when-will-debt-hit-41-trillion/ : The same projection in prose. The live countdown is /41-trillion/.",
     "- /world/ : World Debt Clock. General government gross debt for every IMF economy. A national or Eurostat or QPSD stock is used only when it is general government gross debt; otherwise the row is the IMF World Economic Outlook estimate. Narrower official series are labeled and not added.",
     "- /world-government-debt/ : Redirects to /world/. GitHub Pages serves this as an HTML refresh with a canonical link, not an HTTP 301.",
     "- /global-debt-clock/ : Redirects to /world/ the same way.",
