@@ -146,7 +146,7 @@ def _page(ctx, slug, title, desc, ld, hero, intro, body):
 {ld}</head><body>
 {search}
 <main>
-<a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>
+<a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
 {hero}
 <section class="intro" id="intro">{intro}</section>
 {body}
