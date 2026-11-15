@@ -9,9 +9,9 @@ Live US, state, country and wealth-fund clocks built from official figures. The 
 - /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ($118,813.07 per person).
 - /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.
 - /41-trillion/ : Live countdown to the next trillion, using the homepage clock's Debt to the Penny base and per-second rate, plus each trillion crossing in that daily series.
+- /when-will-debt-hit-41-trillion/ : Redirects to /41-trillion/. GitHub Pages serves this as an HTML refresh with a canonical link, not an HTTP 301.
 - /national-debt-by-president/ : Debt at the start and end of each term. Debt to the Penny on or before the date from 1993; Historical Debt Outstanding annual records before that.
 - /interest-on-the-national-debt/ : Cash interest paid this fiscal year, MTS net interest by fiscal year, and Treasury's interest-expense dataset by fiscal year.
-- /when-will-debt-hit-41-trillion/ : The same projection in prose. The live countdown is /41-trillion/.
 - /world/ : World Debt Clock. General government gross debt for every IMF economy. A national or Eurostat or QPSD stock is used only when it is general government gross debt; otherwise the row is the IMF World Economic Outlook estimate. Narrower official series are labeled and not added.
 - /world-government-debt/ : Redirects to /world/. GitHub Pages serves this as an HTML refresh with a canonical link, not an HTTP 301.
 - /global-debt-clock/ : Redirects to /world/ the same way.

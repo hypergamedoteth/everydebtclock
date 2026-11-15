@@ -225,10 +225,7 @@ idx = re.sub(r'<script type="application/ld\+json">\{"@context":"https://schema.
 ANSWERS = [("how-much-is-the-national-debt", "How much is the national debt?"), ("national-debt-per-person", "National debt per person"),
            ("national-debt-by-year", "US national debt by year"), ("41-trillion", "When will the US debt hit $41 trillion?"),
            ("national-debt-by-president", "National debt by president"), ("interest-on-the-national-debt", "Interest on the national debt"),
-           ("when-will-debt-hit-41-trillion", "When will US debt hit $41 trillion?"),
            ("methodology", "Methodology and accuracy")]
-# The live countdown replaces the older projection page in the homepage list. The old URL stays in the sitemap.
-HOME_ANSWERS = [a for a in ANSWERS if a[0] != "when-will-debt-hit-41-trillion"]
 KEY_TICKERS = ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "interest_annual", "debt_per_household", "debt_gdp_now"]
 sl_, lim_ = T.get("debt_subject_limit") or {}, T.get("debt_limit") or {}
 rate_day = (T["debt_total"].get("rate_trend", T["debt_total"]["rate"])) * 86400
@@ -297,7 +294,7 @@ if PLACES_LIVE:
 HOME_EXPLORE = explore.explore("", PLACES_LIVE, places_build.calc, cur=None, gdp=places_build.GDP_BY_SLUG, kind_hint="us") if PLACES_LIVE else ""
 links = (f"""<!--LINKS-->""" + HOME_EXPLORE + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
          f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> ({html.escape(p.get("link_label", "state + local"))})</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
-         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (general government gross debt of every IMF economy)</li>' if WORLD else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in HOME_ANSWERS)}</ul>
+         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (general government gross debt of every IMF economy)</li>' if WORLD else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
 <div class="sh"><h2>Popular counters</h2></div><ul>{''.join(f'<li><a href="t/{k}.html">{html.escape(label(k, ALL[k]))}</a></li>' for k in KEY_TICKERS if k in ALL)}</ul><!--/LINKS-->""")
 if "<!--INTRO-->" in idx: idx = re.sub(r"<!--INTRO-->.*?<!--/INTRO-->", lambda m: intro, idx, flags=re.S)
 if "<!--SSR-->" in idx: idx = re.sub(r"<!--SSR-->.*?<!--/SSR-->", lambda m: ssr, idx, flags=re.S)
@@ -692,64 +689,17 @@ The next trillion is the <a href="../41-trillion/">$41 trillion countdown</a>.</
                                   f"{SITE}/national-debt-by-year/", based=[M.get("debt_by_fy_source") or DTP_URL, "https://www.govinfo.gov/app/collection/budget/2027/BUDGET-2027-TAB"],
                                   temporal=f"{min(BY)}/{ly}"))
 
-    # 4) When will US debt hit $41 trillion?
-    TARGET = 41e12
-    first_hit = next((c for c in sorted(CLOSES) if c[1] >= TARGET), None)
-    cf = T["debt_total"].get("calc") or {}
-    t_off = dt.datetime.fromisoformat(OFF_D + "T23:59:59").replace(tzinfo=ET).timestamp()
-    def when(rate_s):
-        return dt.datetime.fromtimestamp(t_off + (TARGET - OFF_V) / rate_s, ZoneInfo("America/Chicago")) if rate_s and rate_s > 0 else None
-    r_ols = T["debt_total"].get("rate_trend", T["debt_total"]["rate"])
-    r_ft = None
-    if cf.get("first") and cf.get("last"):
-        dd = (dt.date.fromisoformat(cf["last"][0]) - dt.date.fromisoformat(cf["first"][0])).days
-        if dd > 0: r_ft = (cf["last"][1] - cf["first"][1]) / dd / 86400
-    e1, e2 = when(r_ols), when(r_ft)
-    lim_t = dt.datetime.fromtimestamp(DLS["freeze_t"], ZoneInfo("America/Chicago")) if DLS.get("freeze_t") else None
-    subj_at_target = TARGET - not_subj if not_subj is not None else None
-    if first_hit:
-        ans = f"It already has. Treasury's total public debt outstanding first closed above $41 trillion on <b>{fdate(first_hit[0])}</b> ({usd0(first_hit[1])})."
-        ttl = f"When Did US Debt Hit $41 Trillion? {fdate(first_hit[0])} (Treasury)"
-    elif DLS.get("at_limit"):
-        ans = (f"Not while the debt limit binds. The debt was {usd0(OFF_V)} on {fdate(OFF_D)}, {bil(TARGET - OFF_V)} short of $41 trillion, and debt subject to the "
-               f"limit is at the {tril(LIM, 3)} limit, so it can't grow much until Congress raises or suspends the limit.")
-        ttl = "When Will US Debt Hit $41 Trillion? On Hold at the Debt Limit"
-    else:
-        ans = (f"At its recent pace, around <b>{e1.strftime('%b %-d, %Y')}</b>. The debt was {usd0(OFF_V)} at Treasury's {fdate(OFF_D)} close, "
-               f"{bil(TARGET - OFF_V)} short of $41 trillion. That date is our projection from Treasury's daily figures, not a Treasury forecast.")
-        ttl = f"When Will US Debt Hit $41 Trillion? Projected Around {e1.strftime('%b %-d, %Y')}"
-    proj_rows = ""
-    if not first_hit and not DLS.get("at_limit"):
-        proj_rows = "<table><tr><th>Pace used</th><th>Per day</th><th>Projected $41T date (CT)</th></tr>"
-        proj_rows += f"<tr><td>90-day least-squares trend ({cf.get('n', '—')} daily closes; the rate the live clock uses)</td><td class=\"num\">{bil(r_ols * 86400)}</td><td>{e1.strftime('%b %-d, %Y') if e1 else '—'}</td></tr>"
-        if e2: proj_rows += f"<tr><td>Straight line from {fdate(cf['first'][0])} to {fdate(cf['last'][0])} (first and last close only)</td><td class=\"num\">{bil(r_ft * 86400)}</td><td>{e2.strftime('%b %-d, %Y')}</td></tr>"
-        proj_rows += "</table><p>The two paces give a rough range, not a forecast. Daily moves are lumpy (big jumps on auction settlement days, dips when trust-fund securities mature), so the actual crossing can land days or weeks either side.</p>"
-    lim_par = ""
-    if LIM and SUBJ.get("base"):
-        lim_par = (f"<h2>The debt limit</h2><p>The statutory debt limit is <b>{usd0(LIM)}</b> ({tril(LIM, 3)}), per Treasury's Daily Treasury Statement. It applies to "
-                   f"<i>debt subject to the limit</i>, which was {usd0(SUBJ['base'])} on {fdate(SUBJ.get('as_of'))}, leaving {bil(LIM - SUBJ['base'])} of room.")
-        if not_subj is not None:
-            lim_par += (f" About {bil(not_subj)} of the total debt is not subject to the limit, so total debt reaches $41 trillion when debt subject to the limit is about "
-                        f"{tril(subj_at_target, 3)}" + (", still under the limit" if subj_at_target < LIM else ", which is above the limit, so $41 trillion can't be reached unless Congress raises or suspends it")
-                        + f"; the limit itself would bind with total debt near {tril(LIM + not_subj, 2)}.")
-        if lim_t and not DLS.get("at_limit"):
-            lim_par += f" At the 90-day pace of debt subject to the limit, the limit would be reached around {lim_t.strftime('%b %-d, %Y')} (our projection)."
-            if e1 and lim_t < e1: lim_par += " That is before the projected $41 trillion date, so the crossing may wait until Congress acts."
-        lim_par += (" Once the limit binds, Treasury uses extraordinary measures and the debt goes roughly flat; our clock then stops projecting growth and holds at the official figure.</p>")
-    try: _rows = sorted(json.load(open(f"{R}/cache/debt_to_penny.json"))["data"]["rows"], key=lambda r: r["record_date"])
-    except Exception: _rows = []
-    _h40 = next((r for r in _rows if float(r["tot_pub_debt_out_amt"]) >= 40e12), None)
-    m40 = (f"<p>For comparison, the previous trillion: total debt first closed above $40 trillion on {fdate(_h40['record_date'])} "
-           f"({usd0(float(_h40['tot_pub_debt_out_amt']))}, Debt to the Penny).</p>") if _h40 and _h40 is not _rows[0] else ""
-    body = f"""<p><b>Answer.</b> {ans}</p>
-<p>The <a href="../41-trillion/">live $41 trillion countdown</a> uses this same pace and lists every trillion crossing in Debt to the Penny.</p>{proj_rows}{lim_par}
-<h2>Recent official closes</h2>{closes_table(5)}
-{m40}<p>This page is rebuilt after each Treasury release.</p>
-{src_links([SRC_DTP, SRC_DSL])}"""
-    answer_page("when-will-debt-hit-41-trillion", ttl,
-                (f"Projected date the US national debt passes $41 trillion, from Treasury's {fdate(OFF_D)} close of {tril(OFF_V)} and its 90-day trend, with the "
-                 f"{tril(LIM or 0, 3)} debt limit explained." if not first_hit else f"US national debt first closed above $41 trillion on {fdate(first_hit[0])}, per Treasury's Debt to the Penny."),
-                "When will US debt hit $41 trillion?", body)
+    # 4) Old $41 trillion URL. The live page is /41-trillion/. GitHub Pages has no HTTP 301,
+    # so this is the same refresh the world-clock redirects use: canonical, noindex, meta refresh.
+    redir = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<title>When Will the US Debt Hit $41 Trillion?</title>
+<link rel="canonical" href="{SITE}/41-trillion/"><meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0; url=../41-trillion/">
+<script>location.replace("../41-trillion/")</script></head>
+<body><p>This page has moved to the <a href="../41-trillion/">$41 trillion countdown</a>.</p></body></html>
+"""
+    os.makedirs(f"{R}/when-will-debt-hit-41-trillion", exist_ok=True)
+    open(f"{R}/when-will-debt-hit-41-trillion/index.html", "w").write(redir)
 
 # ---------------------------------------------------------------- 5) Methodology and accuracy (/methodology/)
 # Dated snapshot of two other debt clocks, read in a browser on Oct 27, 2026 (values verified by hand that day; not updated automatically).
@@ -872,9 +822,9 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
     "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
     "- /41-trillion/ : Live countdown to the next trillion, using the homepage clock's Debt to the Penny base and per-second rate, plus each trillion crossing in that daily series.",
+    "- /when-will-debt-hit-41-trillion/ : Redirects to /41-trillion/. GitHub Pages serves this as an HTML refresh with a canonical link, not an HTTP 301.",
     "- /national-debt-by-president/ : Debt at the start and end of each term. Debt to the Penny on or before the date from 1993; Historical Debt Outstanding annual records before that.",
     "- /interest-on-the-national-debt/ : Cash interest paid this fiscal year, MTS net interest by fiscal year, and Treasury's interest-expense dataset by fiscal year.",
-    "- /when-will-debt-hit-41-trillion/ : The same projection in prose. The live countdown is /41-trillion/.",
     "- /world/ : World Debt Clock. General government gross debt for every IMF economy. A national or Eurostat or QPSD stock is used only when it is general government gross debt; otherwise the row is the IMF World Economic Outlook estimate. Narrower official series are labeled and not added.",
     "- /world-government-debt/ : Redirects to /world/. GitHub Pages serves this as an HTML refresh with a canonical link, not an HTTP 301.",
     "- /global-debt-clock/ : Redirects to /world/ the same way.",

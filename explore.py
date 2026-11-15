@@ -197,11 +197,6 @@ def pick_related(places, calc, cur=None, gdp=None, usd=None, kind_hint=None, top
                 ("US national debt by year", "national-debt-by-year/", "Official totals by fiscal year"),
                 ("How much is the national debt?", "how-much-is-the-national-debt/", "The official Treasury total"),
             ],
-            "when-will-debt-hit-41-trillion": [
-                ("When will the US debt hit $41 trillion?", "41-trillion/", "Live countdown from the official trend"),
-                ("US national debt clock", "", "Live official total"),
-                ("US national debt by year", "national-debt-by-year/", "Official totals by fiscal year"),
-            ],
             "methodology": [
                 ("US national debt clock", "", "Live official total"),
                 ("How much is the national debt?", "how-much-is-the-national-debt/", "The official Treasury total"),
