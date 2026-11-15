@@ -10,7 +10,7 @@ Every number ticks like usdebtclock.org, but each one starts from an **official 
 | `build.py` | Inlines CSS/JS/data into `dist/debtclock-standalone.html`; writes per-ticker share pages `t/<slug>.html` |
 | `index.html`, `style.css`, `app.js` | Static front end, no build step. `requestAnimationFrame` loop updates every ticker every frame |
 | `api/daily.json`, `api/daily.txt` | Small stable feed for the daily X post (official Debt to the Penny close, 1/7/30-day official changes, 90-day average, projected now, per person/household) and one plain-English post line. Crawlable, not in the sitemap. Null when a value cannot be computed. |
-| `widget.html?t=<slug>` | Embeddable single-ticker widget (iframe) |
+| `embed/` | Free embeddable clocks (US, states, DC, countries, world). `/embed/` is the index; each clock is a small noindex page. |
 | `cache/` | Last good response per source (used if a source is down; tile shows "cached") |
 | `analytics.html` (optional) or `ANALYTICS_HTML` env | Analytics snippet injected before `</head>` on every page; empty by default |
 
@@ -77,7 +77,7 @@ Static files only: Cloudflare Pages or GitHub Pages (free), Cloudflare CDN in fr
 
 ## Traffic plan (nothing has been posted)
 - **One URL per ticker** (`/t/<slug>`, 57 today) with its own title/description → long-tail search ("US interest on debt today", "Social Security spending 2027").
-- **Embeds:** one-line iframe for every ticker; pitch to bloggers, newsletters, teachers, local news. Each embed links back.
+- **Embeds:** `/embed/` lists a paste-in clock for the US, every state and DC, every country, and the world. The snippet is an iframe plus a plain link back. Clock pages are noindex and carry no analytics.
 - **Milestone auto-posts to X** (e.g. debt crosses $40.5T, interest passes defense FYTD): the pipeline can detect crossings and queue a draft post + share image. Needs an approval step; not built and nothing posted.
 - **Daily "debt today" share card** (OG image per ticker), weekly email digest, and a "verified vs Treasury" track record page as the trust differentiator vs usdebtclock.
 - Next tickers to add (official sources exist): state & local debt (Census), Social Security/Medicare trust fund balances (Treasury/SSA), Fed holdings of Treasuries (H.4.1), debt per worker (BLS), debt subject to the limit.

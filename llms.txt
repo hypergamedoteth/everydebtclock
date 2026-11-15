@@ -16,6 +16,7 @@ Live US, state, country and wealth-fund clocks built from official figures. The 
 - /states/ : State and local debt clocks for every US state and Washington, DC, from official Census figures.
 - /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.
 - /methodology/ : Sources, how the live ticker is calculated, and how it is checked against Treasury.
+- /embed/ : Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.
 
 ## Data
 US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.
