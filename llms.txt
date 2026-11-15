@@ -22,6 +22,28 @@ Live US, state, country and wealth-fund clocks built from official figures. The 
 - /data/ : Free CSV files and charts of the US and world series this site publishes. Free to use with credit: Source: EveryDebtClock.com.
 - /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.
 
+## Debt by year
+
+- /countries/brazil/debt-by-year/ : Brazil gross government debt by year, 2006–2026. Banco Central do Brasil, SGS series 13761, Dívida bruta do governo geral (DBGG), R$ million.
+- /countries/canada/debt-by-year/ : Canada federal debt by year, 2003–2026. Bank of Canada Valet, series V42141673, Government of Canada total securities outstanding (inflation adjusted), C$ millions.
+- /countries/china/debt-by-year/ : China central government debt by year, 2025–2026. Ministry of Finance of China, Central Government Operations And Debt (SDDS), quarterly central government debt balance, RMB billion.
+- /countries/france/debt-by-year/ : France central government debt by year, 2000–2026. Eurostat, Quarterly government debt (gov_10q_ggdebt), central government (S1311), Maastricht debt, million euro.
+- /countries/germany/debt-by-year/ : Germany central government debt by year, 2000–2026. Eurostat, Quarterly government debt (gov_10q_ggdebt), central government (S1311), Maastricht debt, million euro.
+- /countries/india/debt-by-year/ : India central government liabilities by year, 2025–2026. Department of Economic Affairs, Ministry of Finance, Quarterly Report on Public Debt Management, Table 4.1 Total Liabilities of Central Government, item H Gross Liabilities as per FRBM Act, rupees crore.
+- /countries/italy/debt-by-year/ : Italy central government debt by year, 2000–2026. Eurostat, Quarterly government debt (gov_10q_ggdebt), central government (S1311), Maastricht debt, million euro.
+- /countries/japan/debt-by-year/ : Japan national government debt by year, 2022–2026. Ministry of Finance Japan, Central Government Debt (government bonds, borrowings, financing bills), quarterly table, 100 million yen.
+- /countries/united-kingdom/debt-by-year/ : United Kingdom government debt by year, 1975–2026. Office for National Statistics, Public sector finances, series BKPX, general government consolidated gross debt (Maastricht), £ million.
+- /states/california/debt-by-year/ : California state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
+- /states/florida/debt-by-year/ : Florida state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
+- /states/illinois/debt-by-year/ : Illinois state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
+- /states/massachusetts/debt-by-year/ : Massachusetts state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
+- /states/new-jersey/debt-by-year/ : New Jersey state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
+- /states/new-york/debt-by-year/ : New York state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
+- /states/ohio/debt-by-year/ : Ohio state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
+- /states/pennsylvania/debt-by-year/ : Pennsylvania state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
+- /states/texas/debt-by-year/ : Texas state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
+- /states/washington/debt-by-year/ : Washington state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
+- Skipped australia: The Australian Office of Financial Management data hub (aofm.gov.au) did not respond, so the monthly workbook behind the Australia clock could not be read as a full history. The clock file only keeps the latest year of that workbook, which is not the long official series.
 ## Data
 US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.
 

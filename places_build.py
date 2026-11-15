@@ -71,6 +71,14 @@ def _world_line(p, name, pub, as_of):
     return (f'<p><b>World Debt Clock.</b> This general-government gross debt stock, {amount}, is the headline for {E(name)}.</p>')
 CUR = "$"  # currency symbol for the page being rendered ("$" for US places, "C$" for Canada); set by _cur(p)
 def _cur(p): global CUR; CUR = (p.get("currency") or {}).get("symbol", "$"); return CUR
+
+def _debt_year_link(slug, name):
+    """Link the clock to its debt-by-year page. Sits in the summary, under the ticker."""
+    try:
+        import debt_by_year_build as dy
+        return dy.parent_link(slug, name)
+    except Exception:
+        return ""
 def _usd0(x): return ("−" if x < 0 else "") + CUR + f"{abs(x):,.0f}"
 def _usd2(x): return ("−" if x < 0 else "") + CUR + f"{abs(x):,.2f}"
 def _sg(x): return "+" if x >= 0 else "−"
@@ -310,6 +318,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
              + ("" if is_state else f'<p>Source tier: {"harmonized official dataset" if ("Eurostat" in pub or p.get("source_tier") == "harmonized") else "official national series"}. As of {as_of}. Coverage: {E(p.get("world_measure") or p.get("headline_long") or T["head"])}.</p>')
              + (f'<p>{E(p["intro_extra"])}</p>' if p.get("intro_extra") else "")
              + (_world_line(p, name, pub, as_of) if not is_state else "")
+             + _debt_year_link(p["slug"], name)
              + '</section>')
 
     # ---- hero (same block and labels as the US hero)

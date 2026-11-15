@@ -1,0 +1,8042 @@
+{
+ "_doc": "Year-by-year debt fetched by pipeline/fetch_debt_by_year.py. Amounts are whole currency units. State rows before 2017 are Census summary tables; the page builder adds 2017\u20132024 from places/<state>.json (Census time series GS00LOCALFIN), the same figures as the state clocks. Country points are the clock's own official series.",
+ "fetched": "2026-11-15",
+ "places": {
+  "california": {
+   "kind": "state",
+   "year_end_month": 6,
+   "rows": [
+    {
+     "year": 1992,
+     "date": "1992-06-30",
+     "total": 114175508000,
+     "state": 37823709000,
+     "local": 76351799000
+    },
+    {
+     "year": 1993,
+     "date": "1993-06-30",
+     "total": 122890376000,
+     "state": 41294944000,
+     "local": 81595432000
+    },
+    {
+     "year": 1994,
+     "date": "1994-06-30",
+     "total": 140938771000,
+     "state": 48120610000,
+     "local": 92818161000
+    },
+    {
+     "year": 1995,
+     "date": "1995-06-30",
+     "total": 141980899000,
+     "state": 48197317000,
+     "local": 93783582000
+    },
+    {
+     "year": 1996,
+     "date": "1996-06-30",
+     "total": 143791233000,
+     "state": 45859003000,
+     "local": 97932230000
+    },
+    {
+     "year": 1997,
+     "date": "1997-06-30",
+     "total": 156129665000,
+     "state": 45336911000,
+     "local": 110792754000
+    },
+    {
+     "year": 1998,
+     "date": "1998-06-30",
+     "total": 161486091000,
+     "state": 50250539000,
+     "local": 111235552000
+    },
+    {
+     "year": 1999,
+     "date": "1999-06-30",
+     "total": 168344216000,
+     "state": 53974509000,
+     "local": 114369707000
+    },
+    {
+     "year": 2000,
+     "date": "2000-06-30",
+     "total": 177919620000,
+     "state": 57170067000,
+     "local": 120749554000
+    },
+    {
+     "year": 2002,
+     "date": "2002-06-30",
+     "total": 209671522000,
+     "state": 71244503000,
+     "local": 138427019000
+    },
+    {
+     "year": 2004,
+     "date": "2004-06-30",
+     "total": 270427573000,
+     "state": 105519806000,
+     "local": 164907767000
+    },
+    {
+     "year": 2005,
+     "date": "2005-06-30",
+     "total": 286790862000,
+     "state": 107372729000,
+     "local": 179418133000
+    },
+    {
+     "year": 2006,
+     "date": "2006-06-30",
+     "total": 300672060000,
+     "state": 109416606000,
+     "local": 191255454000
+    },
+    {
+     "year": 2007,
+     "date": "2007-06-30",
+     "total": 330536815000,
+     "state": 114701797000,
+     "local": 215835018000
+    },
+    {
+     "year": 2008,
+     "date": "2008-06-30",
+     "total": 341028442000,
+     "state": 121929578000,
+     "local": 219098864000
+    },
+    {
+     "year": 2009,
+     "date": "2009-06-30",
+     "total": 374840098000,
+     "state": 134764874000,
+     "local": 240075224000
+    },
+    {
+     "year": 2010,
+     "date": "2010-06-30",
+     "total": 405662606000,
+     "state": 148929107000,
+     "local": 256733499000
+    },
+    {
+     "year": 2011,
+     "date": "2011-06-30",
+     "total": 420722502000,
+     "state": 149670954000,
+     "local": 271051548000
+    },
+    {
+     "year": 2012,
+     "date": "2012-06-30",
+     "total": 421808449000,
+     "state": 153528617000,
+     "local": 268279832000
+    },
+    {
+     "year": 2013,
+     "date": "2013-06-30",
+     "total": 421598222000,
+     "state": 152186012000,
+     "local": 269412210000
+    },
+    {
+     "year": 2014,
+     "date": "2014-06-30",
+     "total": 425607386000,
+     "state": 156807868000,
+     "local": 268799518000
+    },
+    {
+     "year": 2015,
+     "date": "2015-06-30",
+     "total": 421315510000,
+     "state": 151715007000,
+     "local": 269600503000
+    },
+    {
+     "year": 2016,
+     "date": "2016-06-30",
+     "total": 437899643000,
+     "state": 151824176000,
+     "local": 286075467000
+    }
+   ],
+   "sources": [
+    {
+     "year": 1992,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1992, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1992/summary-tables/92sl05ca.csv"
+    },
+    {
+     "year": 1993,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1993, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1993/summary-tables/9305ca.csv"
+    },
+    {
+     "year": 1994,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1994, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1994/summary-tables/9405ca.csv"
+    },
+    {
+     "year": 1995,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1995, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1995/summary-tables/9505ca.csv"
+    },
+    {
+     "year": 1996,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1996, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1996/summary-tables/9605ca.csv"
+    },
+    {
+     "year": 1997,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1997, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1997/summary-tables/97sl05ca.csv"
+    },
+    {
+     "year": 1998,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1998, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1998/summary-tables/9805ca.csv"
+    },
+    {
+     "year": 1999,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1999, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1999/summary-tables/9905ca.csv"
+    },
+    {
+     "year": 2000,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2000, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2000/summary-tables/00sl05ca.csv"
+    },
+    {
+     "year": 2002,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2002, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2002/summary-tables/02slsstab1a.xls"
+    },
+    {
+     "year": 2004,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2004, total debt outstanding",
+     "url": "https://www2.census.gov/govs/estimate/04slsstab1a.xls"
+    },
+    {
+     "year": 2005,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2005, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2005/summary-tables/05slsstab1a.xls"
+    },
+    {
+     "year": 2006,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2006, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2006/summary-tables/06slsstab1a.xls"
+    },
+    {
+     "year": 2007,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2007, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2007/summary-tables/07slsstab1a.xls"
+    },
+    {
+     "year": 2008,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2008, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2008/summary-tables/08slsstab1a.xls"
+    },
+    {
+     "year": 2009,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2009, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2009/summary-tables/09slsstab1a.xls"
+    },
+    {
+     "year": 2010,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2010, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2010/summary-tables/10slsstab1a.xls"
+    },
+    {
+     "year": 2011,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2011, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2011/summary-tables/11slsstab1a.xls"
+    },
+    {
+     "year": 2012,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2012, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2012/summary-tables/12slsstab1a.xlsx"
+    },
+    {
+     "year": 2013,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2013, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2013/summary-tables/13slsstab1a.xlsx"
+    },
+    {
+     "year": 2014,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2014, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2014/summary-tables/14slsstab1a.xlsx"
+    },
+    {
+     "year": 2015,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2015, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2015/summary-tables/15slsstab1a.xlsx"
+    },
+    {
+     "year": 2016,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2016, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2016/summary-tables/16slsstab1a.xlsx"
+    }
+   ],
+   "api_source": {
+    "name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017\u20132024",
+    "url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US06"
+   },
+   "api_download": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US06",
+   "release_page": "https://www.census.gov/programs-surveys/gov-finances/data/tables.html",
+   "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017\u20132024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables."
+  },
+  "texas": {
+   "kind": "state",
+   "year_end_month": 6,
+   "rows": [
+    {
+     "year": 1992,
+     "date": "1992-06-30",
+     "total": 65364097000,
+     "state": 8001178000,
+     "local": 57362919000
+    },
+    {
+     "year": 1993,
+     "date": "1993-06-30",
+     "total": 68488774000,
+     "state": 8683525000,
+     "local": 59805249000
+    },
+    {
+     "year": 1994,
+     "date": "1994-06-30",
+     "total": 69706098000,
+     "state": 9377851000,
+     "local": 60328247000
+    },
+    {
+     "year": 1995,
+     "date": "1995-06-30",
+     "total": 65737561000,
+     "state": 9921999000,
+     "local": 55815562000
+    },
+    {
+     "year": 1996,
+     "date": "1996-06-30",
+     "total": 75988396000,
+     "state": 14575675000,
+     "local": 61412721000
+    },
+    {
+     "year": 1997,
+     "date": "1997-06-30",
+     "total": 78348599000,
+     "state": 12461867000,
+     "local": 65886732000
+    },
+    {
+     "year": 1998,
+     "date": "1998-06-30",
+     "total": 83658228000,
+     "state": 14408011000,
+     "local": 69250217000
+    },
+    {
+     "year": 1999,
+     "date": "1999-06-30",
+     "total": 90558337000,
+     "state": 14736223000,
+     "local": 75822114000
+    },
+    {
+     "year": 2000,
+     "date": "2000-06-30",
+     "total": 100174846000,
+     "state": 19228150000,
+     "local": 80946696000
+    },
+    {
+     "year": 2002,
+     "date": "2002-06-30",
+     "total": 119225742000,
+     "state": 20424298000,
+     "local": 98801444000
+    },
+    {
+     "year": 2004,
+     "date": "2004-06-30",
+     "total": 146795531000,
+     "state": 23326277000,
+     "local": 123469254000
+    },
+    {
+     "year": 2005,
+     "date": "2005-06-30",
+     "total": 152100930000,
+     "state": 18153032000,
+     "local": 133947898000
+    },
+    {
+     "year": 2006,
+     "date": "2006-06-30",
+     "total": 167649569000,
+     "state": 24501385000,
+     "local": 143148184000
+    },
+    {
+     "year": 2007,
+     "date": "2007-06-30",
+     "total": 186672973000,
+     "state": 24256461000,
+     "local": 162416512000
+    },
+    {
+     "year": 2008,
+     "date": "2008-06-30",
+     "total": 216398293000,
+     "state": 33587699000,
+     "local": 182810594000
+    },
+    {
+     "year": 2009,
+     "date": "2009-06-30",
+     "total": 231166674000,
+     "state": 30438160000,
+     "local": 200728514000
+    },
+    {
+     "year": 2010,
+     "date": "2010-06-30",
+     "total": 253641619000,
+     "state": 42033571000,
+     "local": 211608048000
+    },
+    {
+     "year": 2011,
+     "date": "2011-06-30",
+     "total": 260564524000,
+     "state": 38530338000,
+     "local": 222034186000
+    },
+    {
+     "year": 2012,
+     "date": "2012-06-30",
+     "total": 271012994000,
+     "state": 45626393000,
+     "local": 225386601000
+    },
+    {
+     "year": 2013,
+     "date": "2013-06-30",
+     "total": 267051695000,
+     "state": 39624672000,
+     "local": 227427023000
+    },
+    {
+     "year": 2014,
+     "date": "2014-06-30",
+     "total": 268880607000,
+     "state": 41855106000,
+     "local": 227025501000
+    },
+    {
+     "year": 2015,
+     "date": "2015-06-30",
+     "total": 277290993000,
+     "state": 48038004000,
+     "local": 229252989000
+    },
+    {
+     "year": 2016,
+     "date": "2016-06-30",
+     "total": 280422633000,
+     "state": 49357183000,
+     "local": 231065450000
+    }
+   ],
+   "sources": [
+    {
+     "year": 1992,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1992, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1992/summary-tables/92sl44tx.csv"
+    },
+    {
+     "year": 1993,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1993, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1993/summary-tables/9344tx.csv"
+    },
+    {
+     "year": 1994,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1994, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1994/summary-tables/9444tx.csv"
+    },
+    {
+     "year": 1995,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1995, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1995/summary-tables/9544tx.csv"
+    },
+    {
+     "year": 1996,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1996, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1996/summary-tables/9644tx.csv"
+    },
+    {
+     "year": 1997,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1997, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1997/summary-tables/97sl44tx.csv"
+    },
+    {
+     "year": 1998,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1998, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1998/summary-tables/9844tx.csv"
+    },
+    {
+     "year": 1999,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1999, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1999/summary-tables/9944tx.csv"
+    },
+    {
+     "year": 2000,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2000, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2000/summary-tables/00sl44tx.csv"
+    },
+    {
+     "year": 2002,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2002, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2002/summary-tables/02slsstab1b.xls"
+    },
+    {
+     "year": 2004,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2004, total debt outstanding",
+     "url": "https://www2.census.gov/govs/estimate/04slsstab1b.xls"
+    },
+    {
+     "year": 2005,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2005, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2005/summary-tables/05slsstab1b.xls"
+    },
+    {
+     "year": 2006,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2006, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2006/summary-tables/06slsstab1b.xls"
+    },
+    {
+     "year": 2007,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2007, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2007/summary-tables/07slsstab1b.xls"
+    },
+    {
+     "year": 2008,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2008, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2008/summary-tables/08slsstab1b.xls"
+    },
+    {
+     "year": 2009,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2009, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2009/summary-tables/09slsstab1b.xls"
+    },
+    {
+     "year": 2010,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2010, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2010/summary-tables/10slsstab1b.xls"
+    },
+    {
+     "year": 2011,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2011, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2011/summary-tables/11slsstab1b.xls"
+    },
+    {
+     "year": 2012,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2012, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2012/summary-tables/12slsstab1b.xlsx"
+    },
+    {
+     "year": 2013,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2013, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2013/summary-tables/13slsstab1b.xlsx"
+    },
+    {
+     "year": 2014,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2014, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2014/summary-tables/14slsstab1b.xlsx"
+    },
+    {
+     "year": 2015,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2015, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2015/summary-tables/15slsstab1b.xlsx"
+    },
+    {
+     "year": 2016,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2016, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2016/summary-tables/16slsstab1b.xlsx"
+    }
+   ],
+   "api_source": {
+    "name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017\u20132024",
+    "url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US48"
+   },
+   "api_download": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US48",
+   "release_page": "https://www.census.gov/programs-surveys/gov-finances/data/tables.html",
+   "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017\u20132024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables."
+  },
+  "new-york": {
+   "kind": "state",
+   "year_end_month": 6,
+   "rows": [
+    {
+     "year": 1992,
+     "date": "1992-06-30",
+     "total": 116085659000,
+     "state": 55868432000,
+     "local": 60217227000
+    },
+    {
+     "year": 1993,
+     "date": "1993-06-30",
+     "total": 122618164000,
+     "state": 59218591000,
+     "local": 63399573000
+    },
+    {
+     "year": 1994,
+     "date": "1994-06-30",
+     "total": 133401758000,
+     "state": 65077504000,
+     "local": 68324254000
+    },
+    {
+     "year": 1995,
+     "date": "1995-06-30",
+     "total": 142160300000,
+     "state": 68465667000,
+     "local": 73694633000
+    },
+    {
+     "year": 1996,
+     "date": "1996-06-30",
+     "total": 149700886000,
+     "state": 73121852000,
+     "local": 76579034000
+    },
+    {
+     "year": 1997,
+     "date": "1997-06-30",
+     "total": 151538584000,
+     "state": 74078490000,
+     "local": 77460094000
+    },
+    {
+     "year": 1998,
+     "date": "1998-06-30",
+     "total": 155709646000,
+     "state": 73254370000,
+     "local": 82455276000
+    },
+    {
+     "year": 1999,
+     "date": "1999-06-30",
+     "total": 171419297000,
+     "state": 76562422000,
+     "local": 94856875000
+    },
+    {
+     "year": 2000,
+     "date": "2000-06-30",
+     "total": 177549900000,
+     "state": 78615990000,
+     "local": 98933910000
+    },
+    {
+     "year": 2002,
+     "date": "2002-06-30",
+     "total": 195317691000,
+     "state": 87978794000,
+     "local": 107338897000
+    },
+    {
+     "year": 2004,
+     "date": "2004-06-30",
+     "total": 221405713000,
+     "state": 97920518000,
+     "local": 123485195000
+    },
+    {
+     "year": 2005,
+     "date": "2005-06-30",
+     "total": 232890030000,
+     "state": 102564586000,
+     "local": 130325444000
+    },
+    {
+     "year": 2006,
+     "date": "2006-06-30",
+     "total": 241364471000,
+     "state": 105306179000,
+     "local": 136058292000
+    },
+    {
+     "year": 2007,
+     "date": "2007-06-30",
+     "total": 263285501000,
+     "state": 110084829000,
+     "local": 153200672000
+    },
+    {
+     "year": 2008,
+     "date": "2008-06-30",
+     "total": 273166944000,
+     "state": 114240227000,
+     "local": 158926717000
+    },
+    {
+     "year": 2009,
+     "date": "2009-06-30",
+     "total": 297334237000,
+     "state": 122651630000,
+     "local": 174682607000
+    },
+    {
+     "year": 2010,
+     "date": "2010-06-30",
+     "total": 316065338000,
+     "state": 129529501000,
+     "local": 186535837000
+    },
+    {
+     "year": 2011,
+     "date": "2011-06-30",
+     "total": 334651978000,
+     "state": 134928505000,
+     "local": 199723473000
+    },
+    {
+     "year": 2012,
+     "date": "2012-06-30",
+     "total": 347138169000,
+     "state": 142513773000,
+     "local": 204624396000
+    },
+    {
+     "year": 2013,
+     "date": "2013-06-30",
+     "total": 353162773000,
+     "state": 142864900000,
+     "local": 210297873000
+    },
+    {
+     "year": 2014,
+     "date": "2014-06-30",
+     "total": 352346265000,
+     "state": 143407624000,
+     "local": 208938641000
+    },
+    {
+     "year": 2015,
+     "date": "2015-06-30",
+     "total": 352648620000,
+     "state": 143880477000,
+     "local": 208768143000
+    },
+    {
+     "year": 2016,
+     "date": "2016-06-30",
+     "total": 354643513000,
+     "state": 143986640000,
+     "local": 210656873000
+    }
+   ],
+   "sources": [
+    {
+     "year": 1992,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1992, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1992/summary-tables/92sl33ny.csv"
+    },
+    {
+     "year": 1993,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1993, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1993/summary-tables/9333ny.csv"
+    },
+    {
+     "year": 1994,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1994, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1994/summary-tables/9433ny.csv"
+    },
+    {
+     "year": 1995,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1995, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1995/summary-tables/9533ny.csv"
+    },
+    {
+     "year": 1996,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1996, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1996/summary-tables/9633ny.csv"
+    },
+    {
+     "year": 1997,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1997, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1997/summary-tables/97sl33ny.csv"
+    },
+    {
+     "year": 1998,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1998, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1998/summary-tables/9833ny.csv"
+    },
+    {
+     "year": 1999,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1999, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1999/summary-tables/9933ny.csv"
+    },
+    {
+     "year": 2000,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2000, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2000/summary-tables/00sl33ny.csv"
+    },
+    {
+     "year": 2002,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2002, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2002/summary-tables/02slsstab1b.xls"
+    },
+    {
+     "year": 2004,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2004, total debt outstanding",
+     "url": "https://www2.census.gov/govs/estimate/04slsstab1b.xls"
+    },
+    {
+     "year": 2005,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2005, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2005/summary-tables/05slsstab1b.xls"
+    },
+    {
+     "year": 2006,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2006, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2006/summary-tables/06slsstab1b.xls"
+    },
+    {
+     "year": 2007,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2007, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2007/summary-tables/07slsstab1b.xls"
+    },
+    {
+     "year": 2008,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2008, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2008/summary-tables/08slsstab1b.xls"
+    },
+    {
+     "year": 2009,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2009, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2009/summary-tables/09slsstab1b.xls"
+    },
+    {
+     "year": 2010,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2010, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2010/summary-tables/10slsstab1b.xls"
+    },
+    {
+     "year": 2011,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2011, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2011/summary-tables/11slsstab1b.xls"
+    },
+    {
+     "year": 2012,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2012, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2012/summary-tables/12slsstab1b.xlsx"
+    },
+    {
+     "year": 2013,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2013, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2013/summary-tables/13slsstab1b.xlsx"
+    },
+    {
+     "year": 2014,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2014, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2014/summary-tables/14slsstab1b.xlsx"
+    },
+    {
+     "year": 2015,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2015, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2015/summary-tables/15slsstab1b.xlsx"
+    },
+    {
+     "year": 2016,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2016, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2016/summary-tables/16slsstab1b.xlsx"
+    }
+   ],
+   "api_source": {
+    "name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017\u20132024",
+    "url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US36"
+   },
+   "api_download": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US36",
+   "release_page": "https://www.census.gov/programs-surveys/gov-finances/data/tables.html",
+   "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017\u20132024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables."
+  },
+  "florida": {
+   "kind": "state",
+   "year_end_month": 6,
+   "rows": [
+    {
+     "year": 1992,
+     "date": "1992-06-30",
+     "total": 55277985000,
+     "state": 12295486000,
+     "local": 42982499000
+    },
+    {
+     "year": 1993,
+     "date": "1993-06-30",
+     "total": 59078058000,
+     "state": 13634806000,
+     "local": 45443252000
+    },
+    {
+     "year": 1994,
+     "date": "1994-06-30",
+     "total": 60467052000,
+     "state": 14565270000,
+     "local": 45901782000
+    },
+    {
+     "year": 1995,
+     "date": "1995-06-30",
+     "total": 64451151000,
+     "state": 15369609000,
+     "local": 49081542000
+    },
+    {
+     "year": 1996,
+     "date": "1996-06-30",
+     "total": 65163736000,
+     "state": 15514762000,
+     "local": 49648974000
+    },
+    {
+     "year": 1997,
+     "date": "1997-06-30",
+     "total": 70448642000,
+     "state": 16021603000,
+     "local": 54427039000
+    },
+    {
+     "year": 1998,
+     "date": "1998-06-30",
+     "total": 71809108000,
+     "state": 16969289000,
+     "local": 54839819000
+    },
+    {
+     "year": 1999,
+     "date": "1999-06-30",
+     "total": 75706459000,
+     "state": 17825277000,
+     "local": 57881182000
+    },
+    {
+     "year": 2000,
+     "date": "2000-06-30",
+     "total": 78495159000,
+     "state": 18181456000,
+     "local": 60313703000
+    },
+    {
+     "year": 2002,
+     "date": "2002-06-30",
+     "total": 90316174000,
+     "state": 20265599000,
+     "local": 70050575000
+    },
+    {
+     "year": 2004,
+     "date": "2004-06-30",
+     "total": 109900159000,
+     "state": 26787366000,
+     "local": 83112793000
+    },
+    {
+     "year": 2005,
+     "date": "2005-06-30",
+     "total": 113252330000,
+     "state": 28255074000,
+     "local": 84997256000
+    },
+    {
+     "year": 2006,
+     "date": "2006-06-30",
+     "total": 119765298000,
+     "state": 29311808000,
+     "local": 90453490000
+    },
+    {
+     "year": 2007,
+     "date": "2007-06-30",
+     "total": 134852353000,
+     "state": 37426489000,
+     "local": 97425864000
+    },
+    {
+     "year": 2008,
+     "date": "2008-06-30",
+     "total": 146500378000,
+     "state": 44076196000,
+     "local": 102424182000
+    },
+    {
+     "year": 2009,
+     "date": "2009-06-30",
+     "total": 148424375000,
+     "state": 39813877000,
+     "local": 108610498000
+    },
+    {
+     "year": 2010,
+     "date": "2010-06-30",
+     "total": 150873114000,
+     "state": 41324398000,
+     "local": 109548716000
+    },
+    {
+     "year": 2011,
+     "date": "2011-06-30",
+     "total": 152034819000,
+     "state": 43471755000,
+     "local": 108563064000
+    },
+    {
+     "year": 2012,
+     "date": "2012-06-30",
+     "total": 146952126000,
+     "state": 38174909000,
+     "local": 108777217000
+    },
+    {
+     "year": 2013,
+     "date": "2013-06-30",
+     "total": 146513645000,
+     "state": 37896730000,
+     "local": 108616915000
+    },
+    {
+     "year": 2014,
+     "date": "2014-06-30",
+     "total": 145213147000,
+     "state": 36353065000,
+     "local": 108860082000
+    },
+    {
+     "year": 2015,
+     "date": "2015-06-30",
+     "total": 139994455000,
+     "state": 33368651000,
+     "local": 106625804000
+    },
+    {
+     "year": 2016,
+     "date": "2016-06-30",
+     "total": 139264317000,
+     "state": 33468245000,
+     "local": 105796072000
+    }
+   ],
+   "sources": [
+    {
+     "year": 1992,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1992, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1992/summary-tables/92sl10fl.csv"
+    },
+    {
+     "year": 1993,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1993, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1993/summary-tables/9310fl.csv"
+    },
+    {
+     "year": 1994,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1994, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1994/summary-tables/9410fl.csv"
+    },
+    {
+     "year": 1995,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1995, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1995/summary-tables/9510fl.csv"
+    },
+    {
+     "year": 1996,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1996, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1996/summary-tables/9610fl.csv"
+    },
+    {
+     "year": 1997,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1997, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1997/summary-tables/97sl10fl.csv"
+    },
+    {
+     "year": 1998,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1998, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1998/summary-tables/9810fl.csv"
+    },
+    {
+     "year": 1999,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1999, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1999/summary-tables/9910fl.csv"
+    },
+    {
+     "year": 2000,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2000, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2000/summary-tables/00sl10fl.csv"
+    },
+    {
+     "year": 2002,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2002, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2002/summary-tables/02slsstab1a.xls"
+    },
+    {
+     "year": 2004,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2004, total debt outstanding",
+     "url": "https://www2.census.gov/govs/estimate/04slsstab1a.xls"
+    },
+    {
+     "year": 2005,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2005, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2005/summary-tables/05slsstab1a.xls"
+    },
+    {
+     "year": 2006,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2006, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2006/summary-tables/06slsstab1a.xls"
+    },
+    {
+     "year": 2007,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2007, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2007/summary-tables/07slsstab1a.xls"
+    },
+    {
+     "year": 2008,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2008, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2008/summary-tables/08slsstab1a.xls"
+    },
+    {
+     "year": 2009,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2009, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2009/summary-tables/09slsstab1a.xls"
+    },
+    {
+     "year": 2010,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2010, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2010/summary-tables/10slsstab1a.xls"
+    },
+    {
+     "year": 2011,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2011, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2011/summary-tables/11slsstab1a.xls"
+    },
+    {
+     "year": 2012,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2012, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2012/summary-tables/12slsstab1a.xlsx"
+    },
+    {
+     "year": 2013,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2013, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2013/summary-tables/13slsstab1a.xlsx"
+    },
+    {
+     "year": 2014,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2014, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2014/summary-tables/14slsstab1a.xlsx"
+    },
+    {
+     "year": 2015,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2015, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2015/summary-tables/15slsstab1a.xlsx"
+    },
+    {
+     "year": 2016,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2016, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2016/summary-tables/16slsstab1a.xlsx"
+    }
+   ],
+   "api_source": {
+    "name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017\u20132024",
+    "url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US12"
+   },
+   "api_download": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US12",
+   "release_page": "https://www.census.gov/programs-surveys/gov-finances/data/tables.html",
+   "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017\u20132024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables."
+  },
+  "illinois": {
+   "kind": "state",
+   "year_end_month": 6,
+   "rows": [
+    {
+     "year": 1992,
+     "date": "1992-06-30",
+     "total": 40621141000,
+     "state": 18741630000,
+     "local": 21879511000
+    },
+    {
+     "year": 1993,
+     "date": "1993-06-30",
+     "total": 43836568000,
+     "state": 19892834000,
+     "local": 23943734000
+    },
+    {
+     "year": 1994,
+     "date": "1994-06-30",
+     "total": 46434418000,
+     "state": 20355305000,
+     "local": 26079113000
+    },
+    {
+     "year": 1995,
+     "date": "1995-06-30",
+     "total": 48802984000,
+     "state": 21950300000,
+     "local": 26852684000
+    },
+    {
+     "year": 1996,
+     "date": "1996-06-30",
+     "total": 52418679000,
+     "state": 22676430000,
+     "local": 29742249000
+    },
+    {
+     "year": 1997,
+     "date": "1997-06-30",
+     "total": 52159328000,
+     "state": 23800807000,
+     "local": 28358521000
+    },
+    {
+     "year": 1998,
+     "date": "1998-06-30",
+     "total": 58854927000,
+     "state": 25314532000,
+     "local": 33540395000
+    },
+    {
+     "year": 1999,
+     "date": "1999-06-30",
+     "total": 62897101000,
+     "state": 26581939000,
+     "local": 36315162000
+    },
+    {
+     "year": 2000,
+     "date": "2000-06-30",
+     "total": 67573181000,
+     "state": 28827990000,
+     "local": 38745191000
+    },
+    {
+     "year": 2002,
+     "date": "2002-06-30",
+     "total": 80936138000,
+     "state": 34760529000,
+     "local": 46175609000
+    },
+    {
+     "year": 2004,
+     "date": "2004-06-30",
+     "total": 102304281000,
+     "state": 48726054000,
+     "local": 53578227000
+    },
+    {
+     "year": 2005,
+     "date": "2005-06-30",
+     "total": 106703969000,
+     "state": 51275461000,
+     "local": 55428508000
+    },
+    {
+     "year": 2006,
+     "date": "2006-06-30",
+     "total": 110776999000,
+     "state": 53648701000,
+     "local": 57128298000
+    },
+    {
+     "year": 2007,
+     "date": "2007-06-30",
+     "total": 116696701000,
+     "state": 54535159000,
+     "local": 62161542000
+    },
+    {
+     "year": 2008,
+     "date": "2008-06-30",
+     "total": 123934398000,
+     "state": 58436829000,
+     "local": 65497569000
+    },
+    {
+     "year": 2009,
+     "date": "2009-06-30",
+     "total": 128306295000,
+     "state": 56962364000,
+     "local": 71343931000
+    },
+    {
+     "year": 2010,
+     "date": "2010-06-30",
+     "total": 136122476000,
+     "state": 61360745000,
+     "local": 74761731000
+    },
+    {
+     "year": 2011,
+     "date": "2011-06-30",
+     "total": 145420030000,
+     "state": 64801423000,
+     "local": 80618607000
+    },
+    {
+     "year": 2012,
+     "date": "2012-06-30",
+     "total": 146204841000,
+     "state": 64301765000,
+     "local": 81903076000
+    },
+    {
+     "year": 2013,
+     "date": "2013-06-30",
+     "total": 148617626000,
+     "state": 63660340000,
+     "local": 84957286000
+    },
+    {
+     "year": 2014,
+     "date": "2014-06-30",
+     "total": 149127420000,
+     "state": 65831516000,
+     "local": 83295904000
+    },
+    {
+     "year": 2015,
+     "date": "2015-06-30",
+     "total": 147788893000,
+     "state": 64212776000,
+     "local": 83576117000
+    },
+    {
+     "year": 2016,
+     "date": "2016-06-30",
+     "total": 151844994000,
+     "state": 65791900000,
+     "local": 86053094000
+    }
+   ],
+   "sources": [
+    {
+     "year": 1992,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1992, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1992/summary-tables/92sl14il.csv"
+    },
+    {
+     "year": 1993,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1993, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1993/summary-tables/9314il.csv"
+    },
+    {
+     "year": 1994,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1994, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1994/summary-tables/9414il.csv"
+    },
+    {
+     "year": 1995,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1995, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1995/summary-tables/9514il.csv"
+    },
+    {
+     "year": 1996,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1996, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1996/summary-tables/9614il.csv"
+    },
+    {
+     "year": 1997,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1997, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1997/summary-tables/97sl14il.csv"
+    },
+    {
+     "year": 1998,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1998, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1998/summary-tables/9814il.csv"
+    },
+    {
+     "year": 1999,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1999, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1999/summary-tables/9914il.csv"
+    },
+    {
+     "year": 2000,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2000, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2000/summary-tables/00sl14il.csv"
+    },
+    {
+     "year": 2002,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2002, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2002/summary-tables/02slsstab1a.xls"
+    },
+    {
+     "year": 2004,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2004, total debt outstanding",
+     "url": "https://www2.census.gov/govs/estimate/04slsstab1a.xls"
+    },
+    {
+     "year": 2005,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2005, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2005/summary-tables/05slsstab1a.xls"
+    },
+    {
+     "year": 2006,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2006, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2006/summary-tables/06slsstab1a.xls"
+    },
+    {
+     "year": 2007,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2007, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2007/summary-tables/07slsstab1a.xls"
+    },
+    {
+     "year": 2008,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2008, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2008/summary-tables/08slsstab1a.xls"
+    },
+    {
+     "year": 2009,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2009, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2009/summary-tables/09slsstab1a.xls"
+    },
+    {
+     "year": 2010,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2010, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2010/summary-tables/10slsstab1a.xls"
+    },
+    {
+     "year": 2011,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2011, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2011/summary-tables/11slsstab1a.xls"
+    },
+    {
+     "year": 2012,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2012, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2012/summary-tables/12slsstab1a.xlsx"
+    },
+    {
+     "year": 2013,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2013, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2013/summary-tables/13slsstab1a.xlsx"
+    },
+    {
+     "year": 2014,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2014, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2014/summary-tables/14slsstab1a.xlsx"
+    },
+    {
+     "year": 2015,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2015, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2015/summary-tables/15slsstab1a.xlsx"
+    },
+    {
+     "year": 2016,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2016, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2016/summary-tables/16slsstab1a.xlsx"
+    }
+   ],
+   "api_source": {
+    "name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017\u20132024",
+    "url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US17"
+   },
+   "api_download": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US17",
+   "release_page": "https://www.census.gov/programs-surveys/gov-finances/data/tables.html",
+   "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017\u20132024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables."
+  },
+  "new-jersey": {
+   "kind": "state",
+   "year_end_month": 6,
+   "rows": [
+    {
+     "year": 1992,
+     "date": "1992-06-30",
+     "total": 34943641000,
+     "state": 19786201000,
+     "local": 15157440000
+    },
+    {
+     "year": 1993,
+     "date": "1993-06-30",
+     "total": 37483749000,
+     "state": 21778675000,
+     "local": 15705074000
+    },
+    {
+     "year": 1994,
+     "date": "1994-06-30",
+     "total": 39349513000,
+     "state": 22894179000,
+     "local": 16455334000
+    },
+    {
+     "year": 1995,
+     "date": "1995-06-30",
+     "total": 39781043000,
+     "state": 24357951000,
+     "local": 15423092000
+    },
+    {
+     "year": 1996,
+     "date": "1996-06-30",
+     "total": 41629710000,
+     "state": 25601576000,
+     "local": 16028134000
+    },
+    {
+     "year": 1997,
+     "date": "1997-06-30",
+     "total": 43333895000,
+     "state": 26590636000,
+     "local": 16743259000
+    },
+    {
+     "year": 1998,
+     "date": "1998-06-30",
+     "total": 46560090000,
+     "state": 27213664000,
+     "local": 19346426000
+    },
+    {
+     "year": 1999,
+     "date": "1999-06-30",
+     "total": 47929532000,
+     "state": 27931901000,
+     "local": 19997631000
+    },
+    {
+     "year": 2000,
+     "date": "2000-06-30",
+     "total": 50314502000,
+     "state": 28938283000,
+     "local": 21376219000
+    },
+    {
+     "year": 2002,
+     "date": "2002-06-30",
+     "total": 57590436000,
+     "state": 32093133000,
+     "local": 25497303000
+    },
+    {
+     "year": 2004,
+     "date": "2004-06-30",
+     "total": 69142265000,
+     "state": 40640195000,
+     "local": 28502070000
+    },
+    {
+     "year": 2005,
+     "date": "2005-06-30",
+     "total": 72894132000,
+     "state": 42313155000,
+     "local": 30580977000
+    },
+    {
+     "year": 2006,
+     "date": "2006-06-30",
+     "total": 81681441000,
+     "state": 50201418000,
+     "local": 31480023000
+    },
+    {
+     "year": 2007,
+     "date": "2007-06-30",
+     "total": 85703402000,
+     "state": 51384806000,
+     "local": 34318596000
+    },
+    {
+     "year": 2008,
+     "date": "2008-06-30",
+     "total": 87969801000,
+     "state": 52785000000,
+     "local": 35184801000
+    },
+    {
+     "year": 2009,
+     "date": "2009-06-30",
+     "total": 92641575000,
+     "state": 56897866000,
+     "local": 35743709000
+    },
+    {
+     "year": 2010,
+     "date": "2010-06-30",
+     "total": 98062380000,
+     "state": 60968300000,
+     "local": 37094080000
+    },
+    {
+     "year": 2011,
+     "date": "2011-06-30",
+     "total": 102256654000,
+     "state": 64004651000,
+     "local": 38252003000
+    },
+    {
+     "year": 2012,
+     "date": "2012-06-30",
+     "total": 102999475000,
+     "state": 64851557000,
+     "local": 38147918000
+    },
+    {
+     "year": 2013,
+     "date": "2013-06-30",
+     "total": 99264183000,
+     "state": 64264050000,
+     "local": 35000133000
+    },
+    {
+     "year": 2014,
+     "date": "2014-06-30",
+     "total": 99366897000,
+     "state": 66089949000,
+     "local": 33276948000
+    },
+    {
+     "year": 2015,
+     "date": "2015-06-30",
+     "total": 100438603000,
+     "state": 67167455000,
+     "local": 33271148000
+    },
+    {
+     "year": 2016,
+     "date": "2016-06-30",
+     "total": 99139366000,
+     "state": 66731791000,
+     "local": 32407575000
+    }
+   ],
+   "sources": [
+    {
+     "year": 1992,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1992, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1992/summary-tables/92sl31nj.csv"
+    },
+    {
+     "year": 1993,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1993, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1993/summary-tables/9331nj.csv"
+    },
+    {
+     "year": 1994,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1994, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1994/summary-tables/9431nj.csv"
+    },
+    {
+     "year": 1995,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1995, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1995/summary-tables/9531nj.csv"
+    },
+    {
+     "year": 1996,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1996, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1996/summary-tables/9631nj.csv"
+    },
+    {
+     "year": 1997,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1997, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1997/summary-tables/97sl31nj.csv"
+    },
+    {
+     "year": 1998,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1998, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1998/summary-tables/9831nj.csv"
+    },
+    {
+     "year": 1999,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1999, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1999/summary-tables/9931nj.csv"
+    },
+    {
+     "year": 2000,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2000, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2000/summary-tables/00sl31nj.csv"
+    },
+    {
+     "year": 2002,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2002, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2002/summary-tables/02slsstab1b.xls"
+    },
+    {
+     "year": 2004,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2004, total debt outstanding",
+     "url": "https://www2.census.gov/govs/estimate/04slsstab1b.xls"
+    },
+    {
+     "year": 2005,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2005, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2005/summary-tables/05slsstab1b.xls"
+    },
+    {
+     "year": 2006,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2006, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2006/summary-tables/06slsstab1b.xls"
+    },
+    {
+     "year": 2007,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2007, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2007/summary-tables/07slsstab1b.xls"
+    },
+    {
+     "year": 2008,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2008, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2008/summary-tables/08slsstab1b.xls"
+    },
+    {
+     "year": 2009,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2009, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2009/summary-tables/09slsstab1b.xls"
+    },
+    {
+     "year": 2010,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2010, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2010/summary-tables/10slsstab1b.xls"
+    },
+    {
+     "year": 2011,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2011, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2011/summary-tables/11slsstab1b.xls"
+    },
+    {
+     "year": 2012,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2012, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2012/summary-tables/12slsstab1b.xlsx"
+    },
+    {
+     "year": 2013,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2013, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2013/summary-tables/13slsstab1b.xlsx"
+    },
+    {
+     "year": 2014,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2014, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2014/summary-tables/14slsstab1b.xlsx"
+    },
+    {
+     "year": 2015,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2015, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2015/summary-tables/15slsstab1b.xlsx"
+    },
+    {
+     "year": 2016,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2016, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2016/summary-tables/16slsstab1b.xlsx"
+    }
+   ],
+   "api_source": {
+    "name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017\u20132024",
+    "url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US34"
+   },
+   "api_download": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US34",
+   "release_page": "https://www.census.gov/programs-surveys/gov-finances/data/tables.html",
+   "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017\u20132024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables."
+  },
+  "massachusetts": {
+   "kind": "state",
+   "year_end_month": 6,
+   "rows": [
+    {
+     "year": 1992,
+     "date": "1992-06-30",
+     "total": 32898233000,
+     "state": 24008036000,
+     "local": 8890197000
+    },
+    {
+     "year": 1993,
+     "date": "1993-06-30",
+     "total": 34475120000,
+     "state": 25415253000,
+     "local": 9059867000
+    },
+    {
+     "year": 1994,
+     "date": "1994-06-30",
+     "total": 35898108000,
+     "state": 26680560000,
+     "local": 9217548000
+    },
+    {
+     "year": 1995,
+     "date": "1995-06-30",
+     "total": 38220813000,
+     "state": 27734128000,
+     "local": 10486685000
+    },
+    {
+     "year": 1996,
+     "date": "1996-06-30",
+     "total": 40634729000,
+     "state": 29294682000,
+     "local": 11340047000
+    },
+    {
+     "year": 1997,
+     "date": "1997-06-30",
+     "total": 41523138000,
+     "state": 29386049000,
+     "local": 12137089000
+    },
+    {
+     "year": 1998,
+     "date": "1998-06-30",
+     "total": 46319975000,
+     "state": 32833163000,
+     "local": 13486812000
+    },
+    {
+     "year": 1999,
+     "date": "1999-06-30",
+     "total": 50318928000,
+     "state": 35797930000,
+     "local": 14520998000
+    },
+    {
+     "year": 2000,
+     "date": "2000-06-30",
+     "total": 55163476000,
+     "state": 38961069000,
+     "local": 16202409000
+    },
+    {
+     "year": 2002,
+     "date": "2002-06-30",
+     "total": 65322342000,
+     "state": 45216090000,
+     "local": 20106252000
+    },
+    {
+     "year": 2004,
+     "date": "2004-06-30",
+     "total": 79080227000,
+     "state": 57163315000,
+     "local": 21916912000
+    },
+    {
+     "year": 2005,
+     "date": "2005-06-30",
+     "total": 82007935000,
+     "state": 60011937000,
+     "local": 21995998000
+    },
+    {
+     "year": 2006,
+     "date": "2006-06-30",
+     "total": 85434094000,
+     "state": 63804044000,
+     "local": 21630050000
+    },
+    {
+     "year": 2007,
+     "date": "2007-06-30",
+     "total": 89274827000,
+     "state": 68447547000,
+     "local": 20827280000
+    },
+    {
+     "year": 2008,
+     "date": "2008-06-30",
+     "total": 92716219000,
+     "state": 71892262000,
+     "local": 20823957000
+    },
+    {
+     "year": 2009,
+     "date": "2009-06-30",
+     "total": 97602578000,
+     "state": 74597901000,
+     "local": 23004677000
+    },
+    {
+     "year": 2010,
+     "date": "2010-06-30",
+     "total": 97438862000,
+     "state": 73939716000,
+     "local": 23499146000
+    },
+    {
+     "year": 2011,
+     "date": "2011-06-30",
+     "total": 98199750000,
+     "state": 79902558000,
+     "local": 18297192000
+    },
+    {
+     "year": 2012,
+     "date": "2012-06-30",
+     "total": 87008565000,
+     "state": 70606494000,
+     "local": 16402071000
+    },
+    {
+     "year": 2013,
+     "date": "2013-06-30",
+     "total": 89630567000,
+     "state": 70423629000,
+     "local": 19206938000
+    },
+    {
+     "year": 2014,
+     "date": "2014-06-30",
+     "total": 88962560000,
+     "state": 71823536000,
+     "local": 17139024000
+    },
+    {
+     "year": 2015,
+     "date": "2015-06-30",
+     "total": 90576701000,
+     "state": 72751021000,
+     "local": 17825680000
+    },
+    {
+     "year": 2016,
+     "date": "2016-06-30",
+     "total": 95752932000,
+     "state": 77692592000,
+     "local": 18060340000
+    }
+   ],
+   "sources": [
+    {
+     "year": 1992,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1992, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1992/summary-tables/92sl22ma.csv"
+    },
+    {
+     "year": 1993,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1993, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1993/summary-tables/9322ma.csv"
+    },
+    {
+     "year": 1994,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1994, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1994/summary-tables/9422ma.csv"
+    },
+    {
+     "year": 1995,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1995, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1995/summary-tables/9522ma.csv"
+    },
+    {
+     "year": 1996,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1996, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1996/summary-tables/9622ma.csv"
+    },
+    {
+     "year": 1997,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1997, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1997/summary-tables/97sl22ma.csv"
+    },
+    {
+     "year": 1998,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1998, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1998/summary-tables/9822ma.csv"
+    },
+    {
+     "year": 1999,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1999, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1999/summary-tables/9922ma.csv"
+    },
+    {
+     "year": 2000,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2000, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2000/summary-tables/00sl22ma.csv"
+    },
+    {
+     "year": 2002,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2002, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2002/summary-tables/02slsstab1a.xls"
+    },
+    {
+     "year": 2004,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2004, total debt outstanding",
+     "url": "https://www2.census.gov/govs/estimate/04slsstab1a.xls"
+    },
+    {
+     "year": 2005,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2005, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2005/summary-tables/05slsstab1a.xls"
+    },
+    {
+     "year": 2006,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2006, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2006/summary-tables/06slsstab1a.xls"
+    },
+    {
+     "year": 2007,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2007, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2007/summary-tables/07slsstab1a.xls"
+    },
+    {
+     "year": 2008,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2008, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2008/summary-tables/08slsstab1a.xls"
+    },
+    {
+     "year": 2009,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2009, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2009/summary-tables/09slsstab1a.xls"
+    },
+    {
+     "year": 2010,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2010, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2010/summary-tables/10slsstab1a.xls"
+    },
+    {
+     "year": 2011,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2011, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2011/summary-tables/11slsstab1a.xls"
+    },
+    {
+     "year": 2012,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2012, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2012/summary-tables/12slsstab1a.xlsx"
+    },
+    {
+     "year": 2013,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2013, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2013/summary-tables/13slsstab1a.xlsx"
+    },
+    {
+     "year": 2014,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2014, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2014/summary-tables/14slsstab1a.xlsx"
+    },
+    {
+     "year": 2015,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2015, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2015/summary-tables/15slsstab1a.xlsx"
+    },
+    {
+     "year": 2016,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2016, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2016/summary-tables/16slsstab1a.xlsx"
+    }
+   ],
+   "api_source": {
+    "name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017\u20132024",
+    "url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US25"
+   },
+   "api_download": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US25",
+   "release_page": "https://www.census.gov/programs-surveys/gov-finances/data/tables.html",
+   "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017\u20132024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables."
+  },
+  "pennsylvania": {
+   "kind": "state",
+   "year_end_month": 6,
+   "rows": [
+    {
+     "year": 1992,
+     "date": "1992-06-30",
+     "total": 48080008000,
+     "state": 12962120000,
+     "local": 35117888000
+    },
+    {
+     "year": 1993,
+     "date": "1993-06-30",
+     "total": 50992303000,
+     "state": 12989361000,
+     "local": 38002942000
+    },
+    {
+     "year": 1994,
+     "date": "1994-06-30",
+     "total": 55270314000,
+     "state": 13670944000,
+     "local": 41599370000
+    },
+    {
+     "year": 1995,
+     "date": "1995-06-30",
+     "total": 52833053000,
+     "state": 14294000000,
+     "local": 38539053000
+    },
+    {
+     "year": 1996,
+     "date": "1996-06-30",
+     "total": 58489945000,
+     "state": 15045892000,
+     "local": 43444053000
+    },
+    {
+     "year": 1997,
+     "date": "1997-06-30",
+     "total": 59873639000,
+     "state": 15367631000,
+     "local": 44506008000
+    },
+    {
+     "year": 1998,
+     "date": "1998-06-30",
+     "total": 61863361000,
+     "state": 16393928000,
+     "local": 45469433000
+    },
+    {
+     "year": 1999,
+     "date": "1999-06-30",
+     "total": 69464614000,
+     "state": 17658457000,
+     "local": 51806157000
+    },
+    {
+     "year": 2000,
+     "date": "2000-06-30",
+     "total": 73325038000,
+     "state": 18594981000,
+     "local": 54730056000
+    },
+    {
+     "year": 2002,
+     "date": "2002-06-30",
+     "total": 83809049000,
+     "state": 20982531000,
+     "local": 62826518000
+    },
+    {
+     "year": 2004,
+     "date": "2004-06-30",
+     "total": 96374062000,
+     "state": 25995752000,
+     "local": 70378310000
+    },
+    {
+     "year": 2005,
+     "date": "2005-06-30",
+     "total": 100473599000,
+     "state": 27573088000,
+     "local": 72900511000
+    },
+    {
+     "year": 2006,
+     "date": "2006-06-30",
+     "total": 106821500000,
+     "state": 32121487000,
+     "local": 74700013000
+    },
+    {
+     "year": 2007,
+     "date": "2007-06-30",
+     "total": 111215586000,
+     "state": 37078731000,
+     "local": 74136855000
+    },
+    {
+     "year": 2008,
+     "date": "2008-06-30",
+     "total": 119281352000,
+     "state": 40100004000,
+     "local": 79181348000
+    },
+    {
+     "year": 2009,
+     "date": "2009-06-30",
+     "total": 119303387000,
+     "state": 41924042000,
+     "local": 77379345000
+    },
+    {
+     "year": 2010,
+     "date": "2010-06-30",
+     "total": 123628628000,
+     "state": 44737622000,
+     "local": 78891006000
+    },
+    {
+     "year": 2011,
+     "date": "2011-06-30",
+     "total": 124861672000,
+     "state": 45267281000,
+     "local": 79594391000
+    },
+    {
+     "year": 2012,
+     "date": "2012-06-30",
+     "total": 127343725000,
+     "state": 46198646000,
+     "local": 81145079000
+    },
+    {
+     "year": 2013,
+     "date": "2013-06-30",
+     "total": 127868806000,
+     "state": 47020552000,
+     "local": 80848254000
+    },
+    {
+     "year": 2014,
+     "date": "2014-06-30",
+     "total": 124356045000,
+     "state": 47840058000,
+     "local": 76515987000
+    },
+    {
+     "year": 2015,
+     "date": "2015-06-30",
+     "total": 127795178000,
+     "state": 47920479000,
+     "local": 79874699000
+    },
+    {
+     "year": 2016,
+     "date": "2016-06-30",
+     "total": 126862125000,
+     "state": 47099314000,
+     "local": 79762811000
+    }
+   ],
+   "sources": [
+    {
+     "year": 1992,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1992, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1992/summary-tables/92sl39pa.csv"
+    },
+    {
+     "year": 1993,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1993, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1993/summary-tables/9339pa.csv"
+    },
+    {
+     "year": 1994,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1994, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1994/summary-tables/9439pa.csv"
+    },
+    {
+     "year": 1995,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1995, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1995/summary-tables/9539pa.csv"
+    },
+    {
+     "year": 1996,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1996, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1996/summary-tables/9639pa.csv"
+    },
+    {
+     "year": 1997,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1997, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1997/summary-tables/97sl39pa.csv"
+    },
+    {
+     "year": 1998,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1998, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1998/summary-tables/9839pa.csv"
+    },
+    {
+     "year": 1999,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1999, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1999/summary-tables/9939pa.csv"
+    },
+    {
+     "year": 2000,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2000, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2000/summary-tables/00sl39pa.csv"
+    },
+    {
+     "year": 2002,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2002, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2002/summary-tables/02slsstab1b.xls"
+    },
+    {
+     "year": 2004,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2004, total debt outstanding",
+     "url": "https://www2.census.gov/govs/estimate/04slsstab1b.xls"
+    },
+    {
+     "year": 2005,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2005, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2005/summary-tables/05slsstab1b.xls"
+    },
+    {
+     "year": 2006,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2006, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2006/summary-tables/06slsstab1b.xls"
+    },
+    {
+     "year": 2007,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2007, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2007/summary-tables/07slsstab1b.xls"
+    },
+    {
+     "year": 2008,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2008, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2008/summary-tables/08slsstab1b.xls"
+    },
+    {
+     "year": 2009,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2009, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2009/summary-tables/09slsstab1b.xls"
+    },
+    {
+     "year": 2010,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2010, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2010/summary-tables/10slsstab1b.xls"
+    },
+    {
+     "year": 2011,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2011, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2011/summary-tables/11slsstab1b.xls"
+    },
+    {
+     "year": 2012,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2012, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2012/summary-tables/12slsstab1b.xlsx"
+    },
+    {
+     "year": 2013,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2013, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2013/summary-tables/13slsstab1b.xlsx"
+    },
+    {
+     "year": 2014,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2014, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2014/summary-tables/14slsstab1b.xlsx"
+    },
+    {
+     "year": 2015,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2015, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2015/summary-tables/15slsstab1b.xlsx"
+    },
+    {
+     "year": 2016,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2016, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2016/summary-tables/16slsstab1b.xlsx"
+    }
+   ],
+   "api_source": {
+    "name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017\u20132024",
+    "url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US42"
+   },
+   "api_download": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US42",
+   "release_page": "https://www.census.gov/programs-surveys/gov-finances/data/tables.html",
+   "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017\u20132024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables."
+  },
+  "washington": {
+   "kind": "state",
+   "year_end_month": 6,
+   "rows": [
+    {
+     "year": 1992,
+     "date": "1992-06-30",
+     "total": 28021760000,
+     "state": 7191988000,
+     "local": 20829772000
+    },
+    {
+     "year": 1993,
+     "date": "1993-06-30",
+     "total": 29941531000,
+     "state": 7847752000,
+     "local": 22093779000
+    },
+    {
+     "year": 1994,
+     "date": "1994-06-30",
+     "total": 28761402000,
+     "state": 8265639000,
+     "local": 20495763000
+    },
+    {
+     "year": 1995,
+     "date": "1995-06-30",
+     "total": 33420668000,
+     "state": 8820118000,
+     "local": 24600550000
+    },
+    {
+     "year": 1996,
+     "date": "1996-06-30",
+     "total": 31769724000,
+     "state": 8991106000,
+     "local": 22778618000
+    },
+    {
+     "year": 1997,
+     "date": "1997-06-30",
+     "total": 33563827000,
+     "state": 9493472000,
+     "local": 24070355000
+    },
+    {
+     "year": 1998,
+     "date": "1998-06-30",
+     "total": 35005420000,
+     "state": 10289381000,
+     "local": 24716039000
+    },
+    {
+     "year": 1999,
+     "date": "1999-06-30",
+     "total": 37198360000,
+     "state": 11079735000,
+     "local": 26118625000
+    },
+    {
+     "year": 2000,
+     "date": "2000-06-30",
+     "total": 38697244000,
+     "state": 11734299000,
+     "local": 26962945000
+    },
+    {
+     "year": 2002,
+     "date": "2002-06-30",
+     "total": 45560550000,
+     "state": 13552176000,
+     "local": 32008374000
+    },
+    {
+     "year": 2004,
+     "date": "2004-06-30",
+     "total": 50370178000,
+     "state": 15773698000,
+     "local": 34596480000
+    },
+    {
+     "year": 2005,
+     "date": "2005-06-30",
+     "total": 53049067000,
+     "state": 17023263000,
+     "local": 36025804000
+    },
+    {
+     "year": 2006,
+     "date": "2006-06-30",
+     "total": 56655485000,
+     "state": 18329181000,
+     "local": 38326304000
+    },
+    {
+     "year": 2007,
+     "date": "2007-06-30",
+     "total": 61403640000,
+     "state": 21058558000,
+     "local": 40345082000
+    },
+    {
+     "year": 2008,
+     "date": "2008-06-30",
+     "total": 64574788000,
+     "state": 23524009000,
+     "local": 41050779000
+    },
+    {
+     "year": 2009,
+     "date": "2009-06-30",
+     "total": 66713369000,
+     "state": 24603219000,
+     "local": 42110150000
+    },
+    {
+     "year": 2010,
+     "date": "2010-06-30",
+     "total": 71124339000,
+     "state": 27522099000,
+     "local": 43602240000
+    },
+    {
+     "year": 2011,
+     "date": "2011-06-30",
+     "total": 74100934000,
+     "state": 28153562000,
+     "local": 45947372000
+    },
+    {
+     "year": 2012,
+     "date": "2012-06-30",
+     "total": 76172159000,
+     "state": 29090132000,
+     "local": 47082027000
+    },
+    {
+     "year": 2013,
+     "date": "2013-06-30",
+     "total": 77484903000,
+     "state": 30474333000,
+     "local": 47010570000
+    },
+    {
+     "year": 2014,
+     "date": "2014-06-30",
+     "total": 80311886000,
+     "state": 31601016000,
+     "local": 48710870000
+    },
+    {
+     "year": 2015,
+     "date": "2015-06-30",
+     "total": 81290718000,
+     "state": 32231967000,
+     "local": 49058751000
+    },
+    {
+     "year": 2016,
+     "date": "2016-06-30",
+     "total": 85663989000,
+     "state": 33051285000,
+     "local": 52612704000
+    }
+   ],
+   "sources": [
+    {
+     "year": 1992,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1992, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1992/summary-tables/92sl48wa.csv"
+    },
+    {
+     "year": 1993,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1993, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1993/summary-tables/9348wa.csv"
+    },
+    {
+     "year": 1994,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1994, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1994/summary-tables/9448wa.csv"
+    },
+    {
+     "year": 1995,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1995, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1995/summary-tables/9548wa.csv"
+    },
+    {
+     "year": 1996,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1996, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1996/summary-tables/9648wa.csv"
+    },
+    {
+     "year": 1997,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1997, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1997/summary-tables/97sl48wa.csv"
+    },
+    {
+     "year": 1998,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1998, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1998/summary-tables/9848wa.csv"
+    },
+    {
+     "year": 1999,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1999, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1999/summary-tables/9948wa.csv"
+    },
+    {
+     "year": 2000,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2000, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2000/summary-tables/00sl48wa.csv"
+    },
+    {
+     "year": 2002,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2002, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2002/summary-tables/02slsstab1b.xls"
+    },
+    {
+     "year": 2004,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2004, total debt outstanding",
+     "url": "https://www2.census.gov/govs/estimate/04slsstab1b.xls"
+    },
+    {
+     "year": 2005,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2005, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2005/summary-tables/05slsstab1b.xls"
+    },
+    {
+     "year": 2006,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2006, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2006/summary-tables/06slsstab1b.xls"
+    },
+    {
+     "year": 2007,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2007, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2007/summary-tables/07slsstab1b.xls"
+    },
+    {
+     "year": 2008,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2008, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2008/summary-tables/08slsstab1b.xls"
+    },
+    {
+     "year": 2009,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2009, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2009/summary-tables/09slsstab1b.xls"
+    },
+    {
+     "year": 2010,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2010, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2010/summary-tables/10slsstab1b.xls"
+    },
+    {
+     "year": 2011,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2011, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2011/summary-tables/11slsstab1b.xls"
+    },
+    {
+     "year": 2012,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2012, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2012/summary-tables/12slsstab1b.xlsx"
+    },
+    {
+     "year": 2013,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2013, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2013/summary-tables/13slsstab1b.xlsx"
+    },
+    {
+     "year": 2014,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2014, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2014/summary-tables/14slsstab1b.xlsx"
+    },
+    {
+     "year": 2015,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2015, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2015/summary-tables/15slsstab1b.xlsx"
+    },
+    {
+     "year": 2016,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2016, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2016/summary-tables/16slsstab1b.xlsx"
+    }
+   ],
+   "api_source": {
+    "name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017\u20132024",
+    "url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US53"
+   },
+   "api_download": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US53",
+   "release_page": "https://www.census.gov/programs-surveys/gov-finances/data/tables.html",
+   "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017\u20132024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables."
+  },
+  "ohio": {
+   "kind": "state",
+   "year_end_month": 6,
+   "rows": [
+    {
+     "year": 1992,
+     "date": "1992-06-30",
+     "total": 25984056000,
+     "state": 12193154000,
+     "local": 13790902000
+    },
+    {
+     "year": 1993,
+     "date": "1993-06-30",
+     "total": 26699835000,
+     "state": 12485771000,
+     "local": 14214064000
+    },
+    {
+     "year": 1994,
+     "date": "1994-06-30",
+     "total": 27484786000,
+     "state": 12117371000,
+     "local": 15367415000
+    },
+    {
+     "year": 1995,
+     "date": "1995-06-30",
+     "total": 28345787000,
+     "state": 12295305000,
+     "local": 16050482000
+    },
+    {
+     "year": 1996,
+     "date": "1996-06-30",
+     "total": 28954341000,
+     "state": 12627741000,
+     "local": 16326600000
+    },
+    {
+     "year": 1997,
+     "date": "1997-06-30",
+     "total": 31100882000,
+     "state": 13437403000,
+     "local": 17663479000
+    },
+    {
+     "year": 1998,
+     "date": "1998-06-30",
+     "total": 33948521000,
+     "state": 14182878000,
+     "local": 19765643000
+    },
+    {
+     "year": 1999,
+     "date": "1999-06-30",
+     "total": 36510355000,
+     "state": 14963046000,
+     "local": 21547309000
+    },
+    {
+     "year": 2000,
+     "date": "2000-06-30",
+     "total": 42086957000,
+     "state": 18087387000,
+     "local": 23999571000
+    },
+    {
+     "year": 2002,
+     "date": "2002-06-30",
+     "total": 51343613000,
+     "state": 20008613000,
+     "local": 31335000000
+    },
+    {
+     "year": 2004,
+     "date": "2004-06-30",
+     "total": 57555049000,
+     "state": 21840151000,
+     "local": 35714898000
+    },
+    {
+     "year": 2005,
+     "date": "2005-06-30",
+     "total": 60720269000,
+     "state": 23176721000,
+     "local": 37543548000
+    },
+    {
+     "year": 2006,
+     "date": "2006-06-30",
+     "total": 63675721000,
+     "state": 24713030000,
+     "local": 38962691000
+    },
+    {
+     "year": 2007,
+     "date": "2007-06-30",
+     "total": 66968321000,
+     "state": 26065238000,
+     "local": 40903083000
+    },
+    {
+     "year": 2008,
+     "date": "2008-06-30",
+     "total": 69907119000,
+     "state": 27306103000,
+     "local": 42601016000
+    },
+    {
+     "year": 2009,
+     "date": "2009-06-30",
+     "total": 75569436000,
+     "state": 29090503000,
+     "local": 46478933000
+    },
+    {
+     "year": 2010,
+     "date": "2010-06-30",
+     "total": 76716071000,
+     "state": 30003599000,
+     "local": 46712472000
+    },
+    {
+     "year": 2011,
+     "date": "2011-06-30",
+     "total": 79092513000,
+     "state": 32231133000,
+     "local": 46861380000
+    },
+    {
+     "year": 2012,
+     "date": "2012-06-30",
+     "total": 81520649000,
+     "state": 33602457000,
+     "local": 47918192000
+    },
+    {
+     "year": 2013,
+     "date": "2013-06-30",
+     "total": 83174396000,
+     "state": 33145736000,
+     "local": 50028660000
+    },
+    {
+     "year": 2014,
+     "date": "2014-06-30",
+     "total": 85182771000,
+     "state": 33662042000,
+     "local": 51520729000
+    },
+    {
+     "year": 2015,
+     "date": "2015-06-30",
+     "total": 85589105000,
+     "state": 33108954000,
+     "local": 52480151000
+    },
+    {
+     "year": 2016,
+     "date": "2016-06-30",
+     "total": 86001457000,
+     "state": 33164507000,
+     "local": 52836950000
+    }
+   ],
+   "sources": [
+    {
+     "year": 1992,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1992, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1992/summary-tables/92sl36oh.csv"
+    },
+    {
+     "year": 1993,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1993, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1993/summary-tables/9336oh.csv"
+    },
+    {
+     "year": 1994,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1994, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1994/summary-tables/9436oh.csv"
+    },
+    {
+     "year": 1995,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1995, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1995/summary-tables/9536oh.csv"
+    },
+    {
+     "year": 1996,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1996, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1996/summary-tables/9636oh.csv"
+    },
+    {
+     "year": 1997,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1997, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1997/summary-tables/97sl36oh.csv"
+    },
+    {
+     "year": 1998,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1998, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1998/summary-tables/9836oh.csv"
+    },
+    {
+     "year": 1999,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 1999, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/1999/summary-tables/9936oh.csv"
+    },
+    {
+     "year": 2000,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2000, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2000/summary-tables/00sl36oh.csv"
+    },
+    {
+     "year": 2002,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2002, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2002/summary-tables/02slsstab1b.xls"
+    },
+    {
+     "year": 2004,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2004, total debt outstanding",
+     "url": "https://www2.census.gov/govs/estimate/04slsstab1b.xls"
+    },
+    {
+     "year": 2005,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2005, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2005/summary-tables/05slsstab1b.xls"
+    },
+    {
+     "year": 2006,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2006, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2006/summary-tables/06slsstab1b.xls"
+    },
+    {
+     "year": 2007,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2007, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2007/summary-tables/07slsstab1b.xls"
+    },
+    {
+     "year": 2008,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2008, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2008/summary-tables/08slsstab1b.xls"
+    },
+    {
+     "year": 2009,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2009, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2009/summary-tables/09slsstab1b.xls"
+    },
+    {
+     "year": 2010,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2010, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2010/summary-tables/10slsstab1b.xls"
+    },
+    {
+     "year": 2011,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2011, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2011/summary-tables/11slsstab1b.xls"
+    },
+    {
+     "year": 2012,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2012, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2012/summary-tables/12slsstab1b.xlsx"
+    },
+    {
+     "year": 2013,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2013, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2013/summary-tables/13slsstab1b.xlsx"
+    },
+    {
+     "year": 2014,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2014, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2014/summary-tables/14slsstab1b.xlsx"
+    },
+    {
+     "year": 2015,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2015, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2015/summary-tables/15slsstab1b.xlsx"
+    },
+    {
+     "year": 2016,
+     "name": "US Census Bureau, State and Local Government Finances, survey year 2016, total debt outstanding",
+     "url": "https://www2.census.gov/programs-surveys/gov-finances/tables/2016/summary-tables/16slsstab1b.xlsx"
+    }
+   ],
+   "api_source": {
+    "name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017\u20132024",
+    "url": "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US39"
+   },
+   "api_download": "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US39",
+   "release_page": "https://www.census.gov/programs-surveys/gov-finances/data/tables.html",
+   "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017\u20132024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables."
+  },
+  "germany": {
+   "kind": "country",
+   "year_end_month": 12,
+   "points": [
+    {
+     "date": "2000-03-31",
+     "amount": 824397300000
+    },
+    {
+     "date": "2000-06-30",
+     "amount": 821235800000
+    },
+    {
+     "date": "2000-09-30",
+     "amount": 831673300000
+    },
+    {
+     "date": "2000-12-31",
+     "amount": 814963100000
+    },
+    {
+     "date": "2001-03-31",
+     "amount": 797398800000
+    },
+    {
+     "date": "2001-06-30",
+     "amount": 790159100000
+    },
+    {
+     "date": "2001-09-30",
+     "amount": 797565800000
+    },
+    {
+     "date": "2001-12-31",
+     "amount": 800273300000
+    },
+    {
+     "date": "2002-03-31",
+     "amount": 816303700000
+    },
+    {
+     "date": "2002-06-30",
+     "amount": 814518600000
+    },
+    {
+     "date": "2002-09-30",
+     "amount": 825360200000
+    },
+    {
+     "date": "2002-12-31",
+     "amount": 824380500000
+    },
+    {
+     "date": "2003-03-31",
+     "amount": 842095100000
+    },
+    {
+     "date": "2003-06-30",
+     "amount": 848690500000
+    },
+    {
+     "date": "2003-09-30",
+     "amount": 867756700000
+    },
+    {
+     "date": "2003-12-31",
+     "amount": 872290900000
+    },
+    {
+     "date": "2004-03-31",
+     "amount": 904506300000
+    },
+    {
+     "date": "2004-06-30",
+     "amount": 907022000000
+    },
+    {
+     "date": "2004-09-30",
+     "amount": 918122900000
+    },
+    {
+     "date": "2004-12-31",
+     "amount": 911943300000
+    },
+    {
+     "date": "2005-03-31",
+     "amount": 932907100000
+    },
+    {
+     "date": "2005-06-30",
+     "amount": 941816800000
+    },
+    {
+     "date": "2005-09-30",
+     "amount": 958171700000
+    },
+    {
+     "date": "2005-12-31",
+     "amount": 957536400000
+    },
+    {
+     "date": "2006-03-31",
+     "amount": 969544700000
+    },
+    {
+     "date": "2006-06-30",
+     "amount": 980470700000
+    },
+    {
+     "date": "2006-09-30",
+     "amount": 999120700000
+    },
+    {
+     "date": "2006-12-31",
+     "amount": 994743800000
+    },
+    {
+     "date": "2007-03-31",
+     "amount": 997047300000
+    },
+    {
+     "date": "2007-06-30",
+     "amount": 1018936800000
+    },
+    {
+     "date": "2007-09-30",
+     "amount": 1000005400000
+    },
+    {
+     "date": "2007-12-31",
+     "amount": 1000425500000
+    },
+    {
+     "date": "2008-03-31",
+     "amount": 1011177000000
+    },
+    {
+     "date": "2008-06-30",
+     "amount": 1018541600000
+    },
+    {
+     "date": "2008-09-30",
+     "amount": 1017259000000
+    },
+    {
+     "date": "2008-12-31",
+     "amount": 1031947900000
+    },
+    {
+     "date": "2009-03-31",
+     "amount": 1050432400000
+    },
+    {
+     "date": "2009-06-30",
+     "amount": 1096673200000
+    },
+    {
+     "date": "2009-09-30",
+     "amount": 1099405100000
+    },
+    {
+     "date": "2009-12-31",
+     "amount": 1098584400000
+    },
+    {
+     "date": "2010-03-31",
+     "amount": 1111357000000
+    },
+    {
+     "date": "2010-06-30",
+     "amount": 1121868300000
+    },
+    {
+     "date": "2010-09-30",
+     "amount": 1140931900000
+    },
+    {
+     "date": "2010-12-31",
+     "amount": 1349562700000
+    },
+    {
+     "date": "2011-03-31",
+     "amount": 1353166100000
+    },
+    {
+     "date": "2011-06-30",
+     "amount": 1357334100000
+    },
+    {
+     "date": "2011-09-30",
+     "amount": 1370031000000
+    },
+    {
+     "date": "2011-12-31",
+     "amount": 1359258900000
+    },
+    {
+     "date": "2012-03-31",
+     "amount": 1379754700000
+    },
+    {
+     "date": "2012-06-30",
+     "amount": 1408222700000
+    },
+    {
+     "date": "2012-09-30",
+     "amount": 1392096900000
+    },
+    {
+     "date": "2012-12-31",
+     "amount": 1402753400000
+    },
+    {
+     "date": "2013-03-31",
+     "amount": 1402845000000
+    },
+    {
+     "date": "2013-06-30",
+     "amount": 1409734900000
+    },
+    {
+     "date": "2013-09-30",
+     "amount": 1395664400000
+    },
+    {
+     "date": "2013-12-31",
+     "amount": 1405275800000
+    },
+    {
+     "date": "2014-03-31",
+     "amount": 1401776600000
+    },
+    {
+     "date": "2014-06-30",
+     "amount": 1409723100000
+    },
+    {
+     "date": "2014-09-30",
+     "amount": 1406258500000
+    },
+    {
+     "date": "2014-12-31",
+     "amount": 1411880300000
+    },
+    {
+     "date": "2015-03-31",
+     "amount": 1411333400000
+    },
+    {
+     "date": "2015-06-30",
+     "amount": 1393698200000
+    },
+    {
+     "date": "2015-09-30",
+     "amount": 1387907400000
+    },
+    {
+     "date": "2015-12-31",
+     "amount": 1385955800000
+    },
+    {
+     "date": "2016-03-31",
+     "amount": 1395869800000
+    },
+    {
+     "date": "2016-06-30",
+     "amount": 1404367100000
+    },
+    {
+     "date": "2016-09-30",
+     "amount": 1394342800000
+    },
+    {
+     "date": "2016-12-31",
+     "amount": 1380164600000
+    },
+    {
+     "date": "2017-03-31",
+     "amount": 1364146900000
+    },
+    {
+     "date": "2017-06-30",
+     "amount": 1366399500000
+    },
+    {
+     "date": "2017-09-30",
+     "amount": 1365621400000
+    },
+    {
+     "date": "2017-12-31",
+     "amount": 1363919500000
+    },
+    {
+     "date": "2018-03-31",
+     "amount": 1351436400000
+    },
+    {
+     "date": "2018-06-30",
+     "amount": 1343155600000
+    },
+    {
+     "date": "2018-09-30",
+     "amount": 1349512900000
+    },
+    {
+     "date": "2018-12-31",
+     "amount": 1337194200000
+    },
+    {
+     "date": "2019-03-31",
+     "amount": 1338997500000
+    },
+    {
+     "date": "2019-06-30",
+     "amount": 1335213100000
+    },
+    {
+     "date": "2019-09-30",
+     "amount": 1343263000000
+    },
+    {
+     "date": "2019-12-31",
+     "amount": 1315637300000
+    },
+    {
+     "date": "2020-03-31",
+     "amount": 1343832100000
+    },
+    {
+     "date": "2020-06-30",
+     "amount": 1490398700000
+    },
+    {
+     "date": "2020-09-30",
+     "amount": 1553721400000
+    },
+    {
+     "date": "2020-12-31",
+     "amount": 1530350600000
+    },
+    {
+     "date": "2021-03-31",
+     "amount": 1555980100000
+    },
+    {
+     "date": "2021-06-30",
+     "amount": 1606097300000
+    },
+    {
+     "date": "2021-09-30",
+     "amount": 1634030800000
+    },
+    {
+     "date": "2021-12-31",
+     "amount": 1683326500000
+    },
+    {
+     "date": "2022-03-31",
+     "amount": 1688210800000
+    },
+    {
+     "date": "2022-06-30",
+     "amount": 1727566300000
+    },
+    {
+     "date": "2022-09-30",
+     "amount": 1761267900000
+    },
+    {
+     "date": "2022-12-31",
+     "amount": 1780765500000
+    },
+    {
+     "date": "2023-03-31",
+     "amount": 1803733800000
+    },
+    {
+     "date": "2023-06-30",
+     "amount": 1811195000000
+    },
+    {
+     "date": "2023-09-30",
+     "amount": 1854480100000
+    },
+    {
+     "date": "2023-12-31",
+     "amount": 1857153200000
+    },
+    {
+     "date": "2024-03-31",
+     "amount": 1859875000000
+    },
+    {
+     "date": "2024-06-30",
+     "amount": 1851612100000
+    },
+    {
+     "date": "2024-09-30",
+     "amount": 1879060400000
+    },
+    {
+     "date": "2024-12-31",
+     "amount": 1893510200000
+    },
+    {
+     "date": "2025-03-31",
+     "amount": 1891240700000
+    },
+    {
+     "date": "2025-06-30",
+     "amount": 1924613700000
+    },
+    {
+     "date": "2025-09-30",
+     "amount": 1973270300000
+    },
+    {
+     "date": "2025-12-31",
+     "amount": 2000597900000
+    },
+    {
+     "date": "2026-03-31",
+     "amount": 2040674400000
+    },
+    {
+     "date": "2026-06-30",
+     "amount": 2054716500000
+    }
+   ],
+   "sources": [
+    {
+     "name": "Eurostat, Quarterly government debt (gov_10q_ggdebt), central government (S1311), Maastricht debt, million euro",
+     "url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table"
+    }
+   ]
+  },
+  "france": {
+   "kind": "country",
+   "year_end_month": 12,
+   "points": [
+    {
+     "date": "2000-03-31",
+     "amount": 734237900000
+    },
+    {
+     "date": "2000-06-30",
+     "amount": 744965700000
+    },
+    {
+     "date": "2000-09-30",
+     "amount": 749751500000
+    },
+    {
+     "date": "2000-12-31",
+     "amount": 761420300000
+    },
+    {
+     "date": "2001-03-31",
+     "amount": 756144900000
+    },
+    {
+     "date": "2001-06-30",
+     "amount": 779374300000
+    },
+    {
+     "date": "2001-09-30",
+     "amount": 787886000000
+    },
+    {
+     "date": "2001-12-31",
+     "amount": 791996500000
+    },
+    {
+     "date": "2002-03-31",
+     "amount": 809794500000
+    },
+    {
+     "date": "2002-06-30",
+     "amount": 839024400000
+    },
+    {
+     "date": "2002-09-30",
+     "amount": 842870400000
+    },
+    {
+     "date": "2002-12-31",
+     "amount": 857270400000
+    },
+    {
+     "date": "2003-03-31",
+     "amount": 882029800000
+    },
+    {
+     "date": "2003-06-30",
+     "amount": 917978200000
+    },
+    {
+     "date": "2003-09-30",
+     "amount": 924988000000
+    },
+    {
+     "date": "2003-12-31",
+     "amount": 924059600000
+    },
+    {
+     "date": "2004-03-31",
+     "amount": 938541000000
+    },
+    {
+     "date": "2004-06-30",
+     "amount": 962776700000
+    },
+    {
+     "date": "2004-09-30",
+     "amount": 966949300000
+    },
+    {
+     "date": "2004-12-31",
+     "amount": 964537900000
+    },
+    {
+     "date": "2005-03-31",
+     "amount": 979731600000
+    },
+    {
+     "date": "2005-06-30",
+     "amount": 994894400000
+    },
+    {
+     "date": "2005-09-30",
+     "amount": 998597400000
+    },
+    {
+     "date": "2005-12-31",
+     "amount": 1010756400000
+    },
+    {
+     "date": "2006-03-31",
+     "amount": 1013627600000
+    },
+    {
+     "date": "2006-06-30",
+     "amount": 1011930400000
+    },
+    {
+     "date": "2006-09-30",
+     "amount": 1018900100000
+    },
+    {
+     "date": "2006-12-31",
+     "amount": 1006790600000
+    },
+    {
+     "date": "2007-03-31",
+     "amount": 1026540000000
+    },
+    {
+     "date": "2007-06-30",
+     "amount": 1056836400000
+    },
+    {
+     "date": "2007-09-30",
+     "amount": 1056498900000
+    },
+    {
+     "date": "2007-12-31",
+     "amount": 1055978400000
+    },
+    {
+     "date": "2008-03-31",
+     "amount": 1079083300000
+    },
+    {
+     "date": "2008-06-30",
+     "amount": 1093031000000
+    },
+    {
+     "date": "2008-09-30",
+     "amount": 1104581500000
+    },
+    {
+     "date": "2008-12-31",
+     "amount": 1161523600000
+    },
+    {
+     "date": "2009-03-31",
+     "amount": 1229324100000
+    },
+    {
+     "date": "2009-06-30",
+     "amount": 1312841500000
+    },
+    {
+     "date": "2009-09-30",
+     "amount": 1346113700000
+    },
+    {
+     "date": "2009-12-31",
+     "amount": 1363764500000
+    },
+    {
+     "date": "2010-03-31",
+     "amount": 1397617600000
+    },
+    {
+     "date": "2010-06-30",
+     "amount": 1443533300000
+    },
+    {
+     "date": "2010-09-30",
+     "amount": 1425757200000
+    },
+    {
+     "date": "2010-12-31",
+     "amount": 1432590500000
+    },
+    {
+     "date": "2011-03-31",
+     "amount": 1455430100000
+    },
+    {
+     "date": "2011-06-30",
+     "amount": 1507888200000
+    },
+    {
+     "date": "2011-09-30",
+     "amount": 1501036400000
+    },
+    {
+     "date": "2011-12-31",
+     "amount": 1514643800000
+    },
+    {
+     "date": "2012-03-31",
+     "amount": 1539875100000
+    },
+    {
+     "date": "2012-06-30",
+     "amount": 1586193300000
+    },
+    {
+     "date": "2012-09-30",
+     "amount": 1570908700000
+    },
+    {
+     "date": "2012-12-31",
+     "amount": 1598209900000
+    },
+    {
+     "date": "2013-03-31",
+     "amount": 1626488900000
+    },
+    {
+     "date": "2013-06-30",
+     "amount": 1670858800000
+    },
+    {
+     "date": "2013-09-30",
+     "amount": 1662476200000
+    },
+    {
+     "date": "2013-12-31",
+     "amount": 1675081500000
+    },
+    {
+     "date": "2014-03-31",
+     "amount": 1706716100000
+    },
+    {
+     "date": "2014-06-30",
+     "amount": 1727108200000
+    },
+    {
+     "date": "2014-09-30",
+     "amount": 1721356100000
+    },
+    {
+     "date": "2014-12-31",
+     "amount": 1725897500000
+    },
+    {
+     "date": "2015-03-31",
+     "amount": 1759178900000
+    },
+    {
+     "date": "2015-06-30",
+     "amount": 1784325800000
+    },
+    {
+     "date": "2015-09-30",
+     "amount": 1787129300000
+    },
+    {
+     "date": "2015-12-31",
+     "amount": 1782562200000
+    },
+    {
+     "date": "2016-03-31",
+     "amount": 1824053800000
+    },
+    {
+     "date": "2016-06-30",
+     "amount": 1851676900000
+    },
+    {
+     "date": "2016-09-30",
+     "amount": 1848618100000
+    },
+    {
+     "date": "2016-12-31",
+     "amount": 1831745000000
+    },
+    {
+     "date": "2017-03-31",
+     "amount": 1880619800000
+    },
+    {
+     "date": "2017-06-30",
+     "amount": 1913779900000
+    },
+    {
+     "date": "2017-09-30",
+     "amount": 1926056500000
+    },
+    {
+     "date": "2017-12-31",
+     "amount": 1908786200000
+    },
+    {
+     "date": "2018-03-31",
+     "amount": 1946192900000
+    },
+    {
+     "date": "2018-06-30",
+     "amount": 1964638700000
+    },
+    {
+     "date": "2018-09-30",
+     "amount": 2001607300000
+    },
+    {
+     "date": "2018-12-31",
+     "amount": 1985549400000
+    },
+    {
+     "date": "2019-03-31",
+     "amount": 2026514400000
+    },
+    {
+     "date": "2019-06-30",
+     "amount": 2048827600000
+    },
+    {
+     "date": "2019-09-30",
+     "amount": 2093471100000
+    },
+    {
+     "date": "2019-12-31",
+     "amount": 2062946900000
+    },
+    {
+     "date": "2020-03-31",
+     "amount": 2113590700000
+    },
+    {
+     "date": "2020-06-30",
+     "amount": 2239000300000
+    },
+    {
+     "date": "2020-09-30",
+     "amount": 2273957000000
+    },
+    {
+     "date": "2020-12-31",
+     "amount": 2263958000000
+    },
+    {
+     "date": "2021-03-31",
+     "amount": 2332831000000
+    },
+    {
+     "date": "2021-06-30",
+     "amount": 2357691900000
+    },
+    {
+     "date": "2021-09-30",
+     "amount": 2425766100000
+    },
+    {
+     "date": "2021-12-31",
+     "amount": 2424458800000
+    },
+    {
+     "date": "2022-03-31",
+     "amount": 2486722600000
+    },
+    {
+     "date": "2022-06-30",
+     "amount": 2509818100000
+    },
+    {
+     "date": "2022-09-30",
+     "amount": 2547563400000
+    },
+    {
+     "date": "2022-12-31",
+     "amount": 2552724100000
+    },
+    {
+     "date": "2023-03-31",
+     "amount": 2599863500000
+    },
+    {
+     "date": "2023-06-30",
+     "amount": 2646106000000
+    },
+    {
+     "date": "2023-09-30",
+     "amount": 2692772800000
+    },
+    {
+     "date": "2023-12-31",
+     "amount": 2693359400000
+    },
+    {
+     "date": "2024-03-31",
+     "amount": 2734216000000
+    },
+    {
+     "date": "2024-06-30",
+     "amount": 2799717400000
+    },
+    {
+     "date": "2024-09-30",
+     "amount": 2861676200000
+    },
+    {
+     "date": "2024-12-31",
+     "amount": 2857681100000
+    },
+    {
+     "date": "2025-03-31",
+     "amount": 2894084300000
+    },
+    {
+     "date": "2025-06-30",
+     "amount": 2955358000000
+    },
+    {
+     "date": "2025-09-30",
+     "amount": 3018698000000
+    },
+    {
+     "date": "2025-12-31",
+     "amount": 2987048800000
+    },
+    {
+     "date": "2026-03-31",
+     "amount": 3053318300000
+    },
+    {
+     "date": "2026-06-30",
+     "amount": 3112560000000
+    }
+   ],
+   "sources": [
+    {
+     "name": "Eurostat, Quarterly government debt (gov_10q_ggdebt), central government (S1311), Maastricht debt, million euro",
+     "url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table"
+    }
+   ]
+  },
+  "italy": {
+   "kind": "country",
+   "year_end_month": 12,
+   "points": [
+    {
+     "date": "2000-03-31",
+     "amount": 1312963100000
+    },
+    {
+     "date": "2000-06-30",
+     "amount": 1329887500000
+    },
+    {
+     "date": "2000-09-30",
+     "amount": 1331588800000
+    },
+    {
+     "date": "2000-12-31",
+     "amount": 1315341200000
+    },
+    {
+     "date": "2001-03-31",
+     "amount": 1349463900000
+    },
+    {
+     "date": "2001-06-30",
+     "amount": 1369682800000
+    },
+    {
+     "date": "2001-09-30",
+     "amount": 1362457300000
+    },
+    {
+     "date": "2001-12-31",
+     "amount": 1377184600000
+    },
+    {
+     "date": "2002-03-31",
+     "amount": 1417596000000
+    },
+    {
+     "date": "2002-06-30",
+     "amount": 1424268800000
+    },
+    {
+     "date": "2002-09-30",
+     "amount": 1427119900000
+    },
+    {
+     "date": "2002-12-31",
+     "amount": 1392819800000
+    },
+    {
+     "date": "2003-03-31",
+     "amount": 1429354800000
+    },
+    {
+     "date": "2003-06-30",
+     "amount": 1445267000000
+    },
+    {
+     "date": "2003-09-30",
+     "amount": 1464804800000
+    },
+    {
+     "date": "2003-12-31",
+     "amount": 1411297300000
+    },
+    {
+     "date": "2004-03-31",
+     "amount": 1463420600000
+    },
+    {
+     "date": "2004-06-30",
+     "amount": 1504150200000
+    },
+    {
+     "date": "2004-09-30",
+     "amount": 1508668300000
+    },
+    {
+     "date": "2004-12-31",
+     "amount": 1461781200000
+    },
+    {
+     "date": "2005-03-31",
+     "amount": 1522205300000
+    },
+    {
+     "date": "2005-06-30",
+     "amount": 1562907500000
+    },
+    {
+     "date": "2005-09-30",
+     "amount": 1547307600000
+    },
+    {
+     "date": "2005-12-31",
+     "amount": 1516521600000
+    },
+    {
+     "date": "2006-03-31",
+     "amount": 1564040400000
+    },
+    {
+     "date": "2006-06-30",
+     "amount": 1593922100000
+    },
+    {
+     "date": "2006-09-30",
+     "amount": 1590629900000
+    },
+    {
+     "date": "2006-12-31",
+     "amount": 1564676200000
+    },
+    {
+     "date": "2007-03-31",
+     "amount": 1591017300000
+    },
+    {
+     "date": "2007-06-30",
+     "amount": 1605784800000
+    },
+    {
+     "date": "2007-09-30",
+     "amount": 1603184900000
+    },
+    {
+     "date": "2007-12-31",
+     "amount": 1579755600000
+    },
+    {
+     "date": "2008-03-31",
+     "amount": 1630251400000
+    },
+    {
+     "date": "2008-06-30",
+     "amount": 1631501400000
+    },
+    {
+     "date": "2008-09-30",
+     "amount": 1629845300000
+    },
+    {
+     "date": "2008-12-31",
+     "amount": 1644874500000
+    },
+    {
+     "date": "2009-03-31",
+     "amount": 1721507100000
+    },
+    {
+     "date": "2009-06-30",
+     "amount": 1734031000000
+    },
+    {
+     "date": "2009-09-30",
+     "amount": 1759211600000
+    },
+    {
+     "date": "2009-12-31",
+     "amount": 1732265500000
+    },
+    {
+     "date": "2010-03-31",
+     "amount": 1767630700000
+    },
+    {
+     "date": "2010-06-30",
+     "amount": 1792686100000
+    },
+    {
+     "date": "2010-09-30",
+     "amount": 1812103800000
+    },
+    {
+     "date": "2010-12-31",
+     "amount": 1812984300000
+    },
+    {
+     "date": "2011-03-31",
+     "amount": 1834804100000
+    },
+    {
+     "date": "2011-06-30",
+     "amount": 1867706200000
+    },
+    {
+     "date": "2011-09-30",
+     "amount": 1850210900000
+    },
+    {
+     "date": "2011-12-31",
+     "amount": 1867054200000
+    },
+    {
+     "date": "2012-03-31",
+     "amount": 1915462000000
+    },
+    {
+     "date": "2012-06-30",
+     "amount": 1943732800000
+    },
+    {
+     "date": "2012-09-30",
+     "amount": 1958340600000
+    },
+    {
+     "date": "2012-12-31",
+     "amount": 1950679000000
+    },
+    {
+     "date": "2013-03-31",
+     "amount": 1996261400000
+    },
+    {
+     "date": "2013-06-30",
+     "amount": 2038960600000
+    },
+    {
+     "date": "2013-09-30",
+     "amount": 2035630000000
+    },
+    {
+     "date": "2013-12-31",
+     "amount": 2038838700000
+    },
+    {
+     "date": "2014-03-31",
+     "amount": 2089965400000
+    },
+    {
+     "date": "2014-06-30",
+     "amount": 2143042900000
+    },
+    {
+     "date": "2014-09-30",
+     "amount": 2110271200000
+    },
+    {
+     "date": "2014-12-31",
+     "amount": 2114447200000
+    },
+    {
+     "date": "2015-03-31",
+     "amount": 2163085300000
+    },
+    {
+     "date": "2015-06-30",
+     "amount": 2185285000000
+    },
+    {
+     "date": "2015-09-30",
+     "amount": 2174820900000
+    },
+    {
+     "date": "2015-12-31",
+     "amount": 2154799500000
+    },
+    {
+     "date": "2016-03-31",
+     "amount": 2213282400000
+    },
+    {
+     "date": "2016-06-30",
+     "amount": 2236250800000
+    },
+    {
+     "date": "2016-09-30",
+     "amount": 2199261900000
+    },
+    {
+     "date": "2016-12-31",
+     "amount": 2205379900000
+    },
+    {
+     "date": "2017-03-31",
+     "amount": 2246662400000
+    },
+    {
+     "date": "2017-06-30",
+     "amount": 2277945500000
+    },
+    {
+     "date": "2017-09-30",
+     "amount": 2281587800000
+    },
+    {
+     "date": "2017-12-31",
+     "amount": 2252803100000
+    },
+    {
+     "date": "2018-03-31",
+     "amount": 2291525900000
+    },
+    {
+     "date": "2018-06-30",
+     "amount": 2312906000000
+    },
+    {
+     "date": "2018-09-30",
+     "amount": 2323287700000
+    },
+    {
+     "date": "2018-12-31",
+     "amount": 2307885600000
+    },
+    {
+     "date": "2019-03-31",
+     "amount": 2343861000000
+    },
+    {
+     "date": "2019-06-30",
+     "amount": 2371956500000
+    },
+    {
+     "date": "2019-09-30",
+     "amount": 2368490600000
+    },
+    {
+     "date": "2019-12-31",
+     "amount": 2339624300000
+    },
+    {
+     "date": "2020-03-31",
+     "amount": 2363746300000
+    },
+    {
+     "date": "2020-06-30",
+     "amount": 2460377700000
+    },
+    {
+     "date": "2020-09-30",
+     "amount": 2514272700000
+    },
+    {
+     "date": "2020-12-31",
+     "amount": 2503771300000
+    },
+    {
+     "date": "2021-03-31",
+     "amount": 2583248900000
+    },
+    {
+     "date": "2021-06-30",
+     "amount": 2624668800000
+    },
+    {
+     "date": "2021-09-30",
+     "amount": 2637210300000
+    },
+    {
+     "date": "2021-12-31",
+     "amount": 2609272200000
+    },
+    {
+     "date": "2022-03-31",
+     "amount": 2686984400000
+    },
+    {
+     "date": "2022-06-30",
+     "amount": 2701551600000
+    },
+    {
+     "date": "2022-09-30",
+     "amount": 2670975200000
+    },
+    {
+     "date": "2022-12-31",
+     "amount": 2690479000000
+    },
+    {
+     "date": "2023-03-31",
+     "amount": 2724737100000
+    },
+    {
+     "date": "2023-06-30",
+     "amount": 2783365300000
+    },
+    {
+     "date": "2023-09-30",
+     "amount": 2779916400000
+    },
+    {
+     "date": "2023-12-31",
+     "amount": 2803944300000
+    },
+    {
+     "date": "2024-03-31",
+     "amount": 2835692000000
+    },
+    {
+     "date": "2024-06-30",
+     "amount": 2889710900000
+    },
+    {
+     "date": "2024-09-30",
+     "amount": 2899016100000
+    },
+    {
+     "date": "2024-12-31",
+     "amount": 2905265400000
+    },
+    {
+     "date": "2025-03-31",
+     "amount": 2972420600000
+    },
+    {
+     "date": "2025-06-30",
+     "amount": 3011769000000
+    },
+    {
+     "date": "2025-09-30",
+     "amount": 3021633800000
+    },
+    {
+     "date": "2025-12-31",
+     "amount": 3039281600000
+    },
+    {
+     "date": "2026-03-31",
+     "amount": 3107124200000
+    },
+    {
+     "date": "2026-06-30",
+     "amount": 3157200800000
+    }
+   ],
+   "sources": [
+    {
+     "name": "Eurostat, Quarterly government debt (gov_10q_ggdebt), central government (S1311), Maastricht debt, million euro",
+     "url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table"
+    }
+   ]
+  },
+  "united-kingdom": {
+   "kind": "country",
+   "year_end_month": 3,
+   "points": [
+    {
+     "date": "1975-03-31",
+     "amount": 53670000000
+    },
+    {
+     "date": "1976-03-31",
+     "amount": 65638000000
+    },
+    {
+     "date": "1977-03-31",
+     "amount": 75991000000
+    },
+    {
+     "date": "1978-03-31",
+     "amount": 86357000000
+    },
+    {
+     "date": "1979-03-31",
+     "amount": 96731000000
+    },
+    {
+     "date": "1980-03-31",
+     "amount": 107499000000
+    },
+    {
+     "date": "1981-03-31",
+     "amount": 126222000000
+    },
+    {
+     "date": "1982-03-31",
+     "amount": 133648000000
+    },
+    {
+     "date": "1983-03-31",
+     "amount": 142889000000
+    },
+    {
+     "date": "1984-03-31",
+     "amount": 155148000000
+    },
+    {
+     "date": "1985-03-31",
+     "amount": 166482000000
+    },
+    {
+     "date": "1986-03-31",
+     "amount": 179283000000
+    },
+    {
+     "date": "1987-03-31",
+     "amount": 190684000000
+    },
+    {
+     "date": "1988-03-31",
+     "amount": 200915000000
+    },
+    {
+     "date": "1989-03-31",
+     "amount": 195244000000
+    },
+    {
+     "date": "1990-03-31",
+     "amount": 186658000000
+    },
+    {
+     "date": "1991-03-31",
+     "amount": 188319000000
+    },
+    {
+     "date": "1992-03-31",
+     "amount": 204683000000
+    },
+    {
+     "date": "1993-03-31",
+     "amount": 248646000000
+    },
+    {
+     "date": "1994-03-31",
+     "amount": 298715000000
+    },
+    {
+     "date": "1995-03-31",
+     "amount": 339931000000
+    },
+    {
+     "date": "1996-03-31",
+     "amount": 377355000000
+    },
+    {
+     "date": "1997-03-31",
+     "amount": 408366000000
+    },
+    {
+     "date": "1997-04-30",
+     "amount": 408913000000
+    },
+    {
+     "date": "1997-05-31",
+     "amount": 414289000000
+    },
+    {
+     "date": "1997-06-30",
+     "amount": 419303000000
+    },
+    {
+     "date": "1997-07-31",
+     "amount": 416579000000
+    },
+    {
+     "date": "1997-08-31",
+     "amount": 419379000000
+    },
+    {
+     "date": "1997-09-30",
+     "amount": 422726000000
+    },
+    {
+     "date": "1997-10-31",
+     "amount": 415383000000
+    },
+    {
+     "date": "1997-11-30",
+     "amount": 419507000000
+    },
+    {
+     "date": "1997-12-31",
+     "amount": 420757000000
+    },
+    {
+     "date": "1998-01-31",
+     "amount": 409748000000
+    },
+    {
+     "date": "1998-02-28",
+     "amount": 407088000000
+    },
+    {
+     "date": "1998-03-31",
+     "amount": 412278000000
+    },
+    {
+     "date": "1998-04-30",
+     "amount": 410615000000
+    },
+    {
+     "date": "1998-05-31",
+     "amount": 413584000000
+    },
+    {
+     "date": "1998-06-30",
+     "amount": 420034000000
+    },
+    {
+     "date": "1998-07-31",
+     "amount": 417065000000
+    },
+    {
+     "date": "1998-08-31",
+     "amount": 417889000000
+    },
+    {
+     "date": "1998-09-30",
+     "amount": 420576000000
+    },
+    {
+     "date": "1998-10-31",
+     "amount": 413079000000
+    },
+    {
+     "date": "1998-11-30",
+     "amount": 415765000000
+    },
+    {
+     "date": "1998-12-31",
+     "amount": 419066000000
+    },
+    {
+     "date": "1999-01-31",
+     "amount": 408196000000
+    },
+    {
+     "date": "1999-02-28",
+     "amount": 408446000000
+    },
+    {
+     "date": "1999-03-31",
+     "amount": 415121000000
+    },
+    {
+     "date": "1999-04-30",
+     "amount": 412219000000
+    },
+    {
+     "date": "1999-05-31",
+     "amount": 413332000000
+    },
+    {
+     "date": "1999-06-30",
+     "amount": 419038000000
+    },
+    {
+     "date": "1999-07-31",
+     "amount": 413600000000
+    },
+    {
+     "date": "1999-08-31",
+     "amount": 413553000000
+    },
+    {
+     "date": "1999-09-30",
+     "amount": 414481000000
+    },
+    {
+     "date": "1999-10-31",
+     "amount": 405352000000
+    },
+    {
+     "date": "1999-11-30",
+     "amount": 407851000000
+    },
+    {
+     "date": "1999-12-31",
+     "amount": 421574000000
+    },
+    {
+     "date": "2000-01-31",
+     "amount": 402460000000
+    },
+    {
+     "date": "2000-02-29",
+     "amount": 398875000000
+    },
+    {
+     "date": "2000-03-31",
+     "amount": 408327000000
+    },
+    {
+     "date": "2000-04-30",
+     "amount": 408988000000
+    },
+    {
+     "date": "2000-05-31",
+     "amount": 407767000000
+    },
+    {
+     "date": "2000-06-30",
+     "amount": 415499000000
+    },
+    {
+     "date": "2000-07-31",
+     "amount": 412281000000
+    },
+    {
+     "date": "2000-08-31",
+     "amount": 418079000000
+    },
+    {
+     "date": "2000-09-30",
+     "amount": 407470000000
+    },
+    {
+     "date": "2000-10-31",
+     "amount": 406034000000
+    },
+    {
+     "date": "2000-11-30",
+     "amount": 414302000000
+    },
+    {
+     "date": "2000-12-31",
+     "amount": 414826000000
+    },
+    {
+     "date": "2001-01-31",
+     "amount": 403432000000
+    },
+    {
+     "date": "2001-02-28",
+     "amount": 396218000000
+    },
+    {
+     "date": "2001-03-31",
+     "amount": 398365000000
+    },
+    {
+     "date": "2001-04-30",
+     "amount": 395558000000
+    },
+    {
+     "date": "2001-05-31",
+     "amount": 397743000000
+    },
+    {
+     "date": "2001-06-30",
+     "amount": 402239000000
+    },
+    {
+     "date": "2001-07-31",
+     "amount": 397327000000
+    },
+    {
+     "date": "2001-08-31",
+     "amount": 397398000000
+    },
+    {
+     "date": "2001-09-30",
+     "amount": 396623000000
+    },
+    {
+     "date": "2001-10-31",
+     "amount": 395763000000
+    },
+    {
+     "date": "2001-11-30",
+     "amount": 394438000000
+    },
+    {
+     "date": "2001-12-31",
+     "amount": 400663000000
+    },
+    {
+     "date": "2002-01-31",
+     "amount": 397679000000
+    },
+    {
+     "date": "2002-02-28",
+     "amount": 394663000000
+    },
+    {
+     "date": "2002-03-31",
+     "amount": 397654000000
+    },
+    {
+     "date": "2002-04-30",
+     "amount": 398493000000
+    },
+    {
+     "date": "2002-05-31",
+     "amount": 403830000000
+    },
+    {
+     "date": "2002-06-30",
+     "amount": 407825000000
+    },
+    {
+     "date": "2002-07-31",
+     "amount": 405520000000
+    },
+    {
+     "date": "2002-08-31",
+     "amount": 402283000000
+    },
+    {
+     "date": "2002-09-30",
+     "amount": 410543000000
+    },
+    {
+     "date": "2002-10-31",
+     "amount": 411532000000
+    },
+    {
+     "date": "2002-11-30",
+     "amount": 413173000000
+    },
+    {
+     "date": "2002-12-31",
+     "amount": 422180000000
+    },
+    {
+     "date": "2003-01-31",
+     "amount": 415855000000
+    },
+    {
+     "date": "2003-02-28",
+     "amount": 415075000000
+    },
+    {
+     "date": "2003-03-31",
+     "amount": 422005000000
+    },
+    {
+     "date": "2003-04-30",
+     "amount": 421467000000
+    },
+    {
+     "date": "2003-05-31",
+     "amount": 427708000000
+    },
+    {
+     "date": "2003-06-30",
+     "amount": 433154000000
+    },
+    {
+     "date": "2003-07-31",
+     "amount": 436837000000
+    },
+    {
+     "date": "2003-08-31",
+     "amount": 437387000000
+    },
+    {
+     "date": "2003-09-30",
+     "amount": 445427000000
+    },
+    {
+     "date": "2003-10-31",
+     "amount": 452118000000
+    },
+    {
+     "date": "2003-11-30",
+     "amount": 461594000000
+    },
+    {
+     "date": "2003-12-31",
+     "amount": 462610000000
+    },
+    {
+     "date": "2004-01-31",
+     "amount": 461645000000
+    },
+    {
+     "date": "2004-02-29",
+     "amount": 461846000000
+    },
+    {
+     "date": "2004-03-31",
+     "amount": 467675000000
+    },
+    {
+     "date": "2004-04-30",
+     "amount": 478751000000
+    },
+    {
+     "date": "2004-05-31",
+     "amount": 486097000000
+    },
+    {
+     "date": "2004-06-30",
+     "amount": 493249000000
+    },
+    {
+     "date": "2004-07-31",
+     "amount": 491247000000
+    },
+    {
+     "date": "2004-08-31",
+     "amount": 492199000000
+    },
+    {
+     "date": "2004-09-30",
+     "amount": 500957000000
+    },
+    {
+     "date": "2004-10-31",
+     "amount": 502076000000
+    },
+    {
+     "date": "2004-11-30",
+     "amount": 511387000000
+    },
+    {
+     "date": "2004-12-31",
+     "amount": 526430000000
+    },
+    {
+     "date": "2005-01-31",
+     "amount": 520356000000
+    },
+    {
+     "date": "2005-02-28",
+     "amount": 519319000000
+    },
+    {
+     "date": "2005-03-31",
+     "amount": 525618000000
+    },
+    {
+     "date": "2005-04-30",
+     "amount": 525411000000
+    },
+    {
+     "date": "2005-05-31",
+     "amount": 533899000000
+    },
+    {
+     "date": "2005-06-30",
+     "amount": 545145000000
+    },
+    {
+     "date": "2005-07-31",
+     "amount": 541014000000
+    },
+    {
+     "date": "2005-08-31",
+     "amount": 543997000000
+    },
+    {
+     "date": "2005-09-30",
+     "amount": 556673000000
+    },
+    {
+     "date": "2005-10-31",
+     "amount": 562068000000
+    },
+    {
+     "date": "2005-11-30",
+     "amount": 568246000000
+    },
+    {
+     "date": "2005-12-31",
+     "amount": 573493000000
+    },
+    {
+     "date": "2006-01-31",
+     "amount": 567874000000
+    },
+    {
+     "date": "2006-02-28",
+     "amount": 565535000000
+    },
+    {
+     "date": "2006-03-31",
+     "amount": 574744000000
+    },
+    {
+     "date": "2006-04-30",
+     "amount": 578154000000
+    },
+    {
+     "date": "2006-05-31",
+     "amount": 590385000000
+    },
+    {
+     "date": "2006-06-30",
+     "amount": 597446000000
+    },
+    {
+     "date": "2006-07-31",
+     "amount": 592276000000
+    },
+    {
+     "date": "2006-08-31",
+     "amount": 594416000000
+    },
+    {
+     "date": "2006-09-30",
+     "amount": 606328000000
+    },
+    {
+     "date": "2006-10-31",
+     "amount": 607433000000
+    },
+    {
+     "date": "2006-11-30",
+     "amount": 615996000000
+    },
+    {
+     "date": "2006-12-31",
+     "amount": 619114000000
+    },
+    {
+     "date": "2007-01-31",
+     "amount": 612350000000
+    },
+    {
+     "date": "2007-02-28",
+     "amount": 617866000000
+    },
+    {
+     "date": "2007-03-31",
+     "amount": 618021000000
+    },
+    {
+     "date": "2007-04-30",
+     "amount": 622356000000
+    },
+    {
+     "date": "2007-05-31",
+     "amount": 632402000000
+    },
+    {
+     "date": "2007-06-30",
+     "amount": 639495000000
+    },
+    {
+     "date": "2007-07-31",
+     "amount": 636720000000
+    },
+    {
+     "date": "2007-08-31",
+     "amount": 640348000000
+    },
+    {
+     "date": "2007-09-30",
+     "amount": 648126000000
+    },
+    {
+     "date": "2007-10-31",
+     "amount": 654663000000
+    },
+    {
+     "date": "2007-11-30",
+     "amount": 662385000000
+    },
+    {
+     "date": "2007-12-31",
+     "amount": 666880000000
+    },
+    {
+     "date": "2008-01-31",
+     "amount": 661690000000
+    },
+    {
+     "date": "2008-02-29",
+     "amount": 667393000000
+    },
+    {
+     "date": "2008-03-31",
+     "amount": 661926000000
+    },
+    {
+     "date": "2008-04-30",
+     "amount": 675094000000
+    },
+    {
+     "date": "2008-05-31",
+     "amount": 679614000000
+    },
+    {
+     "date": "2008-06-30",
+     "amount": 689797000000
+    },
+    {
+     "date": "2008-07-31",
+     "amount": 696093000000
+    },
+    {
+     "date": "2008-08-31",
+     "amount": 700406000000
+    },
+    {
+     "date": "2008-09-30",
+     "amount": 736882000000
+    },
+    {
+     "date": "2008-10-31",
+     "amount": 788563000000
+    },
+    {
+     "date": "2008-11-30",
+     "amount": 796058000000
+    },
+    {
+     "date": "2008-12-31",
+     "amount": 809985000000
+    },
+    {
+     "date": "2009-01-31",
+     "amount": 829213000000
+    },
+    {
+     "date": "2009-02-28",
+     "amount": 837475000000
+    },
+    {
+     "date": "2009-03-31",
+     "amount": 847407000000
+    },
+    {
+     "date": "2009-04-30",
+     "amount": 859183000000
+    },
+    {
+     "date": "2009-05-31",
+     "amount": 881652000000
+    },
+    {
+     "date": "2009-06-30",
+     "amount": 895083000000
+    },
+    {
+     "date": "2009-07-31",
+     "amount": 921640000000
+    },
+    {
+     "date": "2009-08-31",
+     "amount": 924390000000
+    },
+    {
+     "date": "2009-09-30",
+     "amount": 948500000000
+    },
+    {
+     "date": "2009-10-31",
+     "amount": 967328000000
+    },
+    {
+     "date": "2009-11-30",
+     "amount": 987119000000
+    },
+    {
+     "date": "2009-12-31",
+     "amount": 1005405000000
+    },
+    {
+     "date": "2010-01-31",
+     "amount": 1064599000000
+    },
+    {
+     "date": "2010-02-28",
+     "amount": 1075222000000
+    },
+    {
+     "date": "2010-03-31",
+     "amount": 1102320000000
+    },
+    {
+     "date": "2010-04-30",
+     "amount": 1116478000000
+    },
+    {
+     "date": "2010-05-31",
+     "amount": 1132146000000
+    },
+    {
+     "date": "2010-06-30",
+     "amount": 1141601000000
+    },
+    {
+     "date": "2010-07-31",
+     "amount": 1157777000000
+    },
+    {
+     "date": "2010-08-31",
+     "amount": 1174536000000
+    },
+    {
+     "date": "2010-09-30",
+     "amount": 1198325000000
+    },
+    {
+     "date": "2010-10-31",
+     "amount": 1210142000000
+    },
+    {
+     "date": "2010-11-30",
+     "amount": 1214363000000
+    },
+    {
+     "date": "2010-12-31",
+     "amount": 1220252000000
+    },
+    {
+     "date": "2011-01-31",
+     "amount": 1229035000000
+    },
+    {
+     "date": "2011-02-28",
+     "amount": 1239271000000
+    },
+    {
+     "date": "2011-03-31",
+     "amount": 1240638000000
+    },
+    {
+     "date": "2011-04-30",
+     "amount": 1253724000000
+    },
+    {
+     "date": "2011-05-31",
+     "amount": 1272772000000
+    },
+    {
+     "date": "2011-06-30",
+     "amount": 1298749000000
+    },
+    {
+     "date": "2011-07-31",
+     "amount": 1302159000000
+    },
+    {
+     "date": "2011-08-31",
+     "amount": 1312671000000
+    },
+    {
+     "date": "2011-09-30",
+     "amount": 1322584000000
+    },
+    {
+     "date": "2011-10-31",
+     "amount": 1331843000000
+    },
+    {
+     "date": "2011-11-30",
+     "amount": 1340869000000
+    },
+    {
+     "date": "2011-12-31",
+     "amount": 1353765000000
+    },
+    {
+     "date": "2012-01-31",
+     "amount": 1355100000000
+    },
+    {
+     "date": "2012-02-29",
+     "amount": 1371987000000
+    },
+    {
+     "date": "2012-03-31",
+     "amount": 1374119000000
+    },
+    {
+     "date": "2012-04-30",
+     "amount": 1368548000000
+    },
+    {
+     "date": "2012-05-31",
+     "amount": 1384127000000
+    },
+    {
+     "date": "2012-06-30",
+     "amount": 1382839000000
+    },
+    {
+     "date": "2012-07-31",
+     "amount": 1391570000000
+    },
+    {
+     "date": "2012-08-31",
+     "amount": 1399654000000
+    },
+    {
+     "date": "2012-09-30",
+     "amount": 1414144000000
+    },
+    {
+     "date": "2012-10-31",
+     "amount": 1427262000000
+    },
+    {
+     "date": "2012-11-30",
+     "amount": 1438146000000
+    },
+    {
+     "date": "2012-12-31",
+     "amount": 1447791000000
+    },
+    {
+     "date": "2013-01-31",
+     "amount": 1450618000000
+    },
+    {
+     "date": "2013-02-28",
+     "amount": 1462536000000
+    },
+    {
+     "date": "2013-03-31",
+     "amount": 1448047000000
+    },
+    {
+     "date": "2013-04-30",
+     "amount": 1449885000000
+    },
+    {
+     "date": "2013-05-31",
+     "amount": 1463771000000
+    },
+    {
+     "date": "2013-06-30",
+     "amount": 1482330000000
+    },
+    {
+     "date": "2013-07-31",
+     "amount": 1485510000000
+    },
+    {
+     "date": "2013-08-31",
+     "amount": 1479499000000
+    },
+    {
+     "date": "2013-09-30",
+     "amount": 1491370000000
+    },
+    {
+     "date": "2013-10-31",
+     "amount": 1503261000000
+    },
+    {
+     "date": "2013-11-30",
+     "amount": 1514856000000
+    },
+    {
+     "date": "2013-12-31",
+     "amount": 1519787000000
+    },
+    {
+     "date": "2014-01-31",
+     "amount": 1529489000000
+    },
+    {
+     "date": "2014-02-28",
+     "amount": 1545311000000
+    },
+    {
+     "date": "2014-03-31",
+     "amount": 1539787000000
+    },
+    {
+     "date": "2014-04-30",
+     "amount": 1545776000000
+    },
+    {
+     "date": "2014-05-31",
+     "amount": 1552401000000
+    },
+    {
+     "date": "2014-06-30",
+     "amount": 1573349000000
+    },
+    {
+     "date": "2014-07-31",
+     "amount": 1584485000000
+    },
+    {
+     "date": "2014-08-31",
+     "amount": 1592235000000
+    },
+    {
+     "date": "2014-09-30",
+     "amount": 1578929000000
+    },
+    {
+     "date": "2014-10-31",
+     "amount": 1593743000000
+    },
+    {
+     "date": "2014-11-30",
+     "amount": 1605865000000
+    },
+    {
+     "date": "2014-12-31",
+     "amount": 1622453000000
+    },
+    {
+     "date": "2015-01-31",
+     "amount": 1603584000000
+    },
+    {
+     "date": "2015-02-28",
+     "amount": 1606106000000
+    },
+    {
+     "date": "2015-03-31",
+     "amount": 1621844000000
+    },
+    {
+     "date": "2015-04-30",
+     "amount": 1623438000000
+    },
+    {
+     "date": "2015-05-31",
+     "amount": 1640211000000
+    },
+    {
+     "date": "2015-06-30",
+     "amount": 1659664000000
+    },
+    {
+     "date": "2015-07-31",
+     "amount": 1664769000000
+    },
+    {
+     "date": "2015-08-31",
+     "amount": 1673718000000
+    },
+    {
+     "date": "2015-09-30",
+     "amount": 1659963000000
+    },
+    {
+     "date": "2015-10-31",
+     "amount": 1671128000000
+    },
+    {
+     "date": "2015-11-30",
+     "amount": 1684242000000
+    },
+    {
+     "date": "2015-12-31",
+     "amount": 1683988000000
+    },
+    {
+     "date": "2016-01-31",
+     "amount": 1663876000000
+    },
+    {
+     "date": "2016-02-29",
+     "amount": 1665754000000
+    },
+    {
+     "date": "2016-03-31",
+     "amount": 1670180000000
+    },
+    {
+     "date": "2016-04-30",
+     "amount": 1685420000000
+    },
+    {
+     "date": "2016-05-31",
+     "amount": 1693846000000
+    },
+    {
+     "date": "2016-06-30",
+     "amount": 1708490000000
+    },
+    {
+     "date": "2016-07-31",
+     "amount": 1708208000000
+    },
+    {
+     "date": "2016-08-31",
+     "amount": 1726415000000
+    },
+    {
+     "date": "2016-09-30",
+     "amount": 1709249000000
+    },
+    {
+     "date": "2016-10-31",
+     "amount": 1722513000000
+    },
+    {
+     "date": "2016-11-30",
+     "amount": 1732074000000
+    },
+    {
+     "date": "2016-12-31",
+     "amount": 1749137000000
+    },
+    {
+     "date": "2017-01-31",
+     "amount": 1717434000000
+    },
+    {
+     "date": "2017-02-28",
+     "amount": 1731499000000
+    },
+    {
+     "date": "2017-03-31",
+     "amount": 1737641000000
+    },
+    {
+     "date": "2017-04-30",
+     "amount": 1733204000000
+    },
+    {
+     "date": "2017-05-31",
+     "amount": 1737764000000
+    },
+    {
+     "date": "2017-06-30",
+     "amount": 1753402000000
+    },
+    {
+     "date": "2017-07-31",
+     "amount": 1755883000000
+    },
+    {
+     "date": "2017-08-31",
+     "amount": 1767922000000
+    },
+    {
+     "date": "2017-09-30",
+     "amount": 1764179000000
+    },
+    {
+     "date": "2017-10-31",
+     "amount": 1773141000000
+    },
+    {
+     "date": "2017-11-30",
+     "amount": 1772716000000
+    },
+    {
+     "date": "2017-12-31",
+     "amount": 1807684000000
+    },
+    {
+     "date": "2018-01-31",
+     "amount": 1785098000000
+    },
+    {
+     "date": "2018-02-28",
+     "amount": 1797194000000
+    },
+    {
+     "date": "2018-03-31",
+     "amount": 1786372000000
+    },
+    {
+     "date": "2018-04-30",
+     "amount": 1792321000000
+    },
+    {
+     "date": "2018-05-31",
+     "amount": 1807312000000
+    },
+    {
+     "date": "2018-06-30",
+     "amount": 1821158000000
+    },
+    {
+     "date": "2018-07-31",
+     "amount": 1811824000000
+    },
+    {
+     "date": "2018-08-31",
+     "amount": 1822187000000
+    },
+    {
+     "date": "2018-09-30",
+     "amount": 1835052000000
+    },
+    {
+     "date": "2018-10-31",
+     "amount": 1839328000000
+    },
+    {
+     "date": "2018-11-30",
+     "amount": 1852406000000
+    },
+    {
+     "date": "2018-12-31",
+     "amount": 1860462000000
+    },
+    {
+     "date": "2019-01-31",
+     "amount": 1850050000000
+    },
+    {
+     "date": "2019-02-28",
+     "amount": 1859546000000
+    },
+    {
+     "date": "2019-03-31",
+     "amount": 1844196000000
+    },
+    {
+     "date": "2019-04-30",
+     "amount": 1848091000000
+    },
+    {
+     "date": "2019-05-31",
+     "amount": 1853697000000
+    },
+    {
+     "date": "2019-06-30",
+     "amount": 1872524000000
+    },
+    {
+     "date": "2019-07-31",
+     "amount": 1872418000000
+    },
+    {
+     "date": "2019-08-31",
+     "amount": 1888591000000
+    },
+    {
+     "date": "2019-09-30",
+     "amount": 1871937000000
+    },
+    {
+     "date": "2019-10-31",
+     "amount": 1891743000000
+    },
+    {
+     "date": "2019-11-30",
+     "amount": 1898431000000
+    },
+    {
+     "date": "2019-12-31",
+     "amount": 1914476000000
+    },
+    {
+     "date": "2020-01-31",
+     "amount": 1900466000000
+    },
+    {
+     "date": "2020-02-29",
+     "amount": 1895932000000
+    },
+    {
+     "date": "2020-03-31",
+     "amount": 1899501000000
+    },
+    {
+     "date": "2020-04-30",
+     "amount": 1976145000000
+    },
+    {
+     "date": "2020-05-31",
+     "amount": 2049352000000
+    },
+    {
+     "date": "2020-06-30",
+     "amount": 2092355000000
+    },
+    {
+     "date": "2020-07-31",
+     "amount": 2115928000000
+    },
+    {
+     "date": "2020-08-31",
+     "amount": 2153749000000
+    },
+    {
+     "date": "2020-09-30",
+     "amount": 2162375000000
+    },
+    {
+     "date": "2020-10-31",
+     "amount": 2180216000000
+    },
+    {
+     "date": "2020-11-30",
+     "amount": 2190618000000
+    },
+    {
+     "date": "2020-12-31",
+     "amount": 2228463000000
+    },
+    {
+     "date": "2021-01-31",
+     "amount": 2195929000000
+    },
+    {
+     "date": "2021-02-28",
+     "amount": 2218835000000
+    },
+    {
+     "date": "2021-03-31",
+     "amount": 2246980000000
+    },
+    {
+     "date": "2021-04-30",
+     "amount": 2279113000000
+    },
+    {
+     "date": "2021-05-31",
+     "amount": 2312397000000
+    },
+    {
+     "date": "2021-06-30",
+     "amount": 2318129000000
+    },
+    {
+     "date": "2021-07-31",
+     "amount": 2332240000000
+    },
+    {
+     "date": "2021-08-31",
+     "amount": 2345553000000
+    },
+    {
+     "date": "2021-09-30",
+     "amount": 2353526000000
+    },
+    {
+     "date": "2021-10-31",
+     "amount": 2371983000000
+    },
+    {
+     "date": "2021-11-30",
+     "amount": 2377218000000
+    },
+    {
+     "date": "2021-12-31",
+     "amount": 2402167000000
+    },
+    {
+     "date": "2022-01-31",
+     "amount": 2386090000000
+    },
+    {
+     "date": "2022-02-28",
+     "amount": 2411515000000
+    },
+    {
+     "date": "2022-03-31",
+     "amount": 2383789000000
+    },
+    {
+     "date": "2022-04-30",
+     "amount": 2383696000000
+    },
+    {
+     "date": "2022-05-31",
+     "amount": 2402340000000
+    },
+    {
+     "date": "2022-06-30",
+     "amount": 2433063000000
+    },
+    {
+     "date": "2022-07-31",
+     "amount": 2426799000000
+    },
+    {
+     "date": "2022-08-31",
+     "amount": 2442054000000
+    },
+    {
+     "date": "2022-09-30",
+     "amount": 2441739000000
+    },
+    {
+     "date": "2022-10-31",
+     "amount": 2476930000000
+    },
+    {
+     "date": "2022-11-30",
+     "amount": 2472504000000
+    },
+    {
+     "date": "2022-12-31",
+     "amount": 2514051000000
+    },
+    {
+     "date": "2023-01-31",
+     "amount": 2493826000000
+    },
+    {
+     "date": "2023-02-28",
+     "amount": 2510382000000
+    },
+    {
+     "date": "2023-03-31",
+     "amount": 2535439000000
+    },
+    {
+     "date": "2023-04-30",
+     "amount": 2570190000000
+    },
+    {
+     "date": "2023-05-31",
+     "amount": 2601443000000
+    },
+    {
+     "date": "2023-06-30",
+     "amount": 2634121000000
+    },
+    {
+     "date": "2023-07-31",
+     "amount": 2649377000000
+    },
+    {
+     "date": "2023-08-31",
+     "amount": 2668529000000
+    },
+    {
+     "date": "2023-09-30",
+     "amount": 2651981000000
+    },
+    {
+     "date": "2023-10-31",
+     "amount": 2684804000000
+    },
+    {
+     "date": "2023-11-30",
+     "amount": 2706745000000
+    },
+    {
+     "date": "2023-12-31",
+     "amount": 2718785000000
+    },
+    {
+     "date": "2024-01-31",
+     "amount": 2702119000000
+    },
+    {
+     "date": "2024-02-29",
+     "amount": 2731975000000
+    },
+    {
+     "date": "2024-03-31",
+     "amount": 2734417000000
+    },
+    {
+     "date": "2024-04-30",
+     "amount": 2742948000000
+    },
+    {
+     "date": "2024-05-31",
+     "amount": 2770019000000
+    },
+    {
+     "date": "2024-06-30",
+     "amount": 2802488000000
+    },
+    {
+     "date": "2024-07-31",
+     "amount": 2823286000000
+    },
+    {
+     "date": "2024-08-31",
+     "amount": 2849350000000
+    },
+    {
+     "date": "2024-09-30",
+     "amount": 2842533000000
+    },
+    {
+     "date": "2024-10-31",
+     "amount": 2863763000000
+    },
+    {
+     "date": "2024-11-30",
+     "amount": 2881030000000
+    },
+    {
+     "date": "2024-12-31",
+     "amount": 2885927000000
+    },
+    {
+     "date": "2025-01-31",
+     "amount": 2882468000000
+    },
+    {
+     "date": "2025-02-28",
+     "amount": 2923800000000
+    },
+    {
+     "date": "2025-03-31",
+     "amount": 2923449000000
+    },
+    {
+     "date": "2025-04-30",
+     "amount": 2951164000000
+    },
+    {
+     "date": "2025-05-31",
+     "amount": 3003520000000
+    },
+    {
+     "date": "2025-06-30",
+     "amount": 2995806000000
+    },
+    {
+     "date": "2025-07-31",
+     "amount": 3025584000000
+    },
+    {
+     "date": "2025-08-31",
+     "amount": 3050741000000
+    },
+    {
+     "date": "2025-09-30",
+     "amount": 3056810000000
+    },
+    {
+     "date": "2025-10-31",
+     "amount": 3065779000000
+    },
+    {
+     "date": "2025-11-30",
+     "amount": 3090744000000
+    },
+    {
+     "date": "2025-12-31",
+     "amount": 3106423000000
+    },
+    {
+     "date": "2026-01-31",
+     "amount": 3074534000000
+    },
+    {
+     "date": "2026-02-28",
+     "amount": 3099074000000
+    },
+    {
+     "date": "2026-03-31",
+     "amount": 3101303000000
+    },
+    {
+     "date": "2026-04-30",
+     "amount": 3121712000000
+    },
+    {
+     "date": "2026-05-31",
+     "amount": 3142837000000
+    },
+    {
+     "date": "2026-06-30",
+     "amount": 3183350000000
+    },
+    {
+     "date": "2026-07-31",
+     "amount": 3175403000000
+    },
+    {
+     "date": "2026-08-31",
+     "amount": 3195974000000
+    },
+    {
+     "date": "2026-09-30",
+     "amount": 3231915000000
+    }
+   ],
+   "sources": [
+    {
+     "name": "Office for National Statistics, Public sector finances, series BKPX, general government consolidated gross debt (Maastricht), \u00a3 million",
+     "url": "https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/bkpx/pusf"
+    }
+   ]
+  },
+  "canada": {
+   "kind": "country",
+   "year_end_month": 12,
+   "points": [
+    {
+     "date": "2003-01-31",
+     "amount": 439611000000
+    },
+    {
+     "date": "2003-02-28",
+     "amount": 435248000000
+    },
+    {
+     "date": "2003-03-31",
+     "amount": 441351000000
+    },
+    {
+     "date": "2003-04-30",
+     "amount": 437317000000
+    },
+    {
+     "date": "2003-05-31",
+     "amount": 443060000000
+    },
+    {
+     "date": "2003-06-30",
+     "amount": 440129000000
+    },
+    {
+     "date": "2003-07-31",
+     "amount": 444247000000
+    },
+    {
+     "date": "2003-08-31",
+     "amount": 446634000000
+    },
+    {
+     "date": "2003-09-30",
+     "amount": 441021000000
+    },
+    {
+     "date": "2003-10-31",
+     "amount": 440236000000
+    },
+    {
+     "date": "2003-11-30",
+     "amount": 446104000000
+    },
+    {
+     "date": "2003-12-31",
+     "amount": 437815000000
+    },
+    {
+     "date": "2004-01-31",
+     "amount": 433598000000
+    },
+    {
+     "date": "2004-02-29",
+     "amount": 431879000000
+    },
+    {
+     "date": "2004-03-31",
+     "amount": 438367000000
+    },
+    {
+     "date": "2004-04-30",
+     "amount": 434636000000
+    },
+    {
+     "date": "2004-05-31",
+     "amount": 441169000000
+    },
+    {
+     "date": "2004-06-30",
+     "amount": 434420000000
+    },
+    {
+     "date": "2004-07-31",
+     "amount": 433104000000
+    },
+    {
+     "date": "2004-08-31",
+     "amount": 435731000000
+    },
+    {
+     "date": "2004-09-30",
+     "amount": 427031000000
+    },
+    {
+     "date": "2004-10-31",
+     "amount": 428269000000
+    },
+    {
+     "date": "2004-11-30",
+     "amount": 431099000000
+    },
+    {
+     "date": "2004-12-31",
+     "amount": 417841000000
+    },
+    {
+     "date": "2005-01-31",
+     "amount": 416026000000
+    },
+    {
+     "date": "2005-02-28",
+     "amount": 421671000000
+    },
+    {
+     "date": "2005-03-31",
+     "amount": 433167000000
+    },
+    {
+     "date": "2005-04-30",
+     "amount": 425657000000
+    },
+    {
+     "date": "2005-05-31",
+     "amount": 430464000000
+    },
+    {
+     "date": "2005-06-30",
+     "amount": 424653000000
+    },
+    {
+     "date": "2005-07-31",
+     "amount": 424450000000
+    },
+    {
+     "date": "2005-08-31",
+     "amount": 428090000000
+    },
+    {
+     "date": "2005-09-30",
+     "amount": 420602000000
+    },
+    {
+     "date": "2005-10-31",
+     "amount": 420415000000
+    },
+    {
+     "date": "2005-11-30",
+     "amount": 423359000000
+    },
+    {
+     "date": "2005-12-31",
+     "amount": 419389000000
+    },
+    {
+     "date": "2006-01-31",
+     "amount": 413853000000
+    },
+    {
+     "date": "2006-02-28",
+     "amount": 413374000000
+    },
+    {
+     "date": "2006-03-31",
+     "amount": 428439000000
+    },
+    {
+     "date": "2006-04-30",
+     "amount": 415890000000
+    },
+    {
+     "date": "2006-05-31",
+     "amount": 418708000000
+    },
+    {
+     "date": "2006-06-30",
+     "amount": 412909000000
+    },
+    {
+     "date": "2006-07-31",
+     "amount": 412200000000
+    },
+    {
+     "date": "2006-08-31",
+     "amount": 410689000000
+    },
+    {
+     "date": "2006-09-30",
+     "amount": 410917000000
+    },
+    {
+     "date": "2006-10-31",
+     "amount": 411376000000
+    },
+    {
+     "date": "2006-11-30",
+     "amount": 421618000000
+    },
+    {
+     "date": "2006-12-31",
+     "amount": 409471000000
+    },
+    {
+     "date": "2007-01-31",
+     "amount": 406322000000
+    },
+    {
+     "date": "2007-02-28",
+     "amount": 409640000000
+    },
+    {
+     "date": "2007-03-31",
+     "amount": 419779000000
+    },
+    {
+     "date": "2007-04-30",
+     "amount": 403477000000
+    },
+    {
+     "date": "2007-05-31",
+     "amount": 402910000000
+    },
+    {
+     "date": "2007-06-30",
+     "amount": 400449000000
+    },
+    {
+     "date": "2007-07-31",
+     "amount": 396957000000
+    },
+    {
+     "date": "2007-08-31",
+     "amount": 402138000000
+    },
+    {
+     "date": "2007-09-30",
+     "amount": 391443000000
+    },
+    {
+     "date": "2007-10-31",
+     "amount": 392088000000
+    },
+    {
+     "date": "2007-11-30",
+     "amount": 397723000000
+    },
+    {
+     "date": "2007-12-31",
+     "amount": 390172000000
+    },
+    {
+     "date": "2008-01-31",
+     "amount": 389023000000
+    },
+    {
+     "date": "2008-02-29",
+     "amount": 389514000000
+    },
+    {
+     "date": "2008-03-31",
+     "amount": 394808000000
+    },
+    {
+     "date": "2008-04-30",
+     "amount": 401590000000
+    },
+    {
+     "date": "2008-05-31",
+     "amount": 410908000000
+    },
+    {
+     "date": "2008-06-30",
+     "amount": 407569000000
+    },
+    {
+     "date": "2008-07-31",
+     "amount": 408805000000
+    },
+    {
+     "date": "2008-08-31",
+     "amount": 411904000000
+    },
+    {
+     "date": "2008-09-30",
+     "amount": 407344000000
+    },
+    {
+     "date": "2008-10-31",
+     "amount": 435847000000
+    },
+    {
+     "date": "2008-11-30",
+     "amount": 460567000000
+    },
+    {
+     "date": "2008-12-31",
+     "amount": 463962000000
+    },
+    {
+     "date": "2009-01-31",
+     "amount": 483930000000
+    },
+    {
+     "date": "2009-02-28",
+     "amount": 498182000000
+    },
+    {
+     "date": "2009-03-31",
+     "amount": 511700000000
+    },
+    {
+     "date": "2009-04-30",
+     "amount": 503587000000
+    },
+    {
+     "date": "2009-05-31",
+     "amount": 507675000000
+    },
+    {
+     "date": "2009-06-30",
+     "amount": 521169000000
+    },
+    {
+     "date": "2009-07-31",
+     "amount": 536472000000
+    },
+    {
+     "date": "2009-08-31",
+     "amount": 540898000000
+    },
+    {
+     "date": "2009-09-30",
+     "amount": 547188000000
+    },
+    {
+     "date": "2009-10-31",
+     "amount": 550699000000
+    },
+    {
+     "date": "2009-11-30",
+     "amount": 555139000000
+    },
+    {
+     "date": "2009-12-31",
+     "amount": 551363000000
+    },
+    {
+     "date": "2010-01-31",
+     "amount": 555634000000
+    },
+    {
+     "date": "2010-02-28",
+     "amount": 555661000000
+    },
+    {
+     "date": "2010-03-31",
+     "amount": 564687000000
+    },
+    {
+     "date": "2010-04-30",
+     "amount": 566162000000
+    },
+    {
+     "date": "2010-05-31",
+     "amount": 576313000000
+    },
+    {
+     "date": "2010-06-30",
+     "amount": 568064000000
+    },
+    {
+     "date": "2010-07-31",
+     "amount": 574921000000
+    },
+    {
+     "date": "2010-08-31",
+     "amount": 583064000000
+    },
+    {
+     "date": "2010-09-30",
+     "amount": 583240000000
+    },
+    {
+     "date": "2010-10-31",
+     "amount": 585126000000
+    },
+    {
+     "date": "2010-11-30",
+     "amount": 595440000000
+    },
+    {
+     "date": "2010-12-31",
+     "amount": 591701000000
+    },
+    {
+     "date": "2011-01-31",
+     "amount": 588680000000
+    },
+    {
+     "date": "2011-02-28",
+     "amount": 591611000000
+    },
+    {
+     "date": "2011-03-31",
+     "amount": 597551000000
+    },
+    {
+     "date": "2011-04-30",
+     "amount": 601863000000
+    },
+    {
+     "date": "2011-05-31",
+     "amount": 616600000000
+    },
+    {
+     "date": "2011-06-30",
+     "amount": 610000000000
+    },
+    {
+     "date": "2011-07-31",
+     "amount": 611335000000
+    },
+    {
+     "date": "2011-08-31",
+     "amount": 621959000000
+    },
+    {
+     "date": "2011-09-30",
+     "amount": 620281000000
+    },
+    {
+     "date": "2011-10-31",
+     "amount": 623580000000
+    },
+    {
+     "date": "2011-11-30",
+     "amount": 634259000000
+    },
+    {
+     "date": "2011-12-31",
+     "amount": 627322000000
+    },
+    {
+     "date": "2012-01-31",
+     "amount": 627415000000
+    },
+    {
+     "date": "2012-02-29",
+     "amount": 632792000000
+    },
+    {
+     "date": "2012-03-31",
+     "amount": 631209000000
+    },
+    {
+     "date": "2012-04-30",
+     "amount": 635936000000
+    },
+    {
+     "date": "2012-05-31",
+     "amount": 652672000000
+    },
+    {
+     "date": "2012-06-30",
+     "amount": 644003000000
+    },
+    {
+     "date": "2012-07-31",
+     "amount": 646663000000
+    },
+    {
+     "date": "2012-08-31",
+     "amount": 658611000000
+    },
+    {
+     "date": "2012-09-30",
+     "amount": 656778000000
+    },
+    {
+     "date": "2012-10-31",
+     "amount": 654841000000
+    },
+    {
+     "date": "2012-11-30",
+     "amount": 663982000000
+    },
+    {
+     "date": "2012-12-31",
+     "amount": 658296000000
+    },
+    {
+     "date": "2013-01-31",
+     "amount": 656515000000
+    },
+    {
+     "date": "2013-02-28",
+     "amount": 666720000000
+    },
+    {
+     "date": "2013-03-31",
+     "amount": 668307000000
+    },
+    {
+     "date": "2013-04-30",
+     "amount": 678910000000
+    },
+    {
+     "date": "2013-05-31",
+     "amount": 694567000000
+    },
+    {
+     "date": "2013-06-30",
+     "amount": 684636000000
+    },
+    {
+     "date": "2013-07-31",
+     "amount": 694378000000
+    },
+    {
+     "date": "2013-08-31",
+     "amount": 692978000000
+    },
+    {
+     "date": "2013-09-30",
+     "amount": 689659000000
+    },
+    {
+     "date": "2013-10-31",
+     "amount": 680941000000
+    },
+    {
+     "date": "2013-11-30",
+     "amount": 673351000000
+    },
+    {
+     "date": "2013-12-31",
+     "amount": 668830000000
+    },
+    {
+     "date": "2014-01-31",
+     "amount": 666402000000
+    },
+    {
+     "date": "2014-02-28",
+     "amount": 659762000000
+    },
+    {
+     "date": "2014-03-31",
+     "amount": 648805000000
+    },
+    {
+     "date": "2014-04-30",
+     "amount": 660662000000
+    },
+    {
+     "date": "2014-05-31",
+     "amount": 667480000000
+    },
+    {
+     "date": "2014-06-30",
+     "amount": 657114000000
+    },
+    {
+     "date": "2014-07-31",
+     "amount": 663660000000
+    },
+    {
+     "date": "2014-08-31",
+     "amount": 658178000000
+    },
+    {
+     "date": "2014-09-30",
+     "amount": 655938000000
+    },
+    {
+     "date": "2014-10-31",
+     "amount": 656375000000
+    },
+    {
+     "date": "2014-11-30",
+     "amount": 656633000000
+    },
+    {
+     "date": "2014-12-31",
+     "amount": 650015000000
+    },
+    {
+     "date": "2015-01-31",
+     "amount": 660607000000
+    },
+    {
+     "date": "2015-02-28",
+     "amount": 650670000000
+    },
+    {
+     "date": "2015-03-31",
+     "amount": 650094000000
+    },
+    {
+     "date": "2015-04-30",
+     "amount": 658827000000
+    },
+    {
+     "date": "2015-05-31",
+     "amount": 664231000000
+    },
+    {
+     "date": "2015-06-30",
+     "amount": 655314000000
+    },
+    {
+     "date": "2015-07-31",
+     "amount": 671956000000
+    },
+    {
+     "date": "2015-08-31",
+     "amount": 669909000000
+    },
+    {
+     "date": "2015-09-30",
+     "amount": 672417000000
+    },
+    {
+     "date": "2015-10-31",
+     "amount": 676096000000
+    },
+    {
+     "date": "2015-11-30",
+     "amount": 680392000000
+    },
+    {
+     "date": "2015-12-31",
+     "amount": 673602000000
+    },
+    {
+     "date": "2016-01-31",
+     "amount": 683483000000
+    },
+    {
+     "date": "2016-02-29",
+     "amount": 675728000000
+    },
+    {
+     "date": "2016-03-31",
+     "amount": 671605000000
+    },
+    {
+     "date": "2016-04-30",
+     "amount": 684851000000
+    },
+    {
+     "date": "2016-05-31",
+     "amount": 693641000000
+    },
+    {
+     "date": "2016-06-30",
+     "amount": 687306000000
+    },
+    {
+     "date": "2016-07-31",
+     "amount": 698825000000
+    },
+    {
+     "date": "2016-08-31",
+     "amount": 696401000000
+    },
+    {
+     "date": "2016-09-30",
+     "amount": 695771000000
+    },
+    {
+     "date": "2016-10-31",
+     "amount": 698521000000
+    },
+    {
+     "date": "2016-11-30",
+     "amount": 699485000000
+    },
+    {
+     "date": "2016-12-31",
+     "amount": 698329000000
+    },
+    {
+     "date": "2017-01-31",
+     "amount": 702003000000
+    },
+    {
+     "date": "2017-02-28",
+     "amount": 700690000000
+    },
+    {
+     "date": "2017-03-31",
+     "amount": 698035000000
+    },
+    {
+     "date": "2017-04-30",
+     "amount": 709765000000
+    },
+    {
+     "date": "2017-05-31",
+     "amount": 718941000000
+    },
+    {
+     "date": "2017-06-30",
+     "amount": 721346000000
+    },
+    {
+     "date": "2017-07-31",
+     "amount": 718548000000
+    },
+    {
+     "date": "2017-08-31",
+     "amount": 715788000000
+    },
+    {
+     "date": "2017-09-30",
+     "amount": 714698000000
+    },
+    {
+     "date": "2017-10-31",
+     "amount": 718680000000
+    },
+    {
+     "date": "2017-11-30",
+     "amount": 717057000000
+    },
+    {
+     "date": "2017-12-31",
+     "amount": 716718000000
+    },
+    {
+     "date": "2018-01-31",
+     "amount": 717214000000
+    },
+    {
+     "date": "2018-02-28",
+     "amount": 719818000000
+    },
+    {
+     "date": "2018-03-31",
+     "amount": 708529000000
+    },
+    {
+     "date": "2018-04-30",
+     "amount": 718005000000
+    },
+    {
+     "date": "2018-05-31",
+     "amount": 722134000000
+    },
+    {
+     "date": "2018-06-30",
+     "amount": 721873000000
+    },
+    {
+     "date": "2018-07-31",
+     "amount": 729644000000
+    },
+    {
+     "date": "2018-08-31",
+     "amount": 731076000000
+    },
+    {
+     "date": "2018-09-30",
+     "amount": 725994000000
+    },
+    {
+     "date": "2018-10-31",
+     "amount": 737931000000
+    },
+    {
+     "date": "2018-11-30",
+     "amount": 735260000000
+    },
+    {
+     "date": "2018-12-31",
+     "amount": 734800000000
+    },
+    {
+     "date": "2019-01-31",
+     "amount": 743343000000
+    },
+    {
+     "date": "2019-02-28",
+     "amount": 735442000000
+    },
+    {
+     "date": "2019-03-31",
+     "amount": 736983000000
+    },
+    {
+     "date": "2019-04-30",
+     "amount": 747997000000
+    },
+    {
+     "date": "2019-05-31",
+     "amount": 753057000000
+    },
+    {
+     "date": "2019-06-30",
+     "amount": 744735000000
+    },
+    {
+     "date": "2019-07-31",
+     "amount": 757043000000
+    },
+    {
+     "date": "2019-08-31",
+     "amount": 760272000000
+    },
+    {
+     "date": "2019-09-30",
+     "amount": 750146000000
+    },
+    {
+     "date": "2019-10-31",
+     "amount": 763877000000
+    },
+    {
+     "date": "2019-11-30",
+     "amount": 755462000000
+    },
+    {
+     "date": "2019-12-31",
+     "amount": 751716000000
+    },
+    {
+     "date": "2020-01-31",
+     "amount": 757800000000
+    },
+    {
+     "date": "2020-02-29",
+     "amount": 766334000000
+    },
+    {
+     "date": "2020-03-31",
+     "amount": 772939000000
+    },
+    {
+     "date": "2020-04-30",
+     "amount": 909315000000
+    },
+    {
+     "date": "2020-05-31",
+     "amount": 1014074000000
+    },
+    {
+     "date": "2020-06-30",
+     "amount": 1071953000000
+    },
+    {
+     "date": "2020-07-31",
+     "amount": 1095726000000
+    },
+    {
+     "date": "2020-08-31",
+     "amount": 1080738000000
+    },
+    {
+     "date": "2020-09-30",
+     "amount": 1066661000000
+    },
+    {
+     "date": "2020-10-31",
+     "amount": 1095038000000
+    },
+    {
+     "date": "2020-11-30",
+     "amount": 1095835000000
+    },
+    {
+     "date": "2020-12-31",
+     "amount": 1103174000000
+    },
+    {
+     "date": "2021-01-31",
+     "amount": 1108921000000
+    },
+    {
+     "date": "2021-02-28",
+     "amount": 1117259000000
+    },
+    {
+     "date": "2021-03-31",
+     "amount": 1117604000000
+    },
+    {
+     "date": "2021-04-30",
+     "amount": 1129601000000
+    },
+    {
+     "date": "2021-05-31",
+     "amount": 1153980000000
+    },
+    {
+     "date": "2021-06-30",
+     "amount": 1173033000000
+    },
+    {
+     "date": "2021-07-31",
+     "amount": 1206254000000
+    },
+    {
+     "date": "2021-08-31",
+     "amount": 1218992000000
+    },
+    {
+     "date": "2021-09-30",
+     "amount": 1193740000000
+    },
+    {
+     "date": "2021-10-31",
+     "amount": 1213202000000
+    },
+    {
+     "date": "2021-11-30",
+     "amount": 1213841000000
+    },
+    {
+     "date": "2021-12-31",
+     "amount": 1227453000000
+    },
+    {
+     "date": "2022-01-31",
+     "amount": 1221250000000
+    },
+    {
+     "date": "2022-02-28",
+     "amount": 1225451000000
+    },
+    {
+     "date": "2022-03-31",
+     "amount": 1233056000000
+    },
+    {
+     "date": "2022-04-30",
+     "amount": 1250979000000
+    },
+    {
+     "date": "2022-05-31",
+     "amount": 1254273000000
+    },
+    {
+     "date": "2022-06-30",
+     "amount": 1251895000000
+    },
+    {
+     "date": "2022-07-31",
+     "amount": 1269557000000
+    },
+    {
+     "date": "2022-08-31",
+     "amount": 1263993000000
+    },
+    {
+     "date": "2022-09-30",
+     "amount": 1253187000000
+    },
+    {
+     "date": "2022-10-31",
+     "amount": 1272673000000
+    },
+    {
+     "date": "2022-11-30",
+     "amount": 1248011000000
+    },
+    {
+     "date": "2022-12-31",
+     "amount": 1260339000000
+    },
+    {
+     "date": "2023-01-31",
+     "amount": 1272369000000
+    },
+    {
+     "date": "2023-02-28",
+     "amount": 1260195000000
+    },
+    {
+     "date": "2023-03-31",
+     "amount": 1256166000000
+    },
+    {
+     "date": "2023-04-30",
+     "amount": 1292085000000
+    },
+    {
+     "date": "2023-05-31",
+     "amount": 1292275000000
+    },
+    {
+     "date": "2023-06-30",
+     "amount": 1291049000000
+    },
+    {
+     "date": "2023-07-31",
+     "amount": 1308179000000
+    },
+    {
+     "date": "2023-08-31",
+     "amount": 1327979000000
+    },
+    {
+     "date": "2023-09-30",
+     "amount": 1301957000000
+    },
+    {
+     "date": "2023-10-31",
+     "amount": 1315720000000
+    },
+    {
+     "date": "2023-11-30",
+     "amount": 1311491000000
+    },
+    {
+     "date": "2023-12-31",
+     "amount": 1325521000000
+    },
+    {
+     "date": "2024-01-31",
+     "amount": 1339114000000
+    },
+    {
+     "date": "2024-02-29",
+     "amount": 1348220000000
+    },
+    {
+     "date": "2024-03-31",
+     "amount": 1369937000000
+    },
+    {
+     "date": "2024-04-30",
+     "amount": 1369862000000
+    },
+    {
+     "date": "2024-05-31",
+     "amount": 1377322000000
+    },
+    {
+     "date": "2024-06-30",
+     "amount": 1384032000000
+    },
+    {
+     "date": "2024-07-31",
+     "amount": 1423427000000
+    },
+    {
+     "date": "2024-08-31",
+     "amount": 1408533000000
+    },
+    {
+     "date": "2024-09-30",
+     "amount": 1406688000000
+    },
+    {
+     "date": "2024-10-31",
+     "amount": 1409081000000
+    },
+    {
+     "date": "2024-11-30",
+     "amount": 1414019000000
+    },
+    {
+     "date": "2024-12-31",
+     "amount": 1437202000000
+    },
+    {
+     "date": "2025-01-31",
+     "amount": 1450172000000
+    },
+    {
+     "date": "2025-02-28",
+     "amount": 1461377000000
+    },
+    {
+     "date": "2025-03-31",
+     "amount": 1478044000000
+    },
+    {
+     "date": "2025-04-30",
+     "amount": 1487505000000
+    },
+    {
+     "date": "2025-05-31",
+     "amount": 1516455000000
+    },
+    {
+     "date": "2025-06-30",
+     "amount": 1517441000000
+    },
+    {
+     "date": "2025-07-31",
+     "amount": 1546263000000
+    },
+    {
+     "date": "2025-08-31",
+     "amount": 1567220000000
+    },
+    {
+     "date": "2025-09-30",
+     "amount": 1535818000000
+    },
+    {
+     "date": "2025-10-31",
+     "amount": 1553597000000
+    },
+    {
+     "date": "2025-11-30",
+     "amount": 1558827000000
+    },
+    {
+     "date": "2025-12-31",
+     "amount": 1556306000000
+    },
+    {
+     "date": "2026-01-31",
+     "amount": 1572717000000
+    },
+    {
+     "date": "2026-02-28",
+     "amount": 1579674000000
+    },
+    {
+     "date": "2026-03-31",
+     "amount": 1584195000000
+    },
+    {
+     "date": "2026-04-30",
+     "amount": 1596920000000
+    },
+    {
+     "date": "2026-05-31",
+     "amount": 1608107000000
+    },
+    {
+     "date": "2026-06-30",
+     "amount": 1619274000000
+    },
+    {
+     "date": "2026-07-31",
+     "amount": 1645153000000
+    },
+    {
+     "date": "2026-08-31",
+     "amount": 1648194000000
+    },
+    {
+     "date": "2026-09-30",
+     "amount": 1649639000000
+    },
+    {
+     "date": "2026-10-31",
+     "amount": 1665761000000
+    }
+   ],
+   "sources": [
+    {
+     "name": "Bank of Canada Valet, series V42141673, Government of Canada total securities outstanding (inflation adjusted), C$ millions",
+     "url": "https://www.bankofcanada.ca/valet/observations/V42141673/json"
+    }
+   ]
+  },
+  "brazil": {
+   "kind": "country",
+   "year_end_month": 12,
+   "points": [
+    {
+     "date": "2006-12-31",
+     "amount": 1336644900000
+    },
+    {
+     "date": "2007-01-31",
+     "amount": 1367451910000
+    },
+    {
+     "date": "2007-02-28",
+     "amount": 1399083710000
+    },
+    {
+     "date": "2007-03-31",
+     "amount": 1423273450000
+    },
+    {
+     "date": "2007-04-30",
+     "amount": 1438854850000
+    },
+    {
+     "date": "2007-05-31",
+     "amount": 1474335200000
+    },
+    {
+     "date": "2007-06-30",
+     "amount": 1499458730000
+    },
+    {
+     "date": "2007-07-31",
+     "amount": 1517874000000
+    },
+    {
+     "date": "2007-08-31",
+     "amount": 1536267530000
+    },
+    {
+     "date": "2007-09-30",
+     "amount": 1533431760000
+    },
+    {
+     "date": "2007-10-31",
+     "amount": 1538287060000
+    },
+    {
+     "date": "2007-11-30",
+     "amount": 1544955730000
+    },
+    {
+     "date": "2007-12-31",
+     "amount": 1542851830000
+    },
+    {
+     "date": "2008-01-31",
+     "amount": 1579474280000
+    },
+    {
+     "date": "2008-02-29",
+     "amount": 1583893920000
+    },
+    {
+     "date": "2008-03-31",
+     "amount": 1599048510000
+    },
+    {
+     "date": "2008-04-30",
+     "amount": 1602356930000
+    },
+    {
+     "date": "2008-05-31",
+     "amount": 1598411020000
+    },
+    {
+     "date": "2008-06-30",
+     "amount": 1612136730000
+    },
+    {
+     "date": "2008-07-31",
+     "amount": 1632713680000
+    },
+    {
+     "date": "2008-08-31",
+     "amount": 1634590620000
+    },
+    {
+     "date": "2008-09-30",
+     "amount": 1656166530000
+    },
+    {
+     "date": "2008-10-31",
+     "amount": 1684285470000
+    },
+    {
+     "date": "2008-11-30",
+     "amount": 1687694480000
+    },
+    {
+     "date": "2008-12-31",
+     "amount": 1740887810000
+    },
+    {
+     "date": "2009-01-31",
+     "amount": 1775483000000
+    },
+    {
+     "date": "2009-02-28",
+     "amount": 1791071990000
+    },
+    {
+     "date": "2009-03-31",
+     "amount": 1812527100000
+    },
+    {
+     "date": "2009-04-30",
+     "amount": 1797074170000
+    },
+    {
+     "date": "2009-05-31",
+     "amount": 1813137250000
+    },
+    {
+     "date": "2009-06-30",
+     "amount": 1859801550000
+    },
+    {
+     "date": "2009-07-31",
+     "amount": 1908617460000
+    },
+    {
+     "date": "2009-08-31",
+     "amount": 1951925050000
+    },
+    {
+     "date": "2009-09-30",
+     "amount": 1962852340000
+    },
+    {
+     "date": "2009-10-31",
+     "amount": 1983867720000
+    },
+    {
+     "date": "2009-11-30",
+     "amount": 1980097860000
+    },
+    {
+     "date": "2009-12-31",
+     "amount": 1973423680000
+    },
+    {
+     "date": "2010-01-31",
+     "amount": 2015576950000
+    },
+    {
+     "date": "2010-02-28",
+     "amount": 2014967240000
+    },
+    {
+     "date": "2010-03-31",
+     "amount": 1947898930000
+    },
+    {
+     "date": "2010-04-30",
+     "amount": 1968164600000
+    },
+    {
+     "date": "2010-05-31",
+     "amount": 1991352700000
+    },
+    {
+     "date": "2010-06-30",
+     "amount": 2010317660000
+    },
+    {
+     "date": "2010-07-31",
+     "amount": 2027615020000
+    },
+    {
+     "date": "2010-08-31",
+     "amount": 2034861820000
+    },
+    {
+     "date": "2010-09-30",
+     "amount": 2057909400000
+    },
+    {
+     "date": "2010-10-31",
+     "amount": 2087755650000
+    },
+    {
+     "date": "2010-11-30",
+     "amount": 2099149010000
+    },
+    {
+     "date": "2010-12-31",
+     "amount": 2011521660000
+    },
+    {
+     "date": "2011-01-31",
+     "amount": 2058854320000
+    },
+    {
+     "date": "2011-02-28",
+     "amount": 2083421750000
+    },
+    {
+     "date": "2011-03-31",
+     "amount": 2112891090000
+    },
+    {
+     "date": "2011-04-30",
+     "amount": 2135389030000
+    },
+    {
+     "date": "2011-05-31",
+     "amount": 2146725960000
+    },
+    {
+     "date": "2011-06-30",
+     "amount": 2177090410000
+    },
+    {
+     "date": "2011-07-31",
+     "amount": 2204280740000
+    },
+    {
+     "date": "2011-08-31",
+     "amount": 2216647640000
+    },
+    {
+     "date": "2011-09-30",
+     "amount": 2226487190000
+    },
+    {
+     "date": "2011-10-31",
+     "amount": 2226255490000
+    },
+    {
+     "date": "2011-11-30",
+     "amount": 2245928130000
+    },
+    {
+     "date": "2011-12-31",
+     "amount": 2243603720000
+    },
+    {
+     "date": "2012-01-31",
+     "amount": 2287084440000
+    },
+    {
+     "date": "2012-02-29",
+     "amount": 2322816000000
+    },
+    {
+     "date": "2012-03-31",
+     "amount": 2366667460000
+    },
+    {
+     "date": "2012-04-30",
+     "amount": 2405973840000
+    },
+    {
+     "date": "2012-05-31",
+     "amount": 2425795730000
+    },
+    {
+     "date": "2012-06-30",
+     "amount": 2449693360000
+    },
+    {
+     "date": "2012-07-31",
+     "amount": 2480227830000
+    },
+    {
+     "date": "2012-08-31",
+     "amount": 2491332220000
+    },
+    {
+     "date": "2012-09-30",
+     "amount": 2542432690000
+    },
+    {
+     "date": "2012-10-31",
+     "amount": 2590520150000
+    },
+    {
+     "date": "2012-11-30",
+     "amount": 2615831550000
+    },
+    {
+     "date": "2012-12-31",
+     "amount": 2583946350000
+    },
+    {
+     "date": "2013-01-31",
+     "amount": 2623366110000
+    },
+    {
+     "date": "2013-02-28",
+     "amount": 2641965880000
+    },
+    {
+     "date": "2013-03-31",
+     "amount": 2663208830000
+    },
+    {
+     "date": "2013-04-30",
+     "amount": 2682330010000
+    },
+    {
+     "date": "2013-05-31",
+     "amount": 2710764580000
+    },
+    {
+     "date": "2013-06-30",
+     "amount": 2715918700000
+    },
+    {
+     "date": "2013-07-31",
+     "amount": 2744022880000
+    },
+    {
+     "date": "2013-08-31",
+     "amount": 2749278710000
+    },
+    {
+     "date": "2013-09-30",
+     "amount": 2747899580000
+    },
+    {
+     "date": "2013-10-31",
+     "amount": 2779361470000
+    },
+    {
+     "date": "2013-11-30",
+     "amount": 2783266920000
+    },
+    {
+     "date": "2013-12-31",
+     "amount": 2747996710000
+    },
+    {
+     "date": "2014-01-31",
+     "amount": 2829599140000
+    },
+    {
+     "date": "2014-02-28",
+     "amount": 2816714170000
+    },
+    {
+     "date": "2014-03-31",
+     "amount": 2835759160000
+    },
+    {
+     "date": "2014-04-30",
+     "amount": 2865058280000
+    },
+    {
+     "date": "2014-05-31",
+     "amount": 2895819410000
+    },
+    {
+     "date": "2014-06-30",
+     "amount": 2941138570000
+    },
+    {
+     "date": "2014-07-31",
+     "amount": 2983108330000
+    },
+    {
+     "date": "2014-08-31",
+     "amount": 3034679530000
+    },
+    {
+     "date": "2014-09-30",
+     "amount": 3132133120000
+    },
+    {
+     "date": "2014-10-31",
+     "amount": 3168712960000
+    },
+    {
+     "date": "2014-11-30",
+     "amount": 3217851370000
+    },
+    {
+     "date": "2014-12-31",
+     "amount": 3252448550000
+    },
+    {
+     "date": "2015-01-31",
+     "amount": 3315324380000
+    },
+    {
+     "date": "2015-02-28",
+     "amount": 3386880840000
+    },
+    {
+     "date": "2015-03-31",
+     "amount": 3480229290000
+    },
+    {
+     "date": "2015-04-30",
+     "amount": 3468109370000
+    },
+    {
+     "date": "2015-05-31",
+     "amount": 3538708310000
+    },
+    {
+     "date": "2015-06-30",
+     "amount": 3588440400000
+    },
+    {
+     "date": "2015-07-31",
+     "amount": 3684950960000
+    },
+    {
+     "date": "2015-08-31",
+     "amount": 3743680990000
+    },
+    {
+     "date": "2015-09-30",
+     "amount": 3789051790000
+    },
+    {
+     "date": "2015-10-31",
+     "amount": 3813936880000
+    },
+    {
+     "date": "2015-11-30",
+     "amount": 3844680880000
+    },
+    {
+     "date": "2015-12-31",
+     "amount": 3927523060000
+    },
+    {
+     "date": "2016-01-31",
+     "amount": 3992779140000
+    },
+    {
+     "date": "2016-02-29",
+     "amount": 4017298550000
+    },
+    {
+     "date": "2016-03-31",
+     "amount": 4005700250000
+    },
+    {
+     "date": "2016-04-30",
+     "amount": 4039289280000
+    },
+    {
+     "date": "2016-05-31",
+     "amount": 4113898580000
+    },
+    {
+     "date": "2016-06-30",
+     "amount": 4130830600000
+    },
+    {
+     "date": "2016-07-31",
+     "amount": 4213993300000
+    },
+    {
+     "date": "2016-08-31",
+     "amount": 4272828760000
+    },
+    {
+     "date": "2016-09-30",
+     "amount": 4329703130000
+    },
+    {
+     "date": "2016-10-31",
+     "amount": 4330508190000
+    },
+    {
+     "date": "2016-11-30",
+     "amount": 4418424090000
+    },
+    {
+     "date": "2016-12-31",
+     "amount": 4378486390000
+    },
+    {
+     "date": "2017-01-31",
+     "amount": 4399046840000
+    },
+    {
+     "date": "2017-02-28",
+     "amount": 4450006770000
+    },
+    {
+     "date": "2017-03-31",
+     "amount": 4527003450000
+    },
+    {
+     "date": "2017-04-30",
+     "amount": 4547705050000
+    },
+    {
+     "date": "2017-05-31",
+     "amount": 4633516800000
+    },
+    {
+     "date": "2017-06-30",
+     "amount": 4674598720000
+    },
+    {
+     "date": "2017-07-31",
+     "amount": 4722126380000
+    },
+    {
+     "date": "2017-08-31",
+     "amount": 4768883310000
+    },
+    {
+     "date": "2017-09-30",
+     "amount": 4789341590000
+    },
+    {
+     "date": "2017-10-31",
+     "amount": 4837222060000
+    },
+    {
+     "date": "2017-11-30",
+     "amount": 4852557490000
+    },
+    {
+     "date": "2017-12-31",
+     "amount": 4854678590000
+    },
+    {
+     "date": "2018-01-31",
+     "amount": 4904275230000
+    },
+    {
+     "date": "2018-02-28",
+     "amount": 4957219320000
+    },
+    {
+     "date": "2018-03-31",
+     "amount": 4984707600000
+    },
+    {
+     "date": "2018-04-30",
+     "amount": 5045749250000
+    },
+    {
+     "date": "2018-05-31",
+     "amount": 5133267760000
+    },
+    {
+     "date": "2018-06-30",
+     "amount": 5165402550000
+    },
+    {
+     "date": "2018-07-31",
+     "amount": 5186540040000
+    },
+    {
+     "date": "2018-08-31",
+     "amount": 5223985950000
+    },
+    {
+     "date": "2018-09-30",
+     "amount": 5246734280000
+    },
+    {
+     "date": "2018-10-31",
+     "amount": 5231391550000
+    },
+    {
+     "date": "2018-11-30",
+     "amount": 5284132650000
+    },
+    {
+     "date": "2018-12-31",
+     "amount": 5271982260000
+    },
+    {
+     "date": "2019-01-31",
+     "amount": 5302682270000
+    },
+    {
+     "date": "2019-02-28",
+     "amount": 5336549580000
+    },
+    {
+     "date": "2019-03-31",
+     "amount": 5430959000000
+    },
+    {
+     "date": "2019-04-30",
+     "amount": 5479642900000
+    },
+    {
+     "date": "2019-05-31",
+     "amount": 5480569480000
+    },
+    {
+     "date": "2019-06-30",
+     "amount": 5498994830000
+    },
+    {
+     "date": "2019-07-31",
+     "amount": 5540964870000
+    },
+    {
+     "date": "2019-08-31",
+     "amount": 5617716110000
+    },
+    {
+     "date": "2019-09-30",
+     "amount": 5580374850000
+    },
+    {
+     "date": "2019-10-31",
+     "amount": 5549355510000
+    },
+    {
+     "date": "2019-11-30",
+     "amount": 5602290220000
+    },
+    {
+     "date": "2019-12-31",
+     "amount": 5500104160000
+    },
+    {
+     "date": "2020-01-31",
+     "amount": 5550452100000
+    },
+    {
+     "date": "2020-02-29",
+     "amount": 5611015180000
+    },
+    {
+     "date": "2020-03-31",
+     "amount": 5758363330000
+    },
+    {
+     "date": "2020-04-30",
+     "amount": 5817892360000
+    },
+    {
+     "date": "2020-05-31",
+     "amount": 5929085150000
+    },
+    {
+     "date": "2020-06-30",
+     "amount": 6153523830000
+    },
+    {
+     "date": "2020-07-31",
+     "amount": 6210041660000
+    },
+    {
+     "date": "2020-08-31",
+     "amount": 6389754500000
+    },
+    {
+     "date": "2020-09-30",
+     "amount": 6533712360000
+    },
+    {
+     "date": "2020-10-31",
+     "amount": 6574653330000
+    },
+    {
+     "date": "2020-11-30",
+     "amount": 6558571310000
+    },
+    {
+     "date": "2020-12-31",
+     "amount": 6615755200000
+    },
+    {
+     "date": "2021-01-31",
+     "amount": 6670267060000
+    },
+    {
+     "date": "2021-02-28",
+     "amount": 6744244120000
+    },
+    {
+     "date": "2021-03-31",
+     "amount": 6721063140000
+    },
+    {
+     "date": "2021-04-30",
+     "amount": 6665275150000
+    },
+    {
+     "date": "2021-05-31",
+     "amount": 6696353780000
+    },
+    {
+     "date": "2021-06-30",
+     "amount": 6729562390000
+    },
+    {
+     "date": "2021-07-31",
+     "amount": 6797927950000
+    },
+    {
+     "date": "2021-08-31",
+     "amount": 6849857480000
+    },
+    {
+     "date": "2021-09-30",
+     "amount": 6939728600000
+    },
+    {
+     "date": "2021-10-31",
+     "amount": 7009119320000
+    },
+    {
+     "date": "2021-11-30",
+     "amount": 6978912930000
+    },
+    {
+     "date": "2021-12-31",
+     "amount": 6966925200000
+    },
+    {
+     "date": "2022-01-31",
+     "amount": 6973243100000
+    },
+    {
+     "date": "2022-02-28",
+     "amount": 7001664300000
+    },
+    {
+     "date": "2022-03-31",
+     "amount": 7009269270000
+    },
+    {
+     "date": "2022-04-30",
+     "amount": 7075133230000
+    },
+    {
+     "date": "2022-05-31",
+     "amount": 7098469680000
+    },
+    {
+     "date": "2022-06-30",
+     "amount": 7174528520000
+    },
+    {
+     "date": "2022-07-31",
+     "amount": 7217112270000
+    },
+    {
+     "date": "2022-08-31",
+     "amount": 7231619180000
+    },
+    {
+     "date": "2022-09-30",
+     "amount": 7262409900000
+    },
+    {
+     "date": "2022-10-31",
+     "amount": 7297886220000
+    },
+    {
+     "date": "2022-11-30",
+     "amount": 7290852550000
+    },
+    {
+     "date": "2022-12-31",
+     "amount": 7224882230000
+    },
+    {
+     "date": "2023-01-31",
+     "amount": 7257238780000
+    },
+    {
+     "date": "2023-02-28",
+     "amount": 7351858080000
+    },
+    {
+     "date": "2023-03-31",
+     "amount": 7398049660000
+    },
+    {
+     "date": "2023-04-30",
+     "amount": 7456708220000
+    },
+    {
+     "date": "2023-05-31",
+     "amount": 7563933300000
+    },
+    {
+     "date": "2023-06-30",
+     "amount": 7594036700000
+    },
+    {
+     "date": "2023-07-31",
+     "amount": 7685542670000
+    },
+    {
+     "date": "2023-08-31",
+     "amount": 7771630840000
+    },
+    {
+     "date": "2023-09-30",
+     "amount": 7826080160000
+    },
+    {
+     "date": "2023-10-31",
+     "amount": 7913479780000
+    },
+    {
+     "date": "2023-11-30",
+     "amount": 7972577480000
+    },
+    {
+     "date": "2023-12-31",
+     "amount": 8079270020000
+    },
+    {
+     "date": "2024-01-31",
+     "amount": 8210714540000
+    },
+    {
+     "date": "2024-02-29",
+     "amount": 8301795560000
+    },
+    {
+     "date": "2024-03-31",
+     "amount": 8347113990000
+    },
+    {
+     "date": "2024-04-30",
+     "amount": 8424193190000
+    },
+    {
+     "date": "2024-05-31",
+     "amount": 8522783420000
+    },
+    {
+     "date": "2024-06-30",
+     "amount": 8691534950000
+    },
+    {
+     "date": "2024-07-31",
+     "amount": 8826381740000
+    },
+    {
+     "date": "2024-08-31",
+     "amount": 8898037210000
+    },
+    {
+     "date": "2024-09-30",
+     "amount": 8928002710000
+    },
+    {
+     "date": "2024-10-31",
+     "amount": 9031877390000
+    },
+    {
+     "date": "2024-11-30",
+     "amount": 9091103830000
+    },
+    {
+     "date": "2024-12-31",
+     "amount": 8984236590000
+    },
+    {
+     "date": "2025-01-31",
+     "amount": 8939978050000
+    },
+    {
+     "date": "2025-02-28",
+     "amount": 9045259980000
+    },
+    {
+     "date": "2025-03-31",
+     "amount": 9095938270000
+    },
+    {
+     "date": "2025-04-30",
+     "amount": 9176310110000
+    },
+    {
+     "date": "2025-05-31",
+     "amount": 9264686010000
+    },
+    {
+     "date": "2025-06-30",
+     "amount": 9388792920000
+    },
+    {
+     "date": "2025-07-31",
+     "amount": 9555157650000
+    },
+    {
+     "date": "2025-08-31",
+     "amount": 9619767410000
+    },
+    {
+     "date": "2025-09-30",
+     "amount": 9748473480000
+    },
+    {
+     "date": "2025-10-31",
+     "amount": 9855839290000
+    },
+    {
+     "date": "2025-11-30",
+     "amount": 9990926090000
+    },
+    {
+     "date": "2025-12-31",
+     "amount": 10017919140000
+    },
+    {
+     "date": "2026-01-31",
+     "amount": 10079963200000
+    },
+    {
+     "date": "2026-02-28",
+     "amount": 10178332410000
+    },
+    {
+     "date": "2026-03-31",
+     "amount": 10355752430000
+    },
+    {
+     "date": "2026-04-30",
+     "amount": 10442787180000
+    },
+    {
+     "date": "2026-05-31",
+     "amount": 10622334580000
+    },
+    {
+     "date": "2026-06-30",
+     "amount": 10809475190000
+    },
+    {
+     "date": "2026-07-31",
+     "amount": 10946725800000
+    },
+    {
+     "date": "2026-08-31",
+     "amount": 11054954370000
+    },
+    {
+     "date": "2026-09-30",
+     "amount": 11113782530000
+    }
+   ],
+   "sources": [
+    {
+     "name": "Banco Central do Brasil, SGS series 13761, D\u00edvida bruta do governo geral (DBGG), R$ million",
+     "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.13761/dados?formato=json"
+    }
+   ]
+  },
+  "india": {
+   "kind": "country",
+   "year_end_month": 3,
+   "points": [
+    {
+     "date": "2024-06-30",
+     "amount": 172726570000000
+    },
+    {
+     "date": "2024-09-30",
+     "amount": 176091300000000
+    },
+    {
+     "date": "2024-12-31",
+     "amount": 179985240000000
+    },
+    {
+     "date": "2025-03-31",
+     "amount": 185938060000000
+    },
+    {
+     "date": "2025-06-30",
+     "amount": 187862580000000
+    },
+    {
+     "date": "2025-09-30",
+     "amount": 191297550000000
+    },
+    {
+     "date": "2025-12-31",
+     "amount": 193937950000000
+    },
+    {
+     "date": "2026-03-31",
+     "amount": 201168890000000
+    }
+   ],
+   "sources": [
+    {
+     "name": "Department of Economic Affairs, Ministry of Finance, Quarterly Report on Public Debt Management, Table 4.1 Total Liabilities of Central Government, item H Gross Liabilities as per FRBM Act, rupees crore",
+     "url": "http://dea.gov.in/reports-public-debt-management"
+    }
+   ]
+  },
+  "japan": {
+   "kind": "country",
+   "year_end_month": 3,
+   "points": [
+    {
+     "date": "2021-12-31",
+     "amount": 1218433000000000
+    },
+    {
+     "date": "2022-03-31",
+     "amount": 1241307400000000
+    },
+    {
+     "date": "2022-06-30",
+     "amount": 1255193200000000
+    },
+    {
+     "date": "2022-09-30",
+     "amount": 1251379600000000
+    },
+    {
+     "date": "2022-12-31",
+     "amount": 1256999200000000
+    },
+    {
+     "date": "2023-03-31",
+     "amount": 1270499000000000
+    },
+    {
+     "date": "2023-06-30",
+     "amount": 1276315500000000
+    },
+    {
+     "date": "2023-09-30",
+     "amount": 1275611600000000
+    },
+    {
+     "date": "2023-12-31",
+     "amount": 1286452000000000
+    },
+    {
+     "date": "2024-03-31",
+     "amount": 1297161500000000
+    },
+    {
+     "date": "2024-06-30",
+     "amount": 1311042100000000
+    },
+    {
+     "date": "2024-09-30",
+     "amount": 1310438500000000
+    },
+    {
+     "date": "2024-12-31",
+     "amount": 1317636500000000
+    },
+    {
+     "date": "2025-03-31",
+     "amount": 1323715500000000
+    },
+    {
+     "date": "2025-06-30",
+     "amount": 1332187200000000
+    },
+    {
+     "date": "2025-09-30",
+     "amount": 1333591400000000
+    },
+    {
+     "date": "2025-12-31",
+     "amount": 1342172000000000
+    },
+    {
+     "date": "2026-03-31",
+     "amount": 1343842600000000
+    },
+    {
+     "date": "2026-06-30",
+     "amount": 1346683300000000
+    },
+    {
+     "date": "2026-09-30",
+     "amount": 1323363200000000
+    }
+   ],
+   "sources": [
+    {
+     "name": "Ministry of Finance Japan, Central Government Debt (government bonds, borrowings, financing bills), quarterly table, 100 million yen",
+     "url": "https://www.mof.go.jp/english/policy/jgbs/reference/gbb/suii.xls"
+    }
+   ]
+  },
+  "china": {
+   "kind": "country",
+   "year_end_month": 12,
+   "points": [
+    {
+     "date": "2025-03-31",
+     "amount": 36055700000000
+    },
+    {
+     "date": "2025-06-30",
+     "amount": 37963800000000
+    },
+    {
+     "date": "2025-09-30",
+     "amount": 40007100000000
+    },
+    {
+     "date": "2025-12-31",
+     "amount": 41231800000000
+    },
+    {
+     "date": "2026-03-31",
+     "amount": 42349800000000
+    },
+    {
+     "date": "2026-06-30",
+     "amount": 43926200000000
+    }
+   ],
+   "sources": [
+    {
+     "name": "Ministry of Finance of China, Central Government Operations And Debt (SDDS), quarterly central government debt balance, RMB billion",
+     "url": "https://gks.mof.gov.cn/tongjishuju/"
+    }
+   ]
+  }
+ },
+ "skipped": [
+  {
+   "slug": "australia",
+   "reason": "The Australian Office of Financial Management data hub (aofm.gov.au) did not respond, so the monthly workbook behind the Australia clock could not be read as a full history. The clock file only keeps the latest year of that workbook, which is not the long official series."
+  }
+ ]
+}

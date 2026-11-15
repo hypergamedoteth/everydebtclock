@@ -795,6 +795,9 @@ PLACE_URLS += world_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_
 import weo_build
 PLACE_URLS += weo_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE)
 PLACE_URLS += wealth_build.build(R, SITE, with_analytics, og, PLACES_LIVE, WEALTH_D, WEALTH_FUNDS) if WEALTH_FUNDS else []
+import debt_by_year_build
+DY_URLS = debt_by_year_build.build(R, SITE, with_analytics, STAMP, M.get("generated_iso") or "")
+debt_by_year_build.patch_clocks(R)
 
 # ---------------------------------------------------------------- free data hub (/data/ CSVs, charts). New files only, plus the sitemap and footer links above.
 import data_hub
@@ -805,6 +808,7 @@ lm = gen_ct.date().isoformat()
 # /embed/ is indexable. Per-clock pages under /embed/ are noindex and stay out of this list.
 urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/data/", "0.6", "daily"), (f"{SITE}/embed/", "0.5", "weekly")] + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
         [(u, "0.8", "weekly") for u in PLACE_URLS] +
+        [(u, "0.8", "weekly") for u in DY_URLS] +
         [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None] +
         ([(f"{SITE}/privacy.html", "0.2", "yearly")] if os.path.exists(f"{R}/privacy.html") else []))
 open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
@@ -839,6 +843,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /data/ : Free CSV files and charts of the US and world series this site publishes. Free to use with credit: Source: EveryDebtClock.com.",
     "- /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.",
     "",
+] + debt_by_year_build.llms_lines(R) + [
     "## Data",
     "US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.",
     "",
