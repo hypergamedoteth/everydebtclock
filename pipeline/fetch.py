@@ -696,6 +696,28 @@ dout, dout_stale = cached("debt_outstanding", src_debt_outstanding)
 if dout:
     META["debt_by_fy"] = dout; META["debt_by_fy_stale"] = bool(dout_stale); META["debt_by_fy_source"] = DO_URL
 
+# Milestone crossings, inauguration-date debt, Census population by year, interest by fiscal year.
+# The pages read cache/history_pages.json. These checks fail the refresh if a series contradicts the clock.
+import series as _series
+def src_history():
+    h = _series.build_history(fd, get)
+    _td, _pop = T.get("debt_total") or {}, T.get("population") or {}
+    # Refuse a new extract that disagrees with the clock. cached() then keeps the previous file.
+    _series.validate_history(h, _td.get("base"), _td.get("as_of"), _pop.get("base"))
+    return h
+hist, hist_stale = cached("history_pages", src_history)
+if hist:
+    _td, _pop = T.get("debt_total") or {}, T.get("population") or {}
+    _net = (T.get("out_interest") or {}).get("prev_fy_total")
+    try:
+        _series.validate_history(hist, _td.get("base"), _td.get("as_of"), _pop.get("base"))
+    except ValueError as e:
+        errors["history_pages_check"] = str(e)[:300]
+    META["history_pages"] = {"stale": bool(hist_stale), "series_end": hist.get("series_end"),
+                             "crossings": [c["trillion"] for c in hist.get("crossings") or []],
+                             "population_years": [hist["population_by_year"][0]["year"], hist["population_by_year"][-1]["year"]] if hist.get("population_by_year") else None}
+    validation_rows.extend(_series.validation_rows(hist, _td.get("base"), _td.get("as_of"), _pop.get("base"), _net))
+
 # ---- Federal Reserve holdings of Treasuries (NY Fed SOMA, weekly)
 SOMA_URL = "https://www.newyorkfed.org/markets/soma-holdings"
 def src_soma():
