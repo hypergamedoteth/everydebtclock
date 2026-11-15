@@ -150,3 +150,21 @@ main .intro{max-width:none;margin:2px 0 18px;padding:0 2px}
 .related .rg a:hover{border-color:var(--blue,#5aa9ff)}.related .rn{font-size:15px;font-weight:600}.related .rw{font-size:13px;color:var(--mut,#8a97ab)}
 .answers .related{padding-left:0;padding-right:0}@media (max-width:700px){.related .rg{grid-template-columns:1fr}}
 @media (max-width:640px){.srch ul{right:0}}
+/* Embed-this-clock control (below the page) and the /embed/ directory. The clock widgets themselves are standalone. */
+.embedbox{max-width:1280px;margin:0 auto;padding:0 14px 18px}
+.embedbtn,.embedcopy{background:var(--panel);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.embedbtn:hover,.embedcopy:hover{border-color:var(--blue);color:var(--blue)}
+.embedbtn:focus-visible,.embedcopy:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.embedpanel{margin-top:8px}.embedpanel p{margin:0 0 8px;color:var(--mut);font-size:13px}
+.embedpanel textarea,.embcard textarea{display:block;width:100%;max-width:720px;box-sizing:border-box;margin:8px 0;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:8px;font:12px/1.45 var(--mono)}
+.intro.pitch h2{font-size:16px;letter-spacing:0;text-transform:none;margin:14px 0 6px}
+.intro.pitch p+p,.intro.pitch .embjump{margin-top:8px}
+.intro.pitch code{font-family:var(--mono);font-size:12.5px;color:var(--txt)}
+.embjump a{margin-right:10px}
+.embwrap{max-width:1280px;margin:0 auto;padding:4px 14px 48px}
+.embsec{margin:8px 0 22px}.embsec h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}
+.embgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:14px}
+.embcard{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px;min-width:0}
+.embcard h3{margin:0;font-size:16px}.embcard .sub{margin:2px 0 8px;color:var(--mut);font-size:12px}
+.embcard iframe{display:block;width:100%;height:160px;border:0;border-radius:10px;background:#0e131b}
+.embcard textarea{max-width:none}

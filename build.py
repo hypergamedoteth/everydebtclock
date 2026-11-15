@@ -5,6 +5,7 @@
  3) t/<slug>.html real, indexable, live-ticking share pages (one per ticker)
  4) sitemap.xml + robots.txt
  5) dist/debtclock-standalone.html (everything inlined, works offline)
+ 6) embed/ widgets (one noindex page per US, state, DC, country and world clock) and the indexable /embed/ directory
 Site URL defaults to https://everydebtclock.com; override with DEBTCLOCK_SITE_URL for previews."""
 import json, os, html, time, datetime as dt, re
 from zoneinfo import ZoneInfo
@@ -423,7 +424,7 @@ for slug, i in ALL.items():
 <p><b>* Per person (projected population)</b> divides by the US population projected to now: the official Census Vintage 2025 estimate for July 1, 2025 ({POP_OFF:,.0f}), projected forward at Census's stated growth rate ({POP:,.0f} at build time).{pp_off} <b>Per tax return filed</b> divides by {TAX:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2); a joint return counts once and returns with zero tax liability are included.</p>
 <a class="cta" href="../index.html#t={slug}">Open the full live clock →</a>
 <div class="rel"><b>Related:</b><br>{''.join(f'<a href="{s}.html">{html.escape(ALL[s].get("label", s))}</a>' for s in rel)}</div>
-<footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser. · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser. · <a href="../embed/">Embed a clock</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main><script>window.DEBTCLOCK_DATA={data};</script><script src="../core.js"></script>
 <script>(function(){{const C=DC(window.DEBTCLOCK_DATA),i=C.info({json.dumps(slug)}),v=document.getElementById('v'),p1=document.getElementById('p1'),p2=document.getElementById('p2');
 (function f(){{const t=Date.now()/1000,x=C.get({json.dumps(slug)},t);v.textContent=C.fmt(i,x);if(p1){{p1.textContent=C.ppf(x/C.pop(t));p2.textContent=C.ppf(x/C.tax)}}requestAnimationFrame(f)}})()}})()</script>
@@ -556,7 +557,7 @@ def answer_page(slug, title, desc, h1, body, ld="", og_img="og/debt_total.png"):
 <a class="cta" href="../">Open the live national debt clock →</a>
 {explore.explore("../", PLACES_LIVE, places_build.calc, topic=slug, gdp=places_build.GDP_BY_SLUG) if PLACES_LIVE else ""}
 <div class="rel"><b>More answers:</b><br>{more}<a href="../t/debt_total.html">US national debt, live</a></div>
-<footer>Every figure on this page is an official published number unless it is labelled "projected". Page built {STAMP} from data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT; it is rebuilt after every Treasury update. · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer>Every figure on this page is an official published number unless it is labelled "projected". Page built {STAMP} from data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT; it is rebuilt after every Treasury update. · <a href="../embed/">Embed a clock</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main></body></html>"""
     os.makedirs(f"{R}/{slug}", exist_ok=True)
     open(f"{R}/{slug}/index.html", "w").write(with_analytics(page))
@@ -822,7 +823,8 @@ PLACE_URLS += wealth_build.build(R, SITE, with_analytics, og, PLACES_LIVE, WEALT
 
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()
-urls = ([(f"{SITE}/", "1.0", "hourly")] + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
+# /embed/ is indexable. Per-clock pages under /embed/ are noindex and stay out of this list.
+urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/embed/", "0.5", "weekly")] + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
         [(u, "0.8", "weekly") for u in PLACE_URLS] +
         [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None] +
         ([(f"{SITE}/privacy.html", "0.2", "yearly")] if os.path.exists(f"{R}/privacy.html") else []))
@@ -852,6 +854,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /states/ : State and local debt clocks for every US state and Washington, DC, from official Census figures.",
     "- /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.",
     "- /methodology/ : Sources, how the live ticker is calculated, and how it is checked against Treasury.",
+    "- /embed/ : Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.",
     "",
     "## Data",
     "US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.",
@@ -874,9 +877,13 @@ if os.path.exists(_idx_key_path):
     if _idx_key:
         open(f"{R}/{_idx_key}.txt", "w").write(_idx_key + "\n")
 
-# ---------------------------------------------------------------- standalone
+# ---------------------------------------------------------------- embeddable clocks (after pages exist; patches the US, state, DC, country and world pages)
+import embed_build
+embed_build.apply(R, SITE, with_analytics, require_pages=True, now=NOW, world=WORLD)
+
+# ---------------------------------------------------------------- standalone (read index.html back so the embed control is in the offline copy)
 css, js = open(f"{R}/style.css").read(), open(f"{R}/app.js").read()
-idx_ = re.sub(r'(href|src)="(style\.css|app\.js)\?v=[^"]*"', r'\1="\2"', idx)
+idx_ = re.sub(r'(href|src)="(style\.css|app\.js)\?v=[^"]*"', r'\1="\2"', open(f"{R}/index.html").read())
 single = (idx_.replace('<link rel="stylesheet" href="style.css">', f"<style>{css}</style>")
              .replace("<!--DATA-->", "<script>window.DEBTCLOCK_DATA=" + json.dumps(D, separators=(",", ":")).replace("</", "<\\/") + ";</script>")
              .replace('<script src="app.js"></script>', f"<script>{js}</script>"))
@@ -889,7 +896,8 @@ print(f"standalone: {len(single)//1024} KB; share pages: {len(urls)-1}; og image
 import hashlib, glob as _glob
 AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in ("style.css", "app.js", "core.js") if os.path.exists(f"{R}/{a}")}
 _vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
-_pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html")] + _glob.glob(f"{R}/t/*.html")
+# Per-clock files under embed/ are self-contained (no site CSS, no favicon request). Only the directory is versioned.
+_pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html", "embed/index.html")] + _glob.glob(f"{R}/t/*.html")
           + [f for d in ["states", "countries", "world", "world-government-debt", "global-debt-clock", "wealth"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
 # Every page gets real icon files (favicon.ico, a 32px PNG and the SVG), replacing the old inline data-URI icon. Made by pipeline/make_favicon.py.
 ICON_LINKS = '<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg">'
