@@ -26,7 +26,7 @@
  "legend": "Japan's central government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
  "cadence": "Quarterly. The Ministry of Finance publishes each quarter-end figure about six weeks after the quarter ends.",
  "after_text": ", about six weeks after each quarter-end",
- "next_update": "The September 2026 quarter-end figure is expected from the Ministry of Finance roughly six weeks after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "next_update": "The December 2026 quarter-end figure is expected from the Ministry of Finance roughly six weeks after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
   "value": 122690000,
   "noun": "people",
@@ -44,10 +44,10 @@
    "key": "cgdebt",
    "label": "Japan central government debt (total)",
    "short": "Central government debt",
-   "value": 1346683300000000,
-   "as_of": "2026-06-30",
-   "prior_value": 1332187200000000,
-   "prior_as_of": "2025-06-30",
+   "value": 1323363200000000,
+   "as_of": "2026-09-30",
+   "prior_value": 1333591400000000,
+   "prior_as_of": "2025-09-30",
    "source_name": "Ministry of Finance Japan, Central Government Debt (government bonds, borrowings, financing bills), quarterly table, 100 million yen",
    "source_url": "https://www.mof.go.jp/english/policy/jgbs/reference/gbb/",
    "source_locator": "Quarterly pages e{YYYYMM}.html under https://www.mof.go.jp/english/policy/jgbs/reference/gbb/, table 1 row Total (e.g. e202606.html)",
@@ -56,20 +56,16 @@
     {
      "key": "guar",
      "label": "Government-guaranteed debts (not included above)",
-     "value": 27434600000000,
+     "value": 26298300000000,
      "kind": "usd",
-     "as_of": "2026-06-30",
-     "note": "Debts guaranteed by the government (for example of public corporations) as reported by the Ministry of Finance alongside the debt figures. They are not added to the total. A year earlier (2025-06-30) it was ¥27.9 trillion.",
+     "as_of": "2026-09-30",
+     "note": "Debts guaranteed by the government (for example of public corporations) as reported by the Ministry of Finance alongside the debt figures. They are not added to the total. A year earlier (2025-09-30) it was ¥27.2 trillion.",
      "source_name": "Ministry of Finance Japan, Central Government Debt",
      "source_url": "https://www.mof.go.jp/english/policy/jgbs/reference/gbb/",
      "source_locator": "Government-guaranteed debts row of the quarterly table"
     }
    ],
    "history": [
-    [
-     "2024-06-30",
-     1311042100000000
-    ],
     [
      "2024-09-30",
      1310438500000000
@@ -101,22 +97,26 @@
     [
      "2026-06-30",
      1346683300000000
+    ],
+    [
+     "2026-09-30",
+     1323363200000000
     ]
    ],
    "breakdown": [
     {
      "label": "Government bonds",
-     "value": 1211746600000000,
+     "value": 1214848300000000,
      "group": "Bonds, loans and bills"
     },
     {
      "label": "Borrowings",
-     "value": 40537400000000,
+     "value": 39615500000000,
      "group": "Bonds, loans and bills"
     },
     {
      "label": "Financing bills",
-     "value": 94399400000000,
+     "value": 68899400000000,
      "group": "Bonds, loans and bills"
     }
    ]

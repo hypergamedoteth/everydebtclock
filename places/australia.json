@@ -25,7 +25,7 @@
  "legend": "Australia's Commonwealth securities on issue are reported monthly, at month-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official month-end figures, shown here next to them.",
  "cadence": "Monthly. The AOFM updates its Data Hub with each month-end portfolio in the days after the month ends.",
  "after_text": ", within a few days after each month-end",
- "next_update": "The October 2026 month-end figure is expected on the AOFM Data Hub in the following weeks; this page re-bases to it automatically on the next daily build after it appears.",
+ "next_update": "The November 2026 month-end figure is expected on the AOFM Data Hub in the following weeks; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
   "value": 27921150,
   "noun": "people",
@@ -43,10 +43,10 @@
    "key": "cgdebt",
    "label": "Australian Government Securities on issue",
    "short": "Securities on issue",
-   "value": 981441608000,
-   "as_of": "2026-09-30",
-   "prior_value": 960241680000,
-   "prior_as_of": "2025-09-30",
+   "value": 998941608000,
+   "as_of": "2026-10-31",
+   "prior_value": 970891680000,
+   "prior_as_of": "2025-10-31",
    "source_name": "AOFM Data Hub, Portfolio Aggregate (dealt), sheet FaceValue, Total AUD Main Funding Instruments, A$",
    "source_url": "https://www.aofm.gov.au/data-hub",
    "source_locator": "AOFM Data Hub workbook portfolio_aggregate_-_dealt (xlsx), sheet FaceValue, column Total AUD Main Funding Instruments",
@@ -65,10 +65,6 @@
     }
    ],
    "history": [
-    [
-     "2025-09-30",
-     960241680000
-    ],
     [
      "2025-10-31",
      970891680000
@@ -116,22 +112,26 @@
     [
      "2026-09-30",
      981441608000
+    ],
+    [
+     "2026-10-31",
+     998941608000
     ]
    ],
    "breakdown": [
     {
      "label": "Treasury Bonds",
-     "value": 891949274000,
+     "value": 901149274000,
      "group": "Bonds"
     },
     {
      "label": "Treasury Indexed Bonds (capital indexed)",
-     "value": 41492334000,
+     "value": 41792334000,
      "group": "Bonds"
     },
     {
      "label": "Treasury Notes",
-     "value": 48000000000,
+     "value": 56000000000,
      "group": "Notes"
     }
    ]

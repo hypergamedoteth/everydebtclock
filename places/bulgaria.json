@@ -1,0 +1,152 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in euros. The debt component, history and facts are refreshed by pipeline/fetch_eurostat.py from Eurostat tables gov_10q_ggdebt and demo_pjan; edit wording here, not numbers.",
+ "slug": "bulgaria",
+ "kind": "country",
+ "country": "BG",
+ "name": "Bulgaria",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Eurostat (national statistical institutes' EDP data)",
+ "currency": {
+  "code": "EUR",
+  "symbol": "€"
+ },
+ "frequency": "quarterly",
+ "title": "Bulgaria National Debt Clock: Live Debt, Official Data",
+ "headline": "general government debt",
+ "headline_long": "general government gross debt",
+ "link_label": "general government debt, €",
+ "subject": "The general government of Bulgaria",
+ "hist_label": "General government gross debt",
+ "sum_note": "Bulgaria general government gross debt (Maastricht definition, quarter-end), from Eurostat's quarterly government debt statistics, which are compiled from national data.",
+ "scope_note": "This is general government gross debt in the EU Maastricht (excessive deficit procedure) definition, from Eurostat's quarterly table: currency and deposits, debt securities and loans of central government, local government and social security funds, at nominal value, consolidated. Figures are in euros. Central government is shown below as a fact and is not added on top.",
+ "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with bond issuance calendars and short-term borrowing.",
+ "legend": "Bulgaria's government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
+ "cadence": "Quarterly. Eurostat publishes each quarter-end figure (table gov_10q_ggdebt) about three months after the quarter ends.",
+ "after_text": ", about three months after each quarter-end",
+ "next_update": "The Q3 2026 quarter-end figure is expected from Eurostat roughly three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 6423207,
+  "noun": "people",
+  "as_of": "2026-01-01",
+  "source_name": "Eurostat, Population change, population on 1 January (demo_gind), Bulgaria (provisional)",
+  "source_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_gind/default/table",
+  "publisher_short": "Eurostat",
+  "tag": "Eurostat",
+  "possessive": "Eurostat's",
+  "method_short": "Eurostat population on 1 January, the latest published (provisional estimate)",
+  "noun_full": "people in Bulgaria"
+ },
+ "components": [
+  {
+   "key": "ggdebt",
+   "label": "Bulgaria general government gross debt",
+   "short": "General government debt",
+   "value": 35396300000,
+   "as_of": "2026-06-30",
+   "prior_value": 28385700000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Eurostat, Quarterly government debt (gov_10q_ggdebt), general government (S13), Maastricht debt, million euros",
+   "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+   "source_locator": "geo=BG, sector S13, na_item GD, unit MIO_EUR; machine-readable: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt",
+   "includes": "General government gross debt at nominal value in the Maastricht (EDP) definition: currency and deposits, short- and long-term debt securities and loans, consolidated across general government.",
+   "facts": [
+    {
+     "key": "cg",
+     "label": "Bulgaria central government gross debt (Maastricht)",
+     "value": 34478900000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "Central government (Eurostat sector S.1311) in the same table, on the same Maastricht definition. It is not added to the headline. A year earlier (2025-06-30) it was €27.8 billion. Central government is 97.4% of the general government total.",
+     "source_name": "Eurostat, gov_10q_ggdebt (sector S1311, GD)",
+     "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+     "source_locator": "geo=BG, sector S1311, na_item GD, unit MIO_EUR"
+    }
+   ],
+   "history": [
+    [
+     "2024-06-30",
+     21889200000
+    ],
+    [
+     "2024-09-30",
+     24918300000
+    ],
+    [
+     "2024-12-31",
+     24976900000
+    ],
+    [
+     "2025-03-31",
+     25046000000
+    ],
+    [
+     "2025-06-30",
+     28385700000
+    ],
+    [
+     "2025-09-30",
+     31825000000
+    ],
+    [
+     "2025-12-31",
+     34797000000
+    ],
+    [
+     "2026-03-31",
+     34395100000
+    ],
+    [
+     "2026-06-30",
+     35396300000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Currency and deposits",
+     "value": 1849900000,
+     "group": "Deposits"
+    },
+    {
+     "label": "Long-term debt securities",
+     "value": 28838300000,
+     "group": "Debt securities"
+    },
+    {
+     "label": "Short-term loans",
+     "value": 45500000,
+     "group": "Loans"
+    },
+    {
+     "label": "Long-term loans",
+     "value": 4662600000,
+     "group": "Loans"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Eurostat, Government finance statistics - quarterly data",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Government_finance_statistics_-_quarterly_data"
+  },
+  {
+   "name": "Ministry of Finance of Bulgaria, Government debt",
+   "url": "https://www.minfin.bg/en/statistics/"
+  },
+  {
+   "name": "National Statistical Institute of Bulgaria",
+   "url": "https://www.nsi.bg/en"
+  }
+ ],
+ "notes": [
+  "Why Eurostat: it publishes quarterly government debt for EU and EFTA countries on one Maastricht definition, compiled from the figures national statistical institutes and central banks report. The fetcher reads the public API directly.",
+  "What this page counts: general government gross debt (sector S.13), not central government alone. The central government figure is a fact and is not added again.",
+  "Provisional data: Eurostat flags the latest quarters as provisional and revises them. The page re-bases to each new release.",
+  "Source tier: harmonized official dataset (Eurostat gov_10q_ggdebt). As-of date is the quarter-end of the latest published stock.",
+  "Cross-check: the Ministry of Finance publishes government debt on the national definition as well. Eurostat's euro and national-currency units for Bulgaria are the same figures."
+ ],
+ "iso3": "BGR",
+ "source_tier": "harmonized",
+ "world_measure": "General government, gross"
+}

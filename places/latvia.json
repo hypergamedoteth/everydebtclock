@@ -1,0 +1,152 @@
+{
+ "_doc": "One file per place; see places_build.py. Amounts in euros. The debt component, history and facts are refreshed by pipeline/fetch_eurostat.py from Eurostat tables gov_10q_ggdebt and demo_pjan; edit wording here, not numbers.",
+ "slug": "latvia",
+ "kind": "country",
+ "country": "LV",
+ "name": "Latvia",
+ "demonym": "person",
+ "status": "live",
+ "publisher": "Eurostat (national statistical institutes' EDP data)",
+ "currency": {
+  "code": "EUR",
+  "symbol": "€"
+ },
+ "frequency": "quarterly",
+ "title": "Latvia National Debt Clock: Live Debt, Official Data",
+ "headline": "general government debt",
+ "headline_long": "general government gross debt",
+ "link_label": "general government debt, €",
+ "subject": "The general government of Latvia",
+ "hist_label": "General government gross debt",
+ "sum_note": "Latvia general government gross debt (Maastricht definition, quarter-end), from Eurostat's quarterly government debt statistics, which are compiled from national data.",
+ "scope_note": "This is general government gross debt in the EU Maastricht (excessive deficit procedure) definition, from Eurostat's quarterly table: currency and deposits, debt securities and loans of central government, local government and social security funds, at nominal value, consolidated. Figures are in euros. Central government is shown below as a fact and is not added on top.",
+ "trend_why": "We use the latest four quarters rather than the last quarter because quarter-to-quarter changes swing with bond issuance calendars and short-term borrowing.",
+ "legend": "Latvia's government debt is reported quarterly, at quarter-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official quarter-end figures, shown here next to them.",
+ "cadence": "Quarterly. Eurostat publishes each quarter-end figure (table gov_10q_ggdebt) about three months after the quarter ends.",
+ "after_text": ", about three months after each quarter-end",
+ "next_update": "The Q3 2026 quarter-end figure is expected from Eurostat roughly three months after the quarter ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "population": {
+  "value": 1845096,
+  "noun": "people",
+  "as_of": "2026-01-01",
+  "source_name": "Eurostat, Population change, population on 1 January (demo_gind), Latvia (provisional)",
+  "source_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_gind/default/table",
+  "publisher_short": "Eurostat",
+  "tag": "Eurostat",
+  "possessive": "Eurostat's",
+  "method_short": "Eurostat population on 1 January, the latest published (provisional estimate)",
+  "noun_full": "people in Latvia"
+ },
+ "components": [
+  {
+   "key": "ggdebt",
+   "label": "Latvia general government gross debt",
+   "short": "General government debt",
+   "value": 21633500000,
+   "as_of": "2026-06-30",
+   "prior_value": 19770400000,
+   "prior_as_of": "2025-06-30",
+   "source_name": "Eurostat, Quarterly government debt (gov_10q_ggdebt), general government (S13), Maastricht debt, million euros",
+   "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+   "source_locator": "geo=LV, sector S13, na_item GD, unit MIO_EUR; machine-readable: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10q_ggdebt",
+   "includes": "General government gross debt at nominal value in the Maastricht (EDP) definition: currency and deposits, short- and long-term debt securities and loans, consolidated across general government.",
+   "facts": [
+    {
+     "key": "cg",
+     "label": "Latvia central government gross debt (Maastricht)",
+     "value": 24780200000,
+     "kind": "usd",
+     "as_of": "2026-06-30",
+     "note": "Central government (Eurostat sector S.1311) in the same table, on the same Maastricht definition. It is not added to the headline. A year earlier (2025-06-30) it was €22.4 billion. Central government is larger than the general government total because the general government figure nets out debt held between government units.",
+     "source_name": "Eurostat, gov_10q_ggdebt (sector S1311, GD)",
+     "source_url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table",
+     "source_locator": "geo=LV, sector S1311, na_item GD, unit MIO_EUR"
+    }
+   ],
+   "history": [
+    [
+     "2024-06-30",
+     18183000000
+    ],
+    [
+     "2024-09-30",
+     18846400000
+    ],
+    [
+     "2024-12-31",
+     18795900000
+    ],
+    [
+     "2025-03-31",
+     18488400000
+    ],
+    [
+     "2025-06-30",
+     19770400000
+    ],
+    [
+     "2025-09-30",
+     18959700000
+    ],
+    [
+     "2025-12-31",
+     20153500000
+    ],
+    [
+     "2026-03-31",
+     20428400000
+    ],
+    [
+     "2026-06-30",
+     21633500000
+    ]
+   ],
+   "breakdown": [
+    {
+     "label": "Currency and deposits",
+     "value": 807500000,
+     "group": "Deposits"
+    },
+    {
+     "label": "Long-term debt securities",
+     "value": 19611600000,
+     "group": "Debt securities"
+    },
+    {
+     "label": "Short-term loans",
+     "value": 5900000,
+     "group": "Loans"
+    },
+    {
+     "label": "Long-term loans",
+     "value": 1208500000,
+     "group": "Loans"
+    }
+   ]
+  }
+ ],
+ "extra_sources": [
+  {
+   "name": "Eurostat, Government finance statistics - quarterly data",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Government_finance_statistics_-_quarterly_data"
+  },
+  {
+   "name": "Treasury of Latvia, Debt management",
+   "url": "https://www.kase.gov.lv/en"
+  },
+  {
+   "name": "Official statistics of Latvia",
+   "url": "https://stat.gov.lv/en"
+  }
+ ],
+ "notes": [
+  "Why Eurostat: it publishes quarterly government debt for EU and EFTA countries on one Maastricht definition, compiled from the figures national statistical institutes and central banks report. The fetcher reads the public API directly.",
+  "What this page counts: general government gross debt (sector S.13), not central government alone. The central government figure is a fact and is not added again.",
+  "Provisional data: Eurostat flags the latest quarters as provisional and revises them. The page re-bases to each new release.",
+  "Source tier: harmonized official dataset (Eurostat gov_10q_ggdebt). As-of date is the quarter-end of the latest published stock.",
+  "Cross-check: the Treasury of Latvia publishes central government debt; the clock uses the general government total Eurostat compiles from the national accounts."
+ ],
+ "iso3": "LVA",
+ "source_tier": "harmonized",
+ "world_measure": "General government, gross"
+}

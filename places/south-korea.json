@@ -25,7 +25,7 @@
  "legend": "South Korea's central government debt is reported monthly, at month-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official figures, shown here next to them.",
  "cadence": "Monthly. The Ministry publishes the Monthly Fiscal Trends about six weeks after the month ends.",
  "after_text": ", about six weeks after each month-end",
- "next_update": "The September 2026 month-end figure is expected in the Ministry's Monthly Fiscal Trends about six weeks after the month ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "next_update": "The October 2026 month-end figure is expected in the Ministry's Monthly Fiscal Trends about six weeks after the month ends; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
   "value": 51820000,
   "noun": "people",
@@ -43,8 +43,8 @@
    "key": "cgdebt",
    "label": "South Korea central government debt",
    "short": "Central government debt",
-   "value": 1372100000000000,
-   "as_of": "2026-08-31",
+   "value": 1369400000000000,
+   "as_of": "2026-09-30",
    "prior_value": 1268100000000000,
    "prior_as_of": "2025-12-31",
    "source_name": "Ministry of Planning and Budget, Monthly Fiscal Trends (월간 재정동향), section 5 \"국가채무(중앙정부)\", KRW trillion",
@@ -111,27 +111,31 @@
     [
      "2026-08-31",
      1372100000000000
+    ],
+    [
+     "2026-09-30",
+     1369400000000000
     ]
    ],
    "breakdown": [
     {
      "label": "Treasury bonds (국고채권)",
-     "value": 1263500000000000,
+     "value": 1262400000000000,
      "group": "Government bonds"
     },
     {
      "label": "National housing bonds (국민주택채권)",
-     "value": 72800000000000,
+     "value": 72500000000000,
      "group": "Government bonds"
     },
     {
      "label": "Foreign exchange stabilisation bonds (외평채권)",
-     "value": 34200000000000,
+     "value": 33000000000000,
      "group": "Government bonds"
     },
     {
      "label": "Borrowings (차입금)",
-     "value": 1500000000000,
+     "value": 1400000000000,
      "group": "Borrowings and obligations"
     },
     {

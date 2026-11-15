@@ -26,7 +26,7 @@
  "legend": "Russia's state internal debt is reported monthly, as of the first day of the month. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official monthly figures, shown here next to them.",
  "cadence": "Monthly. The Ministry of Finance updates the figure as of the first of each month.",
  "after_text": ", as of the first day of each month",
- "next_update": "Minfin updates the figure monthly, as of the 1st of the month (2026-11-01 next); this page picks it up automatically on the next daily build after it appears.",
+ "next_update": "Minfin updates the figure monthly, as of the 1st of the month (2026-12-01 next); this page picks it up automatically on the next daily build after it appears.",
  "population": {
   "value": 146119928,
   "noun": "people",
@@ -44,10 +44,10 @@
    "key": "cgdebt",
    "label": "Russia state internal debt",
    "short": "State internal debt",
-   "value": 36682056417700,
-   "as_of": "2026-10-01",
-   "prior_value": 27347992000000,
-   "prior_as_of": "2025-10-01",
+   "value": 36919142940900,
+   "as_of": "2026-11-01",
+   "prior_value": 28297823000000,
+   "prior_as_of": "2025-11-01",
    "source_name": "Минфин России, Государственный внутренний долг Российской Федерации, всего (тыс. руб.)",
    "source_url": "https://minfin.gov.ru/ru/perfomance/public_debt/internal/",
    "source_locator": "Block \"Объем государственного внутреннего долга Российской Федерации, тыс. руб.\", row всего; history: graphDynamicsDebt_ru xlsx on the same page",
@@ -56,9 +56,9 @@
     {
      "key": "guarantees",
      "label": "Of which state guarantees in roubles",
-     "value": 505739151000,
+     "value": 501854145400,
      "kind": "usd",
-     "as_of": "2026-10-01",
+     "as_of": "2026-11-01",
      "note": "Included in the total above, as reported by the Ministry of Finance on the same page.",
      "source_name": "Минфин России, Государственный внутренний долг Российской Федерации",
      "source_url": "https://minfin.gov.ru/ru/perfomance/public_debt/internal/",
@@ -66,10 +66,6 @@
     }
    ],
    "history": [
-    [
-     "2025-10-01",
-     27347992000000
-    ],
     [
      "2025-11-01",
      28297823000000
@@ -117,6 +113,10 @@
     [
      "2026-10-01",
      36682056417700
+    ],
+    [
+     "2026-11-01",
+     36919142940900
     ]
    ],
    "breakdown": []

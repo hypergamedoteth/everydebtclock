@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Self-audit of every US state page against the official sources it cites. Read-only: never writes places/*.json.
+"""Self-audit of every US state page (50 states + DC) against the official sources it cites. Read-only: never writes places/*.json.
 Usage: python3 pipeline/audit_places.py [--offline] [--site DIR] [--report FILE]
   1. Internal checks on each places/<slug>.json (kind=state): state + local = state-and-local total, long + short term = component,
      history ends at the headline value, prior value matches history, population present, every figure has a source URL.
@@ -40,8 +40,9 @@ def census(fips, tries=6):
 def audit_place(p, live, pops, issues, notes):
     slug = p["slug"]; E = lambda m: issues.append(f"{slug}: {m}")
     cs = {c["key"]: c for c in p["components"]}
-    if set(cs) != {"state", "local"}: return E(f"expected components state+local, got {sorted(cs)}")
-    fips = re.search(r"US(\d\d)", cs["state"]["source_url"]); fips = fips and fips.group(1)
+    dc = slug == "district-of-columbia"  # one government: Census has no state level for DC, so its only component is "local" and equals State and Local
+    if set(cs) != ({"local"} if dc else {"state", "local"}): return E(f"expected components {'local' if dc else 'state+local'}, got {sorted(cs)}")
+    fips = re.search(r"US(\d\d)", cs["local"]["source_url"]); fips = fips and fips.group(1)
     if not fips: return E("no FIPS in source_url")
     for k, c in cs.items():
         if not c.get("source_url", "").startswith("https://"): E(f"{k}: missing source_url")
@@ -55,9 +56,9 @@ def audit_place(p, live, pops, issues, notes):
     try: cen = census(fips)
     except Exception as ex: return E(f"could not fetch Census data ({ex.__class__.__name__}); not verified")
     years = sorted(y for (g, a, y) in cen if g == "State and Local" and a == "LF0231")
-    last = int(cs["state"]["as_of"][:4])
+    last = int(cs["local"]["as_of"][:4])
     if years and years[-1] > last: issues.append(f"{slug}: UPDATE AVAILABLE, Census now has survey year {years[-1]} (page uses {last})")
-    for k, g in (("state", "State"), ("local", "Local")):
+    for k, g in ((("local", "Local"),) if dc else (("state", "State"), ("local", "Local"))):
         c = cs[k]
         for d, v in c["history"]:
             y = int(d[:4]); cv = cen.get((g, "LF0231", y))
@@ -67,11 +68,11 @@ def audit_place(p, live, pops, issues, notes):
             a = "LF0233" if "LF0233" in b["label"] else "LF0232"; cv = cen.get((g, a, last))
             if cv != b["value"]: E(f"DRIFT {k} {a} {last}: page {b['value']} vs Census {cv}")
     tot = cen.get(("State and Local", "LF0231", last))
-    if tot is not None and abs(cs["state"]["value"] + cs["local"]["value"] - tot) > TOL: E(f"DRIFT state+local {last}: page sum vs Census total {tot}")
+    if tot is not None and abs(sum(c["value"] for c in cs.values()) - tot) > TOL: E(f"DRIFT state+local {last}: page sum vs Census total {tot}")
     pr = pops.get(p["name"])
     if not pr: E("not in Census population file")
     elif int(pr["POPESTIMATE2025"]) != pop["value"] or int(pr["POPESTIMATE2024"]) != pop["prior_value"]: E("DRIFT population vs Census Vintage 2025")
-    notes.append(f"{slug}: {last} state+local ${(cs['state']['value'] + cs['local']['value'])/1e9:,.2f}B checked against Census" )
+    notes.append(f"{slug}: {last} state+local ${sum(c['value'] for c in cs.values())/1e9:,.2f}B checked against Census" )
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--offline", action="store_true"); ap.add_argument("--site"); ap.add_argument("--report")
@@ -79,7 +80,7 @@ def main():
     places = [p for f in sorted(glob.glob(os.path.join(ROOT, "places", "*.json"))) for p in [json.load(open(f))] if p.get("kind") == "state" and p.get("status") == "live"]
     pops = {} if a.offline else {r["NAME"]: r for r in csv.DictReader(io.StringIO(get(POP_URL).decode("utf-8-sig")))}
     for p in places: audit_place(p, not a.offline, pops, issues, notes)
-    if len(places) != 50: issues.append(f"expected 50 live state files, found {len(places)}")
+    if len(places) != 51: issues.append(f"expected 51 live state files (50 states + DC), found {len(places)}")
     if a.site:
         sm = open(os.path.join(a.site, "sitemap.xml")).read() if os.path.exists(os.path.join(a.site, "sitemap.xml")) else ""
         for p in places:

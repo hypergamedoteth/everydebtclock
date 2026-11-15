@@ -83,6 +83,12 @@ def dataset_ld(name, desc, url, based=None, temporal=None, kw=None):
     if temporal: ld["temporalCoverage"] = temporal
     return '<script type="application/ld+json">' + json.dumps(ld).replace("</", "<\\/") + "</script>"
 
+def faq_ld(pairs):
+    """FAQPage JSON-LD. pairs = [(question, plain-text answer), ...]."""
+    ld = {"@context": "https://schema.org", "@type": "FAQPage",
+          "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in pairs]}
+    return '<script type="application/ld+json">' + json.dumps(ld).replace("</", "<\\/") + "</script>"
+
 def fmt(i, x, short=False):
     if x is None: return "—"
     if i.get("kind") == "pct": return f"{x:.2f}%"
@@ -204,6 +210,12 @@ meta = f"""<!--META--><title>{HOME_TITLE}</title>
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Every Debt Clock: US national debt, live and verified daily">
 <meta name="twitter:description" content="{html.escape(desc)}"><meta name="twitter:image" content="{SITE}/og/home.png">
 {home_ld}
+{faq_ld([
+    ("How much is the US national debt?",
+     f"The US national debt was {usd2(OFF_V)} ({tril(OFF_V)}) at Treasury's {fdate(OFF_D)} close, according to Debt to the Penny."),
+    ("How much is the national debt per person?",
+     f"{usd2(PP_OFF)}. That is the official total divided by the Census Bureau's estimate of {POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}."),
+])}
 <!--/META-->"""
 idx = re.sub(r"<!--META-->.*?<!--/META-->", lambda m: meta, idx, flags=re.S)
 idx = re.sub(r'<meta property="og:title" content="US Debt Clock — live &amp; verified"><meta property="og:type" content="website">\n?', "", idx)
@@ -222,10 +234,12 @@ if held:
 else:
     proj_txt = (f"The clock below starts from that official figure and projects forward at the 90-day trend (about {bil(rate_day)} a day). "
                 "It is re-based to Treasury's new figure every business day and never projects past the debt limit.")
+answer_s = f"The US national debt was <b>{usd2(OFF_V)}</b> ({tril(OFF_V)}) at Treasury's <b>{fdate(OFF_D)}</b> close."
 intro = (f"""<!--INTRO--><h1>US National Debt Clock</h1>
-<p>The US national debt was <b>{usd2(OFF_V)}</b> ({tril(OFF_V)}) at the close of business on <b>{fdate(OFF_D)}</b>, according to Treasury's
-<a href="{DTP_URL}" rel="noopener">Debt to the Penny</a>. That is <b>{usd2(PP_OFF)} per person</b>: the debt divided by the Census Bureau's estimate of
+<p class="answer">{answer_s} The figure is from <a href="{DTP_URL}" rel="noopener">Treasury's Debt to the Penny</a>.</p>
+<p>That is <b>{usd2(PP_OFF)} per person</b>: the debt divided by the Census Bureau's estimate of
 {POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}. {proj_txt}</p><!--/INTRO-->""")
+# The World Debt Clock sentence is inserted after WORLD is computed, because the IMF general-government stock is not known yet.
 def row(slug):
     i = ALL.get(slug)
     if not i: return ""
@@ -256,19 +270,30 @@ import world_build
 WORLD = world_build.compute(R, PLACES_LIVE, {"official": OFF_V, "date": OFF_D, "base": val("debt_total", NOW), "rate": (val("debt_total", NOW + 3600) - val("debt_total", NOW)) / 3600,
                                              "pop": POP_OFF, "pop_date": POP_OFF_DATE}, NOW) if PLACES_LIVE else None
 places_build.WORLD = bool(WORLD)
+places_build.WEO = os.path.exists(f"{R}/data/world_weo_debt.json")
+places_build.HEADLINE_BY_SLUG = {x["slug"]: x for x in WORLD["rows"]} if WORLD else {}
+if WORLD:
+    _us = next(x for x in WORLD["rows"] if x["iso3"] == "USA")
+    _us_note = (f'<p><b>World Debt Clock.</b> The headline for the United States is general government gross debt, '
+                f'{usd0(_us["usd"])} as of {fdate(_us["as_of"]) if len(_us["as_of"]) == 10 else _us["as_of"]} (IMF World Economic Outlook). '
+                f'This page\'s clock is narrower and is not in that total: federal debt, gross, Treasury Debt to the Penny, as of {fdate(OFF_D)}.</p>')
+    intro = intro.replace("<!--/INTRO-->", _us_note + "<!--/INTRO-->")
+    ssr = ssr.replace("<!--/INTRO-->", _us_note + "<!--/INTRO-->")
 import explore
 explore.check(PLACES_LIVE)
 # Wealth tab (wealth_build.py): sets the flags/lists that nav, search and country-page links read, before any page is built
 import wealth_build
 WEALTH_D, WEALTH_FUNDS = wealth_build.prep(PLACES_LIVE)
-# IMF GDP by place slug, used to rank countries in the "Explore more clocks" links (US included as "united-states")
+# IMF GDP by place slug, used to pick peer-country related clocks (US included as "united-states")
 _gdp = json.load(open(f"{R}/data/world_gdp.json")).get("countries", {}) if os.path.exists(f"{R}/data/world_gdp.json") else {}
 places_build.GDP_BY_SLUG = {p["slug"]: _gdp.get(p.get("iso3") or world_build.ISO3.get(p.get("country", ""), ""), 0) for p in PLACES_LIVE if p["kind"] == "country"}
 places_build.GDP_BY_SLUG["united-states"] = _gdp.get("USA", 0)
+if PLACES_LIVE:
+    explore.check_related(PLACES_LIVE, places_build.calc, gdp=places_build.GDP_BY_SLUG, funds=WEALTH_FUNDS)
 HOME_EXPLORE = explore.explore("", PLACES_LIVE, places_build.calc, cur=None, gdp=places_build.GDP_BY_SLUG, kind_hint="us") if PLACES_LIVE else ""
 links = (f"""<!--LINKS-->""" + HOME_EXPLORE + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
          f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> ({html.escape(p.get("link_label", "state + local"))})</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
-         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (sum of the countries, in US dollars)</li>' if WORLD else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
+         + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (general government gross debt of every IMF economy)</li>' if WORLD else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
 <div class="sh"><h2>Popular counters</h2></div><ul>{''.join(f'<li><a href="t/{k}.html">{html.escape(label(k, ALL[k]))}</a></li>' for k in KEY_TICKERS if k in ALL)}</ul><!--/LINKS-->""")
 if "<!--INTRO-->" in idx: idx = re.sub(r"<!--INTRO-->.*?<!--/INTRO-->", lambda m: intro, idx, flags=re.S)
 if "<!--SSR-->" in idx: idx = re.sub(r"<!--SSR-->.*?<!--/SSR-->", lambda m: ssr, idx, flags=re.S)
@@ -524,12 +549,13 @@ def answer_page(slug, title, desc, h1, body, ld="", og_img="og/debt_total.png"):
 <meta property="og:image" content="{SITE}/{og_img}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{html.escape(title)}">
 <meta name="twitter:description" content="{html.escape(desc)}"><meta name="twitter:image" content="{SITE}/{og_img}">
-<meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><style>{PAGE_CSS}{ANS_CSS}</style>
+<meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><style>{PAGE_CSS}{ANS_CSS}{explore.RELATED_CSS}</style>
 {ld}</head><body><main>
 <a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>
 <h1>{html.escape(h1)}</h1>
 {held_note}{body}
 <a class="cta" href="../">Open the live national debt clock →</a>
+{explore.explore("../", PLACES_LIVE, places_build.calc, topic=slug, gdp=places_build.GDP_BY_SLUG) if PLACES_LIVE else ""}
 <div class="rel"><b>More answers:</b><br>{more}<a href="../t/debt_total.html">US national debt, live</a></div>
 <footer>Every figure on this page is an official published number unless it is labelled "projected". Page built {STAMP} from data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT; it is rebuilt after every Treasury update. · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main></body></html>"""
@@ -579,7 +605,13 @@ if OFF_V:
                 f"{usd0(DI.get('base'))} intragovernmental. Daily changes, the debt limit and recent official closes.",
                 "How much is the national debt?", body,
                 ld=dataset_ld("US national debt, latest official close", f"Total public debt outstanding, debt held by the public and intragovernmental holdings from Treasury's Debt to the Penny, latest close {fdate(OFF_D)}.",
-                              f"{SITE}/how-much-is-the-national-debt/", temporal=f"{CLOSES[-1][0]}/{CLOSES[0][0]}" if CLOSES else None))
+                              f"{SITE}/how-much-is-the-national-debt/", temporal=f"{CLOSES[-1][0]}/{CLOSES[0][0]}" if CLOSES else None)
+                    + faq_ld([
+                        ("How much is the US national debt?",
+                         f"The US national debt was {usd2(OFF_V)} ({tril(OFF_V)}) at Treasury's {fdate(OFF_D)} close, according to Debt to the Penny."),
+                        ("How much of that is held by the public?",
+                         f"{usd0(DP.get('base'))} was held by the public and {usd0(DI.get('base'))} was intragovernmental as of {fdate(DP.get('as_of'))}."),
+                    ]))
 
     # 2) National debt per person
     pp = OFF_V / POP_OFF
@@ -748,7 +780,8 @@ if OFF_V:
 <tr><td>Per tax return filed</td><td><a href="{SRC_IRS[1]}" rel="noopener">IRS Data Book FY2025, Table 1-2</a></td><td>{TAX:,.0f} individual returns filed in FY2025, fixed. It includes zero-liability returns, and a joint return counts once.</td></tr>
 <tr><td>GDP, debt-to-GDP</td><td>Bureau of Economic Analysis, NIPA Table 1.1.5 (read through the DBnomics mirror)</td><td>Latest quarter, ticking at the four-quarter trend.</td></tr>
 <tr><td>Federal Reserve holdings, M2</td><td>New York Fed SOMA; Federal Reserve H.6</td><td>Latest published value, ticking at the recent trend.</td></tr>
-<tr><td>State debt clocks</td><td>Census Bureau, Annual Survey of State and Local Government Finances</td><td>Annual and about two years old when published; see each <a href="../states/">state page</a> for its method.</td></tr></table>
+<tr><td>State debt clocks</td><td>Census Bureau, Annual Survey of State and Local Government Finances</td><td>Annual and about two years old when published; see each <a href="../states/">state page</a> for its method.</td></tr>
+<tr><td>World Debt Clock</td><td>National general-government releases, Eurostat Maastricht debt, World Bank/IMF QPSD general government, and the IMF World Economic Outlook (GGXWDG_NGDP times NGDPD)</td><td>One general-government gross stock per economy. A central or federal series is shown on the country page and is not added. See <a href="../world/">/world/</a>.</td></tr></table>
 <h2>Record dates and when Treasury publishes</h2>
 <p>Debt to the Penny gives the debt at the <i>close of business</i> on each business day. Each record is published on the next business day, usually in the afternoon (around 3 PM Central in recent weeks): Monday's record appears Tuesday, and Friday's appears Monday. Weekends and federal holidays have no record of their own. The latest record Treasury had published when this page was built is <b>{fdate(OFF_D)}: {usd2(OFF_V)}</b>. Daily changes are lumpy: the debt steps up on days when auctions settle and moves down when securities held by trust funds mature.</p>
 <h2>How the live ticker works</h2>
@@ -784,6 +817,8 @@ if OFF_V:
 import places_build
 PLACE_URLS = places_build.build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, STAMP, NOW)
 PLACE_URLS += world_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE, WORLD) if WORLD else []
+import weo_build
+PLACE_URLS += weo_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE)
 PLACE_URLS += wealth_build.build(R, SITE, with_analytics, og, PLACES_LIVE, WEALTH_D, WEALTH_FUNDS) if WEALTH_FUNDS else []
 
 # ---------------------------------------------------------------- sitemap + robots
@@ -795,8 +830,51 @@ urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/embed/", "0.5", "weekly")] + [
         ([(f"{SITE}/privacy.html", "0.2", "yearly")] if os.path.exists(f"{R}/privacy.html") else []))
 open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     "".join(f"<url><loc>{u}</loc><lastmod>{lm}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
-# GitHub Pages does not send X-Frame-Options. Leave it that way so /embed/ clocks can be iframed.
-open(f"{R}/robots.txt", "w").write(f"User-agent: *\nAllow: /\nDisallow: /cache/\nDisallow: /pipeline/\nDisallow: /widget.html\nSitemap: {SITE}/sitemap.xml\n")
+AI_BOTS = ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User",
+           "PerplexityBot", "Google-Extended", "Applebot-Extended", "Bingbot")
+robots = "".join(f"User-agent: {b}\nAllow: /\n\n" for b in AI_BOTS)
+robots += f"User-agent: *\nAllow: /\nDisallow: /cache/\nDisallow: /pipeline/\nDisallow: /widget.html\n\nSitemap: {SITE}/sitemap.xml\n"
+open(f"{R}/robots.txt", "w").write(robots)
+open(f"{R}/llms.txt", "w").write("\n".join([
+    "# Every Debt Clock",
+    f"{SITE}/",
+    "",
+    f"Live US, state, country and wealth-fund clocks built from official figures. The US national debt was {usd2(OFF_V)} ({tril(OFF_V)}) at Treasury's {fdate(OFF_D)} close.",
+    "",
+    "## Key pages",
+    f"- / : US national debt clock. Official total {usd2(OFF_V)} as of {fdate(OFF_D)} (Treasury, Debt to the Penny). The live projection is re-based every business day.",
+    "- /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.",
+    f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
+    "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
+    "- /when-will-debt-hit-41-trillion/ : A projection from Treasury's recent trend, labelled as a projection.",
+    "- /world/ : World Debt Clock. General government gross debt for every IMF economy. A national or Eurostat or QPSD stock is used only when it is general government gross debt; otherwise the row is the IMF World Economic Outlook estimate. Narrower official series are labeled and not added.",
+    "- /world-government-debt/ : Redirects to /world/. GitHub Pages serves this as an HTML refresh with a canonical link, not an HTTP 301.",
+    "- /global-debt-clock/ : Redirects to /world/ the same way.",
+    "- /countries/ : National debt clocks by country. Economies with an official source keep that source; the rest are IMF World Economic Outlook estimates.",
+    "- /states/ : State and local debt clocks for every US state and Washington, DC, from official Census figures.",
+    "- /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.",
+    "- /methodology/ : Sources, how the live ticker is calculated, and how it is checked against Treasury.",
+    "",
+    "## Data",
+    "US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.",
+    "",
+    "## Machine-readable",
+    f"- {SITE}/api/daily.json — latest official US total and daily changes",
+    f"- {SITE}/data/data.json — all US tickers, official bases and rates",
+    f"- {SITE}/api/places.json — state and country clocks",
+    f"- {SITE}/api/world.json — best-source world total, with source tier and as-of date for each economy",
+    f"- {SITE}/api/world_government_debt.json — IMF general-government estimate",
+    f"- {SITE}/api/wealth.json — wealth-fund ranking",
+    f"- {SITE}/sitemap.xml",
+    f"- {SITE}/llms.txt",
+    "",
+]))
+# IndexNow verification file: the key is both the filename and the file body.
+_idx_key_path = f"{R}/pipeline/indexnow.key"
+if os.path.exists(_idx_key_path):
+    _idx_key = open(_idx_key_path).read().strip()
+    if _idx_key:
+        open(f"{R}/{_idx_key}.txt", "w").write(_idx_key + "\n")
 
 # ---------------------------------------------------------------- embeddable clocks (after pages exist; patches the US, state and country pages)
 import embed_build
@@ -818,12 +896,13 @@ import hashlib, glob as _glob
 AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in ("style.css", "app.js", "core.js") if os.path.exists(f"{R}/{a}")}
 _vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
 _pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html")] + _glob.glob(f"{R}/t/*.html")
-          + [f for d in ["states", "countries", "world", "embed"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
-# Every page gets the homepage's inline icon, so browsers never fall back to requesting /favicon.ico (a 404).
-_icon = (re.search(r'<link rel="icon"[^>]*>', open(f"{R}/index.html").read()) or [None])[0]
+          + [f for d in ["states", "countries", "world", "world-government-debt", "global-debt-clock", "wealth"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
+# Every page gets real icon files (favicon.ico, a 32px PNG and the SVG), replacing the old inline data-URI icon. Made by pipeline/make_favicon.py.
+ICON_LINKS = '<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg">'
+_icon_re = re.compile(r'<link rel="icon"[^>]*>')
 for f in _pages:
     if not os.path.exists(f): continue
     s_ = open(f).read(); n_ = _vre.sub(lambda m: f'{m.group(1)}{m.group(2)}{m.group(3)}?v={AV[m.group(3)]}"', s_)
-    if _icon and 'rel="icon"' not in n_ and "</head>" in n_: n_ = n_.replace("</head>", _icon + "</head>", 1)
+    if "/favicon.ico" not in n_ and "</head>" in n_: n_ = _icon_re.sub("", n_).replace("</head>", ICON_LINKS + "</head>", 1)
     if n_ != s_: open(f, "w").write(n_)
 print("asset versions:", AV)

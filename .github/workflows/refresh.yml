@@ -127,13 +127,22 @@ jobs:
           python3 pipeline/fetch_kenya.py || echo "kenya fetch skipped"
           python3 pipeline/fetch_egypt.py || echo "egypt fetch skipped"
           python3 pipeline/fetch_south_africa.py || echo "south-africa fetch skipped"
-          # World Debt Clock inputs: ECB + Bank of Russia daily FX, IMF WEO GDP weights. Keeps the last good file on any failure. Never fails the run.
+          # World Debt Clock inputs: ECB + Bank of Russia daily FX, IMF WEO GDP weights, and the IMF general-government debt panel
+          # (GGXWDG_NGDP x NGDPD -> data/world_weo_debt.json). Keeps the last good file on any failure. Never fails the run.
           python3 pipeline/fetch_world.py || echo "world fetch skipped"
+          # Quarterly public-sector debt (World Bank / IMF QPSD, keyless). Keeps the last good file on failure.
+          python3 pipeline/fetch_qpsd.py || echo "qpsd fetch skipped"
 
       - name: Build site
         env:
           DEBTCLOCK_SITE_URL: https://everydebtclock.com
         run: python3 build.py
+
+      - name: Check IMF world government debt totals and new clocks
+        run: python3 pipeline/check_weo.py
+
+      - name: Check the best-source world debt clock
+        run: python3 pipeline/check_world.py
 
       - name: Guard against placeholder URLs
         run: |
@@ -157,9 +166,12 @@ jobs:
       - name: Stage Pages artifact (public files only)
         run: |
           mkdir -p _site
-          cp -r index.html 404.html privacy.html CNAME robots.txt sitemap.xml style.css app.js core.js widget.html \
-                apple-touch-icon.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person national-debt-by-year when-will-debt-hit-41-trillion methodology states countries world wealth embed _site/
+          cp -r index.html 404.html privacy.html privacy favicon.ico favicon-32.png icon.svg CNAME robots.txt llms.txt sitemap.xml style.css app.js core.js widget.html \
+                apple-touch-icon.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person national-debt-by-year when-will-debt-hit-41-trillion methodology states countries world world-government-debt global-debt-clock wealth _site/
           rm -f _site/data/validation_log.csv
+          # IndexNow key file must be at the site root for verification.
+          KEY=$(tr -d ' \n' < pipeline/indexnow.key)
+          if [ -f "$KEY.txt" ]; then cp "$KEY.txt" _site/; fi
 
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -167,6 +179,12 @@ jobs:
 
       - id: deploy
         uses: actions/deploy-pages@v4
+
+      # Instant indexing for Bing/Yandex. The key file must already be on the live site, so this waits
+      # for GitHub Pages to serve it, then posts every sitemap URL. A failure here does not roll back the deploy.
+      - name: Submit sitemap to IndexNow
+        continue-on-error: true
+        run: python3 pipeline/submit_indexnow.py --sitemap _site/sitemap.xml --wait --tries 8 --delay 20
 
       # Runs after deploy so a flagged figure is still published with its ⚠ badge, but the run goes red and GitHub emails you.
       - name: Fail on validation flags or unavailable tickers

@@ -21,6 +21,7 @@ STATES = {
     "georgia": ("Georgia", "Georgian", "GA", "13", "Georgia's state fiscal year ends June 30."),
     "north-carolina": ("North Carolina", "North Carolinian", "NC", "37", "North Carolina's state fiscal year ends June 30."),
     "michigan": ("Michigan", "Michigander", "MI", "26", "Michigan's state fiscal year ends September 30, so Census's survey year 2024 holds the state government's fiscal year that ended September 30, 2023."),
+    'district-of-columbia': ('District of Columbia', 'resident', 'DC', '11', "The District's fiscal year ends September 30, so Census's survey year 2024 holds the District government's fiscal year that ended September 30, 2023."),
     'alabama': ('Alabama', 'Alabamian', 'AL', '01', "Alabama's state fiscal year ends September 30, so Census's survey year 2024 holds the state government's fiscal year that ended September 30, 2023."),
     'alaska': ('Alaska', 'Alaskan', 'AK', '02', "Alaska's state fiscal year ends June 30."),
     'arizona': ('Arizona', 'Arizonan', 'AZ', '04', "Arizona's state fiscal year ends June 30."),
@@ -79,17 +80,22 @@ def main(slugs):
             if r[ix["AGG_DESC"]] in ("LF0232", "LF0233") and g in ("State", "Local"):
                 items[(g, r[ix["AGG_DESC"]], int(r[ix["YEAR"]]))] = int(r[ix["AMOUNT"]]) * 1000
         ys = sorted(out["State and Local"]); last, prev = ys[-1], ys[-2]
-        for y in ys: assert out["State"][y][0] + out["Local"][y][0] == out["State and Local"][y][0], (slug, y)
-        for g in ("State", "Local"):
+        # The District of Columbia has no state government level in Census's tables: its debt is all "Local", and Local must equal State and Local.
+        groups = ("State", "Local") if "State" in out else ("Local",)
+        for y in ys: assert sum(out[g][y][0] for g in groups) == out["State and Local"][y][0], (slug, y)
+        for g in groups:
             # Census publishes in $1,000, so parts can differ from the total by rounding. If Census omits the short-term row (no short-term debt reported), the long-term row must equal the total and the short-term tile is left out rather than assumed.
             assert abs(items.get((g, "LF0232", last), 0) + items[(g, "LF0233", last)] - out[g][last][0]) <= 5000, (slug, g, "LT+ST != total")
         pr = pops[name]
         src = (f"US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN (State and Local Government Finances by Level of Government: "
                f"U.S. and States: 2017-{last}), Debt - Total Debt Outstanding (LF0231)")
         comps = []
-        for key, lab, short, gt, inc in [
+        specs = [
             ("state", "State government debt", "State debt", "State", f"All debt of the {name} state government as Census defines it: long-term and short-term debt of the state and its dependent agencies, whatever the source of repayment. Census uses the same definition for every state."),
-            ("local", "Local government debt", "Local debt", "Local", f"All debt of {name}'s counties, cities, towns, school districts and special districts, on the same Census definition. Census estimates local totals from a sample of local governments in most years (2022 was a full count, the Census of Governments); coefficient of variation for {last}: {out['Local'][last][1]}%.")]:
+            ("local", "Local government debt", "Local debt", "Local", f"All debt of {name}'s counties, cities, towns, school districts and special districts, on the same Census definition. Census estimates local totals from a sample of local governments in most years (2022 was a full count, the Census of Governments); coefficient of variation for {last}: {out['Local'][last][1]}%.")]
+        if groups == ("Local",):
+            specs = [("local", f"{name} government debt", "District debt", "Local", f"All debt of the {name} government and any special districts in it, on the Census definition used for every state. Census's tables have no separate state-government level for the District, so all of its debt is reported as local debt. Census coefficient of variation for {last}: {out['Local'][last][1]}%.")]
+        for key, lab, short, gt, inc in specs:
             comps.append({"key": key, "label": lab, "short": short, "value": out[gt][last][0], "as_of": ye(last), "prior_value": out[gt][prev][0], "prior_as_of": ye(prev),
                           "source_name": src, "source_url": TABLE.format(fips=fips),
                           "source_locator": f"{name}, Government type '{gt}', items LF0231 Total, LF0233 Long-term and LF0232 Short-term Debt Outstanding, survey year {last}; amounts published in $1,000",
@@ -99,7 +105,7 @@ def main(slugs):
         sl = out["State and Local"]; ch = sl[last][0] - sl[prev][0]; se = sl[last][0] * float(sl[last][1]) / 100
         big = abs(ch) > 0.10 * sl[prev][0]  # a one-year move over 10% is more likely a sampling or reclassification event than a trend that should be extended for two more years
         hold = abs(ch) < 2 * se or big  # change is within Census's own sampling error: a straight-line projection would be noise, so the page shows the official figure fixed
-        notes = [f"Census publishes {name}'s state + local total as ${sl[last][0]/1e9:,.2f} billion for {last} (coefficient of variation {sl[last][1]}%) and ${sl[prev][0]/1e9:,.2f} billion for {prev}. State + local here is exactly Census's state figure plus its local figure.",
+        notes = [f"Census publishes {name}'s state + local total as ${sl[last][0]/1e9:,.2f} billion for {last} (coefficient of variation {sl[last][1]}%) and ${sl[prev][0]/1e9:,.2f} billion for {prev}. " + ("State + local here is exactly Census's state figure plus its local figure." if len(groups) == 2 else "Census has no separate state government for the District, so its state + local total is its local figure."),
                  f"Census's figures are the newest official state + local totals that use one definition for all 50 states, but they lag about two years, so the {"page shows the official figure as of" if hold else "live clock projects from"} June 30, {last}. {name}'s own audited report is fresher but is not used here: it covers a narrower scope and would not be comparable with the other states."]
         if abs(ch) < 2 * se:
             notes.append(f"The {prev}→{last} change (${ch/1e9:+,.2f} billion) is smaller than about two standard errors of the Census estimate (about ${2*se/1e9:,.1f} billion at a {sl[last][1]}% coefficient of variation), so Census's data does not show which way the debt is moving. This page therefore shows the official figure as published and does not tick it forward.")
@@ -123,6 +129,15 @@ def main(slugs):
                                {"name": f"Census data API download used for these figures ({name})", "url": API.format(fips=fips)}],
              "notes": notes,
              "hold_trend": hold, "total_cv": float(sl[last][1]), "legend": f"{name} state + local debt is reported once a year by the Census Bureau, about two years after the fact. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so " + ("the page shows the latest official figure without ticking it forward, because Census's own sampling error is larger than the change it measured." if hold else "the live number is a straight-line projection from the latest Census year, shown here next to the official totals.")}
+        if len(groups) == 1:  # District of Columbia: one government, no state level, so the wording drops "state"
+            p.update(headline="debt", headline_long="government debt", subject=f"The {name} government", reporter_its="the District's",
+                     h1="Washington, DC Debt Clock", seo_title="Washington, DC Debt Clock: {lv}Debt, Official Census Data",
+                     seo_desc_noun="District of Columbia government debt", year_label="Survey year", end_label="as of")
+            p["notes"][1] = (f"Census's figures are the newest official totals that use one definition for every state and the District, but they lag about two years, so the "
+                             f"{'page shows the official figure as of' if hold else 'live clock projects from'} June 30, {last}. The District's own audited annual report is fresher but is not used here, so the District stays comparable with the states.")
+            p["notes"][0] = (f"Census publishes the District's debt as ${sl[last][0]/1e9:,.2f} billion for {last} (coefficient of variation {sl[last][1]}%) and ${sl[prev][0]/1e9:,.2f} billion for {prev}. "
+                             "Census has no separate state government for the District, so the whole total is local debt.")
+            p["notes"][-1] = "Not included: pension and retiree-health liabilities, and the District's share of the federal debt."
         state_trend.apply(p)  # one rule for hold/tick, notes and legend (pipeline/state_trend.py)
         with open(os.path.join(ROOT, "places", f"{slug}.json"), "w") as f: json.dump(p, f, indent=1, ensure_ascii=False); f.write("\n")
         print(slug, last, sl[last][0], prev, sl[prev][0], "pop", p["population"]["value"], "per resident", round(sl[last][0] / p["population"]["value"], 2))
