@@ -138,13 +138,14 @@ def calc(p):
             "as_of": max(c["as_of"] for c in cs), "same_date": len({c["as_of"] for c in cs}) == 1}
 
 def nav_html(places, depth, current=None, cls="pl"):
-    """Place nav: United States, then one link per section that has a live place."""
+    """Place nav: United States, then one link per section that has a live place, then Embed."""
     up = "../" * depth
     kinds = {p["kind"] for p in places}
     items = [(up or "./", "United States", current == "us")]
     items += [(f"{up}{d}/", lab, current == k) for k, d, lab, _ in SECTIONS if k in kinds]
     if WORLD and "country" in kinds: items.append((f"{up}world/", "World", current == "world"))
     if WEALTH: items.append((f"{up}wealth/", "Wealth", current == "wealth"))
+    items.append((f"{up}embed/", "Embed", current == "embed"))
     return f'<nav class="{cls}">' + "".join(f'<a href="{h}"{" class=on" if on else ""}>{lab}</a>' for h, lab, on in items) + "</nav>"
 
 def hub_label(places, short=False):
