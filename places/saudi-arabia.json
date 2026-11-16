@@ -43,8 +43,8 @@
    "key": "cgdebt",
    "label": "Saudi Arabia total outstanding direct government debt",
    "short": "Government direct debt",
-   "value": 1685000000000,
-   "as_of": "2026-06-30",
+   "value": 1773600000000,
+   "as_of": "2026-09-30",
    "prior_value": 1519000000000,
    "prior_as_of": "2025-12-31",
    "source_name": "National Debt Management Center, Reports & Statistics",
@@ -64,17 +64,21 @@
     [
      "2026-06-30",
      1685000000000
+    ],
+    [
+     "2026-09-30",
+     1773600000000
     ]
    ],
    "breakdown": [
     {
      "label": "Domestic debt",
-     "value": 1060100000000,
+     "value": 1136000000000,
      "group": "Domestic"
     },
     {
      "label": "External debt",
-     "value": 624900000000,
+     "value": 637600000000,
      "group": "External"
     }
    ]
