@@ -262,7 +262,7 @@ ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="k">US n
 <div class="trio"><div><span class="l">Per person (Census, {fdate(POP_OFF_DATE)})</span><span class="num">{usd2(PP_OFF)}</span></div>
 <div><span class="l">Per tax return filed</span><span class="num">{usd2(OFF_V / TAX)}</span></div><div><span class="l">Per household</span><span class="num">{usd2(OFF_V / HH)}</span></div></div></div>
 <section class="intro" id="intro">{intro}</section>
-<section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
+{site_chrome.sponsor_slot("")}<section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
 {''.join(row(s_) for s_ in ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "spending", "revenue", "gdp"])}</table>
 <noscript><p>Turn on JavaScript to watch these figures tick in real time.</p></noscript></section></div><!--/SSR-->""")
 import places_build
@@ -671,6 +671,7 @@ The total includes {usd0(DI.get('base'))} of intragovernmental debt that the gov
 The ratio columns are from OMB's Historical Tables (Table 7.1 for debt, Table 1.2 for the deficit). OMB's gross federal debt is measured a little differently
 from Treasury's total (it includes some agency debt and nets out unamortized discount), so its ratio won't exactly match the dollar column divided by GDP.
 "—" means the source has not published that year yet.</p>
+{site_chrome.sponsor_slot("../")}
 <h2>By fiscal year, FY1940 to FY{modern[0] if modern else ''}</h2>
 <table><tr><th>Fiscal year</th><th>Total debt (Treasury)</th><th>Record date</th><th>Gross debt % GDP (OMB)</th><th>Held by public % GDP (OMB)</th><th>Deficit % GDP (OMB)</th></tr>{''.join(rows)}</table>
 <details><summary>Earlier years, FY{older[0] if older else ''} back to FY{older[-1] if older else ''} (Treasury totals only)</summary>
@@ -806,6 +807,7 @@ data_hub.build(R, SITE, with_analytics, D, PLACES_LIVE, WORLD)
 
 # ---------------------------------------------------------------- legal pages (/privacy/, /about/, /contact/)
 site_chrome.write_legal_pages(R, SITE, with_analytics)
+site_chrome.write_advertise_page(R, SITE, with_analytics)
 
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()
@@ -847,6 +849,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /about/ : Who runs the site (Hypergame LLC), the main data sources, and the update schedule.",
     "- /privacy/ : Privacy policy, including analytics, data downloads, and cookies if ads are shown.",
     "- /contact/ : Email hello@everydebtclock.com.",
+    "- /advertise/ : Sponsorship on the US clock and the national-debt-by-year page.",
     "- /data/ : Free CSV files and charts of the US and world series this site publishes. Free to use with credit: Source: EveryDebtClock.com.",
     "- /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.",
     "",

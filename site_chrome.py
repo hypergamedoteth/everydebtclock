@@ -20,6 +20,7 @@ FOOTER_LINKS = (
     ("embed/", "Embed a clock"),
     ("data/", "Data"),
     ("about/", "About"),
+    ("advertise/", "Advertise"),
     ("methodology/", "Methodology"),
     ("privacy/", "Privacy"),
     ("contact/", "Contact"),
@@ -311,6 +312,44 @@ def privacy_redirect() -> str:
 """
 
 
+
+
+def sponsor_slot(prefix: str, absolute: bool = False) -> str:
+    """Quiet 'Sponsored by' slot for below a page summary. Never placed on the ticker."""
+    href = "/advertise/" if absolute or prefix == "/" else f"{prefix}advertise/"
+    return (
+        f'<aside class="edc-sponsor" aria-label="Sponsorship">'
+        f'<a href="{href}">Sponsored by — your brand here</a>'
+        f"</aside>\n"
+        "<style>"
+        ".edc-sponsor{margin:12px 0 8px;padding:8px 0;border-top:1px solid #1c2533;border-bottom:1px solid #1c2533;"
+        "font:13px/1.4 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif;color:#8a97ab}"
+        ".edc-sponsor a{color:#8a97ab;text-decoration:none}"
+        ".edc-sponsor a:hover{color:#5aa9ff}"
+        "</style>\n"
+    )
+
+
+def advertise_body() -> str:
+    return """
+<h1>Advertise</h1>
+<p>Every Debt Clock is an independent site that publishes a live US national debt clock, checked daily against Treasury, plus state, country and history pages.</p>
+<p>A sponsorship can appear as a short “Sponsored by” line below the summary on the <a href="/">US clock</a> and on <a href="/national-debt-by-year/">US national debt by year</a>.</p>
+<h2>Audience</h2>
+<p>About 1,380 visits in the 30 days ending November 16, 2026, mostly from the United States. The figures are from Cloudflare Web Analytics, which excludes bots. This is a small site. We will update these numbers as traffic changes.</p>
+<p>We do not publish prices here. If you want to sponsor the clock, email <a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a>.</p>
+"""
+
+
+def write_advertise_page(R: str, site: str, with_analytics=None) -> None:
+    wrap = with_analytics or (lambda p: p)
+    title = "Advertise | Every Debt Clock"
+    desc = "Sponsor Every Debt Clock. About 1,380 visits in the 30 days ending November 16, 2026, mostly from the United States. Email hello@everydebtclock.com."
+    os.makedirs(os.path.join(R, "advertise"), exist_ok=True)
+    page = wrap(_legal_shell(site, "advertise", title, desc, advertise_body()))
+    open(os.path.join(R, "advertise", "index.html"), "w").write(page)
+
+
 def write_legal_pages(R: str, site: str, with_analytics=None) -> None:
     pages = {
         "privacy": (
@@ -340,6 +379,7 @@ def write_legal_pages(R: str, site: str, with_analytics=None) -> None:
 def sitemap_entries(site: str) -> list[tuple[str, str, str]]:
     return [
         (f"{site}/about/", "0.4", "yearly"),
+        (f"{site}/advertise/", "0.3", "yearly"),
         (f"{site}/contact/", "0.3", "yearly"),
         (f"{site}/privacy/", "0.2", "yearly"),
     ]
@@ -350,6 +390,7 @@ def llms_lines() -> list[str]:
         "- /about/ : Who runs the site (Hypergame LLC), the main data sources, and the update schedule.",
         "- /privacy/ : Privacy policy, including analytics, data downloads, and cookies if ads are shown.",
         "- /contact/ : Email hello@everydebtclock.com.",
+        "- /advertise/ : Sponsorship on the US clock and the national-debt-by-year page.",
     ]
 
 

@@ -22,6 +22,7 @@ Live US, state, country and wealth-fund clocks built from official figures. The 
 - /about/ : Who runs the site (Hypergame LLC), the main data sources, and the update schedule.
 - /privacy/ : Privacy policy, including analytics, data downloads, and cookies if ads are shown.
 - /contact/ : Email hello@everydebtclock.com.
+- /advertise/ : Sponsorship on the US clock and the national-debt-by-year page.
 - /data/ : Free CSV files and charts of the US and world series this site publishes. Free to use with credit: Source: EveryDebtClock.com.
 - /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.
 
