@@ -692,11 +692,44 @@ footer{{color:#5c687a;font-size:12px;margin-top:28px}}
 <p>Redrawn on every build from the CSV files. Each image carries the credit EveryDebtClock.com.</p>
 {''.join(figures)}
 <p>The same figures, with the source notes, are on <a href="../national-debt-by-year/">national debt by year</a>, <a href="../national-debt-by-president/">debt by president</a>, <a href="../national-debt-per-person/">debt per person</a>, <a href="../interest-on-the-national-debt/">interest on the debt</a>, <a href="../states/">state debt clocks</a>, and the <a href="../world/">world debt clock</a>.</p>
-<footer class="site-foot">Every Debt Clock · <a href="../">Home</a> · <a href="../embed/">Embed a clock</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer class="site-foot">Every Debt Clock · <a href="../">Home</a> · <a href="../embed/">Embed a clock</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main></body></html>'''
     path = os.path.join(R, "data", "index.html")
     open(path, "w", encoding="utf-8").write(with_analytics(doc))
     return path
+
+
+# Public downloads listed on /data/. Daily JSON snapshots and validation_log.csv
+# stay out of the sitemap; they are not offered as hub files.
+DATA_CSV = (
+    "us-debt-by-year.csv",
+    "us-debt-by-president.csv",
+    "us-debt-per-person.csv",
+    "us-interest.csv",
+    "us-state-debt.csv",
+    "country-debt.csv",
+)
+DATA_CHARTS = (
+    "us-debt-by-year",
+    "us-debt-by-president",
+    "us-interest-by-year",
+    "countries-debt-to-gdp",
+)
+
+def sitemap_entries(R, site):
+    """Hub page plus every public CSV and chart file on /data/."""
+    urls = [(f"{site}/data/", "0.6", "daily")]
+    data = os.path.join(R, "data")
+    for name in DATA_CSV:
+        if os.path.exists(os.path.join(data, name)):
+            urls.append((f"{site}/data/{name}", "0.5", "weekly"))
+    for slug in DATA_CHARTS:
+        for ext in ("png", "svg"):
+            rel = f"charts/{slug}.{ext}"
+            if os.path.exists(os.path.join(data, rel)):
+                urls.append((f"{site}/data/{rel}", "0.4", "weekly"))
+    return urls
+
 
 def build(R, SITE, with_analytics, D, places, world):
     """Write /data/ CSVs, charts, and the hub page. Returns the public page URL."""

@@ -10,6 +10,7 @@ Site URL defaults to https://everydebtclock.com; override with DEBTCLOCK_SITE_UR
 import json, os, html, time, datetime as dt, re
 from zoneinfo import ZoneInfo
 from PIL import Image, ImageDraw, ImageFont
+import site_chrome
 
 R = os.path.dirname(os.path.abspath(__file__))
 SITE = os.environ.get("DEBTCLOCK_SITE_URL", "https://everydebtclock.com").rstrip("/")
@@ -425,7 +426,7 @@ for slug, i in ALL.items():
 <p><b>* Per person (projected population)</b> divides by the US population projected to now: the official Census Vintage 2025 estimate for July 1, 2025 ({POP_OFF:,.0f}), projected forward at Census's stated growth rate ({POP:,.0f} at build time).{pp_off} <b>Per tax return filed</b> divides by {TAX:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2); a joint return counts once and returns with zero tax liability are included.</p>
 <a class="cta" href="../index.html#t={slug}">Open the full live clock →</a>
 <div class="rel"><b>Related:</b><br>{''.join(f'<a href="{s}.html">{html.escape(ALL[s].get("label", s))}</a>' for s in rel)}</div>
-<footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser. · <a href="../embed/">Embed a clock</a> · <a href="../data/">Data</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser. · <a href="../embed/">Embed a clock</a> · <a href="../data/">Data</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main><script>window.DEBTCLOCK_DATA={data};</script><script src="../core.js"></script>
 <script>(function(){{const C=DC(window.DEBTCLOCK_DATA),i=C.info({json.dumps(slug)}),v=document.getElementById('v'),p1=document.getElementById('p1'),p2=document.getElementById('p2');
 (function f(){{const t=Date.now()/1000,x=C.get({json.dumps(slug)},t);v.textContent=C.fmt(i,x);if(p1){{p1.textContent=C.ppf(x/C.pop(t));p2.textContent=C.ppf(x/C.tax)}}requestAnimationFrame(f)}})()}})()</script>
@@ -558,7 +559,7 @@ def answer_page(slug, title, desc, h1, body, ld="", og_img="og/debt_total.png"):
 <a class="cta" href="../">Open the live national debt clock →</a>
 {explore.explore("../", PLACES_LIVE, places_build.calc, topic=slug, gdp=places_build.GDP_BY_SLUG) if PLACES_LIVE else ""}
 <div class="rel"><b>More answers:</b><br>{more}<a href="../t/debt_total.html">US national debt, live</a></div>
-<footer>Every figure on this page is an official published number unless it is labelled "projected". Page built {STAMP} from data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT; it is rebuilt after every Treasury update. · <a href="../embed/">Embed a clock</a> · <a href="../data/">Data</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer>Every figure on this page is an official published number unless it is labelled "projected". Page built {STAMP} from data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT; it is rebuilt after every Treasury update. · <a href="../embed/">Embed a clock</a> · <a href="../data/">Data</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main></body></html>"""
     os.makedirs(f"{R}/{slug}", exist_ok=True)
     open(f"{R}/{slug}/index.html", "w").write(with_analytics(page))
@@ -803,14 +804,17 @@ debt_by_year_build.patch_clocks(R)
 import data_hub
 data_hub.build(R, SITE, with_analytics, D, PLACES_LIVE, WORLD)
 
+# ---------------------------------------------------------------- legal pages (/privacy/, /about/, /contact/)
+site_chrome.write_legal_pages(R, SITE, with_analytics)
+
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()
 # /embed/ is indexable. Per-clock pages under /embed/ are noindex and stay out of this list.
-urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/data/", "0.6", "daily"), (f"{SITE}/embed/", "0.5", "weekly")] + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
+urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/embed/", "0.5", "weekly")] + data_hub.sitemap_entries(R, SITE) + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
         [(u, "0.8", "weekly") for u in PLACE_URLS] +
         [(u, "0.8", "weekly") for u in DY_URLS] +
         [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None] +
-        ([(f"{SITE}/privacy.html", "0.2", "yearly")] if os.path.exists(f"{R}/privacy.html") else []))
+        site_chrome.sitemap_entries(SITE))
 open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     "".join(f"<url><loc>{u}</loc><lastmod>{lm}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
 AI_BOTS = ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User",
@@ -840,6 +844,9 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /states/ : State and local debt clocks for every US state and Washington, DC, from official Census figures.",
     "- /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.",
     "- /methodology/ : Sources, how the live ticker is calculated, and how it is checked against Treasury.",
+    "- /about/ : Who runs the site (Hypergame LLC), the main data sources, and the update schedule.",
+    "- /privacy/ : Privacy policy, including analytics, data downloads, and cookies if ads are shown.",
+    "- /contact/ : Email hello@everydebtclock.com.",
     "- /data/ : Free CSV files and charts of the US and world series this site publishes. Free to use with credit: Source: EveryDebtClock.com.",
     "- /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.",
     "",
@@ -870,6 +877,26 @@ if os.path.exists(_idx_key_path):
 import embed_build
 embed_build.apply(R, SITE, with_analytics, require_pages=True, now=NOW, world=WORLD)
 
+# ---------------------------------------------------------------- asset versions: ?v=<content hash> on every first-party CSS/JS reference
+# so a deploy that changes style.css / app.js / core.js is picked up at once instead of after the 4-hour browser/CDN cache.
+import hashlib, glob as _glob
+AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in ("style.css", "app.js", "core.js") if os.path.exists(f"{R}/{a}")}
+_vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
+# Per-clock files under embed/ are self-contained (no site CSS, no favicon request). Only the directory is versioned.
+_pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html", "embed/index.html")] + _glob.glob(f"{R}/t/*.html")
+          + [f for d in ["states", "countries", "world", "world-government-debt", "global-debt-clock", "wealth", "about", "contact", "privacy", "advertise"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
+# Every page gets real icon files (favicon.ico, a 32px PNG and the SVG), replacing the old inline data-URI icon. Made by pipeline/make_favicon.py.
+ICON_LINKS = '<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg">'
+_icon_re = re.compile(r'<link rel="icon"[^>]*>')
+for f in _pages:
+    if not os.path.exists(f): continue
+    s_ = open(f).read(); n_ = _vre.sub(lambda m: f'{m.group(1)}{m.group(2)}{m.group(3)}?v={AV[m.group(3)]}"', s_)
+    if "/favicon.ico" not in n_ and "</head>" in n_: n_ = _icon_re.sub("", n_).replace("</head>", ICON_LINKS + "</head>", 1)
+    if n_ != s_: open(f, "w").write(n_)
+print("asset versions:", AV)
+
+site_chrome.finalize(R)
+
 # ---------------------------------------------------------------- standalone (read index.html back so the embed control is in the offline copy)
 css, js = open(f"{R}/style.css").read(), open(f"{R}/app.js").read()
 idx_ = re.sub(r'(href|src)="(style\.css|app\.js)\?v=[^"]*"', r'\1="\2"', open(f"{R}/index.html").read())
@@ -880,20 +907,3 @@ os.makedirs(f"{R}/dist", exist_ok=True)
 open(f"{R}/dist/debtclock-standalone.html", "w").write(single)
 print(f"standalone: {len(single)//1024} KB; share pages: {len(urls)-1}; og images: {len(os.listdir(R+'/og'))}; site={SITE}")
 
-# ---------------------------------------------------------------- asset versions: ?v=<content hash> on every first-party CSS/JS reference
-# so a deploy that changes style.css / app.js / core.js is picked up at once instead of after the 4-hour browser/CDN cache.
-import hashlib, glob as _glob
-AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in ("style.css", "app.js", "core.js") if os.path.exists(f"{R}/{a}")}
-_vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
-# Per-clock files under embed/ are self-contained (no site CSS, no favicon request). Only the directory is versioned.
-_pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html", "embed/index.html")] + _glob.glob(f"{R}/t/*.html")
-          + [f for d in ["states", "countries", "world", "world-government-debt", "global-debt-clock", "wealth"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
-# Every page gets real icon files (favicon.ico, a 32px PNG and the SVG), replacing the old inline data-URI icon. Made by pipeline/make_favicon.py.
-ICON_LINKS = '<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg">'
-_icon_re = re.compile(r'<link rel="icon"[^>]*>')
-for f in _pages:
-    if not os.path.exists(f): continue
-    s_ = open(f).read(); n_ = _vre.sub(lambda m: f'{m.group(1)}{m.group(2)}{m.group(3)}?v={AV[m.group(3)]}"', s_)
-    if "/favicon.ico" not in n_ and "</head>" in n_: n_ = _icon_re.sub("", n_).replace("</head>", ICON_LINKS + "</head>", 1)
-    if n_ != s_: open(f, "w").write(n_)
-print("asset versions:", AV)

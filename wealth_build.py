@@ -84,7 +84,7 @@ def _header(places, depth, jump):
 
 def _foot(depth):
     up = "../" * depth
-    return (f'<footer class="site-foot">Every Debt Clock · official data, estimates labelled · <a href="{up}methodology/">Methodology</a> · <a href="{up}privacy.html">Privacy</a> · '
+    return (f'<footer class="site-foot">Every Debt Clock · official data, estimates labelled · <a href="{up}methodology/">Methodology</a> · <a href="{up}privacy/">Privacy</a> · '
             'Independent site, not affiliated with any government or fund. Not financial advice.</footer>')
 
 def _alloc_table(blk, est=False):

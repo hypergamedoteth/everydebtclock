@@ -3,8 +3,35 @@
 <meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -200px,#14203a 0%,#07090d 60%) fixed;color:#e8edf5;font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif;text-align:center;padding:24px}
 .brand{font-weight:800;letter-spacing:.06em;font-size:14px}.brand b{color:#ff4d5e}h1{font-size:clamp(40px,10vw,96px);margin:18px 0 4px;font-family:ui-monospace,Menlo,Consolas,monospace}
-p{color:#8a97ab;max-width:420px;margin:8px auto 22px}a.btn{display:inline-block;border:1px solid #1c2533;background:#0e131b;color:#5aa9ff;border-radius:999px;padding:10px 18px;text-decoration:none;font-weight:600}</style><!--ANALYTICS--><script data-goatcounter="https://everydebtclock.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script><!--/ANALYTICS-->
+p{color:#8a97ab;max-width:420px;margin:8px auto 22px}a.btn{display:inline-block;border:1px solid #1c2533;background:#0e131b;color:#5aa9ff;border-radius:999px;padding:10px 18px;text-decoration:none;font-weight:600}p a{color:#5c687a;text-decoration:none}</style><!--ANALYTICS--><script data-goatcounter="https://everydebtclock.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script><!--/ANALYTICS-->
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg"></head>
 <body><main><div class="brand">EVERY <b>DEBT</b> CLOCK</div><a class="navembed" href="/embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a><h1>404</h1>
 <p>This page doesn't exist. The national debt, unfortunately, does — and it is still ticking.</p>
-<a class="btn" href="/">See the live debt clock →</a><p style="font-size:12px;margin-top:22px"><a href="/embed/" style="color:#5c687a">Embed a clock</a> · <a href="/methodology/" style="color:#5c687a">Methodology</a> · <a href="/privacy.html" style="color:#5c687a">Privacy</a></p></main></body></html>
+<a class="btn" href="/">See the live debt clock →</a><p style="font-size:12px;margin-top:22px"><a href="/embed/">Embed a clock</a> · <a href="/data/">Data</a> · <a href="/about/">About</a> · <a href="/methodology/">Methodology</a> · <a href="/privacy/">Privacy</a> · <a href="/contact/">Contact</a></p></main><!--NOTICE--><aside id="edc-notice" hidden role="region" aria-label="Cookies and ads">
+<p>This site uses privacy-focused analytics. If ads are shown, Google and its partners may use cookies. <a href="/privacy/">Privacy</a></p>
+<button type="button" id="edc-notice-ok">OK</button>
+</aside>
+<style>
+#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-sizing:border-box;margin:0;padding:10px 14px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:13.5px/1.4 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
+#edc-notice[hidden]{display:none!important}
+#edc-notice p{margin:0;flex:1 1 220px}
+#edc-notice a{color:#5aa9ff;text-decoration:none}
+#edc-notice-ok{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:6px 12px;font-weight:650;cursor:pointer}
+</style>
+<script>
+(function(){
+  var n=document.getElementById("edc-notice");
+  if(!n)return;
+  try{if(localStorage.getItem("edc.notice")==="1")return;}catch(e){}
+  n.hidden=false;
+  if(document.body) document.body.style.paddingBottom="72px";
+  var b=document.getElementById("edc-notice-ok");
+  if(b)b.addEventListener("click",function(){
+    try{localStorage.setItem("edc.notice","1")}catch(e){}
+    n.hidden=true;
+    if(document.body) document.body.style.paddingBottom="";
+  });
+})();
+</script>
+<!--/NOTICE-->
+</body></html>

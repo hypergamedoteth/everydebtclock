@@ -179,7 +179,7 @@ def add_footer(page):
     if not m or re.search(r'href="(?:\.\./|/)*embed/"', m.group(0)):
         return page
     foot = m.group(0)
-    for pat in (r'<a href="((?:\.\./)*)methodology/">', r'<a href="((?:\.\./)*)privacy\.html">', r'<a href="(/)(?:methodology/|privacy\.html)">'):
+    for pat in (r'<a href="((?:\.\./)*)methodology/">', r'<a href="((?:\.\./)*)privacy(?:\.html|/)">', r'<a href="(/)(?:methodology/|privacy(?:\.html|/))">'):
         mm = re.search(pat, foot)
         if not mm:
             continue
@@ -413,7 +413,7 @@ def _directory(R, site, clocks, analytics_fn):
 <div class="embgrid">{featured}</div>
 <p class="embjump">{jumps}</p></section>
 <div class="embwrap">{''.join(groups)}</div>
-<footer class="site-foot">Every Debt Clock · <a href="../embed/">Embed a clock</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer class="site-foot">Every Debt Clock · <a href="../embed/">Embed a clock</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 <script>document.addEventListener("click",function(e){{var b=e.target.closest(".embedcopy");if(!b)return;var t=b.parentNode.querySelector("textarea");if(!t)return;
 var label=b.getAttribute("data-label")||"Copy code",done=function(){{b.textContent="Copied";setTimeout(function(){{b.textContent=label}},1500)}};
 if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t.value).then(done,function(){{t.select();document.execCommand("copy");done()}});
