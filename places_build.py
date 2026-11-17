@@ -499,7 +499,7 @@ ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);
 
     explore_html = ex.explore("../../", places, calc, cur=p, gdp=GDP_BY_SLUG)
     page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + ex.search_box("../../") + '<main id="app">' + hero + intro + wc + debt_sec + comp_secs + people + hist + details + method
-            + '</main><dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
+            + '</main><dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))
     _cur({})
@@ -560,7 +560,7 @@ ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='
             f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p></section>'
             f'<main id="app">{sort}{secs}' + ('<!--WEOCOUNTRIES-->' if WEO and kind == "country" else '') + '</main>'
             + explore_html +
-            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')
+            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')
     hub_css = PL_CSS + ".hubsort{display:flex;justify-content:flex-end;margin:4px 2px -14px;font-size:12px;color:var(--mut)}.hubsort select{margin-left:6px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit;font-size:12px}.tile.hubt .lab span:last-child{font-size:11px;color:var(--dim)}"
     page = meta_head(SITE, url, title, desc, "og/home.png", 1, hub_css) + body
     os.makedirs(f"{R}/{sec_dir}", exist_ok=True)

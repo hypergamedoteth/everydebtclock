@@ -361,7 +361,7 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
     head = pb.meta_head(SITE, url, title, desc, img, 2, pb.PL_CSS + world_build.CSS + CSS, _faq_ld(faqs) + _dataset_ld(title, desc, url))
     page = (head + header + ex.search_box("../../") + '<main id="app">' + hero + intro + series + compare + path + meth + faq_html + '</main>'
             + _related(pool, gdp, cur) + links
-            + '<footer class="site-foot">Every Debt Clock · harmonized source, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy.html">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>'
+            + '<footer class="site-foot">Every Debt Clock · harmonized source, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>'
             + TICK + "</body></html>")
     os.makedirs(f"{R}/countries/{slug}", exist_ok=True)
     open(f"{R}/countries/{slug}/index.html", "w").write(with_analytics(page))
@@ -471,7 +471,7 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
         head = head.replace("</head>", '<meta name="robots" content="noindex"></head>', 1)
     page = (head + header + ex.search_box("../../") + '<main id="app">' + hero + intro + compare + path + changed + meth + faq_html + '</main>'
             + _related(pool, gdp, cur) + links
-            + '<footer class="site-foot">Every Debt Clock · IMF estimate, interpolation labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy.html">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>'
+            + '<footer class="site-foot">Every Debt Clock · IMF estimate, interpolation labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>'
             + TICK + "</body></html>")
     os.makedirs(f"{R}/countries/{slug}", exist_ok=True)
     open(f"{R}/countries/{slug}/index.html", "w").write(with_analytics(page))

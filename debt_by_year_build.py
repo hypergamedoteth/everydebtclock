@@ -377,7 +377,7 @@ def _page(R, SITE, with_analytics, stamp, modified, m, models_all):
 {faq_html}
 <a class="cta" href="../">Open the {E(m['name'])} debt clock →</a>
 <section class="related" id="related"><h2>Related clocks</h2><div class="rg">{rel_html}</div></section>
-<footer>Every figure on this page is an official published number. Page built {E(stamp)}. · <a href="{UP}/embed/">Embed a clock</a> · <a href="{UP}/data/">Data</a> · <a href="{UP}/methodology/">Methodology</a> · <a href="{UP}/privacy.html">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>
+<footer>Every figure on this page is an official published number. Page built {E(stamp)}. · <a href="{UP}/embed/">Embed a clock</a> · <a href="{UP}/data/">Data</a> · <a href="{UP}/methodology/">Methodology</a> · <a href="{UP}/privacy/">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>
 </main></body></html>"""
     if "coming soon" in page.lower():
         raise RuntimeError(f"{m['slug']}: page contains coming soon")

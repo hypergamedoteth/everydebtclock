@@ -470,7 +470,7 @@ const c=(av!==''&&bv!==''&&!isNaN(an)&&!isNaN(bn))?an-bn:String(av).localeCompar
 rows.forEach(function(r){tb.appendChild(r)})})})})()</script>"""
     explore_html = ex.explore("../", places, pb.calc, cur=None, gdp=pb.GDP_BY_SLUG, usd={x["slug"]: x["usd"] for x in rows if x["slug"] != "united-states"}, kind_hint="world")
     page = (pb.meta_head(SITE, url, title, desc, img, 1, pb.PL_CSS + CSS, ld) + header + '<main id="app">' + hero + intro + covsent + table + imf_sec + meas + rates + faq_html + ex.search_box("../") + method + '</main>' + explore_html + links
-            + '<footer class="site-foot">Every Debt Clock · mixed sources, projection labelled · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>' + script + "</body></html>")
+            + '<footer class="site-foot">Every Debt Clock · mixed sources, projection labelled · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>' + script + "</body></html>")
     os.makedirs(f"{R}/world", exist_ok=True)
     open(f"{R}/world/index.html", "w").write(with_analytics(page))
     return [url]

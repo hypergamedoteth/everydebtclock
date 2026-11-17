@@ -153,7 +153,7 @@ def _page(ctx, slug, title, desc, ld, hero, intro, body):
 <a class="cta" href="../">Open the live national debt clock →</a>
 {related}
 <div class="rel"><b>More answers:</b><br>{more}<a href="../t/debt_total.html">US national debt, live</a></div>
-<footer class="site-foot">The figure at the top uses the same Treasury base and per-second rate as the homepage clock. Other figures are official records unless a line says projected. Built {E(ctx["STAMP"])}. · <a href="../methodology/">Methodology</a> · <a href="../privacy.html">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer class="site-foot">The figure at the top uses the same Treasury base and per-second rate as the homepage clock. Other figures are official records unless a line says projected. Built {E(ctx["STAMP"])}. · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main>
 <script>window.DEBTCLOCK_DATA={ctx["clock"]};</script><script src="../core.js"></script>
 {COUNT_JS}
