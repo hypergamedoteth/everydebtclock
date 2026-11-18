@@ -34,10 +34,22 @@ def slug_for(name):
     return s
 
 
+def _round_dollar(n):
+    """Nearest dollar, the same rounding the table prints."""
+    return int(round(n))
+
+
 def _usd0(n):
     if n is None:
         return "—"
-    return ("−$" if n < 0 else "$") + f"{abs(round(n)):,.0f}"
+    return ("−$" if n < 0 else "$") + f"{abs(_round_dollar(n)):,}"
+
+
+def _footed_change(start_amount, end_amount):
+    """Change the table can subtract: rounded end minus rounded start."""
+    change = _round_dollar(end_amount) - _round_dollar(start_amount)
+    pct = change / _round_dollar(start_amount) * 100 if _round_dollar(start_amount) else None
+    return change, pct
 
 
 def _usd2(n):
@@ -86,8 +98,7 @@ def _term_row(name, n, start, end, H, hdo, off_d, off_v, pops):
     same = a and b and a["date"] == b["date"]
     change = pct = None
     if a and b and not same and a.get("amount"):
-        change = b["amount"] - a["amount"]
-        pct = change / a["amount"] * 100
+        change, pct = _footed_change(a["amount"], b["amount"])
     return {
         "name": name, "n": n, "start": start, "end": end, "open": open_term,
         "a": a, "b": b, "change": change, "pct": pct,
@@ -133,8 +144,7 @@ def records(R, off_d=None, off_v=None, hdo=None):
         last = next((t["b"] for t in reversed(terms) if t["b"]), None)
         span_change = span_pct = None
         if first and last and first["date"] != last["date"] and first.get("amount"):
-            span_change = last["amount"] - first["amount"]
-            span_pct = span_change / first["amount"] * 100
+            span_change, span_pct = _footed_change(first["amount"], last["amount"])
         published.append({
             "name": name, "slug": slug, "terms": terms,
             "first": first, "last": last, "change": span_change, "pct": span_pct,
@@ -307,6 +317,41 @@ def llms_lines(R):
     return lines
 
 
+def _parse_displayed_dollars(cell):
+    """Whole-dollar figure printed in a table cell, ignoring the basis note."""
+    cell = re.sub(r"<span class=\"when\">.*?</span>", "", cell, flags=re.S)
+    text = re.sub(r"<[^>]+>", "", cell).strip()
+    if text in ("—", "-", "") or text.startswith("No record"):
+        return None
+    neg = text.startswith("−") or text.startswith("-")
+    m = re.search(r"\$(\d[\d,]*)", text)
+    if not m:
+        raise SystemExit(f"president table cell has no dollar amount: {text!r}")
+    n = int(m.group(1).replace(",", ""))
+    return -n if neg else n
+
+
+def _assert_rows_foot(slug, html):
+    """Displayed change must equal the displayed end minus the displayed start."""
+    checked = 0
+    for row in re.findall(r"<tr>(.*?)</tr>", html, flags=re.S):
+        cells = re.findall(r"<td[^>]*>(.*?)</td>", row, flags=re.S)
+        if len(cells) < 8:
+            continue
+        start = _parse_displayed_dollars(cells[2])
+        end = _parse_displayed_dollars(cells[4])
+        change = _parse_displayed_dollars(cells[6])
+        if change is None:
+            continue
+        if start is None or end is None:
+            raise SystemExit(f"{slug}: a change is shown without a start and an end")
+        if change != end - start:
+            raise SystemExit(f"{slug}: change {change} does not equal end {end} minus start {start}")
+        checked += 1
+    if checked < 1:
+        raise SystemExit(f"{slug}: no term row to foot")
+
+
 def check(R, site):
     published, skipped, _H = records(R)
     sm = open(os.path.join(R, "sitemap.xml")).read()
@@ -315,6 +360,7 @@ def check(R, site):
     for p in published:
         path = os.path.join(R, "national-debt-by-president", p["slug"], "index.html")
         text = open(path).read()
+        _assert_rows_foot(p["slug"], text)
         if _usd0(p["last"]["amount"]) not in text or _usd0(p["first"]["amount"]) not in text:
             raise SystemExit(f"{p['slug']}: Treasury amounts are not on the page")
         if f"{p['pct']:+.1f}%" not in text:
