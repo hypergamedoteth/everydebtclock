@@ -22,7 +22,8 @@ TOPIC_CSS = """
 body{margin:0;background:#07090d;color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif;line-height:1.5}
 main{max-width:920px;margin:0 auto;padding:8px 16px 48px}a{color:#5aa9ff;text-decoration:none}
 .brand{font-weight:800;letter-spacing:.06em;font-size:14px;display:inline-block;margin:8px 0 4px}.brand b{color:#ff4d5e}
-h1{font-size:22px;margin:0 0 6px}h2{font-size:17px;margin:22px 0 6px}
+h1{font-size:17px;line-height:1.35;font-weight:650;margin:0 0 6px}h2{font-size:17px;margin:22px 0 6px}
+p.official{margin:8px 2px 2px;color:#8a97ab;font-size:13.5px;line-height:1.45}
 p{color:#c2ccda;font-size:15px;margin:0 0 10px}
 .hero{border:1px solid var(--line);background:linear-gradient(180deg,#101828,#0b0f16);border-radius:18px;padding:16px 16px 14px;margin:8px 0 0}
 .hero .k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:0}
@@ -63,6 +64,9 @@ COUNT_JS = r"""
   const usd2 = n => (n == null || !isFinite(n)) ? '—' : (n < 0 ? '−$' : '$') + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   function tick(){
     const t = Date.now() / 1000;
+    if (mode === 'debt' || mode === 'person' || mode === 'interest') {
+      if (k.dataset.live) k.textContent = k.dataset.live;
+    }
     if (mode === 'debt') {
       v.textContent = usd0(C.val('debt_total', t));
     } else if (mode === 'person') {
@@ -93,6 +97,7 @@ COUNT_JS = r"""
         v.textContent = usd0(Math.max(target - d, 0));
         sub.textContent = 'No projected date while the debt is not growing · ' + usd0(d) + ' now';
       } else {
+        if (k.dataset.live) k.textContent = k.dataset.live;
         const left = target - d;
         v.textContent = usd0(Math.max(left, 0));
         sub.textContent = countdown(left / rate) + ' · ' + lead.dataset.when + ' · ' + usd0(d) + ' now';
@@ -153,14 +158,14 @@ def _page(ctx, slug, title, desc, ld, hero, intro, body, faqs=None, og=None):
 {search}
 <main>
 <a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
-<section class="intro" id="intro">{intro}</section>
 {hero}
+<section class="intro" id="intro">{intro}</section>
 {body}
 {_faq_html(faqs) if faqs else ""}
 <a class="cta" href="../">Open the live national debt clock →</a>
 {related}
 <div class="rel"><b>More answers:</b><br>{more}<a href="../t/debt_total.html">US national debt, live</a></div>
-<footer class="site-foot">The official figure is stated first. A live estimate, when this page has one, is labeled and sits below that figure. Built {E(ctx["STAMP"])}. · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer class="site-foot">The live clock is first. With JavaScript off, that number is the official figure. Built {E(ctx["STAMP"])}. · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main>
 <script>window.DEBTCLOCK_DATA={ctx["clock"]};</script><script src="../core.js"></script><script src="../cross41.js"></script>
 {COUNT_JS}
@@ -280,11 +285,11 @@ def milestone_state(ctx, H, n):
                      f"At the homepage clock's 90-day pace, about {bil(per_day)} a day, ${n} trillion falls on {when}. "
                      f"It is a projection, not a Treasury forecast.")
             summary = (f"At the homepage clock's 90-day pace, about {bil(per_day)} a day, ${n} trillion falls on {when}. "
-                       f"It is a projection, not a Treasury forecast. The figure below is a live estimate of what is left.")
+                       f"It is a projection, not a Treasury forecast. The figure above is a live estimate of what is left.")
         else:
             quote = (f"The debt was {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}, {bil(target - ctx['OFF_V'])} short of ${n} trillion. "
                      f"The clock is not projecting a date, because the debt is not growing past the statutory limit.")
-            summary = quote + " The figure below is a live estimate."
+            summary = quote + " The figure above is a live estimate."
     return {
         "n": n, "target": target, "nxt": nxt, "base": base, "t0": t0, "live_rate": live_rate, "freeze": freeze,
         "debt_now": debt_now, "official": official, "passed": passed, "per_day": per_day, "lim": lim, "subj_t": subj_t,
@@ -356,11 +361,19 @@ def _milestone_pages(ctx, H):
         if len(desc) > 320:
             desc = desc[:317].rsplit(" ", 1)[0] + "."
         banner = crossing_banner.HTML if n == 41 else ""
+        if kicker.startswith("Live estimate"):
+            static_k = "Official" + kicker[len("Live estimate"):]
+            live_attr = f' data-live="{html.escape(kicker, quote=True)}"'
+            shown = usd0(max(target - ctx["OFF_V"], 0))
+        else:
+            static_k, live_attr, shown = kicker, "", usd0(max(left, 0))
         hero = f"""<div class="hero lead" id="lead" data-mode="count" data-target="{target}" data-next="{nxt}" data-rate="{live_rate}" data-level="{n}" data-next-level="{n+1}" data-passed="{'1' if official else '0'}" data-passed-date="{html.escape(passed_date)}" data-when="{html.escape(when or '')}" data-next-ok="{'1' if next_ok else '0'}" data-hold="{html.escape(hold, quote=True)}">
-<div class="k" id="lead-k">{html.escape(kicker)}</div>
-<div class="big num" id="lead-v">{usd0(max(left, 0))}</div>
-<div class="sub" id="lead-sub">{html.escape(when or 'Debt to the Penny')} · {usd0(debt_now if debt_now is not None else base)} now</div>
-</div>{banner}"""
+<div class="k" id="lead-k"{live_attr}>{html.escape(static_k)}</div>
+<div class="big num" id="lead-v">{shown}</div>
+<div class="sub" id="lead-sub">{html.escape(when or 'Debt to the Penny')} · official close {html.escape(usd2(ctx['OFF_V']))}</div>
+</div>
+<p class="official">Official: {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}, Treasury Debt to the Penny</p>
+{banner}"""
         intro = f"<h1>{html.escape(h1)}</h1><p class=\"answer\">{summary} Source: <a href=\"{ctx['DTP']}\" rel=\"noopener\">Treasury, Debt to the Penny</a>.</p>"
         rows = []
         for c in reversed(H["crossings"]):
@@ -468,10 +481,11 @@ def _president_page(ctx, H):
              f"A term that starts after a death or resignation is still listed as that president's term: Tyler, Fillmore, Andrew Johnson, Arthur, Theodore Roosevelt, Coolidge, Truman, Lyndon Johnson, and Ford.</p>")
     hero_debt = ctx["val"]("debt_total", ctx["NOW"])
     hero = f"""<div class="hero lead" id="lead" data-mode="debt">
-<div class="k" id="lead-k">Live estimate · US national debt</div>
-<div class="big num" id="lead-v">{usd0(hero_debt)}</div>
-<div class="sub" id="lead-sub">Live estimate from the same clock as the homepage. Official close {html.escape(fdate(ctx['OFF_D']))} {html.escape(usd2(ctx['OFF_V']))}.</div>
-</div>"""
+<div class="k" id="lead-k" data-live="Live estimate · US national debt">Official · {html.escape(fdate(ctx['OFF_D']))} · Treasury Debt to the Penny</div>
+<div class="big num" id="lead-v">{usd2(ctx['OFF_V'])}</div>
+<div class="sub" id="lead-sub">Same per-second rate as the homepage clock. Official close {html.escape(fdate(ctx['OFF_D']))} {html.escape(usd2(ctx['OFF_V']))}.</div>
+</div>
+<p class="official">Official: {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}, Treasury Debt to the Penny</p>"""
     body = f"""<div class="tw"><table><tr><th>President</th><th>Term</th><th>Debt at start</th><th>Debt at end</th><th>Change</th><th>Change %</th></tr>{''.join(rows)}</table></div>
 <p>A dash means there are not two different Treasury records to subtract. That happens when the annual series has only one reading in the term, or no record on or before the start. Debt to the Penny's latest row in this extract is {fdate(end['date'])}, {usd2(end['amount'])}.</p>
 {ctx['src']([("Treasury, Debt to the Penny", ctx['DTP']), ("Treasury, Historical Debt Outstanding", H['sources']['debt_outstanding'])])}"""
@@ -517,16 +531,17 @@ def _person_page(ctx, H):
     live = debt_now / pop_now if debt_now and pop_now else pp
     hh, tax = ctx["HH"], ctx["TAX"]
     hero = f"""<div class="hero lead" id="lead" data-mode="person">
-<div class="k" id="lead-k">Live estimate · national debt per person</div>
-<div class="big num" id="lead-v">{usd2(live)}</div>
-<div class="sub" id="lead-sub">Live estimate: debt clock ÷ population projected from the Census estimate for {fdate(ctx['POP_OFF_DATE'])}. Not the official per-person figure.</div>
-<div class="trio"><div><span class="l">Live estimate per person</span><span class="n" id="pp-p">{usd2(live)}</span></div>
-<div><span class="l">Live estimate per household</span><span class="n" id="pp-h">{usd2(debt_now / hh)}</span></div>
-<div><span class="l">Live estimate per tax return filed</span><span class="n" id="pp-r">{usd2(debt_now / tax)}</span></div></div>
-</div>"""
+<div class="k" id="lead-k" data-live="Live estimate · national debt per person">Official · {html.escape(fdate(ctx['OFF_D']))} · Treasury Debt to the Penny ÷ Census</div>
+<div class="big num" id="lead-v">{usd2(pp)}</div>
+<div class="sub" id="lead-sub">Debt clock ÷ population projected from the Census estimate for {fdate(ctx['POP_OFF_DATE'])}. The official per-person figure is {usd2(pp)}.</div>
+<div class="trio"><div><span class="l">Per person</span><span class="n" id="pp-p">{usd2(pp)}</span></div>
+<div><span class="l">Per household</span><span class="n" id="pp-h">{usd2(ctx['OFF_V'] / hh)}</span></div>
+<div><span class="l">Per tax return filed</span><span class="n" id="pp-r">{usd2(ctx['OFF_V'] / tax)}</span></div></div>
+</div>
+<p class="official">Official: {usd2(pp)} as of {fdate(ctx['OFF_D'])}, Treasury Debt to the Penny ÷ Census population</p>"""
     intro = (f"<h1>As of {fdate(ctx['OFF_D'])}, US debt per person is {usd2(pp)} (Treasury Debt to the Penny / Census population)</h1>"
              f"<p class=\"answer\">That is Treasury's total of {usd2(ctx['OFF_V'])} divided by the Census Bureau's {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])} (Vintage 2025), with no projection. "
-             f"The live estimate below moves with the debt clock and with Census's stated population growth. "
+             f"The live estimate above moves with the debt clock and with Census's stated population growth. "
              f"Per household is {usd2(ctx['OFF_V'] / hh)} ({hh:,.0f} households). "
              f"Per tax return filed is {usd2(ctx['OFF_V'] / tax)} ({tax:,.0f} individual returns in FY2025). A joint return counts once. "
              f'Sources: <a href="{ctx["DTP"]}" rel="noopener">Treasury, Debt to the Penny</a> and '
@@ -573,13 +588,13 @@ def _person_page(ctx, H):
         ("How much is the national debt per person?",
          f"{usd2(pp)} as of {fdate(ctx['OFF_D'])}. Treasury's total of {usd2(ctx['OFF_V'])} divided by the Census Vintage 2025 estimate of {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}."),
         ("What population is used?",
-         f"The official per-person figure uses the Census Vintage 2025 estimate of {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}, with no projection. The live estimate below that figure projects the population forward at the rate Census states. The by-year table uses the July 1 estimate from the Census series named in each row."),
+         f"The official per-person figure uses the Census Vintage 2025 estimate of {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}, with no projection. The live estimate above that figure projects the population forward at the rate Census states. The by-year table uses the July 1 estimate from the Census series named in each row."),
         ("How much is the national debt per household?",
          f"{usd2(ctx['OFF_V'] / hh)} as of {fdate(ctx['OFF_D'])}. Treasury's {fdate(ctx['OFF_D'])} total divided by {hh:,.0f} households in Census CPS ASEC 2025."),
         ("How much is the national debt per tax return?",
          f"{usd2(ctx['OFF_V'] / tax)} as of {fdate(ctx['OFF_D'])}. Treasury's {fdate(ctx['OFF_D'])} total divided by {tax:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2). A joint return counts once."),
         ("Why is the live estimate different from the official per-person figure?",
-         f"The live estimate below the official figure divides the live debt clock by population projected from the Census estimate for {fdate(ctx['POP_OFF_DATE'])}. "
+         f"The live estimate above the official figure divides the live debt clock by population projected from the Census estimate for {fdate(ctx['POP_OFF_DATE'])}. "
          f"{usd2(pp)} divides the {fdate(ctx['OFF_D'])} Treasury close by the {ctx['POP_OFF']:,.0f} residents Census estimated for that date, with no projection."),
     ]
     ld = ctx["dataset_ld"]("US national debt per person", desc, f"{ctx['SITE']}/national-debt-per-person/",
@@ -632,16 +647,17 @@ def _interest_page(ctx, H):
     full = next((r for r in H["net_interest_by_fy"][::-1]), None)
     intro = (f"<h1>As of {as_of_s}, cash interest paid on Treasury securities is {off_s} (Daily Treasury Statement)</h1>"
              f"<p class=\"answer\">That is the Daily Treasury Statement close, not a projection. "
-             f"The figure below is a live estimate from that close and has moved since then. Payments land in lumps, so the digits jump on coupon dates. "
+             f"The figure above is a live estimate from that close and has moved since then. Payments land in lumps, so the digits jump on coupon dates. "
              f"On an accrual basis, Treasury's interest-expense dataset is running at about {pace_s}, the last 12 reported months spread over the year."
              + (f" Net interest, the budget total, was {usd0(full['amount'])} in FY{full['fy']}." if full else "")
              + latest_line
              + f' Source: <a href="{html.escape(H["sources"]["dts_interest_paid"])}" rel="noopener">Treasury, Daily Treasury Statement</a>.</p>')
     hero = f"""<div class="hero lead" id="lead" data-mode="interest">
-<div class="k" id="lead-k">Live estimate · interest paid this fiscal year</div>
-<div class="big num" id="lead-v">{live_s}</div>
-<div class="sub" id="lead-sub">Live estimate, projected from the {html.escape(as_of_s)} Daily Treasury Statement close of {html.escape(off_s)}. FY{fy_now}.</div>
-</div>"""
+<div class="k" id="lead-k" data-live="Live estimate · interest paid this fiscal year">Official · {html.escape(as_of_s)} · Daily Treasury Statement</div>
+<div class="big num" id="lead-v">{off_s}</div>
+<div class="sub" id="lead-sub">Projected from the {html.escape(as_of_s)} Daily Treasury Statement close of {html.escape(off_s)}. FY{fy_now}.</div>
+</div>
+<p class="official">Official: {html.escape(off_s)} as of {html.escape(as_of_s)}, Daily Treasury Statement</p>"""
     body = f"""<h2>By fiscal year</h2>
 <p>Net interest is MTS Table 9, line 320, the September year-to-date total. Interest expense is the sum of every line in Treasury's Interest Expense on the Public Debt Outstanding dataset for that September. The dataset total is larger. It counts interest on all Treasury securities, including securities held by government accounts. Net interest is the budget figure after interest the government receives.</p>
 <div class="tw"><table><tr><th>Fiscal year</th><th>Net interest (MTS)</th><th>Interest expense (dataset)</th></tr>{''.join(rows)}</table></div>
@@ -651,7 +667,7 @@ def _interest_page(ctx, H):
             f"The page projects forward from that close. Net interest by fiscal year is from the Monthly Treasury Statement, and interest expense is from Treasury's debt-outstanding dataset.")
     faqs = [
         ("How much interest has the US paid this fiscal year?",
-         f"{off_s} in cash interest on Treasury securities as of {as_of_s}, from the Daily Treasury Statement. The live estimate below that figure is a projection and has moved since that close."),
+         f"{off_s} in cash interest on Treasury securities as of {as_of_s}, from the Daily Treasury Statement. The live estimate above that figure is a projection and has moved since that close."),
         ("What is net interest on the national debt?",
          f"Net interest was {usd0(full['amount'])} in FY{full['fy']} (Monthly Treasury Statement, line 320). It is the budget total, smaller than the interest-expense dataset because interest received by the government is netted out." if full else "Net interest is MTS Table 9, line 320."),
     ]
@@ -660,7 +676,7 @@ def _interest_page(ctx, H):
         faqs.append(("How much interest does the US pay per day?", day))
     faqs.append((
         "Is the live estimate the official interest total?",
-        f"No. The live estimate below the official close is projected forward from the Daily Treasury Statement close of {off_s} as of {as_of_s}. Payments land on coupon dates, so the official cash total stays flat between those dates and then jumps.",
+        f"No. The live estimate above the official close is projected forward from the Daily Treasury Statement close of {off_s} as of {as_of_s}. Payments land on coupon dates, so the official cash total stays flat between those dates and then jumps.",
     ))
     faqs.append((
         "Where do the interest figures come from?",

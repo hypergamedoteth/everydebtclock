@@ -360,7 +360,7 @@
 
   function render(D, r) {
     document.getElementById("share-num").textContent = money(r.share, 2);
-    document.getElementById("asof").textContent = "As of Treasury's " + fdate(D.debtDate) + " close · Census population " + fdate(D.populationDate);
+    document.getElementById("asof").textContent = "Official: " + money(r.share, 2) + " as of " + fdate(D.debtDate) + ", Treasury Debt to the Penny ÷ Census population";
     document.getElementById("sentence").textContent = sentence(r);
     var box = document.getElementById("details");
     box.replaceChildren();
