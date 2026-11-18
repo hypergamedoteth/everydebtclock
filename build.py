@@ -774,13 +774,14 @@ if OFF_V:
                 "Methodology and accuracy", body, ld='<script type="application/ld+json">' + json.dumps(_ld).replace("</", "<\\/") + "</script>", og_img="og/home.png")
 
 # ---------------------------------------------------------------- milestone, president, per-person, and interest pages
+PRES_URLS = []
 if OFF_V:
     import importlib.util
     _spec = importlib.util.spec_from_file_location("debtclock_series", f"{R}/pipeline/series.py")
     _series = importlib.util.module_from_spec(_spec)
     _spec.loader.exec_module(_series)
     import topics_build
-    topics_build.build({
+    PRES_URLS = topics_build.build({
         "R": R, "SITE": SITE, "NOW": NOW, "STAMP": STAMP, "T": T, "M": M, "val": val,
         "fdate": fdate, "usd0": usd0, "usd2": usd2, "bil": bil, "tril": tril,
         "OFF_D": OFF_D, "OFF_V": OFF_V, "POP_OFF": POP_OFF, "POP_OFF_DATE": POP_OFF_DATE,
@@ -788,7 +789,7 @@ if OFF_V:
         "ANSWERS": ANSWERS, "places": PLACES_LIVE, "calc": places_build.calc, "gdp": places_build.GDP_BY_SLUG,
         "with_analytics": with_analytics, "dataset_ld": dataset_ld, "faq_ld": faq_ld, "src": src_links,
         "terms": _series.TERMS, "hdo": M.get("debt_by_fy") or [],
-    })
+    }) or []
 
 # ---------------------------------------------------------------- place pages: /states/<slug>/, /countries/<slug>/ from places/*.json
 import places_build
@@ -800,6 +801,9 @@ PLACE_URLS += wealth_build.build(R, SITE, with_analytics, og, PLACES_LIVE, WEALT
 import debt_by_year_build
 DY_URLS = debt_by_year_build.build(R, SITE, with_analytics, STAMP, M.get("generated_iso") or "")
 debt_by_year_build.patch_clocks(R)
+import state_per_person_build
+import presidents_build
+SP_URLS = state_per_person_build.build(R, SITE, with_analytics, STAMP)
 
 # ---------------------------------------------------------------- free data hub (/data/ CSVs, charts). New files only, plus the sitemap and footer links above.
 import data_hub
@@ -815,6 +819,8 @@ lm = gen_ct.date().isoformat()
 urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/embed/", "0.5", "weekly")] + data_hub.sitemap_entries(R, SITE) + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
         [(u, "0.8", "weekly") for u in PLACE_URLS] +
         [(u, "0.8", "weekly") for u in DY_URLS] +
+        [(u, "0.8", "weekly") for u in PRES_URLS] +
+        [(u, "0.8", "weekly") for u in SP_URLS] +
         [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None] +
         site_chrome.sitemap_entries(SITE))
 open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
@@ -853,7 +859,11 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /data/ : Free CSV files and charts of the US and world series this site publishes. Free to use with credit: Source: EveryDebtClock.com.",
     "- /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.",
     "",
-] + debt_by_year_build.llms_lines(R) + [
+] + debt_by_year_build.llms_lines(R) + presidents_build.llms_lines(R) + [
+    "## Comparisons",
+    "- /states/debt-per-person/ : Census state and local debt divided by Census Vintage 2025 population, for every state and the District of Columbia. The debt date and the population date are both named.",
+    "",
+] + [
     "## Data",
     "US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.",
     "",
@@ -899,6 +909,9 @@ for f in _pages:
 print("asset versions:", AV)
 
 site_chrome.finalize(R)
+debt_by_year_build.check(R, SITE)
+presidents_build.check(R, SITE)
+state_per_person_build.check(R, SITE)
 
 # ---------------------------------------------------------------- standalone (read index.html back so the embed control is in the offline copy)
 css, js = open(f"{R}/style.css").read(), open(f"{R}/app.js").read()
