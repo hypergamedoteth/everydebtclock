@@ -142,6 +142,76 @@ NOTICE_INNER = """\
 
 NOTICE_BLOCK = NOTICE_MARK_START + NOTICE_INNER + NOTICE_MARK_END
 
+A2HS_MARK_START = "<!--A2HS-->"
+A2HS_MARK_END = "<!--/A2HS-->"
+A2HS_INNER = """\
+<aside id="edc-a2hs" hidden>
+<p id="edc-a2hs-text">Add this live clock to your home screen.</p>
+<button type="button" id="edc-a2hs-go" hidden>Add to home screen</button>
+<button type="button" id="edc-a2hs-x">Not now</button>
+</aside>
+<style>
+#edc-a2hs{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;padding:8px 16px;background:#101828;color:#c2ccda;border-bottom:1px solid #1c2533;font:13px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+#edc-a2hs[hidden]{display:none!important}
+#edc-a2hs p{margin:0;flex:1 1 180px}
+#edc-a2hs button{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+#edc-a2hs-go{color:#9fd0ff}
+</style>
+<script>
+(function(){
+  if(!("serviceWorker" in navigator)){}
+  else if(location.protocol==="https:"||location.hostname==="localhost"){
+    navigator.serviceWorker.register("/sw.js").catch(function(){});
+  }
+  var n=document.getElementById("edc-a2hs"),go=document.getElementById("edc-a2hs-go"),x=document.getElementById("edc-a2hs-x"),text=document.getElementById("edc-a2hs-text");
+  if(!n)return;
+  var key="edc.a2hs";
+  try{if(localStorage.getItem(key))return;}catch(e){return;}
+  if(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches||navigator.standalone){
+    try{localStorage.setItem(key,"1");}catch(e){}
+    return;
+  }
+  var deferred=null,shown=false;
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown)show(true);});
+  function show(install){
+    if(shown)return;shown=true;
+    try{localStorage.setItem(key,"1");}catch(e){}
+    if(install&&deferred){text.textContent="Add this live clock to your home screen.";go.hidden=false;}
+    else if(/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)){
+      text.textContent="Bookmark this clock: tap Share, then Add to Home Screen.";go.hidden=true;
+    }else{text.textContent="Bookmark this clock to keep the live numbers one tap away.";go.hidden=true;}
+    n.hidden=false;
+  }
+  if(go)go.addEventListener("click",function(){if(!deferred)return;deferred.prompt();deferred=null;n.hidden=true;});
+  if(x)x.addEventListener("click",function(){try{localStorage.setItem(key,"1");}catch(e){}n.hidden=true;});
+  setTimeout(function(){if(!shown)show(false);},1500);
+})();
+</script>
+"""
+A2HS_BLOCK = A2HS_MARK_START + A2HS_INNER + A2HS_MARK_END
+
+
+def with_a2hs(page: str) -> str:
+    if A2HS_MARK_START in page:
+        page = re.sub(
+            re.escape(A2HS_MARK_START) + r".*?" + re.escape(A2HS_MARK_END),
+            lambda _m: A2HS_BLOCK,
+            page,
+            count=1,
+            flags=re.S,
+        )
+        return page
+    header = re.search(r"</header>", page, re.I)
+    if header:
+        at = header.end()
+        return page[:at] + "\n" + A2HS_BLOCK + page[at:]
+    return re.sub(r"<body[^>]*>", lambda m: m.group(0) + A2HS_BLOCK, page, count=1, flags=re.I)
+
+
+def _redirect(page: str) -> bool:
+    head = page[:1800]
+    return 'http-equiv="refresh"' in head or "location.replace" in head
+
 
 def with_notice(page: str) -> str:
     if NOTICE_MARK_START in page:
@@ -214,7 +284,7 @@ def _legal_shell(site: str, slug: str, title: str, desc: str, body: str, robots:
 def privacy_body() -> str:
     return """
 <h1>Privacy Policy</h1>
-<p class="eff">Effective October 26, 2026. Updated November 17, 2026.</p>
+<p class="eff">Effective October 26, 2026. Updated November 18, 2026.</p>
 
 <p>This website, <a href="https://everydebtclock.com/">everydebtclock.com</a>, is operated by Hypergame LLC, a Texas limited liability company ("we", "us"). This page explains what happens to information about you when you visit. There are no accounts and no sign-ups, and we don't ask for your name or email to use the site.</p>
 
@@ -231,11 +301,13 @@ def privacy_body() -> str:
 <p>Because the site is delivered through Cloudflare, Cloudflare Web Analytics may also be on. It can be enabled at Cloudflare's network without a script in our pages. It is privacy-focused, does not use cookies and does not track you across other websites. It counts page views, referrers, browser and device type, an approximate country, and page-load performance. We see only totals. See <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare's privacy policy</a>.</p>
 
 <h2>Cookies and local storage</h2>
-<p>The site does not set its own first-party cookies today. It uses your browser's local storage in two places, both only on your device:</p>
+<p>The site does not set its own first-party cookies today. It uses your browser's local storage in three places, all only on your device:</p>
 <ul>
 <li>When you pick a place in the home page's place picker, the site saves that choice (a place name such as "texas", under the key <code>edc.place</code>) so the same place can show next time.</li>
 <li>When you dismiss the cookie and ads notice, the site saves that choice under the key <code>edc.notice</code> so the notice stays hidden.</li>
+<li>When the add-to-home-screen prompt is shown, the site saves that under the key <code>edc.a2hs</code> so the prompt is not shown again. Nothing about that choice is sent to us.</li>
 </ul>
+<p>If the page registers its service worker, the browser keeps a copy of the stylesheet, scripts, and icons so a home-screen icon can open. Debt figures are requested again each visit and are not stored in that cache. The service worker does not set a cookie and does not record your visit.</p>
 <p>You can remove both by clearing this site's data in your browser. The live counters are calculated in your browser from data files on our own site. The site does not look up your location: the featured place is a fixed default until you choose another.</p>
 
 <h2>Advertising (if and when ads are shown)</h2>
@@ -434,5 +506,7 @@ def finalize(R: str, extra: tuple[tuple[str, str], ...] = ()) -> None:
             page = _FOOTER_RE.sub(lambda m: upgrade_footer(m.group(0), extra), page)
         if not skip_notice(rel):
             page = with_notice(page)
+            if not _redirect(page):
+                page = with_a2hs(page)
         if page != raw:
             open(path, "w", encoding="utf-8").write(page)

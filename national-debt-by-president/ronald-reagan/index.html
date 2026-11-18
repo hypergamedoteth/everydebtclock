@@ -24,15 +24,57 @@ figcaption{color:#8a97ab;font-size:12.5px;margin-top:6px}
 @media (max-width:700px){.related .rg{grid-template-columns:1fr}}
 ul.sources{padding-left:18px}ul.sources li{font-size:13.5px;margin:3px 0}
 td .when{display:block;color:#8a97ab;font-size:12px;font-weight:400;white-space:normal}</style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "National debt under Ronald Reagan", "description": "National debt under Ronald Reagan: $907,701,000,000 on Sep 30, 1980, $2,602,337,712,041 on Sep 30, 1988, a change of $1,694,636,712,041 (+186.7%). Treasury figures.", "url": "https://everydebtclock.com/national-debt-by-president/ronald-reagan/", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": "https://everydebtclock.com/"}, "dateModified": "2026-11-18", "temporalCoverage": "1980/1988", "isBasedOn": ["https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny", "https://fiscaldata.treasury.gov/datasets/historical-debt-outstanding/historical-debt-outstanding"], "keywords": ["national debt under Ronald Reagan", "Ronald Reagan national debt", "US debt by president"]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "National debt under Ronald Reagan", "description": "National debt under Ronald Reagan: $907,701,000,000 on Sep 30, 1980, $2,602,337,712,041 on Sep 30, 1988, a change of $1,694,636,712,041 (+186.7%). Treasury figures.", "url": "https://everydebtclock.com/national-debt-by-president/ronald-reagan/", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": "https://everydebtclock.com/"}, "dateModified": "1988-09-30", "temporalCoverage": "1980/1988", "isBasedOn": ["https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny", "https://fiscaldata.treasury.gov/datasets/historical-debt-outstanding/historical-debt-outstanding"], "keywords": ["national debt under Ronald Reagan", "Ronald Reagan national debt", "US debt by president"]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What was the national debt under Ronald Reagan?", "acceptedAnswer": {"@type": "Answer", "text": "The Treasury total was $907,701,000,000 on Sep 30, 1980 and $2,602,337,712,041 on Sep 30, 1988 (the end of the last term). The difference is $1,694,636,712,041 (+186.7%), so the debt was higher. That is the change between those two Treasury figures. It is not a measure of what the president added: Congress writes tax and spending laws, and terms are not the same length."}}, {"@type": "Question", "name": "Does the change show what the president added to the debt?", "acceptedAnswer": {"@type": "Answer", "text": "No. It is the difference between the Treasury total at the start and at the end. Term lengths differ, and spending and tax laws are passed by Congress."}}, {"@type": "Question", "name": "Is the per-person figure the population on that day?", "acceptedAnswer": {"@type": "Answer", "text": "No. It is the Treasury figure divided by the Census Bureau's July 1 resident population of that calendar year, when that year is in the series this site uses. The series starts in 1900."}}]}</script>
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg">
 <!--ANALYTICS--><script data-goatcounter="https://everydebtclock.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script><!--/ANALYTICS-->
-</head><body><main>
+<link rel="manifest" href="/manifest.json"></head><body><!--A2HS--><aside id="edc-a2hs" hidden>
+<p id="edc-a2hs-text">Add this live clock to your home screen.</p>
+<button type="button" id="edc-a2hs-go" hidden>Add to home screen</button>
+<button type="button" id="edc-a2hs-x">Not now</button>
+</aside>
+<style>
+#edc-a2hs{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;padding:8px 16px;background:#101828;color:#c2ccda;border-bottom:1px solid #1c2533;font:13px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+#edc-a2hs[hidden]{display:none!important}
+#edc-a2hs p{margin:0;flex:1 1 180px}
+#edc-a2hs button{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+#edc-a2hs-go{color:#9fd0ff}
+</style>
+<script>
+(function(){
+  if(!("serviceWorker" in navigator)){}
+  else if(location.protocol==="https:"||location.hostname==="localhost"){
+    navigator.serviceWorker.register("/sw.js").catch(function(){});
+  }
+  var n=document.getElementById("edc-a2hs"),go=document.getElementById("edc-a2hs-go"),x=document.getElementById("edc-a2hs-x"),text=document.getElementById("edc-a2hs-text");
+  if(!n)return;
+  var key="edc.a2hs";
+  try{if(localStorage.getItem(key))return;}catch(e){return;}
+  if(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches||navigator.standalone){
+    try{localStorage.setItem(key,"1");}catch(e){}
+    return;
+  }
+  var deferred=null,shown=false;
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown)show(true);});
+  function show(install){
+    if(shown)return;shown=true;
+    try{localStorage.setItem(key,"1");}catch(e){}
+    if(install&&deferred){text.textContent="Add this live clock to your home screen.";go.hidden=false;}
+    else if(/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)){
+      text.textContent="Bookmark this clock: tap Share, then Add to Home Screen.";go.hidden=true;
+    }else{text.textContent="Bookmark this clock to keep the live numbers one tap away.";go.hidden=true;}
+    n.hidden=false;
+  }
+  if(go)go.addEventListener("click",function(){if(!deferred)return;deferred.prompt();deferred=null;n.hidden=true;});
+  if(x)x.addEventListener("click",function(){try{localStorage.setItem(key,"1");}catch(e){}n.hidden=true;});
+  setTimeout(function(){if(!shown)show(false);},1500);
+})();
+</script>
+<!--/A2HS--><main>
 <a class="brand" href="../../">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
 <p class="k"><a href="../../">US debt clock</a> · <a href="../">National debt by president</a></p>
-<h1>National debt under Ronald Reagan</h1>
-<p><b>Answer.</b> The Treasury total was $907,701,000,000 on Sep 30, 1980 and $2,602,337,712,041 on Sep 30, 1988 (the end of the last term). The difference is $1,694,636,712,041 (+186.7%), so the debt was higher. That is the change between those two Treasury figures. It is not a measure of what the president added: Congress writes tax and spending laws, and terms are not the same length. Per person: $3,994.73 per person at the first record (Census July 1, 1980), and $10,643.55 per person at the last record (Census July 1, 1988).</p>
+<h1>As of Sep 30, 1988, the national debt was $2,602,337,712,041.16 (Treasury)</h1>
+<p class="answer"><b>Answer.</b> The Treasury total was $907,701,000,000 on Sep 30, 1980 and $2,602,337,712,041 on Sep 30, 1988 (the end of the last term). The difference is $1,694,636,712,041 (+186.7%), so the debt was higher. That is the change between those two Treasury figures. It is not a measure of what the president added: Congress writes tax and spending laws, and terms are not the same length. Per person: $3,994.73 per person at the first record (Census July 1, 1980), and $10,643.55 per person at the last record (Census July 1, 1988).</p><p class="updated" data-updated="1988-09-30">Updated Sep 30, 1988</p>
 <figure><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" role="img"><title>US national debt at the end of each Ronald Reagan term</title><polyline points="12.0,91.7 708.0,26.0" fill="none" stroke="#ff4d5e" stroke-width="2.5"/><circle cx="12.0" cy="91.7" r="2.4" fill="#ff4d5e"/><circle cx="708.0" cy="26.0" r="2.4" fill="#ff4d5e"/><text x="12" y="212" text-anchor="start" fill="#8a97ab" font-size="12" font-family="sans-serif">1984</text><text x="708" y="212" text-anchor="end" fill="#8a97ab" font-size="12" font-family="sans-serif">1988</text></svg><figcaption>US national debt at the end of each Ronald Reagan term. Each point is the Treasury record at the end of that term, or the latest close if the term is in progress.</figcaption></figure>
 <h2>By term</h2>
 <div class="tw"><table><tr><th>Term</th><th>Dates</th><th>Debt at start</th><th>Per person</th><th>Debt at end</th><th>Per person</th><th>Change</th><th>Change %</th></tr><tr><td>1st term</td><td>Jan 20, 1981 – Jan 20, 1985</td><td class="num">$907,701,000,000<span class="when">Sep 30, 1980 · Historical Debt Outstanding, annual record (not inauguration day)</span></td><td class="num">$3,994.73<span class="when">Census July 1, 1980</span></td><td class="num">$1,572,266,000,000<span class="when">Sep 30, 1984 · Historical Debt Outstanding, annual record (not inauguration day)</span></td><td class="num">$6,667.09<span class="when">Census July 1, 1984</span></td><td class="num">$664,565,000,000</td><td class="num">+73.2%</td></tr><tr><td>2nd term</td><td>Jan 20, 1985 – Jan 20, 1989</td><td class="num">$1,572,266,000,000<span class="when">Sep 30, 1984 · Historical Debt Outstanding, annual record (not inauguration day)</span></td><td class="num">$6,667.09<span class="when">Census July 1, 1984</span></td><td class="num">$2,602,337,712,041<span class="when">Sep 30, 1988 · Historical Debt Outstanding, annual record (not inauguration day)</span></td><td class="num">$10,643.55<span class="when">Census July 1, 1988</span></td><td class="num">$1,030,071,712,041</td><td class="num">+65.5%</td></tr></table></div>
@@ -46,7 +88,7 @@ td .when{display:block;color:#8a97ab;font-size:12px;font-weight:400;white-space:
 <h3>What was the national debt under Ronald Reagan?</h3><p>The Treasury total was $907,701,000,000 on Sep 30, 1980 and $2,602,337,712,041 on Sep 30, 1988 (the end of the last term). The difference is $1,694,636,712,041 (+186.7%), so the debt was higher. That is the change between those two Treasury figures. It is not a measure of what the president added: Congress writes tax and spending laws, and terms are not the same length.</p><h3>Does the change show what the president added to the debt?</h3><p>No. It is the difference between the Treasury total at the start and at the end. Term lengths differ, and spending and tax laws are passed by Congress.</p><h3>Is the per-person figure the population on that day?</h3><p>No. It is the Treasury figure divided by the Census Bureau&#x27;s July 1 resident population of that calendar year, when that year is in the series this site uses. The series starts in 1900.</p>
 <a class="cta" href="../../">Open the live national debt clock →</a>
 <section class="related" id="related"><h2>Related</h2><div class="rg"><a href="../"><span class="rn">National debt by president</span><span class="rw">Every term in one table</span></a><a href="../../national-debt-by-year/"><span class="rn">US national debt by year</span><span class="rw">Treasury totals by fiscal year</span></a><a href="../jimmy-carter/"><span class="rn">National debt under Jimmy Carter</span><span class="rw">The previous president in this table</span></a></div></section>
-<footer>Every figure on this page is a Treasury or Census record. The change is not attributed to the person in office. Page built Nov 18, 2026 12:53 PM CT. · <a href="../../embed/">Embed a clock</a> · <a href="../../data/">Data</a> · <a href="../../press/">Press</a> · <a href="../../about/">About</a> · <a href="../../advertise/">Advertise</a> · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · <a href="../../contact/">Contact</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer>Every figure on this page is a Treasury or Census record. The change is not attributed to the person in office. Page built Nov 18, 2026 2:09 PM CT. · <a href="../../embed/">Embed a clock</a> · <a href="../../data/">Data</a> · <a href="../../press/">Press</a> · <a href="../../about/">About</a> · <a href="../../advertise/">Advertise</a> · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · <a href="../../contact/">Contact</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main><!--NOTICE--><aside id="edc-notice" hidden role="region" aria-label="Cookies and ads">
 <p>This site uses privacy-focused analytics. If ads are shown, Google and its partners may use cookies. <a href="/privacy/">Privacy</a></p>
 <button type="button" id="edc-notice-ok">OK</button>

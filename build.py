@@ -14,6 +14,8 @@ import site_chrome
 
 R = os.path.dirname(os.path.abspath(__file__))
 SITE = os.environ.get("DEBTCLOCK_SITE_URL", "https://everydebtclock.com").rstrip("/")
+import freshness
+OLD_LASTMOD = freshness.read_lastmods(os.path.join(R, "sitemap.xml"))
 # Analytics hook: empty by default. Set ANALYTICS_HTML (raw HTML snippet) or put it in analytics.html next to build.py.
 # The env var wins if both exist. It is injected before </head> on index.html, every t/ page, 404.html and the standalone.
 ANALYTICS_HTML = os.environ.get("ANALYTICS_HTML")
@@ -276,7 +278,7 @@ else:
     proj_txt = (f"The clock below starts from that official figure and projects forward at the 90-day trend (about {bil(rate_day)} a day). "
                 "It is re-based to Treasury's new figure every business day and never projects past the debt limit.")
 answer_s = f"The US national debt was <b>{usd2(OFF_V)}</b> ({tril(OFF_V)}) as of <b>{fdate(OFF_D)}</b>, Treasury's Debt to the Penny close."
-intro = (f"""<!--INTRO--><h1>US National Debt Clock</h1>
+intro = (f"""<!--INTRO--><h1>As of {fdate(OFF_D)}, the US national debt is {usd2(OFF_V)} (Treasury Debt to the Penny)</h1>
 <p class="answer">{answer_s} The figure is from <a href="{DTP_URL}" rel="noopener">Treasury's Debt to the Penny</a>.</p>
 <p>That is <b>{usd2(PP_OFF)} per person</b>: the debt divided by the Census Bureau's estimate of
 {POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}. {proj_txt}</p>
@@ -298,10 +300,10 @@ def row(slug):
             v = usd0(i["base"]) if i.get("kind") == "usd" else fmt(i, i["base"])
             asof = (i["basis_txt"] if i.get("basis_txt") else f"official, {fdate(i.get('as_of'))}")
     return f'<tr><td><a href="t/{slug}.html">{html.escape(label(slug, i))}</a></td><td class="num">{v}</td><td>{html.escape(asof)}</td></tr>'
-ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="k">US national debt · official, {fdate(OFF_D)} close</div><div class="big num">{usd0(OFF_V)}</div>
+ssr = (f"""<!--SSR--><div class="ssr"><section class="intro" id="intro">{intro}</section>
+<div class="hero lead"><div class="k">Official close · {fdate(OFF_D)} · Treasury Debt to the Penny</div><div class="big num">{usd2(OFF_V)}</div>
 <div class="trio"><div><span class="l">Per person (Census, {fdate(POP_OFF_DATE)})</span><span class="num">{usd2(PP_OFF)}</span></div>
 <div><span class="l">Per tax return filed</span><span class="num">{usd2(OFF_V / TAX)}</span></div><div><span class="l">Per household</span><span class="num">{usd2(OFF_V / HH)}</span></div></div></div>
-<section class="intro" id="intro">{intro}</section>
 {site_chrome.sponsor_slot("")}<section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
 {''.join(row(s_) for s_ in ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "spending", "revenue", "gdp"])}</table>
 <noscript><p>Turn on JavaScript to watch these figures tick in real time.</p></noscript></section></div><!--/SSR-->""")
@@ -347,13 +349,6 @@ links = (f"""<!--LINKS-->""" + HOME_FAQ_HTML + HOME_EXPLORE + ("" if not PLACES_
 if "<!--INTRO-->" in idx: idx = re.sub(r"<!--INTRO-->.*?<!--/INTRO-->", lambda m: intro, idx, flags=re.S)
 if "<!--SSR-->" in idx: idx = re.sub(r"<!--SSR-->.*?<!--/SSR-->", lambda m: ssr, idx, flags=re.S)
 else: idx = idx.replace('<main id="app"></main>', f'<main id="app">{ssr}</main>', 1)
-# The lead ticker is first. Drop a copy of the summary that an older homepage left above it;
-# the SSR block already carries the summary directly under the ticker.
-_hero_at = idx.find('<div class="hero lead"')
-_intro_at = idx.find('<section class="intro"')
-if _intro_at != -1 and _hero_at != -1 and _intro_at < _hero_at:
-    _intro_end = idx.find('</section>', _intro_at)
-    if _intro_end != -1: idx = idx[:_intro_at] + idx[_intro_end + len('</section>'):]
 if "<!--LINKS-->" in idx: idx = re.sub(r"<!--LINKS-->.*?<!--/LINKS-->", lambda m: links, idx, flags=re.S)
 else: idx = idx.replace('<dialog id="dlg"></dialog>', f'<dialog id="dlg"></dialog>\n<section class="answers" id="answers">{links}</section>', 1)
 PLNAV = ("<!--PLNAV-->" + ('<nav class="plnav"><a href="./" class="on">United States</a>' + "".join(f'<a href="{d}/">{lab}</a>' for k, d, lab, _ in places_build.SECTIONS
@@ -686,7 +681,7 @@ and the population estimate have different dates because Census publishes its of
 The total includes {usd0(DI.get('base'))} of intragovernmental debt that the government owes its own trust funds; the "held by the public" row leaves that out.</p>
 {src_links([SRC_DTP, SRC_POP, SRC_HH, SRC_IRS])}"""
     answer_page("national-debt-per-person",
-                f"National Debt Per Person: {usd0(pp)} (Treasury ÷ Census, {fdate(OFF_D)})",
+                f"National Debt Per Person: {usd2(pp)} (Treasury ÷ Census, {fdate(OFF_D)})",
                 f"US national debt per person: {usd2(pp)}, Treasury's {fdate(OFF_D)} total of {tril(OFF_V)} divided by Census's {POP_OFF:,.0f} residents. "
                 f"Also per household ({usd0(OFF_V / HH)}) and per tax return filed.",
                 "National debt per person", body, og_img="og/home.png",
@@ -913,8 +908,9 @@ if OFF_V and POP_OFF:
                       T["households"], T["population"], M.get("debt_by_fy") or [], M.get("debt_by_fy_source"))
 
 # ---------------------------------------------------------------- sitemap + robots
-lm = gen_ct.date().isoformat()
 # /embed/ is indexable. Per-clock pages under /embed/ are noindex and stay out of this list.
+# lastmod is each page's data date, not the time this build ran.
+DATES = freshness.collect(R, OFF_D, WORLD)
 urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/embed/", "0.5", "weekly")] + data_hub.sitemap_entries(R, SITE) + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
         [(u, "0.8", "weekly") for u in PLACE_URLS] +
         [(u, "0.8", "weekly") for u in DY_URLS] +
@@ -922,8 +918,14 @@ urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/embed/", "0.5", "weekly")] + d
         [(u, "0.8", "weekly") for u in SP_URLS] +
         [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None] +
         site_chrome.sitemap_entries(SITE))
+def _lastmod(url):
+    path = url[len(SITE):] if url.startswith(SITE) else url
+    found = freshness.lookup(DATES, path)
+    if not found:
+        raise SystemExit(f"no data date for {url}")
+    return found
 open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-    "".join(f"<url><loc>{u}</loc><lastmod>{lm}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
+    "".join(f"<url><loc>{u}</loc><lastmod>{_lastmod(u)}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
 AI_BOTS = ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User",
            "PerplexityBot", "Google-Extended", "Applebot-Extended", "Bingbot")
 robots = "".join(f"User-agent: {b}\nAllow: /\n\n" for b in AI_BOTS)
@@ -1020,6 +1022,9 @@ for f in _pages:
 print("asset versions:", AV)
 
 site_chrome.finalize(R)
+freshness.stamp_tree(R, SITE, DATES)
+freshness.write_urls(os.path.join(R, "pipeline", "indexnow-urls.txt"), freshness.changed_urls(SITE, DATES, OLD_LASTMOD, urls))
+freshness.check(R, SITE, DATES, urls, OFF_D)
 debt_by_year_build.check(R, SITE)
 presidents_build.check(R, SITE)
 state_per_person_build.check(R, SITE)
@@ -1073,8 +1078,10 @@ def check_quotable():
         if not 3 <= nq <= 6 or visible.count("<h3>") != nq:
             raise SystemExit(f"{name}: {nq} JSON-LD questions, {visible.count('<h3>')} visible")
     home = open(f"{R}/index.html").read()
-    if f'<div class="big num">{usd0(OFF_V)}</div>' not in home:
+    if f'<div class="big num">{usd2(OFF_V)}</div>' not in home:
         raise SystemExit("homepage hero total changed")
+    if " PM CT" in home.split('id="faq"', 1)[-1].split("</section>", 1)[0]:
+        raise SystemExit("homepage FAQ bakes a build-time clock timestamp")
     api = json.load(open(f"{R}/api/daily.json"))
     expect = {"schema_version", "as_of", "fetched_at", "treasury_record_date", "total_debt_official",
               "total_debt_projected_now", "change_1d_official", "change_7d_official", "change_30d_official",
@@ -1087,5 +1094,28 @@ def check_quotable():
         raise SystemExit("api/daily.json format changed: " + " ".join(sorted(set(api) ^ expect)))
     print("quotable pages ok")
 
+def check_crossing():
+    """A page must not contain the $41 trillion crossing claim until Treasury's close is there."""
+    import crossing_banner
+    if crossing_banner.crossed():
+        print("crossing: official close is at the level; claim text is allowed")
+        return
+    bad = []
+    for root, dirs, files in os.walk(R):
+        dirs[:] = [d for d in dirs if d not in {".git", "cache", "pipeline", "__pycache__"}]
+        for fn in files:
+            if not fn.endswith(".html"):
+                continue
+            path = os.path.join(root, fn)
+            text = open(path, encoding="utf-8", errors="replace").read()
+            for claim in crossing_banner.CLAIMS:
+                if claim in text:
+                    bad.append(os.path.relpath(path, R) + ": " + claim)
+                    break
+    if bad:
+        raise SystemExit("crossing-day text is in static HTML before Treasury posts that close:\n" + "\n".join(bad[:12]))
+    print("crossing: static HTML does not say $41 trillion has been reached")
+
 check_quotable()
+check_crossing()
 

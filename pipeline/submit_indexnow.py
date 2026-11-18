@@ -71,33 +71,61 @@ def submit(host, key, key_location, url_list):
     except urllib.error.HTTPError as e:
         return e.code, e.read()
 
+def urls_from_file(path):
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    seen, out = set(), []
+    for line in lines:
+        u = line.strip()
+        if u and u not in seen:
+            seen.add(u)
+            out.append(u)
+    return out
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--sitemap", default=str(ROOT / "sitemap.xml"), help="sitemap.xml path or URL")
+    ap.add_argument("--sitemap", default="", help="sitemap.xml path or URL; used when --urls is omitted")
+    ap.add_argument("--urls", default="", help="text file of URLs whose figures changed, one per line")
     ap.add_argument("--host", default="everydebtclock.com")
     ap.add_argument("--site", default="https://everydebtclock.com")
     ap.add_argument("--key-file", default=str(ROOT / "pipeline" / "indexnow.key"))
     ap.add_argument("--wait", action="store_true", help="wait until the key file is fetchable at the site")
     ap.add_argument("--tries", type=int, default=8)
     ap.add_argument("--delay", type=int, default=15)
+    ap.add_argument("--soft", action="store_true", help="print the error and exit 0 if the ping fails")
     args = ap.parse_args()
-    key = load_key(args.key_file)
+    def fail(msg, code=1):
+        print(msg, file=sys.stderr)
+        sys.exit(0 if args.soft else code)
+    try:
+        key = load_key(args.key_file)
+    except Exception as e:
+        fail(f"indexnow: {e}")
+        return
     key_location = key_url(args.site, key, None)
-    urls = urls_from_sitemap(args.sitemap)
+    try:
+        urls = urls_from_file(args.urls) if args.urls else urls_from_sitemap(args.sitemap or str(ROOT / "sitemap.xml"))
+    except Exception as e:
+        fail(f"indexnow: could not read URLs: {e}")
+        return
     if not urls:
-        sys.exit(f"indexnow: no URLs in {args.sitemap}")
+        fail("indexnow: no URLs to submit")
+        return
     if args.wait:
         ok, st = wait_for_key(key_location, key, tries=args.tries, delay=args.delay)
         if not ok:
-            print(f"indexnow: giving up; key file not live at {key_location}", file=sys.stderr)
-            sys.exit(2)
-    code, body = submit(args.host, key, key_location, urls)
+            fail(f"indexnow: giving up; key file not live at {key_location}", 2)
+            return
+    try:
+        code, body = submit(args.host, key, key_location, urls)
+    except Exception as e:
+        fail(f"indexnow: ping failed: {e}")
+        return
     text = body.decode("utf-8", "replace") if body else ""
     print(f"indexnow: HTTP {code}; submitted {len(urls)} URLs; keyLocation={key_location}")
     if text:
         print(text[:500])
     if code not in (200, 202):
-        sys.exit(1)
+        fail(f"indexnow: HTTP {code}", 1)
 
 if __name__ == "__main__":
     main()
