@@ -301,7 +301,7 @@ def row(slug):
             asof = (i["basis_txt"] if i.get("basis_txt") else f"official, {fdate(i.get('as_of'))}")
     return f'<tr><td><a href="t/{slug}.html">{html.escape(label(slug, i))}</a></td><td class="num">{v}</td><td>{html.escape(asof)}</td></tr>'
 ssr = (f"""<!--SSR--><div class="ssr"><section class="intro" id="intro">{intro}</section>
-<div class="hero lead"><div class="k">Official close · {fdate(OFF_D)} · Treasury Debt to the Penny</div><div class="big num">{usd0(OFF_V)}</div>
+<div class="hero lead"><div class="k">Official close · {fdate(OFF_D)} · Treasury Debt to the Penny</div><div class="big num">{usd2(OFF_V)}</div>
 <div class="trio"><div><span class="l">Per person (Census, {fdate(POP_OFF_DATE)})</span><span class="num">{usd2(PP_OFF)}</span></div>
 <div><span class="l">Per tax return filed</span><span class="num">{usd2(OFF_V / TAX)}</span></div><div><span class="l">Per household</span><span class="num">{usd2(OFF_V / HH)}</span></div></div></div>
 {site_chrome.sponsor_slot("")}<section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
@@ -681,7 +681,7 @@ and the population estimate have different dates because Census publishes its of
 The total includes {usd0(DI.get('base'))} of intragovernmental debt that the government owes its own trust funds; the "held by the public" row leaves that out.</p>
 {src_links([SRC_DTP, SRC_POP, SRC_HH, SRC_IRS])}"""
     answer_page("national-debt-per-person",
-                f"National Debt Per Person: {usd0(pp)} (Treasury ÷ Census, {fdate(OFF_D)})",
+                f"National Debt Per Person: {usd2(pp)} (Treasury ÷ Census, {fdate(OFF_D)})",
                 f"US national debt per person: {usd2(pp)}, Treasury's {fdate(OFF_D)} total of {tril(OFF_V)} divided by Census's {POP_OFF:,.0f} residents. "
                 f"Also per household ({usd0(OFF_V / HH)}) and per tax return filed.",
                 "National debt per person", body, og_img="og/home.png",
@@ -1078,8 +1078,10 @@ def check_quotable():
         if not 3 <= nq <= 6 or visible.count("<h3>") != nq:
             raise SystemExit(f"{name}: {nq} JSON-LD questions, {visible.count('<h3>')} visible")
     home = open(f"{R}/index.html").read()
-    if f'<div class="big num">{usd0(OFF_V)}</div>' not in home:
+    if f'<div class="big num">{usd2(OFF_V)}</div>' not in home:
         raise SystemExit("homepage hero total changed")
+    if " PM CT" in home.split('id="faq"', 1)[-1].split("</section>", 1)[0]:
+        raise SystemExit("homepage FAQ bakes a build-time clock timestamp")
     api = json.load(open(f"{R}/api/daily.json"))
     expect = {"schema_version", "as_of", "fetched_at", "treasury_record_date", "total_debt_official",
               "total_debt_projected_now", "change_1d_official", "change_7d_official", "change_30d_official",

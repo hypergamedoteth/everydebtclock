@@ -192,35 +192,23 @@ def _faq_html(pairs):
 
 
 def interest_day_answer(T, val, now, fdate, usd0, bil, built_label):
-    """Plain answer for 'how much interest per day'.
+    """Official interest per day for FAQ text and JSON-LD.
 
-    Two figures the site already computes, kept distinct:
-    - interest cost per day: projected debt × Treasury's average rate on
-      interest-bearing debt ÷ 365.25 (the homepage tile)
-    - accrual run-rate: the interest-expense dataset's last 12 reported
-      months, spread over a year (rate × 86,400, same number the interest page prints)
-    Neither is cash paid on one calendar day.
+    The quoted figure is Treasury's interest-expense total for the last 12
+    reported months, dated to that dataset. It is not the live clock, and it
+    does not include a build-time projection or a minute timestamp. The clock's
+    own per-day cost moves with the debt and is computed in the browser.
     """
-    debt = val("debt_total", now) if val else None
-    rate = T.get("rate_all") or {}
     ig = T.get("interest_gross") or {}
-    bits = []
-    if debt and rate.get("base") is not None:
-        per = debt * rate["base"] / 100 / 365.25
-        bits.append(
-            f"The clock's interest cost per day is {usd0(per)} as of {built_label}. "
-            f"That is the national debt projected from Treasury's Debt to the Penny, times the {rate['base']:.2f}% average rate "
-            f"on interest-bearing debt as of {fdate(rate.get('as_of'))}, divided by 365.25."
-        )
-    if ig.get("status") == "ok" and ig.get("ttm") and ig.get("rate") and ig.get("as_of"):
-        bits.append(
-            f"Treasury's interest-expense dataset totaled {usd0(ig['ttm'])} in the 12 months ending {fdate(ig['as_of'])}, "
-            f"about {bil(ig['rate'] * 86400)} a day on an accrual basis."
-        )
-    if not bits:
+    if not (ig.get("status") == "ok" and ig.get("ttm") and ig.get("as_of")):
         return None
-    bits.append("Neither figure is the cash paid on a single day. Cash interest is paid in lumps.")
-    return " ".join(bits)
+    daily = ig["rate"] * 86400 if ig.get("rate") else ig["ttm"] / 365.25
+    return (
+        f"Treasury's interest-expense dataset totaled {usd0(ig['ttm'])} in the 12 months ending {fdate(ig['as_of'])}, "
+        f"about {bil(daily)} a day on an accrual basis. "
+        "That is not the cash paid on a single day. Cash interest is paid in lumps. "
+        "The live clock's per-day cost is the national debt times Treasury's average rate on interest-bearing debt, divided by 365.25, and it moves with the clock."
+    )
 
 
 def milestone_state(ctx, H, n):
@@ -597,7 +585,7 @@ def _person_page(ctx, H):
     ld = ctx["dataset_ld"]("US national debt per person", desc, f"{ctx['SITE']}/national-debt-per-person/",
                            based=[ctx["DTP"], H["population_sources"][-1]["page"]]) + ctx["faq_ld"](faqs)
     _page(ctx, "national-debt-per-person",
-          f"National Debt Per Person: {usd0(pp)} (Treasury ÷ Census)", desc, ld, hero, intro, body, faqs)
+          f"National Debt Per Person: {usd2(pp)} (Treasury ÷ Census)", desc, ld, hero, intro, body, faqs)
 
 
 def _interest_page(ctx, H):

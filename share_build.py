@@ -354,7 +354,7 @@ def build(root, site, with_analytics, stamp, off_d, off_v, pop, pop_date, househ
                 [("TOTAL PUBLIC DEBT", money_exact(off_v)), ("US RESIDENTS", f"{pop:,.0f}")], base_notes, True)
     desc = (f"Your share of the US debt is {share_txt}: Treasury's {fdate(off_d)} total of {money_exact(off_v)} "
             f"divided by the Census Bureau's {pop:,.0f} residents on {fdate(pop_date)}. Enter a birth year. Nothing is stored.")
-    title = f"Your Share of the US Debt: {usd0(share)}"
+    title = f"Your Share of the US Debt: {share_txt}"
     v_css = hashlib.sha1(open(os.path.join(root, "style.css"), "rb").read()).hexdigest()[:10]
     v_share = hashlib.sha1(open(os.path.join(out, "share.css"), "rb").read()).hexdigest()[:10]
     v_js = hashlib.sha1(open(os.path.join(out, "share.js"), "rb").read()).hexdigest()[:10]
@@ -387,7 +387,7 @@ def build(root, site, with_analytics, stamp, off_d, off_v, pop, pop_date, househ
         card_title = f"Born in {y}"
         render_card(os.path.join(og_dir, f"{y}.png"), card_title, share_txt, chips, notes, False)
         render_card(os.path.join(og_dir, f"{y}-sq.png"), card_title, share_txt, chips, notes, True)
-        y_title = f"Born in {y}: Your Share of the US Debt Is {usd0(share)}"
+        y_title = f"Born in {y}: Your Share of the US Debt Is {share_txt}"
         ydir = os.path.join(born_dir, str(y))
         os.makedirs(ydir, exist_ok=True)
         write_page(os.path.join(ydir, "index.html"), root="../../../", asset="../../", title=y_title, desc=sent,

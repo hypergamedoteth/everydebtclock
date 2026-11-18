@@ -1,3 +1,7 @@
 https://everydebtclock.com/
 https://everydebtclock.com/41-trillion/
 https://everydebtclock.com/national-debt-per-person/
+https://everydebtclock.com/data/
+https://everydebtclock.com/data/charts/countries-debt-to-gdp.png
+https://everydebtclock.com/data/charts/countries-debt-to-gdp.svg
+https://everydebtclock.com/data/country-debt.csv

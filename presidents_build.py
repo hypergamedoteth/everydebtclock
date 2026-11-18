@@ -262,7 +262,7 @@ td .when{{display:block;color:#8a97ab;font-size:12px;font-weight:400;white-space
 </head><body><main>
 <a class="brand" href="{UP}/">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="{UP}/embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
 <p class="k"><a href="{UP}/">US debt clock</a> · <a href="../">National debt by president</a></p>
-<h1>As of {fdate(last['date'])}, the national debt was {_usd0(last['amount'])} (Treasury)</h1>
+<h1>As of {fdate(last['date'])}, the national debt was {_usd2(last['amount'])} (Treasury)</h1>
 <p class="answer"><b>Answer.</b> {E(answer)}{E(per_sentence)}</p>
 {chart_html}
 <h2>By term</h2>
