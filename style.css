@@ -19,6 +19,9 @@ nav.jump a{flex:none;font-size:12px;color:var(--mut);border:1px solid var(--line
 nav.jump a:hover{color:var(--txt)}
 main{max-width:1280px;margin:0 auto;padding:12px 12px 60px}
 .banner{border:1px solid #5a3a12;background:#20170a;color:var(--amber);border-radius:10px;padding:10px 12px;font-size:13px;margin:8px 0}
+#cross41[hidden]{display:none!important}
+#cross41.preview{border-color:#1e3a5c}
+#cross41 a{color:#9fd0ff}
 .hero{border:1px solid var(--line);background:linear-gradient(180deg,#101828,#0b0f16);border-radius:18px;padding:18px 16px 14px;margin:6px 0 18px;position:relative;overflow:hidden;cursor:pointer}
 .hero:before{content:"";position:absolute;inset:0;background:radial-gradient(500px 160px at 20% 0,rgba(255,77,94,.16),transparent 70%);pointer-events:none}
 .hero .k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}

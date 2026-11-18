@@ -9,6 +9,7 @@ Add a future countdown by appending its trillion level to MILESTONE_PAGES.
 import datetime as dt, html, json, os
 from zoneinfo import ZoneInfo
 
+import crossing_banner
 import explore
 
 CT = ZoneInfo("America/Chicago")
@@ -43,6 +44,9 @@ td .when{display:block;color:#8a97ab;font-size:12px;font-weight:400;white-space:
 details summary{cursor:pointer;color:#5aa9ff;margin:8px 0}
 .rel a{display:inline-block;margin:4px 10px 4px 0;font-size:13.5px}
 footer{color:#5c687a;font-size:12px;margin-top:28px}
+.banner{border:1px solid #5a3a12;background:#20170a;color:#ffb547;border-radius:10px;padding:10px 12px;font-size:14px;margin:12px 0}
+.banner[hidden]{display:none}
+.banner.preview{border-color:#1e3a5c}
 .srchrow{max-width:920px;margin:0 auto;padding:8px 16px 0}
 @media (max-width:560px){.trio{grid-template-columns:1fr}}
 """
@@ -93,6 +97,7 @@ COUNT_JS = r"""
         sub.textContent = countdown(left / rate) + ' · ' + lead.dataset.when + ' · ' + usd0(d) + ' now';
       }
     }
+    if (window.cross41Update) window.cross41Update(C.val('debt_total', t), C.T.debt_total.base, C.T.debt_total.as_of);
     requestAnimationFrame(tick);
   }
   function countdown(sec){
@@ -126,7 +131,7 @@ def _clock(T, keys, meta):
     return json.dumps(blob, separators=(",", ":")).replace("</", "<\\/")
 
 
-def _page(ctx, slug, title, desc, ld, hero, intro, body):
+def _page(ctx, slug, title, desc, ld, hero, intro, body, og=None):
     R, SITE, E = ctx["R"], ctx["SITE"], html.escape
     url = f"{SITE}/{slug}/"
     more = "".join(f'<a href="../{a}/">{E(t)}</a>' for a, t in ctx["ANSWERS"] if a != slug)
@@ -138,9 +143,9 @@ def _page(ctx, slug, title, desc, ld, hero, intro, body):
 <meta name="description" content="{E(desc)}"><link rel="canonical" href="{url}">
 <meta property="og:type" content="article"><meta property="og:site_name" content="Every Debt Clock"><meta property="og:url" content="{url}">
 <meta property="og:title" content="{E(title)}"><meta property="og:description" content="{E(desc)}">
-<meta property="og:image" content="{SITE}/og/home.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image" content="{og or (SITE + '/og/home.png')}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{E(title)}">
-<meta name="twitter:description" content="{E(desc)}"><meta name="twitter:image" content="{SITE}/og/home.png">
+<meta name="twitter:description" content="{E(desc)}"><meta name="twitter:image" content="{og or (SITE + '/og/home.png')}">
 <meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <style>{TOPIC_CSS}{explore.CSS}</style>
 {ld}</head><body>
@@ -155,7 +160,7 @@ def _page(ctx, slug, title, desc, ld, hero, intro, body):
 <div class="rel"><b>More answers:</b><br>{more}<a href="../t/debt_total.html">US national debt, live</a></div>
 <footer class="site-foot">The figure at the top uses the same Treasury base and per-second rate as the homepage clock. Other figures are official records unless a line says projected. Built {E(ctx["STAMP"])}. · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main>
-<script>window.DEBTCLOCK_DATA={ctx["clock"]};</script><script src="../core.js"></script>
+<script>window.DEBTCLOCK_DATA={ctx["clock"]};</script><script src="../core.js"></script><script src="../cross41.js"></script>
 {COUNT_JS}
 </body></html>"""
     os.makedirs(os.path.join(R, slug), exist_ok=True)
@@ -284,11 +289,12 @@ def _milestone_pages(ctx, H):
         desc = summary.replace("The figure above is what is left. It is a projection, not a Treasury forecast.", "Projection from Treasury's 90-day pace.").replace("The figure above is what is left until", "Amount left until")
         if len(desc) > 320:
             desc = desc[:317].rsplit(" ", 1)[0] + "."
+        banner = crossing_banner.HTML if n == 41 else ""
         hero = f"""<div class="hero lead" id="lead" data-mode="count" data-target="{target}" data-next="{nxt}" data-rate="{live_rate}" data-level="{n}" data-next-level="{n+1}" data-passed="{'1' if official else '0'}" data-passed-date="{html.escape(passed_date)}" data-when="{html.escape(when or '')}" data-next-ok="{'1' if next_ok else '0'}" data-hold="{html.escape(hold, quote=True)}">
 <div class="k" id="lead-k">{html.escape(kicker)}</div>
 <div class="big num" id="lead-v">{usd0(max(left, 0))}</div>
 <div class="sub" id="lead-sub">{html.escape(when or 'Debt to the Penny')} · {usd0(debt_now if debt_now is not None else base)} now</div>
-</div>"""
+</div>{banner}"""
         intro = f"<h1>{html.escape(h1)}</h1><p class=\"answer\">{summary} Source: <a href=\"{ctx['DTP']}\" rel=\"noopener\">Treasury, Debt to the Penny</a>.</p>"
         rows = []
         for c in reversed(H["crossings"]):
@@ -321,7 +327,9 @@ def _milestone_pages(ctx, H):
                     limit += " That is before the projected date, so the crossing may wait until Congress acts."
             limit += (" Once the limit binds, Treasury uses extraordinary measures and the debt goes roughly flat; our clock then stops projecting growth and holds at the official figure. "
                       f"This page counts toward ${n+1} trillion only if Congress raises or suspends the limit before then.</p>")
-        body = f"""<h2>How fast the debt is growing</h2>
+        body_press = ('<p>The exact projected time, the 12-month and 3-year paces, charts and a countdown embed are on the '
+                      '<a href="../press/">press page</a>.</p>') if n == 41 else ""
+        body = f"""{body_press}<h2>How fast the debt is growing</h2>
 {pace}
 <ul>{''.join(gaps)}</ul>
 <h2>Trillion levels in Debt to the Penny</h2>
@@ -344,7 +352,8 @@ def _milestone_pages(ctx, H):
         ]
         ld = ctx["dataset_ld"](f"US national debt countdown to ${n} trillion", desc, f"{ctx['SITE']}/{n}-trillion/",
                                based=[ctx["DTP"]]) + ctx["faq_ld"](faqs)
-        _page(ctx, f"{n}-trillion", title, desc, ld, hero, intro, body)
+        og = f"{ctx['SITE']}/og/41-trillion.png" if n == 41 else None
+        _page(ctx, f"{n}-trillion", title, desc, ld, hero, intro, body, og=og)
 
 
 def _president_page(ctx, H):
