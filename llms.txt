@@ -1,12 +1,20 @@
 # Every Debt Clock
 https://everydebtclock.com/
 
-Live US, state, country and wealth-fund clocks built from official figures. The US national debt was $40,608,506,856,903.25 ($40.61 trillion) at Treasury's Nov 12, 2026 close.
+Live US, state, country and wealth-fund clocks built from official figures. The US national debt was $40,662,417,395,617.43 ($40.66 trillion) as of Nov 16, 2026 (Treasury, Debt to the Penny).
+
+## Answers
+These sentences are computed at build time from the same official figures as the pages. Projected figures say so.
+- How much is the US national debt right now? $40,662,417,395,617.43 ($40.66 trillion) as of Nov 16, 2026. Source: Treasury Debt to the Penny. https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny
+- How much is the national debt per person? $118,970.80 as of Nov 16, 2026, the official total divided by the Census estimate of 341,784,857 residents on Jul 1, 2025.
+- How much interest does the US pay per day? The clock's interest cost per day is $3,986,661,763 as of Nov 18, 2026 11:59 AM CT. That is the national debt projected from Treasury's Debt to the Penny, times the 3.58% average rate on interest-bearing debt as of Oct 31, 2026, divided by 365.25. Treasury's interest-expense dataset totaled $1,371,454,499,553 in the 12 months ending Oct 31, 2026, about $3.8 billion a day on an accrual basis. Neither figure is the cash paid on a single day. Cash interest is paid in lumps.
+- When will the US national debt hit $41 trillion? The debt was $40,662,417,395,617.43 as of Nov 16, 2026, $337.6 billion short of $41 trillion. At the homepage clock's 90-day pace, about $7.5 billion a day, $41 trillion falls on December 31, 2026. It is a projection, not a Treasury forecast.
+- World government debt: the latest general-government stocks sum to $118,500,463,818,111 ($118.50 trillion). Each economy has its own as-of date. IMF rows are end-2026 projections. See /world/.
 
 ## Key pages
-- / : US national debt clock. Official total $40,608,506,856,903.25 as of Nov 12, 2026 (Treasury, Debt to the Penny). The live projection is re-based every business day.
+- / : US national debt clock. Official total $40,662,417,395,617.43 as of Nov 16, 2026 (Treasury, Debt to the Penny). The live projection is re-based every business day.
 - /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.
-- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ($118,813.07 per person).
+- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ($118,970.80 per person).
 - /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.
 - /41-trillion/ : Live countdown to the next trillion, using the homepage clock's Debt to the Penny base and per-second rate, plus each trillion crossing in that daily series.
 - /press/ : Press kit for the $41 trillion crossing. Exact projected time from the homepage 90-day pace, 12-month and 3-year comparisons, and the countdown embed.
@@ -49,6 +57,7 @@ Live US, state, country and wealth-fund clocks built from official figures. The 
 - /states/texas/debt-by-year/ : Texas state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
 - /states/washington/debt-by-year/ : Washington state and local debt by year, 1992–2024. US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024.
 - Skipped australia: The Australian Office of Financial Management data hub (aofm.gov.au) did not respond, so the monthly workbook behind the Australia clock could not be read as a full history. The clock file only keeps the latest year of that workbook, which is not the long official series.
+
 ## Data
 US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.
 
