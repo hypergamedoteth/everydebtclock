@@ -251,12 +251,10 @@
       ctx.fillText("CLOCK", x, y);
     }
     wordmark(square ? 90 : 78);
-    ctx.fillStyle = "#38d39f";
-    ctx.beginPath();
-    ctx.arc(W - 188, square ? 80 : 68, 7, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.font = "800 24px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
-    ctx.fillText("OFFICIAL", W - 172, square ? 88 : 76);
+    var badge = "Treasury data";
+    ctx.font = "700 22px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+    ctx.fillStyle = "#9fd0ff";
+    ctx.fillText(badge, W - 60 - ctx.measureText(badge).width, square ? 84 : 74);
 
     var title = r.year && !r.yearMissing && !r.yearError ? "Born in " + r.year : "Your share of the US debt";
     ctx.fillStyle = "#c9d3e2";

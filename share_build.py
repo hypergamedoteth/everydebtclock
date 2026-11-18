@@ -173,8 +173,10 @@ def render_card(path, title, big, chips, notes, square=False):
         d.line([(0, y), (W, y)], fill=(7 + c // 2, 9 + int(c * 0.8), 13 + c * 2))
     d.rectangle([0, 0, W, 10], fill="#ff4d5e")
     wordmark(d, 48 if not square else 56)
-    d.ellipse([W - 196, 58 if not square else 66, W - 182, 72 if not square else 80], fill="#38d39f")
-    d.text((W - 172, 50 if not square else 58), "OFFICIAL", font=font("DejaVuSans-Bold.ttf", 24), fill="#38d39f")
+    # A source credit, not a seal. The site is independent of the Treasury.
+    badge = "Treasury data"
+    bf = font("DejaVuSans-Bold.ttf", 22)
+    d.text((W - 60 - d.textlength(badge, font=bf), 52 if not square else 60), badge, font=bf, fill="#9fd0ff")
     title_size = 44 if square else 36
     d.text((60, 130 if not square else 150), title, font=fit(d, title, "DejaVuSans-Bold.ttf", W - 140, title_size), fill="#c9d3e2")
     big_f = fit(d, big, "DejaVuSansMono-Bold.ttf", W - 140, 108 if square else 92)
@@ -311,13 +313,19 @@ def page_html(site, root, asset, title, desc, canonical, og_image, og_alt, robot
 </ul>
 </section>
 <p class="rel"><a href="{root}national-debt-per-person/">National debt per person</a> · <a href="{root}national-debt-by-year/">Debt by year</a> · <a href="{root}">Live debt clock</a></p>
-{site_chrome.site_footer(root, lead=f"Official close {fdate(data['debtDate'])}. Page built {E(stamp)}.")}
+{site_chrome.site_footer(root, lead=f"Treasury close {fdate(data['debtDate'])}. Page built {E(stamp)}.")}
 </main>
 <script src="{asset}share.js?v={v_js}"></script>
 </body></html>"""
 
 
 def build(root, site, with_analytics, stamp, off_d, off_v, pop, pop_date, households, population_ticker, debt_by_fy, debt_by_fy_source):
+    """Redraw every card and year page from this run's Treasury close and date.
+
+    build.py calls this on every site build. The daily refresh workflow runs
+    build.py, then copies your-share/ into the deploy, so the dollar figure
+    and the close date on the pre-rendered cards stay current.
+    """
     if not off_v or not pop:
         raise SystemExit("your-share: official debt or Census population is missing")
     if not os.path.isdir(FD):

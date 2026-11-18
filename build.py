@@ -811,7 +811,8 @@ data_hub.build(R, SITE, with_analytics, D, PLACES_LIVE, WORLD)
 site_chrome.write_legal_pages(R, SITE, with_analytics)
 site_chrome.write_advertise_page(R, SITE, with_analytics)
 
-# ---------------------------------------------------------------- your share (/your-share/). Client-side; uses the official per-person method.
+# ---------------------------------------------------------------- your share (/your-share/). Client-side; uses the per-person page's Treasury close ÷ Census population.
+# share_build redraws every birth-year card from this run's close and date. The daily refresh runs this file, then deploys your-share/.
 import share_build
 if OFF_V and POP_OFF:
     share_build.build(R, SITE, with_analytics, STAMP, OFF_D, OFF_V, POP_OFF, POP_OFF_DATE,
