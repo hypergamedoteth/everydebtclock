@@ -67,7 +67,9 @@
   // ---------- render
   const app = document.getElementById('app');
   const intro = document.getElementById('intro');
-  if (intro) intro.remove();   // keep the summary; it is reinserted directly under the lead ticker
+  const official = document.getElementById('official');
+  if (intro) intro.remove();   // summary returns under the lead ticker
+  if (official) official.remove();   // dated official line stays directly under the ticker
   app.querySelectorAll('.ssr').forEach(e => e.remove());   // build-time static fallback (for crawlers / no-JS); replaced by the live clock
   const DLS = M.debt_limit_status || {};
   const live = []; // {el, fn}
@@ -148,10 +150,11 @@
       h1.textContent = usd(x / pop(t), 2); h2.textContent = usd(x / tax(), 2); h3.textContent = usd(x / T.households.base, 2); });
     hero.onclick = () => openModal('debt_total');
   } else hero.innerHTML = `<div class="k">US national debt</div><div class="big">source unavailable</div>`;
-  if (intro) app.appendChild(intro);
   app.appendChild(hero);
+  if (official) app.appendChild(official);
+  if (intro) app.appendChild(intro);
   const cross41 = document.getElementById('cross41');
-  if (cross41) hero.after(cross41);
+  if (cross41) (intro || official || hero).after(cross41);
 
   // ---------- "Your state" card (server-rendered with the default place; see build.py place_card)
   const pc = document.getElementById('placecard');

@@ -373,7 +373,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
              f'<p>{gap_txt} The comparison is in the section below the table. '
              f'/world-government-debt/ and /global-debt-clock/ redirect here.</p></section>')
     hero = (f'<div class="hero lead" id="total" data-b="{big_now:.2f}" data-r="{W["rate_s"]:.6f}" data-t="{now:.0f}" style="cursor:default">'
-            f'<div class="k">General government gross debt · {n} countries · US dollars</div><div class="big num" id="hv">{_usd0(big_now)}</div>'
+            f'<div class="k" data-live="Live estimate · general government gross debt · {n} countries">Official · sum of latest figures</div><div class="big num" id="hv">{_usd0(W["total"])}</div>'
             f'<div class="sub"><span>{_sgn(W["rate_s"])}/sec · {_sgn(W["rate_s"] * 86400 / 1e9, ",.1f")} billion/day</span>'
             f'<span class="note">sum of each country\'s own trend; a projection, not one official figure</span>'
             f'<span>Since you opened this page: <span class="num" id="hs">$0</span> more debt</span></div>'
@@ -472,7 +472,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
              '<li><a href="../states/">All US state debt clocks</a></li><li><a href="../api/world.json">World debt clock as JSON</a></li></ul></section>')
     script = """<script>(function(){const nf0=new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
 const H=document.getElementById('total'),B=+H.dataset.b,R=+H.dataset.r,T0=+H.dataset.t,hv=document.getElementById('hv'),hs=document.getElementById('hs'),OPENED=Date.now()/1000;
-const tot=t=>B+R*(t-T0);(function f(){const t=Date.now()/1000,x=tot(t);hv.textContent=(x<0?'−$':'$')+nf0.format(Math.abs(x));
+const tot=t=>B+R*(t-T0);(function f(){const t=Date.now()/1000,x=tot(t);const hk=H.querySelector('.k');if(hk&&hk.dataset.live)hk.textContent=hk.dataset.live;hv.textContent=(x<0?'−$':'$')+nf0.format(Math.abs(x));
 hs.textContent=(R*(t-OPENED)<0?'−':'+')+'$'+nf0.format(Math.abs(R*(t-OPENED)));requestAnimationFrame(f)})();
 const table=document.getElementById('debt-table');if(!table)return;const tb=table.tBodies[0];
 table.querySelectorAll('th[data-k]').forEach(function(th){th.addEventListener('click',function(){const dir=th.dataset.dir==='asc'?'desc':'asc',k=th.dataset.k;
@@ -481,7 +481,8 @@ const rows=[].slice.call(tb.rows);rows.sort(function(a,b){const av=a.dataset[k],
 const c=(av!==''&&bv!==''&&!isNaN(an)&&!isNaN(bn))?an-bn:String(av).localeCompare(String(bv));return dir==='asc'?c:-c});
 rows.forEach(function(r){tb.appendChild(r)})})})})()</script>"""
     explore_html = ex.explore("../", places, pb.calc, cur=None, gdp=pb.GDP_BY_SLUG, usd={x["slug"]: x["usd"] for x in rows if x["slug"] != "united-states"}, kind_hint="world")
-    page = (pb.meta_head(SITE, url, title, desc, img, 1, pb.PL_CSS + CSS, ld) + header + '<main id="app">' + hero + intro + covsent + table + imf_sec + meas + rates + faq_html + ex.search_box("../") + method + '</main>' + explore_html + links
+    official = (f'<p class="official">Official: {_usd0(W["total"])} as of {E(dmin)} through {E(dmax)}, sum of each economy\'s latest figure</p>')
+    page = (pb.meta_head(SITE, url, title, desc, img, 1, pb.PL_CSS + CSS, ld) + header + '<main id="app">' + hero + official + intro + covsent + table + imf_sec + meas + rates + faq_html + ex.search_box("../") + method + '</main>' + explore_html + links
             + '<footer class="site-foot">Every Debt Clock · mixed sources, projection labelled · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>' + script + "</body></html>")
     os.makedirs(f"{R}/world", exist_ok=True)
     open(f"{R}/world/index.html", "w").write(with_analytics(page))

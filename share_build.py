@@ -261,7 +261,12 @@ def page_html(site, root, asset, title, desc, canonical, og_image, og_alt, robot
 </head><body class="share"{born_attr}>
 <main>
 <a class="brand" href="{root}">EVERY <b>DEBT</b> CLOCK</a>
-<h1>Your share of the national debt</h1>
+<section class="result" id="share-clock">
+<p class="k">Official · your share of the US debt</p>
+<p class="big" id="share-num">{usd2(share)}</p>
+<p class="asof official" id="asof">Official: {usd2(share)} as of {fdate(src['debtDate'])}, Treasury Debt to the Penny ÷ Census population</p>
+</section>
+<h1>Your share of the national debt: {usd2(share)} as of {fdate(src['debtDate'])}</h1>
 <p class="lede">One equal share of the official US total. Enter a birth year to see the debt that year and how many times it has grown. A state, a household size, and an income are optional. The math runs in your browser.</p>
 <form id="f" class="panel" action="" method="get" autocomplete="off">
 <div class="fields">
@@ -273,10 +278,7 @@ def page_html(site, root, asset, title, desc, canonical, og_image, og_alt, robot
 <div class="actions"><button class="primary" type="submit">See your share</button></div>
 </form>
 <p id="status" class="status">Loading the official figures…</p>
-<section class="result" aria-live="polite">
-<p class="k">Your share of the US debt</p>
-<p class="big" id="share-num">{usd2(share)}</p>
-<p class="asof" id="asof">As of Treasury's {fdate(src['debtDate'])} close · Census population {fdate(src['populationDate'])}</p>
+<section class="result" id="share-rest" aria-live="polite">
 <p class="sentence" id="sentence">{E(sentence)}</p>
 <noscript>{year_note}<p>Turn on JavaScript for a birth year, a state, or a household. The share above does not need it: it is already the official total divided by the official population.</p></noscript>
 <div class="cardwrap"><img id="preview" width="1200" height="630" alt="{E(og_alt)}" src="{E(og_image)}"><canvas id="card" hidden></canvas></div>

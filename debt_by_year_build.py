@@ -610,9 +610,9 @@ def check(R, site):
             host = open(clock).read()
             hero, intro = host.find('class="hero lead"'), host.find('id="intro"')
             link = host.find("debt-by-year/")
-            # The official summary comes first. The year link sits in that summary, and the ticker follows it.
-            if not (intro >= 0 and link > intro and hero > link):
-                raise SystemExit(f"{m['slug']}: debt-by-year link is not in the summary, above the ticker")
+            # The ticker is first. The year link sits in the summary under it.
+            if not (hero >= 0 and intro > hero and link > intro):
+                raise SystemExit(f"{m['slug']}: debt-by-year link is not in the summary under the ticker")
     for s in doc.get("skipped") or []:
         slug = s.get("slug")
         # A skip note can describe a series that was not used while another series for the same
