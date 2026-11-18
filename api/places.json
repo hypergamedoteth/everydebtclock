@@ -1,6 +1,6 @@
 {
  "_doc": "Live place clocks on everydebtclock.com. value(t) = base + rate * (t - t0), t in Unix seconds; rate 0 = official figure, not projected. url is relative to https://everydebtclock.com/.",
- "generated": "2026-11-14T22:41:09-06:00",
+ "generated": "2026-11-18T12:53:18-06:00",
  "default": "texas",
  "hub": "states/",
  "hub_label": "All state & country debt clocks",
@@ -833,10 +833,10 @@
    "currency": "SAR",
    "sym": "SAR ",
    "frequency": "quarterly",
-   "base": 1685000000000,
-   "base_date": "2026-06-30",
-   "t0": 1782881999.0,
-   "rate": 10617.340803847826,
+   "base": 1773600000000,
+   "base_date": "2026-09-30",
+   "t0": 1790830799.0,
+   "rate": 10795.63764650011,
    "population": 35300000,
    "publisher": "National Debt Management Center (NDMC), Ministry of Finance, Saudi Arabia",
    "url": "countries/saudi-arabia/"

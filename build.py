@@ -263,6 +263,7 @@ idx = re.sub(r'<script type="application/ld\+json">\{"@context":"https://schema.
 ANSWERS = [("how-much-is-the-national-debt", "How much is the national debt?"), ("national-debt-per-person", "National debt per person"),
            ("your-share", "Your share of the national debt"),
            ("national-debt-by-year", "US national debt by year"), ("41-trillion", "When will the US debt hit $41 trillion?"),
+           ("press", "Press: the $41 trillion crossing"),
            ("national-debt-by-president", "National debt by president"), ("interest-on-the-national-debt", "Interest on the national debt"),
            ("methodology", "Methodology and accuracy")]
 KEY_TICKERS = ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "interest_annual", "debt_per_household", "debt_gdp_now"]
@@ -868,8 +869,7 @@ if OFF_V:
     _spec = importlib.util.spec_from_file_location("debtclock_series", f"{R}/pipeline/series.py")
     _series = importlib.util.module_from_spec(_spec)
     _spec.loader.exec_module(_series)
-    import topics_build
-    PRES_URLS = topics_build.build({
+    topic_ctx = {
         "R": R, "SITE": SITE, "NOW": NOW, "STAMP": STAMP, "T": T, "M": M, "val": val,
         "fdate": fdate, "usd0": usd0, "usd2": usd2, "bil": bil, "tril": tril,
         "OFF_D": OFF_D, "OFF_V": OFF_V, "POP_OFF": POP_OFF, "POP_OFF_DATE": POP_OFF_DATE,
@@ -877,7 +877,11 @@ if OFF_V:
         "ANSWERS": ANSWERS, "places": PLACES_LIVE, "calc": places_build.calc, "gdp": places_build.GDP_BY_SLUG,
         "with_analytics": with_analytics, "dataset_ld": dataset_ld, "faq_ld": faq_ld, "src": src_links,
         "terms": _series.TERMS, "hdo": M.get("debt_by_fy") or [],
-    }) or []
+    }
+    import press_build
+    press_build.build(topic_ctx)
+    import topics_build
+    PRES_URLS = topics_build.build(topic_ctx) or []
 
 # ---------------------------------------------------------------- place pages: /states/<slug>/, /countries/<slug>/ from places/*.json
 import places_build
@@ -948,6 +952,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /your-share/ : Your share of that official total. Birth year, and optional state, household size, and income, are calculated in the browser and are not stored.",
     "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
     "- /41-trillion/ : Live countdown to the next trillion, using the homepage clock's Debt to the Penny base and per-second rate, plus each trillion crossing in that daily series.",
+    "- /press/ : Press kit for the $41 trillion crossing. Exact projected time from the homepage 90-day pace, 12-month and 3-year comparisons, and the countdown embed.",
     "- /when-will-debt-hit-41-trillion/ : Redirects to /41-trillion/. GitHub Pages serves this as an HTML refresh with a canonical link, not an HTTP 301.",
     "- /national-debt-by-president/ : Debt at the start and end of each term. Debt to the Penny on or before the date from 1993; Historical Debt Outstanding annual records before that.",
     "- /interest-on-the-national-debt/ : Cash interest paid this fiscal year, MTS net interest by fiscal year, and Treasury's interest-expense dataset by fiscal year.",
@@ -999,7 +1004,7 @@ embed_build.apply(R, SITE, with_analytics, require_pages=True, now=NOW, world=WO
 # ---------------------------------------------------------------- asset versions: ?v=<content hash> on every first-party CSS/JS reference
 # so a deploy that changes style.css / app.js / core.js is picked up at once instead of after the 4-hour browser/CDN cache.
 import hashlib, glob as _glob
-AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in ("style.css", "app.js", "core.js") if os.path.exists(f"{R}/{a}")}
+AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in ("style.css", "app.js", "core.js", "cross41.js") if os.path.exists(f"{R}/{a}")}
 _vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
 # Per-clock files under embed/ are self-contained (no site CSS, no favicon request). Only the directory is versioned.
 _pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html", "embed/index.html")] + _glob.glob(f"{R}/t/*.html")

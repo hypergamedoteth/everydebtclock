@@ -150,6 +150,8 @@
   } else hero.innerHTML = `<div class="k">US national debt</div><div class="big">source unavailable</div>`;
   app.appendChild(hero);
   if (intro) hero.after(intro);
+  const cross41 = document.getElementById('cross41');
+  if (cross41) (intro || hero).after(cross41);
 
   // ---------- "Your state" card (server-rendered with the default place; see build.py place_card)
   const pc = document.getElementById('placecard');
@@ -431,6 +433,8 @@
   const h = location.hash.match(/t=([\w]+)/); if (h) setTimeout(() => { jump(h[1]); openModal(h[1]); }, 300);
 
   // ---------- animation loop
-  function frame() { const t = now(); for (const f of live) f(t); tickSankey(t); if (modalTick) modalTick(t); requestAnimationFrame(frame); }
+  function frame() { const t = now(); for (const f of live) f(t); tickSankey(t); if (modalTick) modalTick(t);
+    if (window.cross41Update && T.debt_total) window.cross41Update(val('debt_total', t), T.debt_total.base, T.debt_total.as_of);
+    requestAnimationFrame(frame); }
   requestAnimationFrame(frame);
 })();

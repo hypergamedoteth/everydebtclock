@@ -19,6 +19,7 @@ NOTICE_MARK_END = "<!--/NOTICE-->"
 FOOTER_LINKS = (
     ("embed/", "Embed a clock"),
     ("data/", "Data"),
+    ("press/", "Press"),
     ("about/", "About"),
     ("advertise/", "Advertise"),
     ("methodology/", "Methodology"),
@@ -32,10 +33,10 @@ _PRIVACY_HREF_RE = re.compile(
     re.I,
 )
 _PREFIX_RE = re.compile(
-    r'href="((?:\.\./)*)(?:embed/|data/|about/|methodology/|privacy(?:\.html|/)|contact/|advertise/)"'
+    r'href="((?:\.\./)*)(?:embed/|data/|press/|about/|methodology/|privacy(?:\.html|/)|contact/|advertise/)"'
 )
 _ABS_PREFIX_RE = re.compile(
-    r'href="/(?:embed/|data/|about/|methodology/|privacy(?:\.html|/)|contact/|advertise/)"'
+    r'href="/(?:embed/|data/|press/|about/|methodology/|privacy(?:\.html|/)|contact/|advertise/)"'
 )
 
 
@@ -93,7 +94,7 @@ def upgrade_footer(foot: str, extra: tuple[tuple[str, str], ...] = ()) -> str:
     # Replace the existing standard-link run (from the first known link to the
     # last), leaving the sentence before it and the disclaimer after it.
     known = (
-        r"(?:(?:\.\./)+|/)?(?:embed/|data/|about/|advertise/|methodology/|"
+        r"(?:(?:\.\./)+|/)?(?:embed/|data/|press/|about/|advertise/|methodology/|"
         r"privacy(?:\.html|/)|contact/|Home)"
     )
     run = re.search(
