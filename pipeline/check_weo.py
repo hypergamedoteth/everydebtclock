@@ -134,9 +134,13 @@ def main():
                 fail(f"noindex page is in the sitemap: {e['slug']}")
         elif loc not in sm:
             fail(f"sitemap missing {e['slug']}")
+        elif "source tier: harmonized" in doc:
+            m = re.search(rf"<loc>{re.escape(loc)}</loc><lastmod>(\d{{4}}-\d{{2}}-\d{{2}})</lastmod>", sm)
+            if not m or m.group(1) not in doc:
+                fail(f"sitemap lastmod for {e['slug']} is not the quarterly stock date")
         elif f"<loc>{loc}</loc><lastmod>2026-10-13</lastmod>" not in sm:
             fail(f"sitemap lastmod for {e['slug']} is not the IMF publication date 2026-10-13")
-        if '"dateModified": "2026-10-13"' not in doc:
+        if "source tier: harmonized" not in doc and '"dateModified": "2026-10-13"' not in doc:
             fail(f"{e['slug']} Dataset/FAQPage dateModified is not the IMF publication date")
     print("noindex:", ", ".join(noindex) if noindex else "none")
     import country_profile

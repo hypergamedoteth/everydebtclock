@@ -1,8 +1,11 @@
-/* Turns the pre-written $41 trillion banner on. No network, no cookies.
+/* Fills the $41 trillion banner in the browser. No network, no cookies.
+   The sentences are not in the HTML. This file creates them only after the
+   live clock passes $41 trillion, or when the address has ?cross41=preview.
    cross41Update(liveDollars, officialClose, asOfISO)
    cross41When(unixSeconds) -> {ct, et} rounded to the nearest second. */
 (function () {
   var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  var LEVEL = 41e12;
   function money(n, digits) {
     if (n == null || !isFinite(n)) return "—";
     return (n < 0 ? "−$" : "$") + Math.abs(n).toLocaleString("en-US", {minimumFractionDigits: digits, maximumFractionDigits: digits});
@@ -20,6 +23,18 @@
     }).formatToParts(new Date(ts * 1000)).forEach(function (p) { if (p.type !== "literal") out[p.type] = p.value; });
     return out.month + " " + out.day + ", " + out.year + ", " + out.hour + ":" + out.minute + ":" + out.second + " " + out.dayPeriod;
   }
+  function sentence(kind, off, when, live) {
+    var level = "$" + "41" + " trillion";
+    if (kind === "official") {
+      return "<b>Treasury's figure is at or above " + level + ".</b> Debt to the Penny's " + when +
+        " close was " + off + ". That is the official total. The digits still moving on this page are the live projection from that close. <a href=\"/press/\">Press figures</a>.";
+    }
+    var preview = kind === "preview" ? "<b>Preview.</b> This is not a report that the debt has crossed. " : "";
+    var liveBit = live ? " (" + live + ")" : "";
+    return preview + "<b>Live estimate, not Treasury's figure.</b> This clock is past " + level + liveBit +
+      ". Treasury has not posted a Debt to the Penny close at that level. The latest official close is still " +
+      off + " on " + when + ". Treasury posts the prior business day's close on the next business day, usually in the afternoon (around 3 PM Central). <a href=\"/press/\">Press figures</a>.";
+  }
   window.cross41When = function (ts) {
     if (!(ts > 0)) return null;
     var r = Math.floor(ts + 0.5);
@@ -28,28 +43,17 @@
   window.cross41Update = function (live, official, asof) {
     var el = document.getElementById("cross41");
     if (!el) return;
-    var level = 41e12;
     var preview = /(?:^|[?&])cross41=preview(?:&|$)/.test(location.search);
-    var off = money(official, 2), when = asofText(asof);
-    el.querySelectorAll("[data-cross=official]").forEach(function (n) { n.textContent = off; });
-    el.querySelectorAll("[data-cross=asof]").forEach(function (n) { n.textContent = when; });
-    el.querySelectorAll("[data-cross=live]").forEach(function (n) { n.textContent = money(Math.round(live), 0); });
-    var overOff = official >= level, overLive = live >= level;
-    var liveP = document.getElementById("cross41-live");
-    var offP = document.getElementById("cross41-official");
-    var preP = document.getElementById("cross41-preview");
-    el.querySelectorAll("[data-cross=live-wrap]").forEach(function (n) { n.hidden = !overLive; });
-    if (overOff) {
-      el.hidden = false; el.classList.remove("preview");
-      if (liveP) liveP.hidden = true; if (offP) offP.hidden = false; if (preP) preP.hidden = true;
-    } else if (overLive) {
-      el.hidden = false; el.classList.remove("preview");
-      if (liveP) liveP.hidden = false; if (offP) offP.hidden = true; if (preP) preP.hidden = true;
-    } else if (preview) {
-      el.hidden = false; el.classList.add("preview");
-      if (liveP) liveP.hidden = false; if (offP) offP.hidden = true; if (preP) preP.hidden = false;
-    } else {
-      el.hidden = true; el.classList.remove("preview");
+    var overOff = official >= LEVEL, overLive = live >= LEVEL;
+    var kind = overOff ? "official" : (overLive || preview) ? (preview && !overLive ? "preview" : "live") : "";
+    if (!kind) {
+      el.hidden = true;
+      el.classList.remove("preview");
+      el.textContent = "";
+      return;
     }
+    el.hidden = false;
+    el.classList.toggle("preview", kind === "preview");
+    el.innerHTML = "<p>" + sentence(kind, money(official, 2), asofText(asof), overLive ? money(Math.round(live), 0) : "") + "</p>";
   };
 })();

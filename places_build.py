@@ -216,7 +216,8 @@ details.det{margin:8px 0}details.det summary{cursor:pointer;color:var(--blue);fo
 table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:right}.dnote{color:var(--mut);font-size:12.5px}
 .badge.ann{border-color:#5a3a12;color:var(--amber)}
 #details table.v td{color:var(--txt)}#details table.v tr.sub td{color:var(--mut);padding-left:22px}#details h3{color:var(--txt);margin:18px 0 4px}
-.hero .sec2{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:13px;color:var(--mut);line-height:1.45}.hero .sec2 b{color:var(--txt);font-size:15px;margin:0 4px}.hero .sec2 .l{color:var(--dim);text-transform:uppercase;letter-spacing:.04em;font-size:11px}.hero .sec2 .note{display:block;font-size:12px}"""
+.hero .sec2{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:13px;color:var(--mut);line-height:1.45}.hero .sec2 b{color:var(--txt);font-size:15px;margin:0 4px}.hero .sec2 .l{color:var(--dim);text-transform:uppercase;letter-spacing:.04em;font-size:11px}.hero .sec2 .note{display:block;font-size:12px}
+.hero h1.figline{font-size:15px;font-weight:650;line-height:1.45;margin:8px 0 12px;max-width:40rem;letter-spacing:0}"""
 
 def tile_html(tid, label, value_txt, acc, badge, rate_txt="fixed", pp=None, tick=None, dlg=None, wide=False):
     """One tile in the US homepage style. tick = (base, rate, t0) makes the value tick; dlg = dict for the tap dialog."""
@@ -252,7 +253,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     lv = "Live " if ticks else ""
     title = (f"{name} State & Local Debt Clock: {lv}Debt, Official Census Data" if is_state else f"{name} National Debt Clock: {lv}Debt, Official Data")
     if p.get("seo_title"): title = p["seo_title"].format(lv=lv)  # optional per-place override (District of Columbia: no state level)
-    h1 = p.get("h1") or (f"{name} State & Local Debt Clock" if is_state else f"{name} National Debt Clock")
+    h1 = p.get("h1") or (f"As of {as_of}, {name} {T['head']} is {_usd0(c['total'])} ({pub})")
     _dn = p.get("seo_desc_noun")  # optional: full noun phrase for the description's opening
     desc = ((f"{_dn[0].upper() + _dn[1:]}: {_b(c['total'])}, " if _dn else f"{name} {'state and local debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, ") + f"{'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
             f"{'Live ' if rate else 'Official '}{name} debt clock, {'about ' if rate else ''}{_usd0(proj / pop['value'])} per {dem}{' (projected)' if rate else ''}, with sources.")
@@ -301,7 +302,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                     _sd = lambda v: ("+" if v >= 0 else "−") + _short(abs(v) * 86400)   # signed amount per day
                     recent = (f"Recent pace differs: over the latest {_g} days ({_fd(_p)} → {as_of}) the official figure changed {'+' if _r >= 0 else '−'}{_short(abs(_r) * _g * 86400)} "
                               f"({_sd(_r)}/day), while the clock runs at {_sd(rate)}/day, the trend over the latest {T['period']}, so the ticking number {'is moving against the latest change' if _r * rate < 0 else 'may run ahead of the latest change'}.")
-    proj_txt = (f"The clock below starts from that official figure and projects forward at {T['pace']} (about {_short(abs(rate) * 86400)} a day{'' if up_ else ' less'}), "
+    proj_txt = (f"The clock {'above' if not is_state else 'below'} starts from that official figure and projects forward at {T['pace']} (about {_short(abs(rate) * 86400)} a day{'' if up_ else ' less'}), "
                 f"the official change from {_fd(cs[0]['prior_as_of'])} to {as_of}. {E(rep)} reports {E(rep_its)} debt {T['once']}, not daily, so the ticking number is a projection, not an official figure; "
                 f"it re-bases when the next {T['report']} come out." + (" " + E(recent) if recent else "")) if rate else \
                (f"{E(rep)} reports {E(rep_its)} debt {T['once']}, not daily. This page shows the official figure for {as_of} and does not tick it forward, because {E(p['hold_why'])}. Earlier official years are in the What changed table."
@@ -310,7 +311,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     others = [o for o in places if o["slug"] != p["slug"]]
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span>'
              f'<a href="../../{sec_dir}/">All {"US state" if is_state else "country"} debt clocks</a>' + ('<span>·</span><a href="../../world/">World debt clock</a>' if WORLD else "") + '</div>')
-    intro = (f'<section class="intro" id="intro">{crumb}<h1>{E(h1)}</h1>'
+    intro = (f'<section class="intro" id="intro">{crumb}{"" if not is_state else f"<h1>{E(h1)}</h1>"}'
              f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
              + (f'on <b>{as_of}</b>' if T["periodic"] else f'in Census survey year {fy} (dated <b>{as_of}</b>)' if p.get("year_label") else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
              + " and ".join(("" if n_.startswith("Eurostat") else "the ") + f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
@@ -324,7 +325,8 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     # ---- hero (same block and labels as the US hero)
     hero_d = dlg(f'{name} {T["head"]}', T["sum_note"], pub, cs[0]['source_url'], cs[0].get("source_locator", "") if len(cs) == 1 else "", base=c['total'], r=rate, official=f"{_usd0(c['total'])} official, {as_of}")
     hero = (f'<div class="hero lead" id="t-total" data-b="{c["total"]}" data-r="{rate or 0}" data-t="{t0}" data-d=\'{E(json.dumps(hero_d), quote=True)}\'>'
-            f'<div class="k">{E(name)} {E(T["head"])} · {"live" if rate else "official"}</div><div class="big num" id="hv">{_usd0(proj)}</div>')
+            f'<div class="k">{"Live estimate · " if rate else "Official figure · "}{E(name)} {E(T["head"])}</div><div class="big num" id="hv">{_usd0(proj if rate else c["total"])}</div>'
+            + (f'<h1 class="figline">{E(h1)}</h1>' if not is_state else ""))
     if rate:
         hero += (f'<div class="sub"><span>{_rate_txt(rate)}</span><span class="note">rate: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}, so this is a projection</span>'
                  + (f'<span class="note">{E(recent)}</span>' if recent else "") + f'<span>Since you opened this page: <span class="num" id="hs">{CUR}0</span> {"more" if up_ else "less"} debt</span></div>')
@@ -502,7 +504,8 @@ ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);
     if not is_state:
         import country_profile as cp
         profile = cp.official_section(R, p)
-    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + ex.search_box("../../") + '<main id="app">' + hero + intro + wc + debt_sec + comp_secs + people + hist + details + profile + method
+    lead = (hero + intro) if not is_state else (intro + hero)
+    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + ex.search_box("../../") + '<main id="app">' + lead + wc + debt_sec + comp_secs + people + hist + details + profile + method
             + '</main><dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))

@@ -44,17 +44,55 @@ footer{color:#5c687a;font-size:12px;margin-top:28px}
 code{font-family:ui-monospace,Menlo,monospace;font-size:13px}
 @media (max-width:640px){.grid{grid-template-columns:1fr}}
 </style><!--ANALYTICS--><script data-goatcounter="https://everydebtclock.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script><!--/ANALYTICS-->
-</head><body>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","dateModified":"2026-11-16","url":"https://everydebtclock.com/press/"}</script><link rel="manifest" href="/manifest.json"></head><body><!--A2HS--><aside id="edc-a2hs" hidden>
+<p id="edc-a2hs-text">Add this live clock to your home screen.</p>
+<button type="button" id="edc-a2hs-go" hidden>Add to home screen</button>
+<button type="button" id="edc-a2hs-x">Not now</button>
+</aside>
+<style>
+#edc-a2hs{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;padding:8px 16px;background:#101828;color:#c2ccda;border-bottom:1px solid #1c2533;font:13px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+#edc-a2hs[hidden]{display:none!important}
+#edc-a2hs p{margin:0;flex:1 1 180px}
+#edc-a2hs button{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+#edc-a2hs-go{color:#9fd0ff}
+</style>
+<script>
+(function(){
+  if(!("serviceWorker" in navigator)){}
+  else if(location.protocol==="https:"||location.hostname==="localhost"){
+    navigator.serviceWorker.register("/sw.js").catch(function(){});
+  }
+  var n=document.getElementById("edc-a2hs"),go=document.getElementById("edc-a2hs-go"),x=document.getElementById("edc-a2hs-x"),text=document.getElementById("edc-a2hs-text");
+  if(!n)return;
+  var key="edc.a2hs";
+  try{if(localStorage.getItem(key))return;}catch(e){return;}
+  if(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches||navigator.standalone){
+    try{localStorage.setItem(key,"1");}catch(e){}
+    return;
+  }
+  var deferred=null,shown=false;
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown)show(true);});
+  function show(install){
+    if(shown)return;shown=true;
+    try{localStorage.setItem(key,"1");}catch(e){}
+    if(install&&deferred){text.textContent="Add this live clock to your home screen.";go.hidden=false;}
+    else if(/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)){
+      text.textContent="Bookmark this clock: tap Share, then Add to Home Screen.";go.hidden=true;
+    }else{text.textContent="Bookmark this clock to keep the live numbers one tap away.";go.hidden=true;}
+    n.hidden=false;
+  }
+  if(go)go.addEventListener("click",function(){if(!deferred)return;deferred.prompt();deferred=null;n.hidden=true;});
+  if(x)x.addEventListener("click",function(){try{localStorage.setItem(key,"1");}catch(e){}n.hidden=true;});
+  setTimeout(function(){if(!shown)show(false);},1500);
+})();
+</script>
+<!--/A2HS-->
 <main>
 <a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
-<div id="cross41" class="banner" hidden role="status">
-<p id="cross41-preview" hidden><b>Preview.</b> This banner stays hidden until the live clock passes $41 trillion. The debt has not passed it. The sentence below is the prepared copy, not a report that the debt has crossed.</p>
-<p id="cross41-live" hidden><b>Live estimate, not Treasury's figure.</b> This clock is past $41 trillion<span data-cross="live-wrap" hidden> (<span data-cross="live"></span>)</span>. Treasury has not posted a Debt to the Penny close at or above $41 trillion. The latest official close is still <span data-cross="official"></span> on <span data-cross="asof"></span>. Treasury posts the prior business day's close on the next business day, usually in the afternoon (around 3 PM Central). <a href="/press/">Press figures</a>.</p>
-<p id="cross41-official" hidden><b>Treasury's figure is at or above $41 trillion.</b> Debt to the Penny's <span data-cross="asof"></span> close was <span data-cross="official"></span>. That is the official total. The digits still moving on this page are the live projection from that close. <a href="/press/">Press figures</a>.</p>
-</div>
+<div id="cross41" class="banner" hidden role="status"></div>
 
 <h1>Press kit: the US debt and $41 trillion</h1>
-<p>At the same 90-day pace as the <a href="../">homepage clock</a>, the projection reaches $41 trillion on <b id="exact-ct">December 31, 2026, 11:34:41 PM CT</b> (<b id="exact-et">January 1, 2027, 12:34:41 AM ET</b>). That instant is computed from Treasury's <b>Nov 16, 2026</b> Debt to the Penny close and the homepage per-second rate. It is a projection, not a Treasury forecast. The Central-time date window from the two fits of that same 90-day stretch is <b>December 31, 2026 through January 2, 2027 (Central)</b>.</p>
+<p>At the same 90-day pace as the <a href="../">homepage clock</a>, the projection reaches $41 trillion on <b id="exact-ct">December 31, 2026, 11:34:41 PM CT</b> (<b id="exact-et">January 1, 2027, 12:34:41 AM ET</b>). That instant is computed from Treasury's <b>Nov 16, 2026</b> Debt to the Penny close and the homepage per-second rate. It is a projection, not a Treasury forecast. The Central-time date window from the two fits of that same 90-day stretch is <b>December 31, 2026 through January 2, 2027 (Central)</b>.</p><p class="updated" data-updated="2026-11-16">Updated Nov 16, 2026</p>
 <div class="hero" id="lead">
 <p class="k">Exact projected time · 90-day pace</p>
 <p class="big" id="exact-ct-2">December 31, 2026, 11:34:41 PM CT</p>
@@ -64,7 +102,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:13px}
 <div><span class="l">Still to go</span><span class="n" id="left">$337,582,604,383</span></div>
 <div><span class="l">Live projection now</span><span class="n" id="live">$40,662,417,395,617</span></div>
 </div>
-<p class="when">The countdown and the two running totals update in the browser from the clock's base, rate and t0. With JavaScript off, the countdown is the gap at the moment this page was built (Nov 18, 2026 12:53 PM CT). The projected clock time does not tick; it changes when Treasury's next close resets the base.</p>
+<p class="when">The countdown and the two running totals update in the browser from the clock's base, rate and t0. With JavaScript off, the countdown is the gap at the moment this page was built (Nov 18, 2026 2:09 PM CT). The projected clock time does not tick; it changes when Treasury's next close resets the base.</p>
 </div>
 <h2>The date window</h2>
 <p>Both ends use the closes in the homepage's 90-day window (trailing 90 days (2026-08-19 to 2026-11-16), 61 closes). The least-squares slope is the rate the clock ticks at, $7.498 billion a day. The homepage per-second rate matches a least-squares fit of the total itself over those same 61 closes. A straight line from the first close in that window (Aug 19, 2026, $40,012,700,535,679.44) to the last (Nov 16, 2026, $40,662,417,395,617.43) is $7.297 billion a day and reaches $41 trillion on <b>January 2, 2027, 5:21:04 AM CT</b> (January 2, 2027, 6:21:04 AM ET).</p>
@@ -120,12 +158,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:13px}
 <textarea readonly rows="4" spellcheck="false" aria-label="Embed code">&lt;iframe src=&quot;https://everydebtclock.com/embed/41-trillion/&quot; width=&quot;100%&quot; height=&quot;160&quot; style=&quot;border:0&quot; title=&quot;$41 trillion countdown&quot;&gt;&lt;/iframe&gt;
 &lt;a href=&quot;https://everydebtclock.com/41-trillion/&quot;&gt;$41 trillion countdown by EveryDebtClock.com&lt;/a&gt;</textarea>
 </div>
-<h2>Banner that turns on at $41 trillion</h2>
-<p>The homepage, this page and the countdown page already contain two sentences. Neither is showing, because the live projection and Treasury's Nov 16, 2026 close are both still under $41 trillion. The live sentence turns on by itself when the clock passes $41 trillion and Treasury's latest close is still under it. The official sentence replaces it when a Debt to the Penny close is at or above $41 trillion. Add <code>?cross41=preview</code> to the <a href="../?cross41=preview">homepage</a> to preview the live sentence. The preview says it is a preview.</p>
-<div class="banner"><b>Prepared copy, live estimate.</b> Live estimate, not Treasury&#x27;s figure. This clock is past $41 trillion. Treasury has not posted a Debt to the Penny close at or above $41 trillion. The latest official close is still $40,662,417,395,617.43 on Nov 16, 2026. Treasury posts the prior business day&#x27;s close on the next business day, usually in the afternoon (around 3 PM Central).</div>
-<p class="when">Shown only while the clock is past $41 trillion and the latest Debt to the Penny close is still under it. The amount in parentheses is the live projection at that moment. It is not filled in here, so this specimen does not invent a total.</p>
-<div class="banner"><b>Prepared copy, after Treasury posts a close at or above $41 trillion.</b> Treasury&#x27;s figure is at or above $41 trillion. Debt to the Penny&#x27;s close was $40,662,417,395,617.43 on Nov 16, 2026. That is the official total. The digits still moving on this page are the live projection from that close.</div>
-<p class="when">The date and amount in the live banner will be the confirming close. They are filled here with the latest close, which is still under $41 trillion, so this sentence is not being shown on the site as fact.</p>
+<h2>Banner that turns on at the next trillion</h2>
+<p>The crossing sentence is not in this page. The browser writes it only after the live clock reaches that level, or when Treasury posts a close that reaches it. Until then the page states the projection from the Nov 16, 2026 close of $40,662,417,395,617.43. Add <code>?cross41=preview</code> to the <a href="../?cross41=preview">homepage</a> to preview the sentence. The preview says it is a preview.</p>
 <h2>The arithmetic</h2>
 <p>The homepage formula is <code>value = base + rate × (now − t0)</code>. t0 is the end of the record date in Eastern time, 11:59:59 PM. The crossing time is <code>t0 + ($41 trillion − base) / rate</code>.</p>
 <ul>
@@ -149,7 +183,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:13px}
 <footer class="site-foot">Every Debt Clock · <a href="../embed/">Embed a clock</a> · <a href="../data/">Data</a> · <a href="../press/">Press</a> · <a href="../about/">About</a> · <a href="../advertise/">Advertise</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · <a href="../contact/">Contact</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main>
 <script type="application/json" id="press-data">{"base":40662417395617.43,"rate":86780.32496035616,"t0":1794891599.0,"freeze":1802443144.0539882,"as_of":"2026-11-16","target":41000000000000}</script>
-<script src="../cross41.js?v=5f23ef1c79"></script>
+<script src="../cross41.js?v=f38a482fcb"></script>
 <script>
 (function(){
   var P = JSON.parse(document.getElementById("press-data").textContent);

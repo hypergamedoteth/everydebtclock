@@ -80,7 +80,7 @@ def _dataset_ld(name, desc, url):
 CSS = """th[data-k]{cursor:pointer}th[data-dir="desc"]::after{content:" ↓"}th[data-dir="asc"]::after{content:" ↑"}
 .src{font-size:14px}.faq h3{font-size:16px;margin:16px 0 4px}.faq p{margin:0 0 8px}
 .spark{width:100%;max-width:360px;height:52px;color:var(--amber);display:block;margin:8px 0 12px}
-.hero h1{font-size:clamp(20px,2.4vw,28px);line-height:1.35;margin:0 0 14px;max-width:920px}
+.hero h1.figline{font-size:15px;font-weight:650;line-height:1.45;margin:8px 0 12px;max-width:40rem;letter-spacing:0}
 .dchart{width:100%;max-width:720px;height:auto;background:#121925;border-radius:12px;display:block;margin:8px 0 12px}
 .legend-line,caption.legend-line{font-size:13px;color:var(--mut);text-align:left;caption-side:bottom;padding-top:6px}
 table.wt tr.proj td{color:#8ec5ff}table.wt tr.est td{color:var(--amber)}
@@ -313,8 +313,8 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../countries/">All country debt clocks</a>'
              '<span>·</span><a href="../../world/">World debt clock</a></div>')
     hero = (f'<div class="hero lead" id="t-total" data-b="{u["usd"]}" data-r="{rate:.12g}" data-t="{u["t0"]:.0f}">'
-            f'<h1>{E(h1)}</h1>'
-            f'<div class="k">{E(name)} {E(sector)} debt · US dollars · harmonized</div><div class="big num" id="hv">{_money0(projected)}</div>'
+            f'<div class="k">Live estimate · {E(name)} {E(sector)} debt</div><div class="big num" id="hv">{_money0(projected)}</div>'
+            f'<h1 class="figline">{E(h1)}</h1>'
             f'<div class="sub"><span>{_signed(rate)}/sec · {_signed(rate * 86400)}/day</span>'
             f'<span class="note">{E(u["trend_note"])}; a projection, not a daily ledger</span>'
             f'<span>Since you opened this page: <span class="num" id="hs">$0</span> {"more" if up else "less"} debt</span></div>'
@@ -324,7 +324,7 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
             f'<div class="meta" style="margin-top:10px"><span class="badge proj">HARMONIZED · as of {E(u["as_of"])}</span><span class="badge">source tier: harmonized</span></div></div>')
     fx_bit = f'{E(u["quote"])}' + (f' on {E(u["rate_date"])}' if u.get("rate_date") else "")
     intro = (f'<section class="intro" id="intro">'
-             f'<p><b>What this page counts.</b> {E(name)}\'s {E(sector)} gross debt, from the World Bank and IMF Quarterly Public Sector Debt database. '
+             f'<p class="answer"><b>What this page counts.</b> {E(name)}\'s {E(sector)} gross debt, from the World Bank and IMF Quarterly Public Sector Debt database. '
              f'The stock is <b>{stock_s}</b> as of <b>{as_of_long}</b>. '
              f'Source tier: harmonized official dataset. '
              f'In {E(u["currency"])} the stock is {u["local"]:,.0f}, converted with {fx_bit} ({E(u["rate_src"])}). '
@@ -404,8 +404,8 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../countries/">All country debt clocks</a>'
              '<span>·</span><a href="../../world/">World debt clock</a></div>')
     hero = (f'<div class="hero lead" id="t-total" data-b="{e["debt_2025_usd"]}" data-r="{rate:.12g}" data-t="{t0:.0f}">'
-            f'<h1>{E(h1)}</h1>'
-            f'<div class="k">{E(name)} general government debt · US dollars · IMF estimate</div><div class="big num" id="hv">{_money0(projected)}</div>'
+            f'<div class="k">Live estimate · {E(name)} general government debt</div><div class="big num" id="hv">{_money0(projected)}</div>'
+            f'<h1 class="figline">{E(h1)}</h1>'
             f'<div class="sub"><span>{_signed(rate)}/sec · {_signed(rate * 86400)}/day</span>'
             f'<span class="note">interpolated from the IMF end-2025 stock to the end-2026 estimate; not a live ledger</span>'
             f'<span>Since you opened this page: <span class="num" id="hs">$0</span> {"more" if up else "less"} debt</span></div>'
@@ -419,13 +419,13 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
     intro = (f'<section class="intro" id="intro">'
              f'{cp.lead_html(profile, us_profile, peers, outside)}'
              f'{crumb}'
-             f'<p><b>What this page counts.</b> {E(name)}\'s general government gross debt, from the IMF World Economic Outlook, October 2026: '
+             f'<p class="answer"><b>What this page counts.</b> {E(name)}\'s general government gross debt, from the IMF World Economic Outlook, October 2026: '
              f'the debt ratio (GGXWDG_NGDP) times GDP in current US dollars (NGDPD). '
              f'The 2026 estimate is <b>{_money0(e["debt_2026_usd"])}</b> ({_money(e["debt_2026_usd"])}), {e["ratio_2026"]:.2f}% of GDP. '
              f'The end-2025 figure was {_money0(e["debt_2025_usd"])} ({e["ratio_2025"]:.2f}% of GDP). '
              f'Years through 2025 are the published series. 2026 is the current-year estimate, based on information through September 30, 2026. '
              f'2027–2031 are IMF projections. '
-             f'The live number is that 2025 stock interpolated to the 2026 estimate, from 1 January 2026 to 1 January 2027. '
+             f'The live number above is that 2025 stock interpolated to the 2026 estimate, from 1 January 2026 to 1 January 2027. '
              f'It is not a live ledger. The dollar change includes exchange-rate effects, not only new borrowing. '
              f'This site has no official-source clock for {E(name)} yet, so this page uses IMF estimates.</p>'
              f'<p>This estimate is the general-government headline for {E(name)} on the <a href="../../world/">World Debt Clock</a>. '

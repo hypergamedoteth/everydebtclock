@@ -520,12 +520,8 @@ def _page(ctx, facts):
         "as_of": as_of, "target": TARGET,
     }
     data = json.dumps(blob, separators=(",", ":")).replace("<", "\\u003c")
-    official_sentence = (
-        f"Live estimate, not Treasury's figure. This clock is past $41 trillion. Treasury has not posted a Debt to the Penny close at or above $41 trillion. "
-        f"The latest official close is still {_money_float(facts['base'])} on {_fdate(as_of)}. Treasury posts the prior business day's close on the next business day, usually in the afternoon (around 3 PM Central).")
-    confirmed_sentence = (
-        f"Treasury's figure is at or above $41 trillion. Debt to the Penny's close was {_money_float(facts['base'])} on {_fdate(as_of)}. "
-        f"That is the official total. The digits still moving on this page are the live projection from that close.")
+    official_sentence = ""
+    confirmed_sentence = ""
     body = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{E(title)} | Every Debt Clock</title>
@@ -641,12 +637,8 @@ code{{font-family:ui-monospace,Menlo,monospace;font-size:13px}}
 <iframe src="{site}/embed/41-trillion/" title="$41 trillion countdown" width="100%" height="160" style="border:0;background:#0e131b;border-radius:10px" loading="lazy"></iframe>
 <textarea readonly rows="4" spellcheck="false" aria-label="Embed code">{E(code)}</textarea>
 </div>
-<h2>Banner that turns on at $41 trillion</h2>
-<p>The homepage, this page and the countdown page already contain two sentences. Neither is showing, because the live projection and Treasury's {_fdate(as_of)} close are both still under $41 trillion. The live sentence turns on by itself when the clock passes $41 trillion and Treasury's latest close is still under it. The official sentence replaces it when a Debt to the Penny close is at or above $41 trillion. Add <code>?cross41=preview</code> to the <a href="../?cross41=preview">homepage</a> to preview the live sentence. The preview says it is a preview.</p>
-<div class="banner"><b>Prepared copy, live estimate.</b> {E(official_sentence)}</div>
-<p class="when">Shown only while the clock is past $41 trillion and the latest Debt to the Penny close is still under it. The amount in parentheses is the live projection at that moment. It is not filled in here, so this specimen does not invent a total.</p>
-<div class="banner"><b>Prepared copy, after Treasury posts a close at or above $41 trillion.</b> {E(confirmed_sentence)}</div>
-<p class="when">The date and amount in the live banner will be the confirming close. They are filled here with the latest close, which is still under $41 trillion, so this sentence is not being shown on the site as fact.</p>
+<h2>Banner that turns on at the next trillion</h2>
+<p>The crossing sentence is not in this page. The browser writes it only after the live clock reaches that level, or when Treasury posts a close that reaches it. Until then the page states the projection from the {_fdate(as_of)} close of {E(_money_float(facts['base']))}. Add <code>?cross41=preview</code> to the <a href="../?cross41=preview">homepage</a> to preview the sentence. The preview says it is a preview.</p>
 <h2>The arithmetic</h2>
 <p>The homepage formula is <code>value = base + rate × (now − t0)</code>. t0 is the end of the record date in Eastern time, 11:59:59 PM. The crossing time is <code>t0 + ($41 trillion − base) / rate</code>.</p>
 <ul>
