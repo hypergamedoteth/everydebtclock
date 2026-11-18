@@ -273,9 +273,9 @@ sl_, lim_ = T.get("debt_subject_limit") or {}, T.get("debt_limit") or {}
 rate_day = (T["debt_total"].get("rate_trend", T["debt_total"]["rate"])) * 86400
 if held:
     proj_txt = (f"Debt subject to the limit is at the {tril(lim_.get('base', 0), 3)} statutory limit and Treasury is using extraordinary measures, "
-                "so the clock below holds at Treasury's latest official figures instead of projecting growth.")
+                "so the clock above holds at Treasury's latest official figures instead of projecting growth.")
 else:
-    proj_txt = (f"The clock below starts from that official figure and projects forward at the 90-day trend (about {bil(rate_day)} a day). "
+    proj_txt = (f"The clock above starts from that official figure and projects forward at the 90-day trend (about {bil(rate_day)} a day). "
                 "It is re-based to Treasury's new figure every business day and never projects past the debt limit.")
 answer_s = f"The US national debt was <b>{usd2(OFF_V)}</b> ({tril(OFF_V)}) as of <b>{fdate(OFF_D)}</b>, Treasury's Debt to the Penny close."
 intro = (f"""<!--INTRO--><h1>As of {fdate(OFF_D)}, the US national debt is {usd2(OFF_V)} (Treasury Debt to the Penny)</h1>
@@ -300,10 +300,11 @@ def row(slug):
             v = usd0(i["base"]) if i.get("kind") == "usd" else fmt(i, i["base"])
             asof = (i["basis_txt"] if i.get("basis_txt") else f"official, {fdate(i.get('as_of'))}")
     return f'<tr><td><a href="t/{slug}.html">{html.escape(label(slug, i))}</a></td><td class="num">{v}</td><td>{html.escape(asof)}</td></tr>'
-ssr = (f"""<!--SSR--><div class="ssr"><section class="intro" id="intro">{intro}</section>
-<div class="hero lead"><div class="k">Official close · {fdate(OFF_D)} · Treasury Debt to the Penny</div><div class="big num">{usd2(OFF_V)}</div>
+ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="k">Official · {fdate(OFF_D)} · Treasury Debt to the Penny</div><div class="big num">{usd2(OFF_V)}</div>
 <div class="trio"><div><span class="l">Per person (Census, {fdate(POP_OFF_DATE)})</span><span class="num">{usd2(PP_OFF)}</span></div>
 <div><span class="l">Per tax return filed</span><span class="num">{usd2(OFF_V / TAX)}</span></div><div><span class="l">Per household</span><span class="num">{usd2(OFF_V / HH)}</span></div></div></div>
+<p class="official" id="official">Official: {usd2(OFF_V)} as of {fdate(OFF_D)}, Treasury Debt to the Penny</p>
+<section class="intro" id="intro">{intro}</section>
 {site_chrome.sponsor_slot("")}<section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
 {''.join(row(s_) for s_ in ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "spending", "revenue", "gdp"])}</table>
 <noscript><p>Turn on JavaScript to watch these figures tick in real time.</p></noscript></section></div><!--/SSR-->""")
@@ -1041,6 +1042,90 @@ os.makedirs(f"{R}/dist", exist_ok=True)
 open(f"{R}/dist/debtclock-standalone.html", "w").write(single)
 print(f"standalone: {len(single)//1024} KB; share pages: {len(urls)-1}; og images: {len(os.listdir(R+'/og'))}; site={SITE}")
 
+def check_clock_first():
+    """Pages with a live clock must lead with that clock, before the heading and the summary."""
+    from html.parser import HTMLParser
+
+    class First(HTMLParser):
+        def __init__(self, share):
+            super().__init__(convert_charrefs=True)
+            self.share = share
+            self.in_main = 0
+            self.skip = 0
+            self.first = None
+
+        def handle_starttag(self, tag, attrs):
+            if self.first:
+                return
+            a = {k: (v or "") for k, v in attrs}
+            if tag == "main":
+                self.in_main += 1
+                return
+            if not self.in_main:
+                return
+            if self.skip:
+                self.skip += 1
+                return
+            cls = a.get("class", "")
+            ident = a.get("id", "")
+            classes = cls.split()
+            if tag in ("script", "style", "noscript", "header", "nav", "dialog"):
+                self.skip = 1
+                return
+            if ident == "cross41" or "hidden" in a:
+                self.skip = 1
+                return
+            if tag == "a" and ("brand" in classes or "navembed" in classes):
+                self.skip = 1
+                return
+            if tag == "div" and (ident == "app" or "ssr" in classes):
+                return
+            clock = ("hero" in classes and "lead" in classes) or ident == "share-num" or (self.share and tag == "section" and "result" in classes)
+            if clock:
+                self.first = "clock"
+                return
+            if tag in ("h1", "h2", "h3", "section", "form", "table", "p", "ul", "ol", "figure", "article") or (tag == "div" and classes):
+                self.first = tag + ("." + cls if cls else "")
+
+        def handle_endtag(self, tag):
+            if self.skip:
+                self.skip -= 1
+                return
+            if tag == "main" and self.in_main:
+                self.in_main -= 1
+
+    samples = [
+        ('<main><div id="cross41" class="banner" hidden></div><div class="ssr"><div class="hero lead"></div><p class="official"></p><h1>As of</h1></div></main>', True),
+        ('<main><a class="brand" href="/">x</a><a class="navembed" href="/e">Embed</a><div class="hero lead"></div><h1>Name</h1></main>', True),
+        ('<main><a class="brand">x</a><section class="result" id="share-clock"><p class="big" id="share-num">$1</p></section><h1>Share</h1></main>', True),
+        ('<main><h1>As of</h1><div class="hero lead"></div></main>', False),
+        ('<main><section class="intro"><h1>As of</h1></section><div class="hero lead"></div></main>', False),
+    ]
+    for html, expect in samples:
+        parser = First('id="share-num"' in html)
+        parser.feed(html)
+        if (parser.first == "clock") != expect:
+            raise SystemExit(f"clock-order self-test failed: {html[:80]}")
+
+    skip = {".git", "cache", "pipeline", "__pycache__", "embed"}
+    bad = []
+    for root, dirs, files in os.walk(R):
+        dirs[:] = [d for d in dirs if d not in skip and not d.startswith(".")]
+        for fn in files:
+            if not fn.endswith(".html"):
+                continue
+            path = os.path.join(root, fn)
+            text = open(path, encoding="utf-8", errors="replace").read()
+            if 'class="hero lead"' not in text and 'id="share-num"' not in text:
+                continue
+            parser = First('id="share-num"' in text)
+            parser.feed(text)
+            if parser.first != "clock":
+                bad.append(f"{os.path.relpath(path, R)}: first content is {parser.first or 'missing'}")
+    if bad:
+        raise SystemExit("live clock is not the first content element:\n" + "\n".join(bad[:20]))
+    print(f"clock order ok")
+
 def check_quotable():
     """The pages answer engines quote must be static HTML, with a dated answer and 3-6 FAQs."""
     bots = ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "PerplexityBot", "Google-Extended", "ClaudeBot")
@@ -1120,4 +1205,5 @@ def check_crossing():
 
 check_quotable()
 check_crossing()
+check_clock_first()
 

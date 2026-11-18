@@ -711,8 +711,8 @@ def _check(R, site, clocks, now, require_pages, milestones):
             raise RuntimeError(f"{rel} should offer the {'$41 trillion countdown' if use_cd else 'US clock'}")
         if 'class="hero lead"' not in host:
             raise RuntimeError(f"{rel} is missing its ticker")
-        if host.find("<h1") > host.find('class="hero lead"'):
-            raise RuntimeError(f"{rel} ticker is above the official figure")
+        if host.find("<h1") >= 0 and host.find("<h1") < host.find('class="hero lead"'):
+            raise RuntimeError(f"{rel} ticker is not above the heading")
     cd_path = os.path.join(R, "embed", "41-trillion", "index.html")
     if not os.path.exists(cd_path):
         raise RuntimeError("embed/41-trillion/ is missing")
