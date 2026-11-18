@@ -12,7 +12,8 @@ Historical Debt Outstanding plus Debt to the Penny for the president dates.
 
 Exit 1 on drift, a page that does not match its data file, or a source that cannot be read.
 """
-import argparse, json, os, sys, urllib.parse, urllib.request
+import argparse, json, os, sys, time, urllib.parse, urllib.request
+from urllib.error import HTTPError, URLError
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 sys.path.insert(0, os.path.join(ROOT, "pipeline"))
 sys.path.insert(0, ROOT)
@@ -21,12 +22,46 @@ import fetch_debt_by_year as fy
 
 FD = "https://api.fiscaldata.treasury.gov/services/api/fiscal_service"
 UA = {"User-Agent": "Mozilla/5.0 (compatible; everydebtclock.com data refresh)"}
+# Census answers a burst of summary-workbook downloads with 429. Keep a gap between
+# requests and, after a 429, wait before the next one instead of failing the audit.
+_pace = {"gap": 0.2, "next": 0.0}
 
 
-def get(url):
-    req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=120) as r:
-        return r.read()
+def get(url, tries=6):
+    last = None
+    for i in range(tries):
+        wait = _pace["next"] - time.time()
+        if wait > 0:
+            time.sleep(wait)
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            with urllib.request.urlopen(req, timeout=120) as r:
+                body = r.read()
+            _pace["next"] = time.time() + _pace["gap"]
+            if _pace["gap"] > 0.2:
+                _pace["gap"] = max(0.2, _pace["gap"] * 0.85)
+            return body
+        except HTTPError as e:
+            last = e
+            if e.code not in (429, 500, 502, 503, 504) or i == tries - 1:
+                raise
+            delay = None
+            raw = e.headers.get("Retry-After") if e.headers else None
+            if raw:
+                try:
+                    delay = float(raw)
+                except ValueError:
+                    delay = None
+            if delay is None:
+                delay = min(30, 5 * (i + 1))
+            _pace["gap"] = min(2.0, max(_pace["gap"] * 2, 0.5))
+            _pace["next"] = time.time() + delay
+        except (URLError, TimeoutError, OSError) as e:
+            last = e
+            if i == tries - 1:
+                raise
+            time.sleep(min(20, 2 * (i + 1)))
+    raise last
 
 
 def issues_or(issues, msg):
