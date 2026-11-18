@@ -352,6 +352,96 @@ def _clocks(R, site, now, world):
         raise RuntimeError("embed: two clocks share a URL")
     return out
 
+def _hit(base, rate, t0, freeze, target):
+    if not rate or rate <= 0 or base >= target:
+        return None
+    ts = t0 + (target - base) / rate
+    if freeze and ts > freeze:
+        return None
+    return ts
+
+
+def _countdown_41(R, site):
+    D = json.load(open(os.path.join(R, "data", "data.json")))
+    td = (D.get("tickers") or {}).get("debt_total") or {}
+    if td.get("status") != "ok":
+        raise RuntimeError("embed: US debt_total ticker is not ok")
+    return _entry(base=td["base"], rate=td.get("rate") or 0, t0=td["t0"], freeze=td.get("freeze_t"),
+                  as_of=td.get("as_of") or "", source=td.get("source_name") or "Treasury, Debt to the Penny",
+                  page_url=site + "/41-trillion/", embed_path="embed/41-trillion/",
+                  iframe_title="$41 trillion countdown", anchor="$41 trillion countdown by EveryDebtClock.com",
+                  label="Until the US debt hits $41 trillion", sym="$")
+
+
+def _when_ct(ts):
+    import datetime as dt
+    from zoneinfo import ZoneInfo
+    rounded = int(ts + 0.5)
+    ct = dt.datetime.fromtimestamp(rounded, ZoneInfo("America/Chicago"))
+    return ct.strftime("%b %-d, %Y, %-I:%M:%S %p") + " CT"
+
+
+def _countdown_html(c, now, embed_home):
+    target = 41 * 10 ** 12
+    rate = c["rate"] or 0
+    frozen = c["freeze"] is not None and now > c["freeze"]
+    live = project(c["base"], rate, c["t0"], now, c["freeze"], None)
+    hit = None if frozen else _hit(c["base"], rate, c["t0"], c["freeze"], target)
+    if c["base"] >= target:
+        kicker, big, sub = "Treasury close is at or above $41 trillion", _total("$", live), "Official close " + c["as_of"]
+    elif live >= target:
+        kicker, big, sub = "Live estimate is past $41 trillion", _total("$", live - target) + " past", "Treasury has not posted that close"
+    elif hit:
+        left = max(0, int(hit - now))
+        dd, hh, mm, ss = left // 86400, left % 86400 // 3600, left % 3600 // 60, left % 60
+        kicker, big, sub = c["label"], f"{dd}d {hh}h {mm}m {ss}s", _when_ct(hit)
+    else:
+        kicker, big, sub = "No projected $41 trillion date", _total("$", live), "The clock is not projecting past the debt limit"
+    cfg = {"b": c["base"], "r": rate, "t0": c["t0"], "target": target, "asof": c["as_of"]}
+    if c["freeze"] is not None:
+        cfg["fz"] = c["freeze"]
+    blob = json.dumps(cfg, separators=(",", ":")).replace("<", "\\u003c")
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>{E(c["iframe_title"])}</title>
+<script>if(new URLSearchParams(location.search).get("theme")==="light")document.documentElement.classList.add("light")</script>
+<style>
+:root{{color-scheme:dark;--bg:#0e131b;--fg:#e8edf5;--mut:#8a97ab;--dim:#6a778c;--link:#7cb6ff;--up:#3dca8e}}
+html.light{{color-scheme:light;--bg:#f6f7fb;--fg:#161a22;--mut:#526074;--dim:#5c6b80;--link:#0b57d0;--up:#067647}}
+*{{box-sizing:border-box}}html,body{{height:100%;margin:0;background:var(--bg);color:var(--fg)}}
+body{{font:13px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden}}
+.w{{height:100%;display:flex;flex-direction:column;justify-content:center;gap:1px;padding:8px 12px 7px;border-left:3px solid #ff4d5e}}
+.n,.v,.s{{min-width:0}}.n{{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.v{{display:block;max-width:100%;font:700 clamp(15px,5.4vw,26px)/1.15 ui-monospace,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.03em;white-space:nowrap;overflow:hidden}}
+.s{{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.when{{font:600 12px/1.3 ui-monospace,Menlo,Consolas,monospace;color:var(--up);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.cr{{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline}}
+a.by,a.get{{color:var(--link);text-decoration:underline;text-underline-offset:2px}}a.by{{font-size:12px}}a.get{{font-size:11px}}
+</style>{ICON}</head><body><div class="w">
+<div class="n" id="k">{E(kicker)}</div>
+<div class="v" id="v">{E(big)}</div>
+<div class="when" id="w">{E(sub)}</div>
+<div class="s">Source: {E(c["source"])}</div>
+<div class="cr"><a class="by" href="{E(c["page_url"], quote=True)}" target="_top">{BYLINE}</a><a class="get" href="{E(embed_home, quote=True)}" target="_blank" rel="noopener">{GET}</a></div>
+</div><script type="application/json" id="c">{blob}</script>
+<script>(function(){{var C=JSON.parse(document.getElementById("c").textContent);
+var k=document.getElementById("k"),v=document.getElementById("v"),w=document.getElementById("w");
+var nf=new Intl.NumberFormat("en-US",{{maximumFractionDigits:0}});
+function val(t){{if(C.fz&&t>C.fz)t=C.fz;return C.b+C.r*(t-C.t0)}}
+function hit(){{if(!(C.r>0)||C.b>=C.target)return null;var ts=C.t0+(C.target-C.b)/C.r;if(C.fz&&ts>C.fz)return null;return ts}}
+function money(n){{return (n<0?"−":"")+C.sym+nf.format(Math.abs(Math.round(n)))}}
+function cd(sec){{var s=Math.max(0,Math.floor(sec));return Math.floor(s/86400)+"d "+Math.floor(s%86400/3600)+"h "+Math.floor(s%3600/60)+"m "+(s%60)+"s"}}
+function when(ts){{var p={{}};new Intl.DateTimeFormat("en-US",{{timeZone:"America/Chicago",month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit",second:"2-digit",hour12:true}}).formatToParts(new Date(Math.floor(ts+0.5)*1000)).forEach(function(x){{if(x.type!=="literal")p[x.type]=x.value}});return p.month+" "+p.day+", "+p.year+", "+p.hour+":"+p.minute+":"+p.second+" "+p.dayPeriod+" CT"}}
+function fit(){{if(!v.clientWidth)return;var s=26;v.style.fontSize=s+"px";while(v.scrollWidth>v.clientWidth+1&&s>11){{s--;v.style.fontSize=s+"px"}}}}
+function paint(){{var t=Date.now()/1000,x=val(t),ts=hit();
+if(C.b>=C.target){{k.textContent="Treasury close is at or above $41 trillion";v.textContent=money(x);w.textContent="Official close "+C.asof}}
+else if(x>=C.target){{k.textContent="Live estimate is past $41 trillion";v.textContent=money(x-C.target)+" past";w.textContent="Treasury has not posted that close"}}
+else if(ts){{k.textContent="Until the US debt hits $41 trillion";v.textContent=cd(ts-t);w.textContent=when(ts)}}
+else{{k.textContent="No projected $41 trillion date";v.textContent=money(x);w.textContent="The clock is not projecting past the debt limit"}}
+fit()}}
+(function loop(){{paint();requestAnimationFrame(loop)}})()}})();</script></body></html>"""
+
+
 def _write(path, text):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     open(path, "w").write(text)
@@ -408,6 +498,7 @@ def _directory(R, site, clocks, analytics_fn):
 <section class="intro pitch"><h1>Free debt clock widget</h1>
 <p>{E(PITCH)}</p>
 <p>Add <code>?theme=light</code> to the iframe address for a light background. The snippet is the iframe plus a plain link under it.</p>
+<p>The countdown to $41 trillion is a separate widget at <a href="41-trillion/">embed/41-trillion/</a>. It follows the same rules: no cookies and no analytics. The snippet is on the <a href="../41-trillion/">$41 trillion page</a> and the <a href="../press/">press page</a>.</p>
 <h2>Add this clock to your site</h2>
 <p>United States, Texas, and the world, live. Every other clock is listed below.</p>
 <div class="embgrid">{featured}</div>
@@ -531,14 +622,34 @@ def _check(R, site, clocks, now, require_pages, milestones):
     us_code = snippet(site, us["embed_path"], us["page_url"], us["iframe_title"], us["anchor"])
     for path in milestones:
         host = open(path).read()
-        rel = os.path.relpath(path, R)
-        if _offer_pos(host, rel, us_preview):
+        rel = os.path.relpath(path, R).replace("\\", "/")
+        use_cd = rel.startswith("41-trillion/")
+        preview = f"{site}/embed/41-trillion/" if use_cd else us_preview
+        expect = snippet(site, "embed/41-trillion/", f"{site}/41-trillion/", "$41 trillion countdown", "$41 trillion countdown by EveryDebtClock.com") if use_cd else us_code
+        if _offer_pos(host, rel, preview):
             phrased += 1
         code = html.unescape(re.search(r'class="embedbox"[\s\S]*?<textarea[^>]*>([\s\S]*?)</textarea>', host).group(1))
-        if code != us_code:
-            raise RuntimeError(f"{rel} should offer the US clock")
+        if code != expect:
+            raise RuntimeError(f"{rel} should offer the {'$41 trillion countdown' if use_cd else 'US clock'}")
         if 'class="hero lead"' not in host.split('id="intro"', 1)[0]:
             raise RuntimeError(f"{rel} ticker is not above the summary")
+    cd_path = os.path.join(R, "embed", "41-trillion", "index.html")
+    if not os.path.exists(cd_path):
+        raise RuntimeError("embed/41-trillion/ is missing")
+    cd_text = open(cd_path).read()
+    if len(cd_text.encode()) > LIMIT:
+        raise RuntimeError(f"embed/41-trillion/ is {len(cd_text.encode())} bytes (limit {LIMIT})")
+    for bad in ("goatcounter", "gc.zgo.at", "fetch(", "XMLHttpRequest", "localStorage", "document.cookie",
+                "nofollow", "stylesheet", "core.js", "app.js", "data.json", "X-Frame-Options", "frame-ancestors",
+                "googletagmanager", "google-analytics"):
+        if bad in cd_text:
+            raise RuntimeError(f"embed/41-trillion/ must not contain {bad}")
+    if 'content="noindex"' not in cd_text or BYLINE not in cd_text or 'get("theme")==="light"' not in cd_text:
+        raise RuntimeError("embed/41-trillion/ missing noindex, byline, or light theme")
+    if f'href="{site}/41-trillion/" target="_top">{BYLINE}</a>' not in cd_text:
+        raise RuntimeError("embed/41-trillion/ backlink is not the countdown page")
+    if f'href="{site}/embed/" target="_blank"' not in cd_text or GET not in cd_text:
+        raise RuntimeError("embed/41-trillion/ is missing the directory link")
     directory = open(os.path.join(R, "embed", "index.html")).read()
     if 'content="noindex"' in directory or 'class="embedbox"' in directory:
         raise RuntimeError("/embed/ index must stay indexable and is not itself a clock panel")
@@ -562,7 +673,7 @@ def _check(R, site, clocks, now, require_pages, milestones):
         raise RuntimeError("/embed/ header is missing the Embed link")
     sm = open(os.path.join(R, "sitemap.xml")).read()
     ET.fromstring(sm)
-    if sm.count("/embed/") != 1 or any(f"{site}/embed/{p}" in sm for p in ("us/", "world/", "states/", "countries/")):
+    if sm.count("/embed/") != 1 or any(f"{site}/embed/{p}" in sm for p in ("us/", "world/", "states/", "countries/", "41-trillion/")):
         raise RuntimeError("sitemap must list /embed/ and no per-clock embed URL")
     robots = open(os.path.join(R, "robots.txt")).read()
     if "Disallow: /embed" in robots:
@@ -645,6 +756,13 @@ def apply(R, site, analytics_fn=None, require_pages=False, now=None, world=None)
     us = next(c for c in clocks if c["embed_path"] == "embed/us/")
     us_code = snippet(site, us["embed_path"], us["page_url"], us["iframe_title"], us["anchor"])
     us_panel = panel_html(us_code, f"{site}/embed/us/", us["iframe_title"])
+    cd = _countdown_41(R, site)
+    cd_html = _countdown_html(cd, now, embed_home)
+    if len(cd_html.encode()) > LIMIT:
+        raise RuntimeError(f"embed/41-trillion/ is {len(cd_html.encode())} bytes (limit {LIMIT})")
+    _write(os.path.join(R, "embed", "41-trillion", "index.html"), cd_html)
+    cd_code = snippet(site, cd["embed_path"], cd["page_url"], cd["iframe_title"], cd["anchor"])
+    cd_panel = panel_html(cd_code, f"{site}/{cd['embed_path']}", cd["iframe_title"])
     milestones = []
     for name in sorted(os.listdir(R)):
         if not re.fullmatch(r"\d+-trillion", name):
@@ -655,7 +773,7 @@ def apply(R, site, analytics_fn=None, require_pages=False, now=None, world=None)
         raw = open(path).read()
         if 'class="hero lead"' not in raw or 'id="intro"' not in raw:
             continue
-        hosts[path] = finish(raw, us_panel)
+        hosts[path] = finish(raw, cd_panel if name == "41-trillion" else us_panel)
         milestones.append(path)
     if missing and require_pages:
         raise RuntimeError("embed: full pages missing after the page build: " + ", ".join(missing[:8]))
