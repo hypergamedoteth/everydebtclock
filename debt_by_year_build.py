@@ -153,8 +153,8 @@ def answer_parts(name, measure, sym, rows):
     latest = rows[-1]
     ago, end = ten_year(rows)
     be = _be(measure)
-    lead_h = f"{E(name)}'s {E(measure)} {be} <b>{money(sym, latest['amount'])}</b> ({short(sym, latest['amount'])}) on {fdate(latest['date'])}"
-    lead_p = f"{name}'s {measure} {be} {money(sym, latest['amount'])} ({short(sym, latest['amount'])}) on {fdate(latest['date'])}"
+    lead_h = f"{E(name)}'s {E(measure)} {be} <b>{money(sym, latest['amount'])}</b> ({short(sym, latest['amount'])}) as of {fdate(latest['date'])}"
+    lead_p = f"{name}'s {measure} {be} {money(sym, latest['amount'])} ({short(sym, latest['amount'])}) as of {fdate(latest['date'])}"
     if ago:
         diff = end["amount"] - ago["amount"]
         pct = diff / ago["amount"] * 100
@@ -313,13 +313,16 @@ def _page(R, SITE, with_analytics, stamp, modified, m, models_all):
         related.append(("All state debt clocks" if state else "All country debt clocks", f"{UP}/{m['sec']}/", "Every clock on this site"))
     q_count = m["count_note"]
     q_source = "The figures are copied from " + "; ".join(n for n, _ in m["sources"][:2]) + "."
-    if not m["has10"]:
-        q10 = m["answer_plain"]
+    if m["has10"] and m["ago"] and m["end"] and m["ago"]["amount"]:
+        diff = m["end"]["amount"] - m["ago"]["amount"]
+        pct = diff / m["ago"]["amount"] * 100
+        q10 = (f"{_verb(diff).capitalize()} {short(sym, abs(diff))} ({pct:+.1f}%), from {money(sym, m['ago']['amount'])} as of {fdate(m['ago']['date'])} "
+               f"to {money(sym, m['end']['amount'])} as of {fdate(m['end']['date'])}.")
     else:
-        q10 = m["answer_plain"]
+        q10 = f"The published series on this page runs from {m['y0']} to {m['y1']} and does not cover 10 years, so a 10-year change is not shown."
     faqs = [
         (f"How much is {m['name']} debt?", m["answer_plain"]),
-        (f"How has {m['name']} debt changed over 10 years?", q10 if m["has10"] else m["answer_plain"]),
+        (f"How has {m['name']} debt changed over 10 years?", q10),
         (f"What does the {m['name']} debt-by-year table count?", q_count),
         (f"Where do the {m['name']} debt-by-year figures come from?", q_source),
     ]
@@ -335,6 +338,7 @@ def _page(R, SITE, with_analytics, stamp, modified, m, models_all):
              "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json",
                                "contentUrl": f"{SITE}/data/debt_by_year.json"}]}
     ld_faq = {"@context": "https://schema.org", "@type": "FAQPage",
+              "dateModified": modified or dt.date.today().isoformat(),
               "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faqs]}
     heads = "<th>Year</th><th>Date</th>" + ("<th>State debt</th><th>Local debt</th>" if state else "") + "<th>Total debt</th><th>Change</th>"
     gap = ""
@@ -363,7 +367,7 @@ def _page(R, SITE, with_analytics, stamp, modified, m, models_all):
 <a class="brand" href="{UP}/">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="{UP}/embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
 <p class="k"><a href="{UP}/">US debt clock</a> · <a href="../">{E(m['name'])} debt clock</a></p>
 <h1>{E(m['name'])} debt by year</h1>
-<p><b>Answer.</b> {m['answer_html']}</p>
+<p class="answer"><b>Answer.</b> {m['answer_html']} Source: <a href="{E(m['sources'][0][1])}" rel="noopener">{E(m['sources'][0][0])}</a>.</p>
 <figure>{chart(rows, chart_title)}<figcaption>{E(chart_title)}. Amounts are the official stock, not a projection.</figcaption></figure>
 <h2>By year, {m['y0']} to {m['y1']}</h2>
 <div class="tw"><table><tr>{heads}</tr>{_row_html(sym, rows, state)}</table></div>
@@ -373,8 +377,9 @@ def _page(R, SITE, with_analytics, stamp, modified, m, models_all):
 <p>The live clock is the <a href="../">{E(m['name'])} debt clock</a>. The same kind of table for the United States is <a href="{UP}/national-debt-by-year/">US national debt by year</a>. Machine-readable copy: <a href="{UP}/data/debt_by_year.json">debt_by_year.json</a>.</p>
 <h2>Sources</h2>
 <ul class="sources">{src_html}</ul>
-<h2>Questions</h2>
+<section class="faq" id="faq"><h2>Questions</h2>
 {faq_html}
+</section>
 <a class="cta" href="../">Open the {E(m['name'])} debt clock →</a>
 <section class="related" id="related"><h2>Related clocks</h2><div class="rg">{rel_html}</div></section>
 <footer>Every figure on this page is an official published number. Page built {E(stamp)}. · <a href="{UP}/embed/">Embed a clock</a> · <a href="{UP}/data/">Data</a> · <a href="{UP}/methodology/">Methodology</a> · <a href="{UP}/privacy/">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>
