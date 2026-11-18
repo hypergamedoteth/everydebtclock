@@ -86,9 +86,17 @@ def dataset_ld(name, desc, url, based=None, temporal=None, kw=None):
 
 def faq_ld(pairs):
     """FAQPage JSON-LD. pairs = [(question, plain-text answer), ...]."""
-    ld = {"@context": "https://schema.org", "@type": "FAQPage",
+    ld = {"@context": "https://schema.org", "@type": "FAQPage", "dateModified": M["generated_iso"],
           "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in pairs]}
     return '<script type="application/ld+json">' + json.dumps(ld).replace("</", "<\\/") + "</script>"
+
+def faq_section(pairs, sources=None):
+    """Visible FAQ. The paragraph text matches the FAQPage answers. sources = [(name, url), ...]."""
+    body = "".join(f"<h3>{html.escape(q)}</h3><p>{html.escape(a)}</p>" for q, a in pairs)
+    src = ""
+    if sources:
+        src = "<p><b>Sources.</b> " + " · ".join(f'<a href="{html.escape(u)}" rel="noopener">{html.escape(n)}</a>' for n, u in sources) + "</p>"
+    return f'<section class="faq" id="faq"><h2>Questions</h2>{body}{src}</section>'
 
 def fmt(i, x, short=False):
     if x is None: return "—"
@@ -201,6 +209,40 @@ home_ld = dataset_ld("US national debt, daily official closes and live projectio
     "with per-person figures on the Census Vintage 2025 population. Re-based to Treasury every business day.",
     f"{SITE}/", based=["https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
                        "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit"], temporal=temporal)
+import topics_build
+_HOME_HIST = topics_build._load(R)
+MILE = topics_build.milestone_state(
+    {"T": T, "NOW": NOW, "val": val, "fdate": fdate, "usd0": usd0, "usd2": usd2, "bil": bil, "OFF_D": OFF_D, "OFF_V": OFF_V},
+    _HOME_HIST, topics_build.MILESTONE_PAGES[0])
+INTEREST_DAY = topics_build.interest_day_answer(T, val, NOW, fdate, usd0, bil, STAMP)
+_pub, _igov = T.get("debt_public") or {}, T.get("debt_intragov") or {}
+_subj, _lim = T.get("debt_subject_limit") or {}, (T.get("debt_limit") or {}).get("base")
+_rate_day = (T["debt_total"].get("rate_trend", T["debt_total"]["rate"])) * 86400
+HOME_FAQS = [
+    ("How much is the US national debt right now?",
+     f"The US national debt was {usd2(OFF_V)} ({tril(OFF_V)}) as of {fdate(OFF_D)}, the latest Treasury Debt to the Penny close. "
+     f"The clock on this page projects forward from that close and is re-based every business day."),
+    ("How much is the national debt per person?",
+     f"{usd2(PP_OFF)} as of {fdate(OFF_D)}. That is the official total divided by the Census Bureau's estimate of {POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}."),
+]
+if INTEREST_DAY:
+    HOME_FAQS.append(("How much interest does the US pay per day?", INTEREST_DAY))
+HOME_FAQS.append((f"When will the US national debt hit ${MILE['n']} trillion?", MILE["quote"]))
+if _pub.get("base") is not None and _igov.get("base") is not None:
+    _limit_bit = (f" Debt subject to the statutory limit was {usd0(_subj['base'])} as of {fdate(_subj.get('as_of'))}. The limit was {usd0(_lim)}."
+                  if _subj.get("base") is not None and _lim else "")
+    HOME_FAQS.append((
+        "How much of the national debt is held by the public?",
+        f"{usd0(_pub['base'])} was held by the public and {usd0(_igov['base'])} was intragovernmental as of {fdate(_pub.get('as_of'))}, from Treasury's Debt to the Penny.{_limit_bit}",
+    ))
+if not held:
+    HOME_FAQS.append((
+        "How fast is the US national debt growing?",
+        f"About {bil(_rate_day)} a day as of {fdate(OFF_D)}, the 90-day least-squares trend of Treasury's Debt to the Penny closes. "
+        f"Daily changes are lumpy. The live clock uses this trend until the next Treasury close.",
+    ))
+if not 3 <= len(HOME_FAQS) <= 6:
+    raise SystemExit(f"homepage FAQ has {len(HOME_FAQS)} questions")
 meta = f"""<!--META--><title>{HOME_TITLE}</title>
 <meta name="description" content="{html.escape(desc)}">
 <link rel="canonical" href="{SITE}/">
@@ -211,12 +253,7 @@ meta = f"""<!--META--><title>{HOME_TITLE}</title>
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Every Debt Clock: US national debt, live and verified daily">
 <meta name="twitter:description" content="{html.escape(desc)}"><meta name="twitter:image" content="{SITE}/og/home.png">
 {home_ld}
-{faq_ld([
-    ("How much is the US national debt?",
-     f"The US national debt was {usd2(OFF_V)} ({tril(OFF_V)}) at Treasury's {fdate(OFF_D)} close, according to Debt to the Penny."),
-    ("How much is the national debt per person?",
-     f"{usd2(PP_OFF)}. That is the official total divided by the Census Bureau's estimate of {POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}."),
-])}
+{faq_ld(HOME_FAQS)}
 <!--/META-->"""
 idx = re.sub(r"<!--META-->.*?<!--/META-->", lambda m: meta, idx, flags=re.S)
 idx = re.sub(r'<meta property="og:title" content="US Debt Clock — live &amp; verified"><meta property="og:type" content="website">\n?', "", idx)
@@ -224,6 +261,7 @@ idx = idx.replace('<meta property="og:title" content="US Debt Clock — live & v
 idx = re.sub(r'<script type="application/ld\+json">\{"@context":"https://schema.org","@type":"Dataset","name":"Every Debt Clock: US live tickers".*?</script>\n?', "", idx, flags=re.S)
 
 ANSWERS = [("how-much-is-the-national-debt", "How much is the national debt?"), ("national-debt-per-person", "National debt per person"),
+           ("your-share", "Your share of the national debt"),
            ("national-debt-by-year", "US national debt by year"), ("41-trillion", "When will the US debt hit $41 trillion?"),
            ("national-debt-by-president", "National debt by president"), ("interest-on-the-national-debt", "Interest on the national debt"),
            ("methodology", "Methodology and accuracy")]
@@ -236,11 +274,12 @@ if held:
 else:
     proj_txt = (f"The clock below starts from that official figure and projects forward at the 90-day trend (about {bil(rate_day)} a day). "
                 "It is re-based to Treasury's new figure every business day and never projects past the debt limit.")
-answer_s = f"The US national debt was <b>{usd2(OFF_V)}</b> ({tril(OFF_V)}) at Treasury's <b>{fdate(OFF_D)}</b> close."
+answer_s = f"The US national debt was <b>{usd2(OFF_V)}</b> ({tril(OFF_V)}) as of <b>{fdate(OFF_D)}</b>, Treasury's Debt to the Penny close."
 intro = (f"""<!--INTRO--><h1>US National Debt Clock</h1>
 <p class="answer">{answer_s} The figure is from <a href="{DTP_URL}" rel="noopener">Treasury's Debt to the Penny</a>.</p>
 <p>That is <b>{usd2(PP_OFF)} per person</b>: the debt divided by the Census Bureau's estimate of
-{POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}. {proj_txt}</p><!--/INTRO-->""")
+{POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}. {proj_txt}</p>
+<div class="sharecta"><a href="your-share/">Your share of the national debt</a><span>Enter a birth year. Same Treasury total divided by the same Census population. Nothing is saved.</span></div><!--/INTRO-->""")
 # The World Debt Clock sentence is inserted after WORLD is computed, because the IMF general-government stock is not known yet.
 def row(slug):
     i = ALL.get(slug)
@@ -293,7 +332,14 @@ places_build.GDP_BY_SLUG["united-states"] = _gdp.get("USA", 0)
 if PLACES_LIVE:
     explore.check_related(PLACES_LIVE, places_build.calc, gdp=places_build.GDP_BY_SLUG, funds=WEALTH_FUNDS)
 HOME_EXPLORE = explore.explore("", PLACES_LIVE, places_build.calc, cur=None, gdp=places_build.GDP_BY_SLUG, kind_hint="us") if PLACES_LIVE else ""
-links = (f"""<!--LINKS-->""" + HOME_EXPLORE + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
+HOME_FAQ_HTML = faq_section(HOME_FAQS, [
+    ("Treasury, Debt to the Penny", DTP_URL),
+    ("Treasury, Daily Treasury Statement Table III-C", "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit"),
+    ("Census Bureau, Vintage 2025 national population estimates", (T.get("population") or {}).get("source") or "https://www.census.gov/data/tables/time-series/demo/popest/2020s-national-total.html"),
+    ("Treasury, Average Interest Rates on U.S. Treasury Securities", (T.get("rate_all") or {}).get("source") or "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities"),
+    ("Treasury, Interest Expense on the Public Debt Outstanding", (T.get("interest_gross") or {}).get("source") or "https://fiscaldata.treasury.gov/datasets/interest-expense-debt-outstanding/interest-expense"),
+])
+links = (f"""<!--LINKS-->""" + HOME_FAQ_HTML + HOME_EXPLORE + ("" if not PLACES_LIVE else '<div class="sh"><h2>Debt by place</h2></div><ul>' + "".join(
          f'<li><a href="{d}/{p["slug"]}/">{html.escape(p["name"])} debt clock</a> ({html.escape(p.get("link_label", "state + local"))})</li>' for k, d, _, _ in places_build.SECTIONS for p in PLACES_LIVE if p["kind"] == k)
          + "".join(f'<li><a href="{d}/">All {lab.lower()}</a></li>' for k, d, lab, _ in places_build.SECTIONS if any(p["kind"] == k for p in PLACES_LIVE)) + ('<li><a href="world/">World debt clock</a> (general government gross debt of every IMF economy)</li>' if WORLD else "") + "</ul>") + f"""<div class="sh"><h2>Quick answers</h2></div><ul>{''.join(f'<li><a href="{a}/">{html.escape(t_)}</a></li>' for a, t_ in ANSWERS)}</ul>
 <div class="sh"><h2>Popular counters</h2></div><ul>{''.join(f'<li><a href="t/{k}.html">{html.escape(label(k, ALL[k]))}</a></li>' for k in KEY_TICKERS if k in ALL)}</ul><!--/LINKS-->""")
@@ -338,6 +384,8 @@ def place_card(ix):
 PCARD = place_card(PIX)
 if "<!--PLACES-->" in idx: idx = re.sub(r"<!--PLACES-->.*?<!--/PLACES-->", lambda m: PCARD, idx, flags=re.S)
 else: idx = idx.replace("<!--/SSR--></main>", "<!--/SSR-->" + PCARD + "</main>", 1)
+if 'href="#faq"' not in idx:
+    idx = idx.replace('<a href="#method">Method</a>', '<a href="#method">Method</a><a href="#faq">Questions</a>', 1)
 idx = with_analytics(idx)
 open(f"{R}/index.html", "w").write(idx)
 if os.path.exists(f"{R}/404.html"):
@@ -528,7 +576,8 @@ API = build_api()
 ANS_CSS = """table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0 14px}th,td{border-bottom:1px solid #1c2533;padding:6px 8px;text-align:left;vertical-align:top}
 th{color:#8a97ab;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em}td.num{font-family:ui-monospace,Menlo,monospace;text-align:right;white-space:nowrap}
 h2{font-size:17px;margin:22px 0 6px}.k{color:#8a97ab;font-size:13px;margin:0}details summary{cursor:pointer;color:#5aa9ff;margin:8px 0}
-.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}code{overflow-wrap:anywhere}.note{border:1px solid #5a3a12;background:#20170a;color:#ffb547;border-radius:10px;padding:10px 12px;font-size:13.5px}"""
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}code{overflow-wrap:anywhere}.note{border:1px solid #5a3a12;background:#20170a;color:#ffb547;border-radius:10px;padding:10px 12px;font-size:13.5px}
+.faq h3{font-size:15.5px;margin:16px 0 4px}.faq p{margin:0 0 8px}"""
 def src_links(items):
     return "<p><b>Sources.</b> " + " · ".join(f'<a href="{html.escape(u)}" rel="noopener">{html.escape(n)}</a>' for n, u in items) + "</p>"
 SRC_DTP = ("Treasury, Debt to the Penny", DTP_URL)
@@ -539,7 +588,7 @@ SRC_IRS = ("IRS Data Book FY2025, Table 1-2", T["tax_returns"].get("source") or 
 held_note = (f'<p class="note">At the debt limit: debt subject to the limit was {usd0(DLS.get("subject_to_limit"))} on {fdate(DLS.get("as_of"))}, '
              f'{bil(DLS.get("headroom") or 0)} under the {usd0(DLS.get("limit"))} limit. Treasury is using extraordinary measures, so the debt is not growing '
              'and our live clock holds at the official figure.</p>') if DLS.get("at_limit") else ""
-def answer_page(slug, title, desc, h1, body, ld="", og_img="og/debt_total.png"):
+def answer_page(slug, title, desc, h1, body, ld="", og_img="og/debt_total.png", faqs=None):
     url = f"{SITE}/{slug}/"
     body = body.replace("<table", '<div class="tw"><table').replace("</table>", "</table></div>")  # wide tables scroll inside the page on phones
     more = "".join(f'<a href="../{a}/">{html.escape(t_)}</a>' for a, t_ in ANSWERS if a != slug)
@@ -556,6 +605,7 @@ def answer_page(slug, title, desc, h1, body, ld="", og_img="og/debt_total.png"):
 <a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
 <h1>{html.escape(h1)}</h1>
 {held_note}{body}
+{faq_section(faqs) if faqs else ""}
 <a class="cta" href="../">Open the live national debt clock →</a>
 {explore.explore("../", PLACES_LIVE, places_build.calc, topic=slug, gdp=places_build.GDP_BY_SLUG) if PLACES_LIVE else ""}
 <div class="rel"><b>More answers:</b><br>{more}<a href="../t/debt_total.html">US national debt, live</a></div>
@@ -659,14 +709,20 @@ The total includes {usd0(DI.get('base'))} of intragovernmental debt that the gov
     orows = "".join(f'<tr id="fy{y}"><td>FY{y}</td><td class="num">{usd0(BY[y][1])}</td><td>{fdate(BY[y][0])}</td></tr>' for y in older)
     peak = max(((float(r[6]), int(y)) for y, r in t71.items() if r and r[6] is not None), default=None)
     ly = max(BY) if BY else None; lomb = max((int(y) for y in t71), default=None)
+    hdo_url = M.get("debt_by_fy_source") or "https://fiscaldata.treasury.gov/datasets/historical-debt-outstanding/historical-debt-outstanding"
+    omb_url = "https://www.govinfo.gov/app/collection/budget/2027/BUDGET-2027-TAB"
     summ = []
-    if ly: summ.append(f"Total public debt outstanding was <b>{usd0(BY[ly][1])}</b> ({tril(BY[ly][1])}) at the end of FY{ly} ({fdate(BY[ly][0])})")
     if ly and ly - 1 in BY: summ.append(f"up {bil(BY[ly][1] - BY[ly - 1][1])} from FY{ly - 1}")
-    if 2000 in BY: summ.append(f"and {BY[ly][1] / BY[2000][1]:.1f} times its FY2000 level of {tril(BY[2000][1])}")
-    intro_y = ", ".join(summ) + "." if summ else ""
-    if peak and lomb: intro_y += (f" Measured against the economy, gross federal debt was {t71[str(lomb)][6]:.1f}% of GDP in FY{lomb} (OMB); the peak in this table is "
-                                  f"{peak[0]:.1f}% in FY{peak[1]}.")
-    body = f"""<p><b>Answer.</b> {intro_y}</p>
+    if ly and 2000 in BY and BY[2000][1]: summ.append(f"{BY[ly][1] / BY[2000][1]:.1f} times its FY2000 level of {tril(BY[2000][1])}")
+    intro_y = ("It was " + " and ".join(summ) + ". ") if summ else ""
+    if peak and lomb and t71.get(str(lomb)) and t71[str(lomb)][6] is not None:
+        intro_y += (f"Measured against the economy, gross federal debt was {t71[str(lomb)][6]:.1f}% of GDP in FY{lomb} (OMB); the peak in this table is "
+                    f"{peak[0]:.1f}% in FY{peak[1]}.")
+    answer_y = (f"The US national debt was <b>{usd0(BY[ly][1])}</b> ({tril(BY[ly][1])}) as of {fdate(BY[ly][0])}, the end of FY{ly}. "
+                f"The figure is from <a href=\"{html.escape(hdo_url)}\" rel=\"noopener\">Treasury's Historical Debt Outstanding</a>."
+                if ly else "")
+    body = f"""<p class="answer">{answer_y}</p>
+<p>{intro_y}</p>
 <p>The dollar column is Treasury's Historical Debt Outstanding: total public debt at each fiscal year end (June 30 through FY1976, September 30 since FY1977).
 The ratio columns are from OMB's Historical Tables (Table 7.1 for debt, Table 1.2 for the deficit). OMB's gross federal debt is measured a little differently
 from Treasury's total (it includes some agency debt and nets out unamortized discount), so its ratio won't exactly match the dollar column divided by GDP.
@@ -680,16 +736,48 @@ from Treasury's total (it includes some agency debt and nets out unamortized dis
 Debt divided by Census population, including a by-year table, is on <a href="../national-debt-per-person/">national debt per person</a>.
 The next trillion is the <a href="../41-trillion/">$41 trillion countdown</a>.</p>
 <p>Today's figure: {usd0(OFF_V)} at Treasury's {fdate(OFF_D)} close (<a href="../how-much-is-the-national-debt/">details</a>).</p>
-{src_links([("Treasury, Historical Debt Outstanding", M.get("debt_by_fy_source") or "https://fiscaldata.treasury.gov/datasets/historical-debt-outstanding/historical-debt-outstanding"),
-            ("OMB Historical Tables (FY2027 Budget)", "https://www.govinfo.gov/app/collection/budget/2027/BUDGET-2027-TAB")])}"""
-    if BY:
+{src_links([("Treasury, Historical Debt Outstanding", hdo_url),
+            ("OMB Historical Tables (FY2027 Budget)", omb_url)])}"""
+    if BY and ly:
+        year_faqs = [(
+            f"How much was the US national debt at the end of FY{ly}?",
+            f"Total public debt outstanding was {usd2(BY[ly][1])} as of {fdate(BY[ly][0])}, the Treasury Historical Debt Outstanding record for the end of FY{ly}.",
+        )]
+        if ly - 1 in BY:
+            chg = BY[ly][1] - BY[ly - 1][1]
+            verb = "rose" if chg > 0 else "fell" if chg < 0 else "was unchanged by"
+            year_faqs.append((
+                f"How much did the national debt change in FY{ly}?",
+                f"It {verb} {bil(abs(chg))}, from {usd0(BY[ly - 1][1])} as of {fdate(BY[ly - 1][0])} to {usd0(BY[ly][1])} as of {fdate(BY[ly][0])}. Both figures are Treasury Historical Debt Outstanding.",
+            ))
+        if lomb and t71.get(str(lomb)) and t71[str(lomb)][6] is not None:
+            missing = f" OMB has not published a gross-debt ratio for FY{ly} in this table." if lomb < ly else ""
+            year_faqs.append((
+                "What is the US debt-to-GDP ratio?",
+                f"OMB Historical Table 7.1 puts gross federal debt at {t71[str(lomb)][6]:.1f}% of GDP in FY{lomb}.{missing} "
+                f"OMB's gross federal debt is measured a little differently from Treasury's total public debt outstanding.",
+            ))
+        if 2000 in BY and ly != 2000 and BY[2000][1]:
+            year_faqs.append((
+                "How does the national debt compare with FY2000?",
+                f"The FY{ly} total of {usd0(BY[ly][1])} as of {fdate(BY[ly][0])} was {BY[ly][1] / BY[2000][1]:.1f} times the FY2000 total of {usd0(BY[2000][1])} as of {fdate(BY[2000][0])}.",
+            ))
+        year_faqs.append((
+            "How much is the national debt right now?",
+            f"The latest Debt to the Penny close is {usd2(OFF_V)} as of {fdate(OFF_D)}. That is after the FY{ly} year-end figure on this page.",
+        ))
+        if peak and len(year_faqs) < 6:
+            year_faqs.append((
+                "When was US debt-to-GDP highest in this table?",
+                f"Gross federal debt peaked at {peak[0]:.1f}% of GDP in FY{peak[1]}, from OMB Historical Table 7.1.",
+            ))
         answer_page("national-debt-by-year",
                     f"US National Debt by Year: Totals and Debt-to-GDP, FY{min(BY)} to FY{ly}",
-                    f"US national debt by fiscal year from Treasury: {tril(BY[ly][1])} at the end of FY{ly}. Debt-to-GDP and deficit-to-GDP by year from OMB Historical Tables, FY1940 on.",
-                    "US national debt by year", body,
+                    f"US national debt by fiscal year from Treasury: {tril(BY[ly][1])} as of {fdate(BY[ly][0])}, the end of FY{ly}. Debt-to-GDP and deficit-to-GDP by year from OMB Historical Tables, FY1940 on.",
+                    "US national debt by year", body, faqs=year_faqs,
                     ld=dataset_ld("US national debt by fiscal year", "Total public debt outstanding at each fiscal year end (Treasury Historical Debt Outstanding) with gross federal debt, debt held by the public and the deficit as a share of GDP (OMB Historical Tables 7.1 and 1.2).",
-                                  f"{SITE}/national-debt-by-year/", based=[M.get("debt_by_fy_source") or DTP_URL, "https://www.govinfo.gov/app/collection/budget/2027/BUDGET-2027-TAB"],
-                                  temporal=f"{min(BY)}/{ly}"))
+                                  f"{SITE}/national-debt-by-year/", based=[hdo_url, omb_url],
+                                  temporal=f"{min(BY)}/{ly}") + faq_ld(year_faqs))
 
     # 4) Old $41 trillion URL. The live page is /41-trillion/. GitHub Pages has no HTTP 301,
     # so this is the same refresh the world-clock redirects use: canonical, noindex, meta refresh.
@@ -794,7 +882,7 @@ if OFF_V:
 # ---------------------------------------------------------------- place pages: /states/<slug>/, /countries/<slug>/ from places/*.json
 import places_build
 PLACE_URLS = places_build.build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, STAMP, NOW)
-PLACE_URLS += world_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE, WORLD) if WORLD else []
+PLACE_URLS += world_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE, WORLD, M.get("generated_iso")) if WORLD else []
 import weo_build
 PLACE_URLS += weo_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE)
 PLACE_URLS += wealth_build.build(R, SITE, with_analytics, og, PLACES_LIVE, WEALTH_D, WEALTH_FUNDS) if WEALTH_FUNDS else []
@@ -812,6 +900,13 @@ data_hub.build(R, SITE, with_analytics, D, PLACES_LIVE, WORLD)
 # ---------------------------------------------------------------- legal pages (/privacy/, /about/, /contact/)
 site_chrome.write_legal_pages(R, SITE, with_analytics)
 site_chrome.write_advertise_page(R, SITE, with_analytics)
+
+# ---------------------------------------------------------------- your share (/your-share/). Client-side; uses the per-person page's Treasury close ÷ Census population.
+# share_build redraws every birth-year card from this run's close and date. The daily refresh runs this file, then deploys your-share/.
+import share_build
+if OFF_V and POP_OFF:
+    share_build.build(R, SITE, with_analytics, STAMP, OFF_D, OFF_V, POP_OFF, POP_OFF_DATE,
+                      T["households"], T["population"], M.get("debt_by_fy") or [], M.get("debt_by_fy_source"))
 
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()
@@ -834,12 +929,23 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "# Every Debt Clock",
     f"{SITE}/",
     "",
-    f"Live US, state, country and wealth-fund clocks built from official figures. The US national debt was {usd2(OFF_V)} ({tril(OFF_V)}) at Treasury's {fdate(OFF_D)} close.",
+    f"Live US, state, country and wealth-fund clocks built from official figures. The US national debt was {usd2(OFF_V)} ({tril(OFF_V)}) as of {fdate(OFF_D)} (Treasury, Debt to the Penny).",
+    "",
+    "## Answers",
+    "These sentences are computed at build time from the same official figures as the pages. Projected figures say so.",
+    f"- How much is the US national debt right now? {usd2(OFF_V)} ({tril(OFF_V)}) as of {fdate(OFF_D)}. Source: Treasury Debt to the Penny. https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
+    f"- How much is the national debt per person? {usd2(PP_OFF)} as of {fdate(OFF_D)}, the official total divided by the Census estimate of {POP_OFF:,.0f} residents on {fdate(POP_OFF_DATE)}.",
+    ("- How much interest does the US pay per day? " + INTEREST_DAY if INTEREST_DAY else "- How much interest does the US pay per day? Not available from the current interest-expense and average-rate inputs."),
+    f"- When will the US national debt hit ${MILE['n']} trillion? {MILE['quote']}",
+    (f"- World government debt: the latest general-government stocks sum to {usd0(WORLD['total'])} ({tril(WORLD['total'])}). "
+     f"Each economy has its own as-of date. IMF rows are end-2026 projections. See /world/." if WORLD else
+     "- World government debt: the world page was not built on this run."),
     "",
     "## Key pages",
     f"- / : US national debt clock. Official total {usd2(OFF_V)} as of {fdate(OFF_D)} (Treasury, Debt to the Penny). The live projection is re-based every business day.",
     "- /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.",
     f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
+    "- /your-share/ : Your share of that official total. Birth year, and optional state, household size, and income, are calculated in the browser and are not stored.",
     "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
     "- /41-trillion/ : Live countdown to the next trillion, using the homepage clock's Debt to the Penny base and per-second rate, plus each trillion crossing in that daily series.",
     "- /when-will-debt-hit-41-trillion/ : Redirects to /41-trillion/. GitHub Pages serves this as an HTML refresh with a canonical link, not an HTTP 301.",
@@ -922,4 +1028,59 @@ single = (idx_.replace('<link rel="stylesheet" href="style.css">', f"<style>{css
 os.makedirs(f"{R}/dist", exist_ok=True)
 open(f"{R}/dist/debtclock-standalone.html", "w").write(single)
 print(f"standalone: {len(single)//1024} KB; share pages: {len(urls)-1}; og images: {len(os.listdir(R+'/og'))}; site={SITE}")
+
+def check_quotable():
+    """The pages answer engines quote must be static HTML, with a dated answer and 3-6 FAQs."""
+    bots = ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "PerplexityBot", "Google-Extended", "ClaudeBot")
+    robots_txt = open(f"{R}/robots.txt").read()
+    for b in bots:
+        if f"User-agent: {b}\nAllow: /" not in robots_txt:
+            raise SystemExit(f"robots.txt does not allow {b}")
+    llms = open(f"{R}/llms.txt").read()
+    for bit in ("## Answers", "/world/", "/national-debt-by-year/", "/41-trillion/", "/national-debt-by-president/",
+                "/national-debt-per-person/", "/interest-on-the-national-debt/", "/data/", "Debt to the Penny"):
+        if bit not in llms:
+            raise SystemExit(f"llms.txt missing {bit}")
+    pages = {
+        f"{R}/index.html": "homepage",
+        f"{R}/world/index.html": "world",
+        f"{R}/national-debt-by-year/index.html": "national debt by year",
+        f"{R}/41-trillion/index.html": "41 trillion",
+        f"{R}/national-debt-by-president/index.html": "debt by president",
+        f"{R}/national-debt-per-person/index.html": "per person",
+        f"{R}/interest-on-the-national-debt/index.html": "interest",
+    }
+    for sample in ("states/california/debt-by-year/index.html", "countries/japan/debt-by-year/index.html"):
+        if os.path.exists(f"{R}/{sample}"):
+            pages[f"{R}/{sample}"] = sample
+    for path, name in pages.items():
+        if not os.path.exists(path):
+            raise SystemExit(f"{name}: page was not built")
+        text = open(path).read()
+        if 'class="answer"' not in text:
+            raise SystemExit(f"{name}: missing the answer line")
+        if "as of" not in text.lower():
+            raise SystemExit(f"{name}: no as-of date")
+        if "FAQPage" not in text or "dateModified" not in text or 'id="faq"' not in text:
+            raise SystemExit(f"{name}: missing FAQPage, dateModified, or a visible FAQ")
+        nq = text.count('"@type": "Question"')
+        visible = text.split('id="faq"', 1)[1].split("</section>", 1)[0]
+        if not 3 <= nq <= 6 or visible.count("<h3>") != nq:
+            raise SystemExit(f"{name}: {nq} JSON-LD questions, {visible.count('<h3>')} visible")
+    home = open(f"{R}/index.html").read()
+    if f'<div class="big num">{usd0(OFF_V)}</div>' not in home:
+        raise SystemExit("homepage hero total changed")
+    api = json.load(open(f"{R}/api/daily.json"))
+    expect = {"schema_version", "as_of", "fetched_at", "treasury_record_date", "total_debt_official",
+              "total_debt_projected_now", "change_1d_official", "change_7d_official", "change_30d_official",
+              "avg_daily_change_90d", "per_second_rate", "held_at_debt_limit", "per_second_rate_method",
+              "debt_per_person_official", "census_population_official", "census_population_vintage",
+              "census_population_date", "debt_per_person_projected_now", "population_projected_now",
+              "debt_per_household_official", "debt_per_household_projected_now", "households_official",
+              "households_source", "per_person_basis", "stale", "source_url", "source_api", "site_url"}
+    if set(api) != expect or api.get("schema_version") != 2:
+        raise SystemExit("api/daily.json format changed: " + " ".join(sorted(set(api) ^ expect)))
+    print("quotable pages ok")
+
+check_quotable()
 

@@ -43,6 +43,7 @@ td .when{display:block;color:#8a97ab;font-size:12px;font-weight:400;white-space:
 details summary{cursor:pointer;color:#5aa9ff;margin:8px 0}
 .rel a{display:inline-block;margin:4px 10px 4px 0;font-size:13.5px}
 footer{color:#5c687a;font-size:12px;margin-top:28px}
+.faq h2{font-size:17px;margin:22px 0 6px}.faq h3{font-size:16px;margin:16px 0 4px}.faq p{margin:0 0 8px}
 .srchrow{max-width:920px;margin:0 auto;padding:8px 16px 0}
 @media (max-width:560px){.trio{grid-template-columns:1fr}}
 """
@@ -126,7 +127,7 @@ def _clock(T, keys, meta):
     return json.dumps(blob, separators=(",", ":")).replace("</", "<\\/")
 
 
-def _page(ctx, slug, title, desc, ld, hero, intro, body):
+def _page(ctx, slug, title, desc, ld, hero, intro, body, faqs=None):
     R, SITE, E = ctx["R"], ctx["SITE"], html.escape
     url = f"{SITE}/{slug}/"
     more = "".join(f'<a href="../{a}/">{E(t)}</a>' for a, t in ctx["ANSWERS"] if a != slug)
@@ -150,6 +151,7 @@ def _page(ctx, slug, title, desc, ld, hero, intro, body):
 {hero}
 <section class="intro" id="intro">{intro}</section>
 {body}
+{_faq_html(faqs) if faqs else ""}
 <a class="cta" href="../">Open the live national debt clock →</a>
 {related}
 <div class="rel"><b>More answers:</b><br>{more}<a href="../t/debt_total.html">US national debt, live</a></div>
@@ -176,6 +178,125 @@ def _when_label(ts):
         return None
     d = dt.datetime.fromtimestamp(ts, CT)
     return d.strftime("%B %-d, %Y")
+
+
+def _faq_html(pairs):
+    return ('<section class="faq" id="faq"><h2>Questions</h2>'
+            + "".join(f"<h3>{html.escape(q)}</h3><p>{html.escape(a)}</p>" for q, a in pairs)
+            + "</section>")
+
+
+def interest_day_answer(T, val, now, fdate, usd0, bil, built_label):
+    """Plain answer for 'how much interest per day'.
+
+    Two figures the site already computes, kept distinct:
+    - interest cost per day: projected debt × Treasury's average rate on
+      interest-bearing debt ÷ 365.25 (the homepage tile)
+    - accrual run-rate: the interest-expense dataset's last 12 reported
+      months, spread over a year (rate × 86,400, same number the interest page prints)
+    Neither is cash paid on one calendar day.
+    """
+    debt = val("debt_total", now) if val else None
+    rate = T.get("rate_all") or {}
+    ig = T.get("interest_gross") or {}
+    bits = []
+    if debt and rate.get("base") is not None:
+        per = debt * rate["base"] / 100 / 365.25
+        bits.append(
+            f"The clock's interest cost per day is {usd0(per)} as of {built_label}. "
+            f"That is the national debt projected from Treasury's Debt to the Penny, times the {rate['base']:.2f}% average rate "
+            f"on interest-bearing debt as of {fdate(rate.get('as_of'))}, divided by 365.25."
+        )
+    if ig.get("status") == "ok" and ig.get("ttm") and ig.get("rate") and ig.get("as_of"):
+        bits.append(
+            f"Treasury's interest-expense dataset totaled {usd0(ig['ttm'])} in the 12 months ending {fdate(ig['as_of'])}, "
+            f"about {bil(ig['rate'] * 86400)} a day on an accrual basis."
+        )
+    if not bits:
+        return None
+    bits.append("Neither figure is the cash paid on a single day. Cash interest is paid in lumps.")
+    return " ".join(bits)
+
+
+def milestone_state(ctx, H, n):
+    """Countdown facts for $n trillion. `summary` is the sentence on /{n}-trillion/.
+    `quote` is that sentence without the words that point at the hero on that page."""
+    T = ctx["T"]["debt_total"]
+    base, t0 = T["base"], T["t0"]
+    live_rate = T["rate"]
+    freeze = T.get("freeze_t")
+    fdate, usd0, usd2, bil = ctx["fdate"], ctx["usd0"], ctx["usd2"], ctx["bil"]
+    now = ctx["NOW"]
+    debt_now = ctx["val"]("debt_total", now)
+    by_n = {c["trillion"]: c for c in H["crossings"]}
+    target = n * 1e12
+    nxt = (n + 1) * 1e12
+    official = by_n.get(n)
+    passed = official is not None or (debt_now is not None and debt_now >= target)
+    per_day = live_rate * 86400
+    lim = (ctx["T"].get("debt_limit") or {}).get("base")
+    subj_t = ctx["T"].get("debt_subject_limit") or {}
+    not_subj = ctx["OFF_V"] - subj_t["base"] if subj_t.get("base") and subj_t.get("as_of") == ctx["OFF_D"] else None
+    total_at_limit = lim + not_subj if lim and not_subj is not None else None
+    next_ok = (nxt < total_at_limit) if total_at_limit is not None else (_hit_ts(base, live_rate, t0, freeze, nxt) is not None)
+    goal_ts = _hit_ts(base, live_rate, t0, freeze, nxt if passed and next_ok else target)
+    when = _when_label(goal_ts)
+    lim_when = _when_label(freeze) if freeze else None
+    hold = (f"The statutory limit would bind before ${n+1} trillion. Once it binds, the clock holds at the official figure. "
+            f"It counts toward ${n+1} trillion only if Congress raises or suspends the limit.")
+    if official and next_ok:
+        kicker = f"The debt passed ${n} trillion on {fdate(official['date'])}"
+        passed_date = fdate(official["date"])
+        title = f"The US Debt Passed ${n} Trillion on {fdate(official['date'])}"
+        left = nxt - (debt_now if debt_now is not None else base)
+        quote = (f"The debt passed ${n} trillion on {fdate(official['date'])}, when Treasury's close was {usd2(official['amount'])}. "
+                 + (f"At the same per-second rate as the homepage clock, about {bil(per_day)} a day, ${n+1} trillion falls on {when}."
+                    if when else f"The homepage clock is not projecting a date for ${n+1} trillion."))
+        summary = (f"The debt passed ${n} trillion on {fdate(official['date'])}, when Treasury's close was {usd2(official['amount'])}. "
+                   f"The figure above is what is left until ${n+1} trillion, at the same per-second rate as the homepage clock"
+                   + (f", about {bil(per_day)} a day. That next level falls on {when}." if when else "."))
+        h1 = f"The debt passed ${n} trillion on {fdate(official['date'])}"
+    elif official:
+        kicker = f"The debt passed ${n} trillion on {fdate(official['date'])}"
+        passed_date = fdate(official["date"])
+        title = f"The US Debt Passed ${n} Trillion on {fdate(official['date'])}"
+        left = debt_now if debt_now is not None else base
+        quote = (f"The debt passed ${n} trillion on {fdate(official['date'])}, when Treasury's close was {usd2(official['amount'])}. {hold}")
+        summary = quote
+        h1 = f"The debt passed ${n} trillion on {fdate(official['date'])}"
+    elif debt_now is not None and debt_now >= target:
+        kicker = f"The running total passed ${n} trillion"
+        passed_date = ""
+        title = f"When Will the US Debt Hit ${n} Trillion? Live Countdown"
+        left = (nxt - debt_now) if next_ok else debt_now
+        quote = (f"The running total is past ${n} trillion. Treasury has not published that close yet, so there is no Treasury date for it. "
+                 + (f"At the homepage clock's pace, about {bil(per_day)} a day, ${n+1} trillion falls on {when}." if next_ok and when else
+                    (f"The countdown toward ${n+1} trillion uses the homepage clock's pace." if next_ok else hold)))
+        summary = (f"The running total is past ${n} trillion. Treasury has not published that close yet, so this page does not give it a date. "
+                   + (f"The figure above counts what is left until ${n+1} trillion." if next_ok else hold))
+        h1 = f"When will the US debt hit ${n} trillion?"
+    else:
+        kicker = f"Left until ${n} trillion"
+        passed_date = ""
+        left = target - (debt_now if debt_now is not None else base)
+        title = f"When Will the US Debt Hit ${n} Trillion? Live Countdown"
+        if when:
+            quote = (f"The debt was {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}, {bil(target - ctx['OFF_V'])} short of ${n} trillion. "
+                     f"At the homepage clock's 90-day pace, about {bil(per_day)} a day, ${n} trillion falls on {when}. "
+                     f"It is a projection, not a Treasury forecast.")
+            summary = quote + " The figure above is what is left after projecting forward from that close."
+        else:
+            quote = (f"The debt was {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}, {bil(target - ctx['OFF_V'])} short of ${n} trillion. "
+                     f"The clock is not projecting a date, because the debt is not growing past the statutory limit.")
+            summary = quote
+        h1 = f"When will the US debt hit ${n} trillion?"
+    return {
+        "n": n, "target": target, "nxt": nxt, "base": base, "t0": t0, "live_rate": live_rate, "freeze": freeze,
+        "debt_now": debt_now, "official": official, "passed": passed, "per_day": per_day, "lim": lim, "subj_t": subj_t,
+        "not_subj": not_subj, "total_at_limit": total_at_limit, "next_ok": next_ok, "goal_ts": goal_ts, "when": when,
+        "lim_when": lim_when, "hold": hold, "kicker": kicker, "passed_date": passed_date, "title": title, "left": left,
+        "quote": quote, "summary": summary, "h1": h1, "T": T,
+    }
 
 
 def _point(day, H, hdo):
@@ -220,71 +341,23 @@ def build(ctx):
 
 
 def _milestone_pages(ctx, H):
-    T = ctx["T"]["debt_total"]
-    base, rate, t0 = T["base"], T["rate_trend"] if T.get("held_at_limit") else T["rate"], T["t0"]
-    # The homepage projects with rate, which is 0 while the debt limit binds. The countdown uses that same rate.
-    live_rate = T["rate"]
-    freeze = T.get("freeze_t")
     fdate, usd0, usd2, bil = ctx["fdate"], ctx["usd0"], ctx["usd2"], ctx["bil"]
-    now = ctx["NOW"]
-    debt_now = ctx["val"]("debt_total", now)
-    by_n = {c["trillion"]: c for c in H["crossings"]}
     for n in MILESTONE_PAGES:
-        target = n * 1e12
-        nxt = (n + 1) * 1e12
-        official = by_n.get(n)
-        # A published Treasury close at or above the level wins over the projection.
-        passed = official is not None or (debt_now is not None and debt_now >= target)
-        per_day = live_rate * 86400
-        lim = (ctx["T"].get("debt_limit") or {}).get("base")
-        subj_t = ctx["T"].get("debt_subject_limit") or {}
-        not_subj = ctx["OFF_V"] - subj_t["base"] if subj_t.get("base") and subj_t.get("as_of") == ctx["OFF_D"] else None
-        total_at_limit = lim + not_subj if lim and not_subj is not None else None
-        # The next trillion counts only while it is still below the total at which the statutory limit binds.
-        next_ok = (nxt < total_at_limit) if total_at_limit is not None else (_hit_ts(base, live_rate, t0, freeze, nxt) is not None)
-        goal_ts = _hit_ts(base, live_rate, t0, freeze, nxt if passed and next_ok else target)
-        when = _when_label(goal_ts)
-        lim_when = _when_label(freeze) if freeze else None
-        hold = (f"The statutory limit would bind before ${n+1} trillion. Once it binds, the clock holds at the official figure. "
-                f"It counts toward ${n+1} trillion only if Congress raises or suspends the limit.")
-        if official and next_ok:
-            kicker = f"The debt passed ${n} trillion on {fdate(official['date'])}"
-            passed_date = fdate(official["date"])
-            title = f"The US Debt Passed ${n} Trillion on {fdate(official['date'])}"
-            left = nxt - (debt_now if debt_now is not None else base)
-            summary = (f"The debt passed ${n} trillion on {fdate(official['date'])}, when Treasury's close was {usd2(official['amount'])}. "
-                       f"The figure above is what is left until ${n+1} trillion, at the same per-second rate as the homepage clock"
-                       + (f", about {bil(per_day)} a day. That next level falls on {when}." if when else "."))
-            h1 = f"The debt passed ${n} trillion on {fdate(official['date'])}"
-        elif official:
-            kicker = f"The debt passed ${n} trillion on {fdate(official['date'])}"
-            passed_date = fdate(official["date"])
-            title = f"The US Debt Passed ${n} Trillion on {fdate(official['date'])}"
-            left = debt_now if debt_now is not None else base
-            summary = (f"The debt passed ${n} trillion on {fdate(official['date'])}, when Treasury's close was {usd2(official['amount'])}. {hold}")
-            h1 = f"The debt passed ${n} trillion on {fdate(official['date'])}"
-        elif debt_now is not None and debt_now >= target:
-            kicker = f"The running total passed ${n} trillion"
-            passed_date = ""
-            title = f"When Will the US Debt Hit ${n} Trillion? Live Countdown"
-            left = (nxt - debt_now) if next_ok else debt_now
-            summary = (f"The running total is past ${n} trillion. Treasury has not published that close yet, so this page does not give it a date. "
-                       + (f"The figure above counts what is left until ${n+1} trillion." if next_ok else hold))
-            h1 = f"When will the US debt hit ${n} trillion?"
-        else:
-            kicker = f"Left until ${n} trillion"
-            passed_date = ""
-            left = target - (debt_now if debt_now is not None else base)
-            title = f"When Will the US Debt Hit ${n} Trillion? Live Countdown"
-            if when:
-                summary = (f"The debt was {usd2(ctx['OFF_V'])} at Treasury's {fdate(ctx['OFF_D'])} close, {bil(target - ctx['OFF_V'])} short of ${n} trillion. "
-                           f"At the homepage clock's 90-day pace, about {bil(per_day)} a day, ${n} trillion falls on {when}. "
-                           f"The figure above is what is left. It is a projection, not a Treasury forecast.")
-            else:
-                summary = (f"The debt was {usd2(ctx['OFF_V'])} at Treasury's {fdate(ctx['OFF_D'])} close, {bil(target - ctx['OFF_V'])} short of ${n} trillion. "
-                           f"The clock is not projecting a date, because the debt is not growing past the statutory limit.")
-            h1 = f"When will the US debt hit ${n} trillion?"
-        desc = summary.replace("The figure above is what is left. It is a projection, not a Treasury forecast.", "Projection from Treasury's 90-day pace.").replace("The figure above is what is left until", "Amount left until")
+        s = milestone_state(ctx, H, n)
+        target, nxt, live_rate = s["target"], s["nxt"], s["live_rate"]
+        official, per_day = s["official"], s["per_day"]
+        lim, subj_t, not_subj = s["lim"], s["subj_t"], s["not_subj"]
+        next_ok, when, lim_when = s["next_ok"], s["when"], s["lim_when"]
+        hold, freeze, goal_ts = s["hold"], s["freeze"], s["goal_ts"]
+        kicker, passed_date, title = s["kicker"], s["passed_date"], s["title"]
+        left, summary, h1 = s["left"], s["summary"], s["h1"]
+        debt_now, base, T = s["debt_now"], s["base"], s["T"]
+        passed = s["passed"]
+        desc = (summary
+                .replace(" The figure above is what is left after projecting forward from that close.", "")
+                .replace(" The figure above is what is left.", "")
+                .replace("The figure above is what is left until", "Amount left until")
+                .replace("The figure above counts what is left until", "Amount left until"))
         if len(desc) > 320:
             desc = desc[:317].rsplit(" ", 1)[0] + "."
         hero = f"""<div class="hero lead" id="lead" data-mode="count" data-target="{target}" data-next="{nxt}" data-rate="{live_rate}" data-level="{n}" data-next-level="{n+1}" data-passed="{'1' if official else '0'}" data-passed-date="{html.escape(passed_date)}" data-when="{html.escape(when or '')}" data-next-ok="{'1' if next_ok else '0'}" data-hold="{html.escape(hold, quote=True)}">
@@ -332,11 +405,15 @@ def _milestone_pages(ctx, H):
 <div class="tw"><table><tr><th>Level</th><th>First close at or above</th><th>Amount</th><th>Prior close</th></tr>{''.join(rows)}</table></div>
 {limit}
 {ctx['src']([("Treasury, Debt to the Penny", ctx['DTP']), ("Treasury, Daily Treasury Statement Table III-C", "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit")])}"""
+        growth = (f"About {bil(per_day)} a day as of {fdate(ctx['OFF_D'])}, ${live_rate:,.2f} a second. "
+                  f"That is the homepage clock's 90-day least-squares trend of Debt to the Penny. Daily changes are lumpy."
+                  if live_rate else
+                  "The clock is not projecting growth. Debt subject to the limit is at the statutory limit, so the clock holds at Treasury's latest close.")
         faqs = [
-            (f"When will the US national debt hit ${n} trillion?",
-             summary.split(" Source:")[0]),
+            (f"When will the US national debt hit ${n} trillion?", s["quote"]),
             ("How is that date calculated?",
              f"From Treasury's {fdate(ctx['OFF_D'])} Debt to the Penny close of {usd2(ctx['OFF_V'])}, plus ${live_rate:,.2f} per second, the homepage clock's 90-day trend. It is a projection."),
+            ("How fast is the national debt growing?", growth),
             (f"When did the national debt hit ${xs[-1]['trillion']} trillion?",
              f"The first Debt to the Penny close at or above ${xs[-1]['trillion']} trillion was {fdate(xs[-1]['date'])}, at {usd2(xs[-1]['amount'])}."),
             (f"What does this page do after the debt passes ${n} trillion?",
@@ -347,7 +424,7 @@ def _milestone_pages(ctx, H):
         ]
         ld = ctx["dataset_ld"](f"US national debt countdown to ${n} trillion", desc, f"{ctx['SITE']}/{n}-trillion/",
                                based=[ctx["DTP"]]) + ctx["faq_ld"](faqs)
-        _page(ctx, f"{n}-trillion", title, desc, ld, hero, intro, body)
+        _page(ctx, f"{n}-trillion", title, desc, ld, hero, intro, body, faqs)
 
 
 def _president_page(ctx, H):
@@ -385,7 +462,9 @@ def _president_page(ctx, H):
              f"<p class=\"answer\">Each row is total public debt outstanding at the start and end of one term. "
              f"From {fdate(H['series_start']['date'])} on, the figure is the last Debt to the Penny close on or before the date. "
              f"Earlier, it is the last <a href=\"{H['sources']['debt_outstanding']}\" rel=\"noopener\">Historical Debt Outstanding</a> record on or before the date, an annual total, not the debt on inauguration day. "
-             f"The current term ends at the latest close, {usd2(ctx['OFF_V'])} on {fdate(ctx['OFF_D'])}.</p>"
+             f"The current term ends at the latest close, {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}. "
+             f'Sources: <a href="{ctx["DTP"]}" rel="noopener">Treasury, Debt to the Penny</a> and '
+             f'<a href="{html.escape(H["sources"]["debt_outstanding"])}" rel="noopener">Historical Debt Outstanding</a>.</p>'
              f"<p>The change is the difference between those two Treasury figures. Terms are not the same length, and Congress writes taxing and spending laws, so the change is not a score for the person in office. "
              f"A term that starts after a death or resignation is still listed as that president's term: Tyler, Fillmore, Andrew Johnson, Arthur, Theodore Roosevelt, Coolidge, Truman, Lyndon Johnson, and Ford.</p>")
     hero_debt = ctx["val"]("debt_total", ctx["NOW"])
@@ -403,10 +482,32 @@ def _president_page(ctx, H):
          f"Where Debt to the Penny has a record, yes: the last close on or before the date. Before {fdate(H['series_start']['date'])}, the table uses Treasury's annual Historical Debt Outstanding record on or before the date, which is not inauguration day."),
         ("Does the change show what a president added to the debt?",
          "No. It is the difference between the Treasury total at the start and at the end. Term lengths differ, and spending and tax laws are passed by Congress."),
+        ("How does the table treat a term that started after a death or resignation?",
+         "That term is listed under the person who took office: Tyler, Fillmore, Andrew Johnson, Arthur, Theodore Roosevelt, Coolidge, Truman, Lyndon Johnson, and Ford. The amounts are still the Treasury records on those dates."),
     ]
+    open_term = next((t for t in terms if t[3] is None), None)
+    if open_term:
+        oname, _on, ostart, _oend = open_term
+        oa = _point(ostart, H, hdo)
+        if oa and oa.get("amount"):
+            ch = ctx["OFF_V"] - oa["amount"]
+            basis = ("Debt to the Penny, the last close on or before the date" if oa["basis"] == "dtp"
+                     else "Historical Debt Outstanding, an annual record, not the debt on that calendar day")
+            faqs.append((
+                f"What is the national debt in the {oname} term that started {fdate(ostart)}?",
+                f"That term is still in progress. Debt at the start was {usd0(oa['amount'])} as of {fdate(oa['date'])} ({basis}). "
+                f"The latest Debt to the Penny close is {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}. "
+                f"The change between those two Treasury figures is {usd0(ch)}.",
+            ))
+    faqs.append((
+        "Where do the debt-by-president figures come from?",
+        f"From {fdate(H['series_start']['date'])} on, each amount is the last Debt to the Penny close on or before the date. "
+        f"Earlier amounts are the last Historical Debt Outstanding record on or before the date. "
+        f"The current term ends at the latest close, {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}.",
+    ))
     ld = ctx["dataset_ld"]("US national debt by presidential term", desc, f"{ctx['SITE']}/national-debt-by-president/",
                            based=[ctx["DTP"], H["sources"]["debt_outstanding"]]) + ctx["faq_ld"](faqs)
-    _page(ctx, "national-debt-by-president", "National Debt by President: Start and End of Each Term", desc, ld, hero, intro, body)
+    _page(ctx, "national-debt-by-president", "National Debt by President: Start and End of Each Term", desc, ld, hero, intro, body, faqs)
 
 
 def _person_page(ctx, H):
@@ -425,11 +526,16 @@ def _person_page(ctx, H):
 <div><span class="l">Per tax return filed</span><span class="n" id="pp-r">{usd2(debt_now / tax)}</span></div></div>
 </div>"""
     intro = (f"<h1>National debt per person</h1>"
-             f"<p class=\"answer\">On the official figures, the debt per person is <b>{usd2(pp)}</b>: Treasury's {fdate(ctx['OFF_D'])} total of {usd2(ctx['OFF_V'])} "
+             f"<p class=\"answer\">On the official figures, the debt per person is <b>{usd2(pp)}</b> as of {fdate(ctx['OFF_D'])}: Treasury's total of {usd2(ctx['OFF_V'])} "
              f"divided by the Census Bureau's {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])} (Vintage 2025). "
              f"The number above moves with the debt clock and with Census's stated population growth. "
              f"Per household is {usd2(ctx['OFF_V'] / hh)} ({hh:,.0f} households). "
-             f"Per tax return filed is {usd2(ctx['OFF_V'] / tax)} ({tax:,.0f} individual returns in FY2025). A joint return counts once.</p>")
+             f"Per tax return filed is {usd2(ctx['OFF_V'] / tax)} ({tax:,.0f} individual returns in FY2025). A joint return counts once. "
+             f'Sources: <a href="{ctx["DTP"]}" rel="noopener">Treasury, Debt to the Penny</a> and '
+             f'<a href="{html.escape(H["population_sources"][-1]["page"])}" rel="noopener">Census Vintage 2025</a>.</p>'
+             f"<p><a class=\"cta\" href=\"../your-share/\">Your share of the national debt</a></p>"
+             f"<p>Enter a birth year. Your share uses this same Treasury total divided by this same Census population. "
+             f"A state, household size, and income are optional. The math runs in your browser and nothing is stored.</p>")
     by_fy = {int(r[0]): (r[1], r[2]) for r in (ctx["M"].get("debt_by_fy") or [])}
     pops = {p["year"]: p for p in H["population_by_year"]}
     def rows_for(years, require_pop):
@@ -467,14 +573,21 @@ def _person_page(ctx, H):
             f"Live per person, per household, and per tax return, plus a by-year table.")
     faqs = [
         ("How much is the national debt per person?",
-         f"{usd2(pp)}. Treasury's {fdate(ctx['OFF_D'])} total of {usd2(ctx['OFF_V'])} divided by the Census Vintage 2025 estimate of {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}."),
+         f"{usd2(pp)} as of {fdate(ctx['OFF_D'])}. Treasury's total of {usd2(ctx['OFF_V'])} divided by the Census Vintage 2025 estimate of {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}."),
         ("What population is used?",
-         "The live figure uses the Census Vintage 2025 July 1, 2025 estimate, projected forward at the rate Census states. The by-year table uses July 1 estimates from the Census series named in each row."),
+         f"The official per-person figure uses the Census Vintage 2025 estimate of {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}, with no projection. The live figure at the top projects that estimate forward at the rate Census states. The by-year table uses the July 1 estimate from the Census series named in each row."),
+        ("How much is the national debt per household?",
+         f"{usd2(ctx['OFF_V'] / hh)} as of {fdate(ctx['OFF_D'])}. Treasury's {fdate(ctx['OFF_D'])} total divided by {hh:,.0f} households in Census CPS ASEC 2025."),
+        ("How much is the national debt per tax return?",
+         f"{usd2(ctx['OFF_V'] / tax)} as of {fdate(ctx['OFF_D'])}. Treasury's {fdate(ctx['OFF_D'])} total divided by {tax:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2). A joint return counts once."),
+        ("Why is the number at the top different from the official per-person figure?",
+         f"The number at the top divides the live debt clock by population projected from the Census estimate for {fdate(ctx['POP_OFF_DATE'])}. "
+         f"{usd2(pp)} divides the {fdate(ctx['OFF_D'])} Treasury close by the {ctx['POP_OFF']:,.0f} residents Census estimated for that date, with no projection."),
     ]
     ld = ctx["dataset_ld"]("US national debt per person", desc, f"{ctx['SITE']}/national-debt-per-person/",
                            based=[ctx["DTP"], H["population_sources"][-1]["page"]]) + ctx["faq_ld"](faqs)
     _page(ctx, "national-debt-per-person",
-          f"National Debt Per Person: {usd0(pp)} (Treasury ÷ Census)", desc, ld, hero, intro, body)
+          f"National Debt Per Person: {usd0(pp)} (Treasury ÷ Census)", desc, ld, hero, intro, body, faqs)
 
 
 def _interest_page(ctx, H):
@@ -520,11 +633,12 @@ def _interest_page(ctx, H):
     pace_s = bil(pace) + " a day" if pace else "unavailable"
     full = next((r for r in H["net_interest_by_fy"][::-1]), None)
     intro = (f"<h1>Interest on the national debt</h1>"
-             f"<p class=\"answer\">Cash interest paid on Treasury securities was <b>{off_s}</b> through {as_of_s}, the Daily Treasury Statement close. "
+             f"<p class=\"answer\">Cash interest paid on Treasury securities was <b>{off_s}</b> as of {as_of_s}, the Daily Treasury Statement close. "
              f"The figure above is a projection from that close and has moved since then. Payments land in lumps, so the digits jump on coupon dates. "
              f"On an accrual basis, Treasury's interest-expense dataset is running at about {pace_s}, the last 12 reported months spread over the year."
              + (f" Net interest, the budget total, was {usd0(full['amount'])} in FY{full['fy']}." if full else "")
-             + latest_line + "</p>")
+             + latest_line
+             + f' Source: <a href="{html.escape(H["sources"]["dts_interest_paid"])}" rel="noopener">Treasury, Daily Treasury Statement</a>.</p>')
     hero = f"""<div class="hero lead" id="lead" data-mode="interest">
 <div class="k" id="lead-k">Interest paid this fiscal year · projected</div>
 <div class="big num" id="lead-v">{live_s}</div>
@@ -539,10 +653,22 @@ def _interest_page(ctx, H):
             f"The page projects forward from that close. Net interest by fiscal year is from the Monthly Treasury Statement, and interest expense is from Treasury's debt-outstanding dataset.")
     faqs = [
         ("How much interest has the US paid this fiscal year?",
-         f"{off_s} in cash interest on Treasury securities through {as_of_s}, from the Daily Treasury Statement. The number at the top of the page is a projection and has moved since that close."),
+         f"{off_s} in cash interest on Treasury securities as of {as_of_s}, from the Daily Treasury Statement. The number at the top of the page is a projection and has moved since that close."),
         ("What is net interest on the national debt?",
          f"Net interest was {usd0(full['amount'])} in FY{full['fy']} (Monthly Treasury Statement, line 320). It is the budget total, smaller than the interest-expense dataset because interest received by the government is netted out." if full else "Net interest is MTS Table 9, line 320."),
     ]
+    day = interest_day_answer(ctx["T"], ctx["val"], ctx["NOW"], fdate, usd0, bil, ctx["STAMP"])
+    if day:
+        faqs.append(("How much interest does the US pay per day?", day))
+    faqs.append((
+        "Is the number at the top the official interest total?",
+        f"No. The figure at the top is projected forward from the Daily Treasury Statement close of {off_s} as of {as_of_s}. Payments land on coupon dates, so the official cash total stays flat between those dates and then jumps.",
+    ))
+    faqs.append((
+        "Where do the interest figures come from?",
+        "Cash interest this fiscal year is the Daily Treasury Statement. Net interest by fiscal year is Monthly Treasury Statement Table 9, line 320. "
+        "Interest expense by fiscal year is Treasury's Interest Expense on the Public Debt Outstanding dataset. They measure different things.",
+    ))
     ld = ctx["dataset_ld"]("Interest on the US national debt", desc, f"{ctx['SITE']}/interest-on-the-national-debt/",
                            based=[H["sources"]["mts_net_interest"], H["sources"]["interest_expense"], H["sources"]["dts_interest_paid"]]) + ctx["faq_ld"](faqs)
-    _page(ctx, "interest-on-the-national-debt", "Interest on the National Debt, by Year and This Year", desc, ld, hero, intro, body)
+    _page(ctx, "interest-on-the-national-debt", "Interest on the National Debt, by Year and This Year", desc, ld, hero, intro, body, faqs)

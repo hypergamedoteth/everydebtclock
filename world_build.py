@@ -313,7 +313,7 @@ def _faqs(W):
          + _named_differences(W)),
     ]
 
-def build(R, SITE, with_analytics, og, stamp, now, places, W):
+def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
     if not W: return []
     rows, cv = W["rows"], W["cov"]; n = len(rows); c = W["counts"]
     url = f"{SITE}/world/"
@@ -331,10 +331,12 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
            f"{_sgn(W['rate_s'] * 86400 / 1e9, ',.1f', 'B')}/day",
            "#ff4d5e", "General government gross debt\nNational stocks only when they match that perimeter")
     faqs = _faqs(W)
-    faq_ld = {"@context": "https://schema.org", "@type": "FAQPage",
+    modified_iso = modified or dt.datetime.fromtimestamp(now, pb.CT).isoformat(timespec="seconds")
+    faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "dateModified": modified_iso,
               "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faqs]}
     ds_ld = {"@context": "https://schema.org", "@type": "Dataset", "name": f"Government debt of {n} countries in US dollars", "description": desc, "url": url, "isAccessibleForFree": True,
-             "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"}, "temporalCoverage": f"{min(x['as_of'] for x in rows)}/{max(x['as_of'] for x in rows)}",
+             "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"}, "dateModified": modified_iso,
+             "temporalCoverage": f"{min(x['as_of'] for x in rows)}/{max(x['as_of'] for x in rows)}",
              "isBasedOn": sorted({x["source_url"] for x in rows})}
     ld = ('<script type="application/ld+json">' + json.dumps(faq_ld).replace("</", "<\\/") + "</script>"
           + '<script type="application/ld+json">' + json.dumps(ds_ld).replace("</", "<\\/") + "</script>")
@@ -352,7 +354,17 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W):
     crumb = '<div class="crumb"><a href="../">← US national debt clock</a><span>·</span><a href="../countries/">All country debt clocks</a><span>·</span><a href="#imf">IMF comparison</a></div>'
     gap = W.get("gap_vs_imf")
     gap_txt = (f' The pure IMF end-2026 sum for the same {n} economies is <b>{_usd0(panel)}</b> ({_tn(panel)}), a difference of {_sgn(gap, ",.0f", plus=False)} ({gap / panel * 100:+.2f}%).' if panel and gap is not None else "")
+    dmin, dmax = _fd(min(x["as_of"] for x in rows)), _fd(max(x["as_of"] for x in rows))
+    imf_note = (" An IMF row dated 31 December 2026 is an end-2026 World Economic Outlook projection, not a closing balance on that day."
+                if any(x["tier"] == "imf" and x["as_of"] == "2026-12-31" for x in rows) else "")
+    answer = (f'<p class="answer">The latest general-government gross debt figures on this page sum to <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}). '
+              f'Each figure is as of its own stock date, from {E(dmin)} through {E(dmax)}.{imf_note} '
+              f'{c["official"]} rows are national general-government releases, {c["harmonized"]} are Eurostat or the World Bank/IMF Quarterly Public Sector Debt database, and {c["imf"]} are IMF estimates. '
+              f'Sources: <a href="https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO" rel="noopener">IMF GGXWDG_NGDP</a> and '
+              f'<a href="https://www.imf.org/external/datamapper/NGDPD@WEO" rel="noopener">NGDPD</a>, plus the national, Eurostat, and QPSD links in the table. '
+              f'The clock above is a projection from those stocks, not one official world total.</p>')
     intro = (f'<section class="intro" id="intro">{crumb}<h1>World Debt Clock</h1>'
+             f'{answer}'
              f'<p><b>What this page counts.</b> General government gross debt for each of {n} economies, in US dollars. '
              f'The latest sum is <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}). '
              f'<b>{c["official"]}</b> rows are a national general-government stock, <b>{c["harmonized"]}</b> are Eurostat Maastricht debt or the World Bank/IMF Quarterly Public Sector Debt general-government stock, and <b>{c["imf"]}</b> are IMF World Economic Outlook estimates. '
