@@ -424,7 +424,10 @@ def _person_page(ctx, H):
              f"divided by the Census Bureau's {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])} (Vintage 2025). "
              f"The number above moves with the debt clock and with Census's stated population growth. "
              f"Per household is {usd2(ctx['OFF_V'] / hh)} ({hh:,.0f} households). "
-             f"Per tax return filed is {usd2(ctx['OFF_V'] / tax)} ({tax:,.0f} individual returns in FY2025). A joint return counts once.</p>")
+             f"Per tax return filed is {usd2(ctx['OFF_V'] / tax)} ({tax:,.0f} individual returns in FY2025). A joint return counts once.</p>"
+             f"<p><a class=\"cta\" href=\"../your-share/\">Your share of the national debt</a></p>"
+             f"<p>Enter a birth year. Your share uses this same Treasury total divided by this same Census population. "
+             f"A state, household size, and income are optional. The math runs in your browser and nothing is stored.</p>")
     by_fy = {int(r[0]): (r[1], r[2]) for r in (ctx["M"].get("debt_by_fy") or [])}
     pops = {p["year"]: p for p in H["population_by_year"]}
     def rows_for(years, require_pop):

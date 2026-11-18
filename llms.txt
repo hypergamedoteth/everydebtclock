@@ -7,6 +7,7 @@ Live US, state, country and wealth-fund clocks built from official figures. The 
 - / : US national debt clock. Official total $40,608,506,856,903.25 as of Nov 12, 2026 (Treasury, Debt to the Penny). The live projection is re-based every business day.
 - /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.
 - /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ($118,813.07 per person).
+- /your-share/ : Your share of that official total. Birth year, and optional state, household size, and income, are calculated in the browser and are not stored.
 - /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.
 - /41-trillion/ : Live countdown to the next trillion, using the homepage clock's Debt to the Penny base and per-second rate, plus each trillion crossing in that daily series.
 - /when-will-debt-hit-41-trillion/ : Redirects to /41-trillion/. GitHub Pages serves this as an HTML refresh with a canonical link, not an HTTP 301.
