@@ -468,11 +468,73 @@ def main():
         print("world gdp: not updated:", e)
     try: weo()
     except Exception as e: print("world weo: not updated:", e)
+    try: refresh_history()
+    except Exception as e: print("world weo history: not updated:", e)
     return 0
+
+
+def refresh_history():
+    """Extend data/world_weo_history.json from the same World Bank mirror, and only when 2026 ratios still match the clock file.
+
+    Years through 2025 are the published series, 2026 is the current-year estimate, and 2027-2031 are projections.
+    A mirror that no longer matches data/world_weo_debt.json is left unused so the two files stay one vintage.
+    """
+    clock = load(WEO)
+    economies = clock.get("economies") or []
+    if len(economies) < 170:
+        print("world weo history: clock file is not ready")
+        return
+    want = {e["iso3"]: e for e in economies}
+    ratio, pop = {}, {}
+    text = io.TextIOWrapper(urllib.request.urlopen(urllib.request.Request(WB_WEO, headers=UA), timeout=180), encoding="utf-8", newline="")
+    for row in csv.DictReader(text):
+        ind = row.get("INDICATOR")
+        if ind not in ("IMF_WEO_GGXWDG_NGDP", "IMF_WEO_LP"):
+            continue
+        if row.get("COMP_BREAKDOWN_1") not in (None, "", "V_LST"):
+            continue
+        code = ISO_ALIAS.get(row.get("REF_AREA") or "", row.get("REF_AREA") or "")
+        if code not in want:
+            continue
+        year, val = row.get("TIME_PERIOD"), _num(row.get("OBS_VALUE"))
+        if not (year and year.isdigit() and val is not None):
+            continue
+        if ind == "IMF_WEO_GGXWDG_NGDP":
+            ratio.setdefault(code, {})[year] = round(val, 6)
+        elif 2024 <= int(year) <= 2026 and val > 0:
+            pop.setdefault(code, {})[year] = int(round(val))
+    bad = [code for code, e in want.items() if abs((ratio.get(code) or {}).get("2026", 0) - e["ratio_2026"]) > 0.02]
+    if bad:
+        print(f"world weo history: {len(bad)} economies no longer match the clock file; not updated")
+        return
+    out = {
+        "_doc": "IMF World Economic Outlook, October 2026. General government gross debt (GGXWDG_NGDP, percent of GDP) for every economy in data/world_weo_debt.json, plus population (LP, persons) for 2024-2026. The 2025 and 2026 ratios match that file. Years through 2025 are the published historical series. 2026 is the current-year estimate (the October 2026 outlook uses information through 30 September 2026). 2027-2031 are IMF projections. Dollar stocks for 2025 and 2026 stay in data/world_weo_debt.json.",
+        "vintage": "October 2026", "published": "2026-10-13", "information_through": "2026-09-30",
+        "source": "IMF World Economic Outlook, October 2026",
+        "source_url": "https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO",
+        "publication_url": "https://www.imf.org/en/publications/weo/issues/2026/10/13/world-economic-outlook-october-2026",
+        "mirror": WB_WEO, "ratio_indicator": "GGXWDG_NGDP", "ratio_unit": "percent of GDP",
+        "population_indicator": "LP", "population_unit": "persons",
+        "population_source_url": "https://www.imf.org/external/datamapper/LP@WEO",
+        "history_through": 2025, "estimate_year": 2026, "projection_from": 2027,
+        "fetched": dt.datetime.now(dt.timezone.utc).date().isoformat(),
+        "economies": {code: {"ratio": ratio.get(code) or {}, "population": pop.get(code) or {}} for code in want},
+    }
+    path = os.path.join(ROOT, "data", "world_weo_history.json")
+    old = load(path)
+    slim = {k: v for k, v in out.items() if k != "fetched"}
+    old_slim = {k: v for k, v in old.items() if k != "fetched"}
+    if slim != old_slim:
+        save(path, out)
+        print(f"world weo history: {len(want)} economies")
+    else:
+        print("world weo history: unchanged")
 
 if __name__ == "__main__":
     if "--weo-only" in sys.argv:
         try: weo()
         except Exception as e: print("world weo: not updated:", e)
+        try: refresh_history()
+        except Exception as e: print("world weo history: not updated:", e)
         sys.exit(0)
     sys.exit(main())

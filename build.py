@@ -1026,6 +1026,8 @@ site_chrome.finalize(R)
 freshness.stamp_tree(R, SITE, DATES)
 freshness.write_urls(os.path.join(R, "pipeline", "indexnow-urls.txt"), freshness.changed_urls(SITE, DATES, OLD_LASTMOD, urls))
 freshness.check(R, SITE, DATES, urls, OFF_D)
+import country_profile
+country_profile.assert_country_pages_differ(R)
 debt_by_year_build.check(R, SITE)
 presidents_build.check(R, SITE)
 state_per_person_build.check(R, SITE)

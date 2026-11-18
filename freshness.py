@@ -159,6 +159,10 @@ def collect(R, off_d, world=None, today=None):
         return parse(places_build.calc(p)["as_of"], today)
 
     weo_fetched = None
+    weo_published = None
+    hist_path = os.path.join(R, "data", "world_weo_history.json")
+    if os.path.exists(hist_path):
+        weo_published = parse(json.load(open(hist_path)).get("published"), today)
     weo_path = os.path.join(R, "data", "world_weo_debt.json")
     economies = []
     if os.path.exists(weo_path):
@@ -187,7 +191,8 @@ def collect(R, off_d, world=None, today=None):
         if not slug or f"/countries/{slug}/" in out:
             continue
         u = upgrades.get(e.get("iso3"))
-        _put(out, f"/countries/{slug}/", parse(u["as_of"], today) if u and u.get("as_of") else weo_fetched)
+        # The quarterly stock's as-of date when that stock is the clock. Otherwise the WEO publication date.
+        _put(out, f"/countries/{slug}/", parse(u["as_of"], today) if u and u.get("as_of") else (weo_published or weo_fetched))
 
     import debt_by_year_build
     for m in debt_by_year_build.models(R):

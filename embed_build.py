@@ -620,13 +620,20 @@ def _offer_pos(host, label, preview):
     intro = host.find('id="intro"')
     box = host.find('class="embedbox"')
     close = host.find("</section>", intro) if intro >= 0 else -1
-    h1 = host.find("<h1", intro if intro >= 0 else 0)
-    if not (intro >= 0 and h1 > intro and intro < box < close):
-        raise RuntimeError(f"{label} embed offer is not inside the summary, after the official figure")
-    if "<p" not in host[intro:box]:
-        raise RuntimeError(f"{label} moved the summary")
-    if host.find("<h1") > box:
-        raise RuntimeError(f"{label} puts the embed offer before the official figure")
+    hero = host.find('class="hero lead"')
+    big = host.find('class="big', hero if hero >= 0 else 0)
+    h1 = host.find("<h1")
+    country = "countries/" in label.replace("\\", "/")
+    if not (intro >= 0 and intro < box < close and "<p" in host[intro:box]):
+        raise RuntimeError(f"{label} embed offer is not inside the summary")
+    if country:
+        # The live clock is the first prominent element. The dated figure is the smaller line under it.
+        if not (hero >= 0 and big >= 0 and big < h1 and h1 < box):
+            raise RuntimeError(f"{label} live clock must sit above the dated figure")
+    else:
+        h1_in = host.find("<h1", intro)
+        if not (h1_in > intro and h1_in < box):
+            raise RuntimeError(f"{label} embed offer is not inside the summary, after the official figure")
     if not _has_header_embed(host):
         raise RuntimeError(f"{label} header is missing the Embed link")
     dm = re.search(r'<meta name="description" content="([^"]*)"', host)
