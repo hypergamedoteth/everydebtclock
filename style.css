@@ -128,6 +128,10 @@ section,.tile,.hero{scroll-margin-top:96px}
 .faq h2{font-size:17px;margin:18px 0 6px}.faq h3{font-size:15.5px;margin:14px 0 4px}
 .faq p{color:#c2ccda;font-size:14.5px;line-height:1.55;margin:0 0 8px;max-width:980px}
 .answers .faq{margin:0 0 22px}
+.sharecta{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:14px 0 2px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--red);border-radius:14px;background:var(--panel);max-width:980px}
+.sharecta a{display:inline-flex;align-items:center;min-height:44px;background:var(--red);color:#fff;font-weight:750;border-radius:10px;padding:10px 14px;text-decoration:none}
+.sharecta a:hover{filter:brightness(1.08)}
+.sharecta span{color:#c2ccda;font-size:13.5px;line-height:1.45}
 /* Lead ticker is the first block; the same intro copy sits directly under it. */
 main .intro{max-width:none;margin:2px 0 18px;padding:0 2px}
 .ssr table.v td,.ssr table.v th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}.ssr table.v td+td{font-family:var(--mono)}

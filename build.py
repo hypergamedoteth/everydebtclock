@@ -261,6 +261,7 @@ idx = idx.replace('<meta property="og:title" content="US Debt Clock — live & v
 idx = re.sub(r'<script type="application/ld\+json">\{"@context":"https://schema.org","@type":"Dataset","name":"Every Debt Clock: US live tickers".*?</script>\n?', "", idx, flags=re.S)
 
 ANSWERS = [("how-much-is-the-national-debt", "How much is the national debt?"), ("national-debt-per-person", "National debt per person"),
+           ("your-share", "Your share of the national debt"),
            ("national-debt-by-year", "US national debt by year"), ("41-trillion", "When will the US debt hit $41 trillion?"),
            ("press", "Press: the $41 trillion crossing"),
            ("national-debt-by-president", "National debt by president"), ("interest-on-the-national-debt", "Interest on the national debt"),
@@ -278,7 +279,8 @@ answer_s = f"The US national debt was <b>{usd2(OFF_V)}</b> ({tril(OFF_V)}) as of
 intro = (f"""<!--INTRO--><h1>US National Debt Clock</h1>
 <p class="answer">{answer_s} The figure is from <a href="{DTP_URL}" rel="noopener">Treasury's Debt to the Penny</a>.</p>
 <p>That is <b>{usd2(PP_OFF)} per person</b>: the debt divided by the Census Bureau's estimate of
-{POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}. {proj_txt}</p><!--/INTRO-->""")
+{POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}. {proj_txt}</p>
+<div class="sharecta"><a href="your-share/">Your share of the national debt</a><span>Enter a birth year. Same Treasury total divided by the same Census population. Nothing is saved.</span></div><!--/INTRO-->""")
 # The World Debt Clock sentence is inserted after WORLD is computed, because the IMF general-government stock is not known yet.
 def row(slug):
     i = ALL.get(slug)
@@ -899,6 +901,13 @@ data_hub.build(R, SITE, with_analytics, D, PLACES_LIVE, WORLD)
 site_chrome.write_legal_pages(R, SITE, with_analytics)
 site_chrome.write_advertise_page(R, SITE, with_analytics)
 
+# ---------------------------------------------------------------- your share (/your-share/). Client-side; uses the per-person page's Treasury close ÷ Census population.
+# share_build redraws every birth-year card from this run's close and date. The daily refresh runs this file, then deploys your-share/.
+import share_build
+if OFF_V and POP_OFF:
+    share_build.build(R, SITE, with_analytics, STAMP, OFF_D, OFF_V, POP_OFF, POP_OFF_DATE,
+                      T["households"], T["population"], M.get("debt_by_fy") or [], M.get("debt_by_fy_source"))
+
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()
 # /embed/ is indexable. Per-clock pages under /embed/ are noindex and stay out of this list.
@@ -934,6 +943,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- / : US national debt clock. Official total {usd2(OFF_V)} as of {fdate(OFF_D)} (Treasury, Debt to the Penny). The live projection is re-based every business day.",
     "- /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.",
     f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
+    "- /your-share/ : Your share of that official total. Birth year, and optional state, household size, and income, are calculated in the browser and are not stored.",
     "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
     "- /41-trillion/ : Live countdown to the next trillion, using the homepage clock's Debt to the Penny base and per-second rate, plus each trillion crossing in that daily series.",
     "- /press/ : Press kit for the $41 trillion crossing. Exact projected time from the homepage 90-day pace, 12-month and 3-year comparisons, and the countdown embed.",
