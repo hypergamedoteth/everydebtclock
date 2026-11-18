@@ -79,31 +79,61 @@ def _place(R, slug):
 def state_rows(R, slug, saved):
     p = _place(R, slug)
     comps = {c["key"]: {d: int(v) for d, v in c["history"]} for c in p["components"]}
-    if "state" not in comps or "local" not in comps:
+    dc = slug == "district-of-columbia"
+    if dc:
+        if set(comps) != {"local"}:
+            raise RuntimeError(f"{slug}: expected only a local component, got {sorted(comps)}")
+    elif "state" not in comps or "local" not in comps:
         raise RuntimeError(f"{slug}: clock file has no state and local history")
     rows = []
     for r in saved:
         total, state, local = int(r["total"]), int(r["state"]), int(r["local"])
         if abs(state + local - total) > 5000:
             raise RuntimeError(f"{slug} {r['year']}: state + local != total")
+        if dc and (state != 0 or local != total):
+            raise RuntimeError(f"{slug} {r['year']}: District debt is the local total, not a state-plus-local split")
         rows.append({"year": int(r["year"]), "date": r["date"], "amount": total, "state": state, "local": local, "year_end": True})
     have = {r["year"] for r in rows}
-    for d in sorted(set(comps["state"]) & set(comps["local"])):
+    dates = set(comps["local"]) if dc else (set(comps["state"]) & set(comps["local"]))
+    for d in sorted(dates):
         y = int(d[:4])
         if y in have:
             raise RuntimeError(f"{slug}: survey year {y} is in both the summary tables and the clock file")
-        state, local = comps["state"][d], comps["local"][d]
-        rows.append({"year": y, "date": d, "amount": state + local, "state": state, "local": local, "year_end": True})
+        if dc:
+            local = comps["local"][d]
+            rows.append({"year": y, "date": d, "amount": local, "state": 0, "local": local, "year_end": True})
+        else:
+            state, local = comps["state"][d], comps["local"][d]
+            rows.append({"year": y, "date": d, "amount": state + local, "state": state, "local": local, "year_end": True})
     rows.sort(key=lambda r: r["date"])
     by_key = {c["key"]: c for c in p["components"]}
-    d = by_key["state"]["as_of"]
-    if d != by_key["local"]["as_of"]:
-        raise RuntimeError(f"{slug}: state and local as-of dates differ")
-    total = int(by_key["state"]["value"]) + int(by_key["local"]["value"])
+    if dc:
+        d = by_key["local"]["as_of"]
+        total = int(by_key["local"]["value"])
+    else:
+        d = by_key["state"]["as_of"]
+        if d != by_key["local"]["as_of"]:
+            raise RuntimeError(f"{slug}: state and local as-of dates differ")
+        total = int(by_key["state"]["value"]) + int(by_key["local"]["value"])
     hit = next((r for r in rows if r["date"] == d), None)
     if hit is None or hit["amount"] != total:
         raise RuntimeError(f"{slug}: clock total {total} on {d} is not in the year table")
     return rows, p
+
+
+def imf_rows(rec):
+    rows = []
+    for pt in rec.get("points") or []:
+        rows.append({
+            "year": int(pt["date"][:4]), "date": pt["date"], "amount": int(pt["amount"]),
+            "year_end": True, "ratio": pt.get("ratio"),
+        })
+    rows.sort(key=lambda r: r["date"])
+    if len(rows) < 5:
+        raise RuntimeError("IMF series has fewer than five year-end figures")
+    if rows[-1]["year"] > 2026:
+        raise RuntimeError("IMF series includes a year after 2026")
+    return rows
 
 
 def country_rows(R, slug, rec):
@@ -228,16 +258,37 @@ def models(R):
         if rec.get("kind") == "state":
             rows, p = state_rows(R, slug, rec["rows"])
             sym = "$"
-            measure = "state and local debt"
             sec = "states"
-            count_note = (f"Each figure is total debt outstanding of the {p['name']} state government and of local governments "
-                          f"(counties, cities, school districts and special districts), as the Census Bureau defines it. "
-                          f"It is the same total as the {p['name']} debt clock. It is not the state's own annual report, and it does not include unfunded pensions or a share of the federal debt. "
-                          f"Census dates each survey year June 30. Amounts are published in thousands of dollars, so the state and local parts can miss the total by a thousand or two.")
+            if slug == "district-of-columbia":
+                measure = "District government debt"
+                count_note = ("Each figure is total debt outstanding of the District of Columbia government, as the Census Bureau defines it. "
+                              "Census has no separate state-government level for the District, so the total is the local-government line. "
+                              "It is the same total as the District of Columbia debt clock. It does not include a share of the federal debt. "
+                              "Census dates each survey year June 30. Amounts are published in thousands of dollars.")
+            else:
+                measure = "state and local debt"
+                count_note = (f"Each figure is total debt outstanding of the {p['name']} state government and of local governments "
+                              f"(counties, cities, school districts and special districts), as the Census Bureau defines it. "
+                              f"It is the same total as the {p['name']} debt clock. It is not the state's own annual report, and it does not include unfunded pensions or a share of the federal debt. "
+                              f"Census dates each survey year June 30. Amounts are published in thousands of dollars, so the state and local parts can miss the total by a thousand or two.")
             year_note = "Survey years 2017–2024 are Census's current time-series table, the same figures as the debt clock. Earlier years are the summary table Census published for that survey year."
             sources = [(rec["api_source"]["name"], rec["api_source"]["url"]),
                        ("US Census Bureau, State and Local Government Finance tables", rec["release_page"])]
             sources += [(s["name"], s["url"]) for s in rec["sources"]]
+        elif rec.get("kind") == "imf":
+            rows = imf_rows(rec)
+            sym = "$"
+            measure = "general government gross debt"
+            sec = "countries"
+            name = rec.get("name") or slug
+            p = {"name": name}
+            count_note = (f"Each figure is the IMF's general government gross debt for {name}, in current US dollars: "
+                          f"GGXWDG_NGDP (percent of GDP) times NGDPD (GDP in current US dollars), from the October 2026 World Economic Outlook. "
+                          f"The dollar change includes exchange rates and IMF revisions, not only new borrowing. "
+                          f"Years after 2026 are forecasts and are not shown. 2026 is the IMF projection for the end of 2026, the same stock the world debt clock uses.")
+            count_note += " " + (rec.get("clock_note") or "")
+            year_note = "A row is the IMF estimate for the end of that calendar year in the October 2026 vintage. It is not a national ledger close, and the IMF revises earlier years when it updates the outlook."
+            sources = [(s["name"], s["url"]) for s in rec["sources"]]
         else:
             rows, p = country_rows(R, slug, rec)
             sym = (p.get("currency") or {}).get("symbol") or ""
@@ -261,6 +312,10 @@ def models(R):
             raise RuntimeError(f"{slug}: fewer than two annual figures")
         ago, end = ten_year(rows)
         ans_h, ans_p, has10 = answer_parts(p["name"], measure, sym, rows)
+        if rec.get("kind") == "imf" and rows[-1]["year"] == 2026:
+            extra = " The 2026 figure is the IMF projection for the end of 2026, not a closed national ledger."
+            ans_h += extra
+            ans_p += extra
         y0, y1 = rows[0]["year"], rows[-1]["year"]
         gaps = missing_years(rows)
         out.append({
@@ -270,19 +325,24 @@ def models(R):
             "y0": y0, "y1": y1, "gaps": gaps, "ago": ago, "end": end,
             "path": f"/{sec}/{slug}/debt-by-year/",
             "url_path": f"{sec}/{slug}/debt-by-year/",
+            "dc": slug == "district-of-columbia",
+            "imf": rec.get("kind") == "imf",
         })
     out.sort(key=lambda m: (m["sec"], m["name"]))
     return out
 
 
-def _row_html(sym, rows, state):
+def _row_html(sym, rows, state, dc=False, imf=False):
     body = []
     for i in range(len(rows) - 1, -1, -1):
         r = rows[i]
         cells = f'<td>{r["year"]}</td><td>{fdate(r["date"])}</td>'
-        if state:
+        if state and not dc:
             cells += f'<td class="num">{money(sym, r["state"])}</td><td class="num">{money(sym, r["local"])}</td>'
-        cells += f'<td class="num">{money(sym, r["amount"])}</td><td class="num">{E(change_text(sym, rows, i))}</td>'
+        cells += f'<td class="num">{money(sym, r["amount"])}</td>'
+        if imf and r.get("ratio") is not None:
+            cells += f'<td class="num">{r["ratio"]:.1f}%</td>'
+        cells += f'<td class="num">{E(change_text(sym, rows, i))}</td>'
         body.append(f'<tr id="y{r["date"]}">{cells}</tr>')
     return "".join(body)
 
@@ -290,8 +350,14 @@ def _row_html(sym, rows, state):
 def _page(R, SITE, with_analytics, stamp, modified, m, models_all):
     sym, rows = m["sym"], m["rows"]
     state = m["kind"] == "state"
-    title = f"{m['name']} Debt by Year ({m['y0']}–{m['y1']})"
-    if m["has10"] and m["end"] and m["rows"][-1]["date"] == m["end"]["date"]:
+    if m.get("imf"):
+        title = f"{m['name']} National Debt by Year ({m['y0']}–{m['y1']})"
+    else:
+        title = f"{m['name']} Debt by Year ({m['y0']}–{m['y1']})"
+    if m.get("imf"):
+        desc = (f"{m['name']} national debt by year: IMF general government gross debt was {short(sym, rows[-1]['amount'])} "
+                f"at the end of {rows[-1]['year']}. October 2026 World Economic Outlook.")
+    elif m["has10"] and m["end"] and m["rows"][-1]["date"] == m["end"]["date"]:
         desc = (f"{m['name']} {m['measure']} by year: {short(sym, rows[-1]['amount'])} on {fdate(rows[-1]['date'])}, "
                 f"{_verb(m['end']['amount'] - m['ago']['amount'])} {short(sym, abs(m['end']['amount'] - m['ago']['amount']))} from {fdate(m['ago']['date'])}.")
     else:
@@ -340,17 +406,30 @@ def _page(R, SITE, with_analytics, stamp, modified, m, models_all):
     ld_faq = {"@context": "https://schema.org", "@type": "FAQPage",
               "dateModified": modified or dt.date.today().isoformat(),
               "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faqs]}
-    heads = "<th>Year</th><th>Date</th>" + ("<th>State debt</th><th>Local debt</th>" if state else "") + "<th>Total debt</th><th>Change</th>"
+    if m.get("dc"):
+        heads = "<th>Year</th><th>Date</th><th>District debt</th><th>Change</th>"
+    elif m.get("imf"):
+        heads = "<th>Year</th><th>Date</th><th>Total debt</th><th>Debt / GDP</th><th>Change</th>"
+    else:
+        heads = "<th>Year</th><th>Date</th>" + ("<th>State debt</th><th>Local debt</th>" if state else "") + "<th>Total debt</th><th>Change</th>"
     gap = ""
     if m["gaps"]:
         shown = ", ".join(str(y) for y in m["gaps"])
-        gap = (f"<p>Not in this table: {shown}. Census published a national summary for "
-               f"{'those survey years' if len(m['gaps']) > 1 else 'that survey year'}, not the by-state workbook used for the other years, "
-               f"so {'they are' if len(m['gaps']) > 1 else 'it is'} left out rather than estimated. A change that crosses a missing year says how many years it covers.</p>")
+        if m["gaps"] == [2001, 2003]:
+            gap = (f"<p>Not in this table: {shown}. Census published a national summary for "
+                   f"those survey years, not the by-state workbook used for the other years, "
+                   f"so they are left out rather than estimated. A change that crosses a missing year says how many years it covers.</p>")
+        else:
+            gap = (f"<p>Not in this table: {shown}. Those years were not in the by-state Census table this page uses, "
+                   f"so they are left out rather than estimated. A change that crosses a missing year says how many years it covers.</p>")
     src_html = "".join(f'<li><a href="{E(u)}" rel="noopener">{E(n)}</a></li>' for n, u in m["sources"])
     rel_html = "".join(f'<a href="{E(href)}"><span class="rn">{E(n)}</span><span class="rw">{E(w)}</span></a>' for n, href, w in related)
     faq_html = "".join(f"<h3>{E(q)}</h3><p>{E(a)}</p>" for q, a in faqs)
     chart_title = f"{m['name']} {m['measure']} by year, {m['y0']} to {m['y1']}"
+    if m.get("imf"):
+        caption = f"{chart_title}. Current US dollars from the IMF October 2026 vintage. 2026 is the IMF end-2026 projection."
+    else:
+        caption = f"{chart_title}. Amounts are the official stock, not a projection."
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{E(title)}</title>
 <meta name="description" content="{E(desc)}"><link rel="canonical" href="{E(url)}">
@@ -366,11 +445,11 @@ def _page(R, SITE, with_analytics, stamp, modified, m, models_all):
 </head><body><main>
 <a class="brand" href="{UP}/">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="{UP}/embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
 <p class="k"><a href="{UP}/">US debt clock</a> · <a href="../">{E(m['name'])} debt clock</a></p>
-<h1>{E(m['name'])} debt by year</h1>
+<h1>{E(m['name'])} {"national debt" if m.get("imf") else "debt"} by year</h1>
 <p class="answer"><b>Answer.</b> {m['answer_html']} Source: <a href="{E(m['sources'][0][1])}" rel="noopener">{E(m['sources'][0][0])}</a>.</p>
-<figure>{chart(rows, chart_title)}<figcaption>{E(chart_title)}. Amounts are the official stock, not a projection.</figcaption></figure>
+<figure>{chart(rows, chart_title)}<figcaption>{E(caption)}</figcaption></figure>
 <h2>By year, {m['y0']} to {m['y1']}</h2>
-<div class="tw"><table><tr>{heads}</tr>{_row_html(sym, rows, state)}</table></div>
+<div class="tw"><table><tr>{heads}</tr>{_row_html(sym, rows, state, m.get("dc"), m.get("imf"))}</table></div>
 <p>{E(m['count_note'])}</p>
 <p>{E(m['year_note'])}</p>
 {gap}
@@ -424,7 +503,8 @@ def patch_clocks(R):
     doc = load(R)
     n = 0
     for slug in doc.get("places", {}):
-        kind = doc["places"][slug].get("kind")
+        rec = doc["places"][slug]
+        kind = rec.get("kind")
         sec = "states" if kind == "state" else "countries"
         path = os.path.join(R, sec, slug, "index.html")
         if not os.path.exists(path):
@@ -432,7 +512,11 @@ def patch_clocks(R):
         text = open(path).read()
         if "debt-by-year/" in text:
             continue
-        name = json.load(open(os.path.join(R, "places", slug + ".json")))["name"]
+        place_path = os.path.join(R, "places", slug + ".json")
+        if os.path.exists(place_path):
+            name = json.load(open(place_path))["name"]
+        else:
+            name = rec.get("name") or slug
         link = parent_link(slug, name)
         if '<aside class="embedbox"' in text:
             text = text.replace('<aside class="embedbox"', link + '<aside class="embedbox"', 1)
@@ -530,6 +614,10 @@ def check(R, site):
                 raise SystemExit(f"{m['slug']}: debt-by-year link is not under the summary, below the ticker")
     for s in doc.get("skipped") or []:
         slug = s.get("slug")
+        # A skip note can describe a series that was not used while another series for the same
+        # place was published (Australia's securities workbook timed out; the IMF page is separate).
+        if slug in (doc.get("places") or {}):
+            continue
         for sec in ("states", "countries"):
             if os.path.exists(os.path.join(R, sec, slug, "debt-by-year", "index.html")):
                 raise SystemExit(f"skipped place {slug} still has a page")

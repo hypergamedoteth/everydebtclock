@@ -529,6 +529,7 @@ def index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, kind, sec_dir, lab, d
         if not items: continue
         secs += (f'<section id="{d}"><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>{E(lab_)}</h2>'
                  f'<span class="h2n">{len(items)} live</span></div><div class="grid hub">{tiles}</div></section>')
+    per_person = '<p>The same Census totals, divided by Census population, are ranked on <a href="debt-per-person/">debt per person by state</a>.</p>' if kind == "state" else ""
     ns, nc = sum(1 for x in ix if x["kind"] == "state"), sum(1 for x in ix if x["kind"] == "country")
     if kind == "state":
         title, h1, desc = "US State Debt Clocks: Debt of Every State, Official Data", "US State Debt Clocks", f"State and local debt of {ns - 1} US states and DC, from official Census figures, with sources. Each state ticks forward only where its trend is reliable; otherwise the official figure is shown as published. Also {nc} country national debt clocks."
@@ -557,7 +558,7 @@ ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='
         WTXT = ""
     explore_html = ex.explore("../", places, calc, kind_hint=("states" if kind == "state" else "countries"), gdp=GDP_BY_SLUG)
     body = (f'{header}{ex.search_box("../")}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>{E(h1)}</h1><p>Every place with a debt clock, built from figures its own government publishes. A clock ticks only where the official trend is reliable; otherwise the official figure is shown as published. Each clock shows who publishes the numbers and how often, '
-            f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p></section>'
+            f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p>{per_person}</section>'
             f'<main id="app">{sort}{secs}' + ('<!--WEOCOUNTRIES-->' if WEO and kind == "country" else '') + '</main>'
             + explore_html +
             f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')

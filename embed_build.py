@@ -702,7 +702,7 @@ def _check(R, site, clocks, now, require_pages, milestones):
         if os.path.exists(path) and 'class="embedbox"' in open(path).read():
             raise RuntimeError(f"{hub} is a list, not a single clock")
     if require_pages:
-        state_dirs = _subdirs(os.path.join(R, "states"))
+        state_dirs = _subdirs(os.path.join(R, "states")) - {"debt-per-person"}
         country_dirs = _subdirs(os.path.join(R, "countries"))
         got_states = {c["slug"] for c in clocks if c["group"] == "States"}
         got_countries = {c["slug"] for c in clocks if c["group"] == "Countries"}

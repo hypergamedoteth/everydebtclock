@@ -21,28 +21,33 @@ from datetime import date
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "pipeline"))
+import census_state
 import xlsx_min
 
 OUT = os.path.join(ROOT, "data", "debt_by_year.json")
+FLAGS = os.path.join(ROOT, "data", "longtail_flags.json")
 UA = {"User-Agent": "Mozilla/5.0 (compatible; everydebtclock.com data refresh)"}
-STATE_SLUGS = [
+# The four original clocks predate census_state.STATES. Same Census definitions.
+_EXTRA_STATES = {
+    "california": ("California", "Californian", "CA", "06", ""),
+    "texas": ("Texas", "Texan", "TX", "48", ""),
+    "florida": ("Florida", "Floridian", "FL", "12", ""),
+    "new-york": ("New York", "New Yorker", "NY", "36", ""),
+}
+_CATALOG = {}
+for _slug, (_name, _dem, _usps, _fips, _note) in {**census_state.STATES, **_EXTRA_STATES}.items():
+    _CATALOG[_slug] = {"name": _name, "postal": _usps.lower(), "fips": _fips}
+STATE_SLUGS = sorted(_CATALOG)
+STATE_NAME = {k: v["name"] for k, v in _CATALOG.items()}
+STATE_FIPS = {k: v["fips"] for k, v in _CATALOG.items()}
+NAME_TO_SLUG = {v: k for k, v in STATE_NAME.items()}
+POSTAL = {k: v["postal"] for k, v in _CATALOG.items()}
+# States whose pre-2017 rows were checked in the first debt-by-year release. A re-parse that
+# disagrees with those rows stops the run instead of rewriting them.
+ANCHOR_STATES = [
     "california", "texas", "new-york", "florida", "illinois", "new-jersey",
     "massachusetts", "pennsylvania", "washington", "ohio",
 ]
-STATE_NAME = {
-    "california": "California", "texas": "Texas", "new-york": "New York", "florida": "Florida",
-    "illinois": "Illinois", "new-jersey": "New Jersey", "massachusetts": "Massachusetts",
-    "pennsylvania": "Pennsylvania", "washington": "Washington", "ohio": "Ohio",
-}
-STATE_FIPS = {
-    "california": "06", "texas": "48", "new-york": "36", "florida": "12", "illinois": "17",
-    "new-jersey": "34", "massachusetts": "25", "pennsylvania": "42", "washington": "53", "ohio": "39",
-}
-NAME_TO_SLUG = {v: k for k, v in STATE_NAME.items()}
-POSTAL = {
-    "california": "ca", "texas": "tx", "new-york": "ny", "florida": "fl", "illinois": "il",
-    "new-jersey": "nj", "massachusetts": "ma", "pennsylvania": "pa", "washington": "wa", "ohio": "oh",
-}
 CENSUS_API = "https://data.census.gov/api/access/data/table?id=GOVSLOCALFINTIMESERIES.GS00LOCALFIN&g=040XX00US{fips}"
 CENSUS_TABLE = "https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&g=040XX00US{fips}"
 CENSUS_REL = "https://www.census.gov/programs-surveys/gov-finances/data/tables.html"
@@ -279,12 +284,11 @@ def census_early_years():
                 continue
             year_rows[slug] = parsed
             year_urls[slug] = url
-        if len(year_rows) == len(STATE_SLUGS):
+        if year_rows:
             out[y] = year_rows
             urls[y] = year_urls
-            print(f"census {y}: per-state files, CA total ${year_rows['california'][0]:,}")
-        elif year_rows:
-            print(f"census {y}: only {len(year_rows)} states parsed, year skipped")
+            ca = year_rows.get("california", (None,))[0]
+            print(f"census {y}: per-state files, {len(year_rows)} states" + (f", CA total ${ca:,}" if ca else ""))
         else:
             print(f"census {y}: no per-state debt files")
     return out, urls
@@ -308,39 +312,61 @@ def fetch_states_clean():
             continue
         found = dict(a)
         found.update(b)
-        missing = [s for s in STATE_SLUGS if s not in found]
-        if missing:
-            print(f"census {y}: missing {missing}, year skipped")
+        if not found:
+            print(f"census {y}: workbook had no state debt rows, year skipped")
             continue
-        for slug in STATE_SLUGS:
-            total, state, local = found[slug]
+        for slug, (total, state, local) in found.items():
+            if slug not in series:
+                continue
+            if slug == "district-of-columbia":
+                if state != 0 or local != total:
+                    print(f"census {y} DC: state {state} local {local} total {total}, year left out")
+                    continue
+            elif state <= 0 or local <= 0:
+                print(f"census {y} {slug}: non-positive part, year left out")
+                continue
             series[slug][y] = row(y, total, state, local)
             file_of[slug][y] = ua if slug in a else ub
-        print(f"census {y}: workbook, CA ${found['california'][0]:,} TX ${found['texas'][0]:,}")
+        missing = [s for s in STATE_SLUGS if s not in found]
+        ca = found.get("california", (None,))[0]
+        print(f"census {y}: workbook, {len(found)} states" + (f", CA ${ca:,}" if ca else "") + (f", missing {len(missing)}" if missing else ""))
     ca = series["california"]
     if ca.get(2002, {}).get("total") != 209_671_522_000:
         raise SystemExit(f"census anchor failed: CA 2002 is {ca.get(2002)}")
     if ca.get(2016, {}).get("total") != 437_899_643_000:
         raise SystemExit(f"census anchor failed: CA 2016 is {ca.get(2016)}")
     # Confirm the current time series still matches the clock files, so pre-2017 can sit beside it.
-    api_ok = True
+    # One state that fails is left out. The ten already published must still match, or the file is not rewritten.
+    api_bad = []
     for slug in STATE_SLUGS:
         try:
             api_rows = census_api(slug)
         except Exception as e:
             print(f"census API {slug}: {e}")
-            api_ok = False
+            api_bad.append(slug)
             continue
         place = json.load(open(os.path.join(ROOT, "places", slug + ".json")))
         comps = {c["key"]: {d: v for d, v in c["history"]} for c in place["components"]}
+        dc = slug == "district-of-columbia"
         for d, total, state, local in api_rows:
-            if comps.get("state", {}).get(d) != state or comps.get("local", {}).get(d) != local:
+            if dc:
+                ok = comps.get("local", {}).get(d) == local and state == 0 and total == local
+            else:
+                ok = comps.get("state", {}).get(d) == state and comps.get("local", {}).get(d) == local
+            if not ok:
                 print(f"census API {slug} {d} does not match places/{slug}.json")
-                api_ok = False
-    if not api_ok:
-        raise SystemExit("Census time series does not match the state clock files; not writing a spliced history")
+                api_bad.append(slug)
+                break
+    anchor_bad = [s for s in api_bad if s in ANCHOR_STATES]
+    if anchor_bad:
+        raise SystemExit(f"Census time series does not match the published state clocks: {anchor_bad}")
+    for slug in api_bad:
+        series[slug].clear()
+        file_of[slug].clear()
     places = {}
     for slug in STATE_SLUGS:
+        if slug in api_bad:
+            continue
         rows = [series[slug][y] for y in sorted(series[slug])]
         # one source entry per file, years ascending
         srcs = []
@@ -354,9 +380,10 @@ def fetch_states_clean():
             "api_source": {"name": "US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN, total debt outstanding (LF0231), survey years 2017–2024", "url": CENSUS_TABLE.format(fips=STATE_FIPS[slug])},
             "api_download": CENSUS_API.format(fips=STATE_FIPS[slug]),
             "release_page": CENSUS_REL,
-            "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017–2024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables.",
+            "note": "Survey years before 2017 are the summary table Census published for that year (total debt outstanding; state government plus local government). Survey years 2017–2024 are Census's current time-series table, the same figures as the state debt clock. Census rebuilt that time series from 2017, so those years are the revised figures and the earlier years are the originally published tables. A survey year that is not in the table was not in a by-state file this fetch could read, and it is left out rather than estimated.",
         }
-    return places
+    skipped = [{"slug": s, "reason": "Census time series GS00LOCALFIN did not match places/" + s + ".json, or the API could not be read. No debt-by-year page was written for this state."} for s in api_bad]
+    return places, skipped
 
 
 def row(y, total, state, local):
@@ -364,8 +391,18 @@ def row(y, total, state, local):
 
 
 def census_api(slug):
-    d = json.loads(get(CENSUS_API.format(fips=STATE_FIPS[slug])))
-    data = d["response"]["data"]
+    import time
+    last = None
+    for i in range(6):
+        try:
+            d = json.loads(get(CENSUS_API.format(fips=STATE_FIPS[slug])))
+            data = d["response"]["data"]
+            break
+        except Exception as e:
+            last = e
+            time.sleep(4 * (i + 1))
+    else:
+        raise RuntimeError(last)
     h = data[0]
     ix = {k: h.index(k) for k in h}
     out = {"State": {}, "Local": {}}
@@ -376,8 +413,14 @@ def census_api(slug):
         if g in out:
             out[g][int(r[ix["YEAR"]])] = int(r[ix["AMOUNT"]]) * 1000
     rows = []
-    for y in sorted(set(out["State"]) & set(out["Local"])):
-        rows.append((f"{y}-06-30", out["State"][y] + out["Local"][y], out["State"][y], out["Local"][y]))
+    if slug == "district-of-columbia":
+        # Census has no state-government level for the District. Local is the total.
+        for y in sorted(out["Local"]):
+            local = out["Local"][y]
+            rows.append((f"{y}-06-30", local, 0, local))
+    else:
+        for y in sorted(set(out["State"]) & set(out["Local"])):
+            rows.append((f"{y}-06-30", out["State"][y] + out["Local"][y], out["State"][y], out["Local"][y]))
     if not rows:
         raise RuntimeError("no LF0231 rows")
     return rows
@@ -593,16 +636,184 @@ def pack_country(slug, series, source, year_end_month):
     }
 
 
+# G20 members that are countries in the IMF panel. The European Union is not a country clock.
+G20_ISO = {
+    "ARG", "AUS", "BRA", "CAN", "CHN", "FRA", "DEU", "IND", "IDN", "ITA", "JPN",
+    "MEX", "RUS", "SAU", "ZAF", "KOR", "TUR", "GBR", "USA",
+}
+IMF_RATIO_URL = "https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO"
+IMF_GDP_URL = "https://www.imf.org/external/datamapper/NGDPD@WEO"
+WB_WEO = "https://data360files.worldbank.org/data360-data/data/IMF_WEO/IMF_WEO.csv"
+IMF_LAST_YEAR = 2026  # later years in this vintage are forecasts and are not published
+
+
+def _debt_usd(ratio, gdp):
+    return int(round(ratio / 100.0 * gdp))
+
+
+def _weo_history():
+    """iso3 -> {year: (ratio_percent, gdp_usd)} from the World Bank mirror of the WEO.
+
+    NGDPD in that file is current US dollars. GGXWDG_NGDP is the unrounded ratio. This is the
+    same file pipeline/fetch_world.py uses when precision_source is worldbank.
+    """
+    import csv, io
+    text = io.TextIOWrapper(urllib.request.urlopen(urllib.request.Request(WB_WEO, headers=UA), timeout=180), encoding="utf-8", newline="")
+    ratio, gdp = {}, {}
+    for row in csv.DictReader(text):
+        ind = row.get("INDICATOR")
+        if ind not in ("IMF_WEO_GGXWDG_NGDP", "IMF_WEO_NGDPD"):
+            continue
+        if row.get("COMP_BREAKDOWN_1") not in (None, "", "V_LST"):
+            continue
+        year = row.get("TIME_PERIOD")
+        if not year or not year.isdigit() or int(year) > IMF_LAST_YEAR:
+            continue
+        code = row.get("REF_AREA") or ""
+        if len(code) != 3:
+            continue
+        val = num(row.get("OBS_VALUE"))
+        if val is None:
+            continue
+        (ratio if ind == "IMF_WEO_GGXWDG_NGDP" else gdp).setdefault(code, {})[year] = val
+    # The mirror reports NGDPD in dollars. A billions file would put the US near 3e4.
+    usa = gdp.get("USA", {}).get(str(IMF_LAST_YEAR))
+    scale = 1e9 if usa is not None and usa < 1e9 else 1.0
+    out = {}
+    for code in set(ratio) & set(gdp):
+        years = {}
+        for y in set(ratio[code]) & set(gdp[code]):
+            r, g = ratio[code][y], gdp[code][y] * scale
+            if r > 0 and g > 0:
+                years[y] = (r, int(round(g)))
+        if years:
+            out[code] = years
+    return out
+
+
+def fetch_imf_countries(national_slugs):
+    """IMF general-government debt by year for G20 and the 40 largest economies by 2026 GDP.
+
+    A country that already has a debt-by-year page from its own source is left on that source.
+    The United States stays on Treasury Debt to the Penny. A series is kept only when its
+    end-2025 and end-2026 stocks match data/world_weo_debt.json exactly.
+    """
+    weo = json.load(open(os.path.join(ROOT, "data", "world_weo_debt.json")))
+    ecos = weo["economies"]
+    top = {e["iso3"] for e in sorted(ecos, key=lambda e: e["gdp_2026_usd"], reverse=True)[:40]}
+    want = top | G20_ISO
+    by = {e["iso3"]: e for e in ecos}
+    print("imf history…")
+    hist = _weo_history()
+    places, skipped = {}, []
+    src = [
+        {"name": "IMF World Economic Outlook, October 2026, GGXWDG_NGDP, general government gross debt, percent of GDP", "url": IMF_RATIO_URL},
+        {"name": "IMF World Economic Outlook, October 2026, NGDPD, GDP, current US dollars", "url": IMF_GDP_URL},
+        {"name": "World Bank Data360 mirror of the IMF World Economic Outlook (unrounded GGXWDG_NGDP and NGDPD)", "url": WB_WEO},
+    ]
+    for code in sorted(want, key=lambda c: by.get(c, {}).get("name") or c):
+        e = by.get(code)
+        if e is None:
+            skipped.append({"slug": code.lower(), "reason": f"{code} is not in data/world_weo_debt.json"})
+            continue
+        slug, name = e["slug"], e["name"]
+        if code == "USA":
+            skipped.append({"slug": slug, "reason": "The US page uses Treasury Debt to the Penny, not the IMF estimate. No second US debt-by-year page."})
+            continue
+        if slug in national_slugs:
+            continue
+        years = hist.get(code) or {}
+        points = []
+        for y in sorted(years):
+            ratio, gdp = years[y]
+            points.append({"date": f"{y}-12-31", "amount": _debt_usd(ratio, gdp), "ratio": round(ratio, 6), "gdp_usd": gdp})
+        reason = None
+        if len(points) < 5:
+            reason = f"fewer than five year-end IMF observations through {IMF_LAST_YEAR}"
+        else:
+            got = {p["date"][:4]: p for p in points}
+            for y in ("2025", "2026"):
+                p = got.get(y)
+                if p is None:
+                    reason = f"no IMF end-{y} stock"
+                    break
+                if p["amount"] != e[f"debt_{y}_usd"] or p["gdp_usd"] != e[f"gdp_{y}_usd"]:
+                    reason = (f"end-{y} stock {p['amount']} or GDP {p['gdp_usd']} does not match "
+                              f"the World Debt Clock's stored WEO figure {e[f'debt_{y}_usd']} / {e[f'gdp_{y}_usd']}")
+                    break
+        if reason:
+            print("imf", slug, "SKIP", reason)
+            skipped.append({"slug": slug, "reason": "IMF general government debt not published: " + reason})
+            continue
+        place_path = os.path.join(ROOT, "places", slug + ".json")
+        if os.path.exists(place_path):
+            p = json.load(open(place_path))
+            clock_note = (f"The {name} debt clock on this site is {p.get('headline') or 'a national series'}, from {p.get('publisher') or 'its publisher'}. "
+                          f"That is a different series from this IMF general-government total, so the two amounts are not the same and are not added together.")
+        else:
+            clock_note = (f"The {name} debt clock uses this same IMF series. It moves between the end-2025 and end-2026 stocks. "
+                          f"This table shows those year-end estimates, not the live interpolation.")
+        places[slug] = {
+            "kind": "imf",
+            "name": name,
+            "year_end_month": 12,
+            "points": points,
+            "sources": src,
+            "clock_note": clock_note,
+            "vintage": weo.get("vintage") or "October 2026",
+            "iso3": code,
+        }
+        print("imf", slug, points[0]["date"], points[-1]["date"], len(points), points[-1]["amount"])
+    return places, skipped
+
+
+def _load_existing():
+    if os.path.exists(OUT):
+        return json.load(open(OUT))
+    return {"places": {}, "skipped": []}
+
+
+def _overlap_matches(old_rows, new_rows):
+    old = {r["year"]: r for r in old_rows}
+    new = {r["year"]: r for r in new_rows}
+    if not set(old) <= set(new):
+        return False
+    for y, r in old.items():
+        n = new[y]
+        for k in ("total", "state", "local"):
+            if abs(int(r[k]) - int(n[k])) > 5000:
+                return False
+    return True
+
+
 def main():
+    existing = _load_existing()
     skipped = []
     places_out = {}
+    for slug, rec in existing.get("places", {}).items():
+        if rec.get("kind") == "country":
+            places_out[slug] = rec
     print("states…")
     try:
-        places_out.update(fetch_states_clean())
+        new_states, state_skipped = fetch_states_clean()
+        skipped.extend(state_skipped)
+        for slug, rec in new_states.items():
+            old = (existing.get("places") or {}).get(slug)
+            if old and old.get("kind") == "state" and slug in ANCHOR_STATES:
+                if not _overlap_matches(old["rows"], rec["rows"]):
+                    raise SystemExit(f"{slug}: re-parsed Census history does not match the published debt-by-year file")
+                extra = sorted(set(r["year"] for r in rec["rows"]) - set(r["year"] for r in old["rows"]))
+                places_out[slug] = old if not extra else rec
+                if extra:
+                    print(slug, "added survey years", extra)
+            else:
+                places_out[slug] = rec
     except Exception as e:
         print("STATES FAILED:", e)
-        for s in STATE_SLUGS:
-            skipped.append({"slug": s, "reason": f"Census history could not be fetched or checked: {e}"})
+        for slug, rec in existing.get("places", {}).items():
+            if rec.get("kind") == "state":
+                places_out[slug] = rec
+        skipped.append({"slug": "states", "reason": f"Census history could not be fetched or checked: {e}"})
     print("countries…")
     euro = {}
     try:
@@ -611,7 +822,10 @@ def main():
     except Exception as e:
         print("eurostat failed:", e)
         for s in ("germany", "france", "italy"):
-            skipped.append({"slug": s, "reason": f"Eurostat gov_10q_ggdebt could not be fetched or did not match the clock: {e}"})
+            if s not in places_out:
+                skipped.append({"slug": s, "reason": f"Eurostat gov_10q_ggdebt could not be fetched or did not match the clock: {e}"})
+            else:
+                print(s, "kept the previously checked series")
     euro_src = {"name": "Eurostat, Quarterly government debt (gov_10q_ggdebt), central government (S1311), Maastricht debt, million euro",
                 "url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10q_ggdebt/default/table"}
     for slug, ser in euro.items():
@@ -631,7 +845,10 @@ def main():
             print(slug, min(ser), max(ser), len(ser))
         except Exception as e:
             print(slug, "FAILED", e)
-            skipped.append({"slug": slug, "reason": str(e)})
+            if slug not in places_out:
+                skipped.append({"slug": slug, "reason": f"The national series for {slug} could not be read ({e}). No debt-by-year page was published from that series."})
+            else:
+                print(slug, "kept the previously checked series")
     for slug, month, fn, src_name in (
         ("australia", 6, australia, None),
         ("japan", 3, japan, None),
@@ -647,16 +864,31 @@ def main():
             print(slug, min(ser), max(ser), len(ser))
         except Exception as e:
             print(slug, "FAILED", e)
-            skipped.append({"slug": slug, "reason": str(e)})
+            if slug not in places_out:
+                skipped.append({"slug": slug, "reason": f"The national series for {slug} could not be read ({e}). No debt-by-year page was published from that series."})
+            else:
+                print(slug, "kept the previously checked series")
+    national = {s for s, rec in places_out.items() if rec.get("kind") == "country"}
+    try:
+        imf_places, imf_skipped = fetch_imf_countries(national)
+        places_out.update(imf_places)
+        skipped.extend(imf_skipped)
+    except Exception as e:
+        print("IMF FAILED:", e)
+        skipped.append({"slug": "imf", "reason": f"IMF World Economic Outlook history could not be fetched or checked: {e}"})
     doc = {
-        "_doc": "Year-by-year debt fetched by pipeline/fetch_debt_by_year.py. Amounts are whole currency units. State rows before 2017 are Census summary tables; the page builder adds 2017–2024 from places/<state>.json (Census time series GS00LOCALFIN), the same figures as the state clocks. Country points are the clock's own official series.",
+        "_doc": "Year-by-year debt fetched by pipeline/fetch_debt_by_year.py. Amounts are whole currency units. State rows before 2017 are Census summary tables; the page builder adds 2017–2024 from places/<state>.json (Census time series GS00LOCALFIN), the same figures as the state clocks. Country points with kind country are that clock's own official series. kind imf is IMF general government gross debt (GGXWDG_NGDP times NGDPD) and is not the country clock when that clock uses a different measure.",
         "fetched": date.today().isoformat(),
         "places": places_out,
         "skipped": skipped,
     }
     json.dump(doc, open(OUT, "w"), indent=1)
     open(OUT, "a").write("\n")
-    print("wrote", OUT, "places", sorted(places_out), "skipped", [s["slug"] for s in skipped])
+    flags = json.load(open(FLAGS)) if os.path.exists(FLAGS) else {}
+    flags["debt_by_year_not_published"] = skipped
+    json.dump(flags, open(FLAGS, "w"), indent=1)
+    open(FLAGS, "a").write("\n")
+    print("wrote", OUT, "places", len(places_out), "skipped", [s["slug"] for s in skipped])
 
 
 if __name__ == "__main__":

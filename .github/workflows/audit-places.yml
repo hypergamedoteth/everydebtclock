@@ -1,6 +1,7 @@
 name: Audit state pages against official sources
 
 # Read-only weekly self-audit. Re-downloads the Census tables and population file that every /states/ page cites and compares each stored figure.
+# The long-tail step re-checks debt-by-year pages, IMF country series, president pages, and debt per person by state against the same sources.
 # Never commits, builds a deploy artifact or touches the live site. A red run (GitHub emails the owner) means DRIFT in a published figure,
 # a failed internal check, or a newer Census survey year than the pages use. Mondays 12:00 UTC = 7:00 AM CDT / 6:00 AM CST.
 on:
@@ -8,7 +9,21 @@ on:
     - cron: "0 12 * * 1"
   workflow_dispatch:
   pull_request:
-    paths: ["places/**", "pipeline/audit_places.py", "pipeline/census_state.py"]
+    paths:
+      - "places/**"
+      - "data/debt_by_year.json"
+      - "data/world_weo_debt.json"
+      - "data/longtail_flags.json"
+      - "pipeline/audit_places.py"
+      - "pipeline/audit_longtail.py"
+      - "pipeline/census_state.py"
+      - "pipeline/fetch_debt_by_year.py"
+      - "debt_by_year_build.py"
+      - "presidents_build.py"
+      - "state_per_person_build.py"
+      - "states/**"
+      - "countries/**"
+      - "national-debt-by-president/**"
 
 permissions:
   contents: read
@@ -16,14 +31,22 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install the workbook reader used for Census summary tables
+        run: python -m pip install xlrd
       - name: Audit every state page against Census
         run: python3 pipeline/audit_places.py --report audit-report.md
+      - name: Audit debt-by-year, IMF, president, and per-person pages
+        if: always()
+        run: python3 pipeline/audit_longtail.py --report audit-longtail.md
       - name: Show report
         if: always()
-        run: cat audit-report.md >> "$GITHUB_STEP_SUMMARY" || true
+        run: |
+          cat audit-report.md >> "$GITHUB_STEP_SUMMARY" || true
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          cat audit-longtail.md >> "$GITHUB_STEP_SUMMARY" || true

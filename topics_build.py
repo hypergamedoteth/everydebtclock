@@ -337,9 +337,12 @@ def build(ctx):
     keys = ["debt_total", "population", "households", "tax_returns", "interest_cash", "interest_gross"]
     ctx["clock"] = _clock(ctx["T"], keys, ctx["M"])
     _milestone_pages(ctx, H)
+    import presidents_build
+    pres_urls = presidents_build.build(ctx)
     _president_page(ctx, H)
     _person_page(ctx, H)
     _interest_page(ctx, H)
+    return pres_urls
 
 
 def _milestone_pages(ctx, H):
@@ -459,7 +462,9 @@ def _president_page(ctx, H):
             if not p:
                 return "<td>No record on or before this date</td>"
             return f"<td class=\"num\">{usd0(p['amount'])}<span class=\"when\">{html.escape(_basis_label(p, fdate, open_))}</span></td>"
-        rows.append(f"<tr><td>{html.escape(name)}<span class=\"when\">{_ord(n)} term</span></td><td>{term}</td>{cell(a)}{cell(b, open_term)}"
+        slug = (ctx.get("president_pages") or {}).get(name)
+        who = f'<a href="{html.escape(slug)}/">{html.escape(name)}</a>' if slug else html.escape(name)
+        rows.append(f"<tr><td>{who}<span class=\"when\">{_ord(n)} term</span></td><td>{term}</td>{cell(a)}{cell(b, open_term)}"
                     f"<td class=\"num\">{ch_s}</td><td class=\"num\">{pct_s}</td></tr>")
     end = H["series_end"]
     intro = (f"<h1>National debt by president</h1>"

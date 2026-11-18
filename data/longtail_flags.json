@@ -1,0 +1,20 @@
+{
+ "debt_by_year_not_published": [
+  {
+   "slug": "australia",
+   "reason": "The AOFM securities workbook (the Australia debt clock's source) timed out, so that history was not published. The Australia debt-by-year page uses the IMF general-government series instead and says it is a different measure from the clock."
+  },
+  {
+   "slug": "united-states",
+   "reason": "The US page uses Treasury Debt to the Penny, not the IMF estimate. No second US debt-by-year page."
+  }
+ ],
+ "presidents_not_published": [
+  {
+   "name": "William Henry Harrison",
+   "slug": "william-henry-harrison",
+   "reason": "The Treasury series used here does not have two different records inside the term, so the change is not shown and no page is published."
+  }
+ ],
+ "states_missing_from_per_person": []
+}
