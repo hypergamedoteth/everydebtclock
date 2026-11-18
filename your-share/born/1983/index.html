@@ -10,14 +10,56 @@
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Born in 1983: Your Share of the US Debt Is $118,971">
 <meta name="twitter:description" content="Your share of the US debt: $118,970.80. When you were born (1983) the debt was $1,377,210,000,000; it has grown 29.5× since."><meta name="twitter:image" content="https://everydebtclock.com/your-share/og/1983.png">
 <meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="../../../style.css?v=b2896feffb"><link rel="stylesheet" href="../../share.css?v=e469f7c4df">
+<link rel="stylesheet" href="../../../style.css?v=4048ce9679"><link rel="stylesheet" href="../../share.css?v=e469f7c4df">
 <!--ANALYTICS--><script data-goatcounter="https://everydebtclock.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script><!--/ANALYTICS-->
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg">
-</head><body class="share" data-born="1983">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","dateModified":"2026-11-16","url":"https://everydebtclock.com/your-share/born/1983/"}</script><link rel="manifest" href="/manifest.json"></head><body class="share" data-born="1983"><!--A2HS--><aside id="edc-a2hs" hidden>
+<p id="edc-a2hs-text">Add this live clock to your home screen.</p>
+<button type="button" id="edc-a2hs-go" hidden>Add to home screen</button>
+<button type="button" id="edc-a2hs-x">Not now</button>
+</aside>
+<style>
+#edc-a2hs{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;padding:8px 16px;background:#101828;color:#c2ccda;border-bottom:1px solid #1c2533;font:13px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+#edc-a2hs[hidden]{display:none!important}
+#edc-a2hs p{margin:0;flex:1 1 180px}
+#edc-a2hs button{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+#edc-a2hs-go{color:#9fd0ff}
+</style>
+<script>
+(function(){
+  if(!("serviceWorker" in navigator)){}
+  else if(location.protocol==="https:"||location.hostname==="localhost"){
+    navigator.serviceWorker.register("/sw.js").catch(function(){});
+  }
+  var n=document.getElementById("edc-a2hs"),go=document.getElementById("edc-a2hs-go"),x=document.getElementById("edc-a2hs-x"),text=document.getElementById("edc-a2hs-text");
+  if(!n)return;
+  var key="edc.a2hs";
+  try{if(localStorage.getItem(key))return;}catch(e){return;}
+  if(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches||navigator.standalone){
+    try{localStorage.setItem(key,"1");}catch(e){}
+    return;
+  }
+  var deferred=null,shown=false;
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown)show(true);});
+  function show(install){
+    if(shown)return;shown=true;
+    try{localStorage.setItem(key,"1");}catch(e){}
+    if(install&&deferred){text.textContent="Add this live clock to your home screen.";go.hidden=false;}
+    else if(/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)){
+      text.textContent="Bookmark this clock: tap Share, then Add to Home Screen.";go.hidden=true;
+    }else{text.textContent="Bookmark this clock to keep the live numbers one tap away.";go.hidden=true;}
+    n.hidden=false;
+  }
+  if(go)go.addEventListener("click",function(){if(!deferred)return;deferred.prompt();deferred=null;n.hidden=true;});
+  if(x)x.addEventListener("click",function(){try{localStorage.setItem(key,"1");}catch(e){}n.hidden=true;});
+  setTimeout(function(){if(!shown)show(false);},1500);
+})();
+</script>
+<!--/A2HS-->
 <main>
 <a class="brand" href="../../../">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../../../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
 <h1>Your share of the national debt</h1>
-<p class="lede">One equal share of the official US total. Enter a birth year to see the debt that year and how many times it has grown. A state, a household size, and an income are optional. The math runs in your browser.</p>
+<p class="lede">One equal share of the official US total. Enter a birth year to see the debt that year and how many times it has grown. A state, a household size, and an income are optional. The math runs in your browser.</p><p class="updated" data-updated="2026-11-16">Updated Nov 16, 2026</p>
 <form id="f" class="panel" action="" method="get" autocomplete="off">
 <div class="fields">
 <div class="span2"><label for="born">Birth year</label><input id="born" name="born" inputmode="numeric" autocomplete="bday-year" maxlength="4" placeholder="1985" aria-describedby="born-hint"><span class="hint" id="born-hint">The year you were born. The debt that year is the fiscal-year-end total, not your birthday.</span></div>

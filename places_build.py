@@ -252,7 +252,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     lv = "Live " if ticks else ""
     title = (f"{name} State & Local Debt Clock: {lv}Debt, Official Census Data" if is_state else f"{name} National Debt Clock: {lv}Debt, Official Data")
     if p.get("seo_title"): title = p["seo_title"].format(lv=lv)  # optional per-place override (District of Columbia: no state level)
-    h1 = p.get("h1") or (f"{name} State & Local Debt Clock" if is_state else f"{name} National Debt Clock")
+    h1 = p.get("h1") or (f"As of {as_of}, {name} {T['head']} is {_usd0(c['total'])} ({pub})")
     _dn = p.get("seo_desc_noun")  # optional: full noun phrase for the description's opening
     desc = ((f"{_dn[0].upper() + _dn[1:]}: {_b(c['total'])}, " if _dn else f"{name} {'state and local debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, ") + f"{'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
             f"{'Live ' if rate else 'Official '}{name} debt clock, {'about ' if rate else ''}{_usd0(proj / pop['value'])} per {dem}{' (projected)' if rate else ''}, with sources.")
@@ -324,7 +324,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     # ---- hero (same block and labels as the US hero)
     hero_d = dlg(f'{name} {T["head"]}', T["sum_note"], pub, cs[0]['source_url'], cs[0].get("source_locator", "") if len(cs) == 1 else "", base=c['total'], r=rate, official=f"{_usd0(c['total'])} official, {as_of}")
     hero = (f'<div class="hero lead" id="t-total" data-b="{c["total"]}" data-r="{rate or 0}" data-t="{t0}" data-d=\'{E(json.dumps(hero_d), quote=True)}\'>'
-            f'<div class="k">{E(name)} {E(T["head"])} · {"live" if rate else "official"}</div><div class="big num" id="hv">{_usd0(proj)}</div>')
+            f'<div class="k">{"Live estimate · " if rate else "Official figure · "}{E(name)} {E(T["head"])}</div><div class="big num" id="hv">{_usd0(proj if rate else c["total"])}</div>')
     if rate:
         hero += (f'<div class="sub"><span>{_rate_txt(rate)}</span><span class="note">rate: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}, so this is a projection</span>'
                  + (f'<span class="note">{E(recent)}</span>' if recent else "") + f'<span>Since you opened this page: <span class="num" id="hs">{CUR}0</span> {"more" if up_ else "less"} debt</span></div>')
@@ -498,7 +498,7 @@ dlg.addEventListener('close',()=>mt=null);document.querySelectorAll('[data-d]').
 ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);k.ppx.forEach(e=>e.textContent=usd(v/+e.dataset.pp,2))}})}}if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
 
     explore_html = ex.explore("../../", places, calc, cur=p, gdp=GDP_BY_SLUG)
-    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + ex.search_box("../../") + '<main id="app">' + hero + intro + wc + debt_sec + comp_secs + people + hist + details + method
+    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + ex.search_box("../../") + '<main id="app">' + intro + hero + wc + debt_sec + comp_secs + people + hist + details + method
             + '</main><dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))

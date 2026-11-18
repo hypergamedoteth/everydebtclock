@@ -166,7 +166,7 @@ jobs:
       - name: Stage Pages artifact (public files only)
         run: |
           mkdir -p _site
-          cp -r index.html 404.html privacy.html privacy about contact advertise favicon.ico favicon-32.png icon.svg CNAME robots.txt llms.txt sitemap.xml style.css app.js core.js cross41.js widget.html \
+          cp -r index.html 404.html privacy.html privacy about contact advertise favicon.ico favicon-32.png icon-192.png icon.svg manifest.json sw.js CNAME robots.txt llms.txt sitemap.xml style.css app.js core.js cross41.js widget.html \
                 apple-touch-icon.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person your-share national-debt-by-year 41-trillion press national-debt-by-president interest-on-the-national-debt when-will-debt-hit-41-trillion methodology states countries world world-government-debt global-debt-clock wealth embed _site/
           rm -f _site/data/validation_log.csv
           # IndexNow key file must be at the site root for verification.
@@ -180,11 +180,12 @@ jobs:
       - id: deploy
         uses: actions/deploy-pages@v4
 
-      # Instant indexing for Bing/Yandex. The key file must already be on the live site, so this waits
-      # for GitHub Pages to serve it, then posts every sitemap URL. A failure here does not roll back the deploy.
-      - name: Submit sitemap to IndexNow
+      # Bing (Copilot and ChatGPT search) recrawls URLs whose figures changed: the homepage,
+      # /41-trillion/, per person, and any other URL whose data date moved forward.
+      # The key file must already be on the live site. A ping error does not roll back the deploy.
+      - name: Ping IndexNow with changed URLs
         continue-on-error: true
-        run: python3 pipeline/submit_indexnow.py --sitemap _site/sitemap.xml --wait --tries 8 --delay 20
+        run: python3 pipeline/submit_indexnow.py --urls pipeline/indexnow-urls.txt --wait --tries 8 --delay 20 --soft
 
       # Runs after deploy so a flagged figure is still published with its ⚠ badge, but the run goes red and GitHub emails you.
       - name: Fail on validation flags or unavailable tickers

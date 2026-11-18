@@ -77,9 +77,12 @@ def _rate(sym, r):
         return sym + "0.00/sec"
     return ("−" if r < 0 else "+") + sym + f"{abs(r):,.2f}/sec"
 
-def snippet(site, embed_path, page_url, title, anchor):
+def snippet(site, embed_path, page_url, title, anchor, theme=None):
     """iframe plus a plain backlink. The backlink is outside the iframe so it counts when the frame is not crawled."""
-    return (f'<iframe src="{site}/{embed_path}" width="100%" height="160" style="border:0" title="{E(title, quote=True)}"></iframe>\n'
+    src = f"{site}/{embed_path}"
+    if theme:
+        src += "?theme=" + theme
+    return (f'<iframe src="{src}" width="100%" height="160" style="border:0" title="{E(title, quote=True)}"></iframe>\n'
             f'<a href="{page_url}">{E(anchor)}</a>')
 
 def panel_html(code, preview, title):
@@ -388,9 +391,7 @@ def _countdown_html(c, now, embed_home):
     live = project(c["base"], rate, c["t0"], now, c["freeze"], None)
     hit = None if frozen else _hit(c["base"], rate, c["t0"], c["freeze"], target)
     if c["base"] >= target:
-        kicker, big, sub = "Treasury close is at or above $41 trillion", _total("$", live), "Official close " + c["as_of"]
-    elif live >= target:
-        kicker, big, sub = "Live estimate is past $41 trillion", _total("$", live - target) + " past", "Treasury has not posted that close"
+        kicker, big, sub = "Treasury close is at or above $" + "41 trillion", _total("$", live), "Official close " + c["as_of"]
     elif hit:
         left = max(0, int(hit - now))
         dd, hh, mm, ss = left // 86400, left % 86400 // 3600, left % 3600 // 60, left % 60
@@ -434,12 +435,65 @@ function cd(sec){{var s=Math.max(0,Math.floor(sec));return Math.floor(s/86400)+"
 function when(ts){{var p={{}};new Intl.DateTimeFormat("en-US",{{timeZone:"America/Chicago",month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit",second:"2-digit",hour12:true}}).formatToParts(new Date(Math.floor(ts+0.5)*1000)).forEach(function(x){{if(x.type!=="literal")p[x.type]=x.value}});return p.month+" "+p.day+", "+p.year+", "+p.hour+":"+p.minute+":"+p.second+" "+p.dayPeriod+" CT"}}
 function fit(){{if(!v.clientWidth)return;var s=26;v.style.fontSize=s+"px";while(v.scrollWidth>v.clientWidth+1&&s>11){{s--;v.style.fontSize=s+"px"}}}}
 function paint(){{var t=Date.now()/1000,x=val(t),ts=hit();
-if(C.b>=C.target){{k.textContent="Treasury close is at or above $41 trillion";v.textContent=money(x);w.textContent="Official close "+C.asof}}
-else if(x>=C.target){{k.textContent="Live estimate is past $41 trillion";v.textContent=money(x-C.target)+" past";w.textContent="Treasury has not posted that close"}}
-else if(ts){{k.textContent="Until the US debt hits $41 trillion";v.textContent=cd(ts-t);w.textContent=when(ts)}}
+var L="$"+"41"+" trillion";
+if(C.b>=C.target){{k.textContent="Treasury close is at or above "+L;v.textContent=money(x);w.textContent="Official close "+C.asof}}
+else if(x>=C.target){{k.textContent="Live estimate is past "+L;v.textContent=money(x-C.target)+" past";w.textContent="Treasury has not posted that close"}}
+else if(ts){{k.textContent="Until the US debt hits "+L;v.textContent=cd(ts-t);w.textContent=when(ts)}}
 else{{k.textContent="No projected $41 trillion date";v.textContent=money(x);w.textContent="The clock is not projecting past the debt limit"}}
 fit()}}
 (function loop(){{paint();requestAnimationFrame(loop)}})()}})();</script></body></html>"""
+
+
+def _share_html(R, site, now, embed_home):
+    """Official per-person figure, plus birth year and household size. No network, no storage."""
+    D = json.load(open(os.path.join(R, "data", "data.json")))
+    td = (D.get("tickers") or {}).get("debt_total") or {}
+    pop = (D.get("tickers") or {}).get("population") or {}
+    if td.get("status") != "ok" or not pop.get("base"):
+        raise RuntimeError("embed: your-share inputs are missing")
+    debt, people = float(td["base"]), float(pop["base"])
+    share = debt / people
+    years = {str(row[0]): int(row[2]) for row in (D.get("meta") or {}).get("debt_by_fy") or [] if len(row) > 2 and row[2]}
+    cfg = {"debt": debt, "pop": int(people), "date": td.get("as_of") or "", "popDate": pop.get("as_of") or "", "years": years}
+    blob = json.dumps(cfg, separators=(",", ":")).replace("<", "\\u003c")
+    shown = "$" + f"{share:,.2f}"
+    page_url = site + "/your-share/"
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Your share of the US debt</title>
+<script>if(new URLSearchParams(location.search).get("theme")==="light")document.documentElement.classList.add("light")</script>
+<style>
+:root{{color-scheme:dark;--bg:#0e131b;--fg:#e8edf5;--mut:#8a97ab;--dim:#6a778c;--link:#7cb6ff;--line:#2a3548}}
+html.light{{color-scheme:light;--bg:#f6f7fb;--fg:#161a22;--mut:#526074;--dim:#5c6b80;--link:#0b57d0;--line:#d5dbe6}}
+*{{box-sizing:border-box}}html,body{{margin:0;background:var(--bg);color:var(--fg)}}
+body{{font:13px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}}
+.w{{padding:8px 12px 7px;border-left:3px solid #ff4d5e}}
+.n{{font-size:12px;color:var(--mut)}}.v{{font:700 22px/1.15 ui-monospace,Menlo,Consolas,monospace;letter-spacing:-.03em}}
+.s,.out{{font-size:11px;color:var(--dim)}}.out{{color:var(--fg);min-height:1.3em;margin:4px 0}}
+label{{display:block;font-size:11px;color:var(--mut);margin-top:4px}}
+input{{width:100%;margin-top:2px;background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit}}
+.cr{{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:4px}}
+a.by,a.get{{color:var(--link);text-decoration:underline;text-underline-offset:2px}}a.by{{font-size:12px}}a.get{{font-size:11px}}
+</style>{ICON}</head><body><div class="w">
+<div class="n">Your share of the US debt</div>
+<div class="v" id="v">{E(shown)}</div>
+<div class="s">As of Treasury {E(td.get("as_of") or "")} · Census population {E(pop.get("as_of") or "")}. Not a projection.</div>
+<label>Birth year <input id="born" inputmode="numeric" maxlength="4" placeholder="1985"></label>
+<label>Household size <input id="hh" inputmode="numeric" maxlength="2" placeholder="1"></label>
+<div class="out" id="o"></div>
+<div class="s">Source: Treasury, Debt to the Penny ÷ Census population</div>
+<div class="cr"><a class="by" href="{E(page_url, quote=True)}" target="_top">{BYLINE}</a><a class="get" href="{E(embed_home, quote=True)}" target="_blank" rel="noopener">{GET}</a></div>
+</div><script type="application/json" id="c">{blob}</script>
+<script>(function(){{var D=JSON.parse(document.getElementById("c").textContent);
+var nf=new Intl.NumberFormat("en-US",{{minimumFractionDigits:2,maximumFractionDigits:2}});
+var money=function(n){{return (n<0?"−$":"$")+nf.format(Math.abs(n))}};
+var v=document.getElementById("v"),o=document.getElementById("o"),born=document.getElementById("born"),hh=document.getElementById("hh");
+var share=D.debt/D.pop;v.textContent=money(share);
+function go(){{var bits=[],y=(born.value||"").trim(),h=(hh.value||"").trim();
+if(y){{if(!/^\\d{{4}}$/.test(y)||!D.years[y])bits.push("No fiscal-year total is stored for that year.");else{{var g=D.debt/D.years[y];bits.push("FY "+y+" total "+money(D.years[y])+". Grown "+(g>=10?g.toFixed(1):g.toFixed(2))+"× since.");}}}}
+if(h){{var n=+h;if(n>=1&&n<=20&&n===Math.round(n))bits.push("Household of "+n+": "+money(share*n)+".");else bits.push("Household size is 1 to 20.");}}
+o.textContent=bits.join(" ")}}
+born.addEventListener("input",go);hh.addEventListener("input",go)}})();</script></body></html>"""
 
 
 def _write(path, text):
@@ -456,12 +510,15 @@ def _prune(parent, keep):
         shutil.rmtree(path) if os.path.isdir(path) else os.remove(path)
 
 def _card(site, c, button):
-    code = snippet(site, c["embed_path"], c["page_url"], c["iframe_title"], c["anchor"])
+    dark = snippet(site, c["embed_path"], c["page_url"], c["iframe_title"], c["anchor"])
+    light = snippet(site, c["embed_path"], c["page_url"], c["iframe_title"], c["anchor"], theme="light")
     sub = f'{c["headline"]} · {c["source"]}'
     return (f'<article class="embcard"><h3>{E(c["name"])}</h3><p class="sub">{E(sub)}</p>'
             f'<iframe src="{E(c["preview"], quote=True)}" width="100%" height="160" style="border:0" loading="lazy" title="{E(c["iframe_title"], quote=True)}"></iframe>'
-            f'<textarea readonly rows="5" spellcheck="false" aria-label="Embed code for {E(c["name"], quote=True)}">{E(code)}</textarea>'
-            f'<button type="button" class="embedcopy" data-label="{button}">{button}</button></article>')
+            f'<p class="embvar">Dark</p><textarea readonly rows="4" spellcheck="false" aria-label="Dark embed code for {E(c["name"], quote=True)}">{E(dark)}</textarea>'
+            f'<button type="button" class="embedcopy" data-label="Copy dark code">Copy dark code</button>'
+            f'<p class="embvar">Light</p><textarea readonly rows="4" spellcheck="false" aria-label="Light embed code for {E(c["name"], quote=True)}">{E(light)}</textarea>'
+            f'<button type="button" class="embedcopy" data-label="Copy light code">Copy light code</button></article>')
 
 def _directory(R, site, clocks, analytics_fn):
     sm = os.path.join(R, "sitemap.xml")
@@ -475,6 +532,15 @@ def _directory(R, site, clocks, analytics_fn):
     order = ("United States", "World", "States", "Countries")
     by_slug = {c["slug"]: c for c in clocks}
     featured = "".join(_card(site, by_slug[s], "Copy code") for s in EXAMPLES if s in by_slug)
+    cd = _countdown_41(R, site)
+    extras = [
+        dict(cd, name="$41 trillion countdown", headline="time left at the homepage pace", preview="41-trillion/"),
+        _entry(name="Your share", headline="official debt per person, in your browser",
+               source="Treasury Debt to the Penny and the Census population",
+               preview="your-share/", embed_path="embed/your-share/", page_url=site + "/your-share/",
+               iframe_title="Your share of the US debt", anchor="Your share of the US debt by EveryDebtClock.com"),
+    ]
+    extra_cards = "".join(_card(site, c, "Copy code") for c in extras)
     groups = []
     for name in order:
         items = [c for c in clocks if c["group"] == name]
@@ -497,15 +563,17 @@ def _directory(R, site, clocks, analytics_fn):
 <header class="top"><div class="topin"><a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>{nav}<span class="live"><span class="dot"></span><span>embed</span></span></div></header>
 <section class="intro pitch"><h1>Free debt clock widget</h1>
 <p>{E(PITCH)}</p>
-<p>Add <code>?theme=light</code> to the iframe address for a light background. The snippet is the iframe plus a plain link under it.</p>
-<p>The countdown to $41 trillion is a separate widget at <a href="41-trillion/">embed/41-trillion/</a>. It follows the same rules: no cookies and no analytics. The snippet is on the <a href="../41-trillion/">$41 trillion page</a> and the <a href="../press/">press page</a>.</p>
+<p>Each card has a dark snippet and a light snippet. The light snippet adds <code>?theme=light</code> to the iframe address. The snippet is the iframe plus a plain link under it. The widget itself carries the credit “Live debt clock by EveryDebtClock.com”.</p>
+<h2>Countdown and your share</h2>
+<p>The $41 trillion countdown and the your-share calculator follow the same rules: no cookies and no analytics. Light and dark code is on each card.</p>
+<div class="embgrid">{extra_cards}</div>
 <h2>Add this clock to your site</h2>
 <p>United States, Texas, and the world, live. Every other clock is listed below.</p>
 <div class="embgrid">{featured}</div>
 <p class="embjump">{jumps}</p></section>
 <div class="embwrap">{''.join(groups)}</div>
 <footer class="site-foot">Every Debt Clock · <a href="../embed/">Embed a clock</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
-<script>document.addEventListener("click",function(e){{var b=e.target.closest(".embedcopy");if(!b)return;var t=b.parentNode.querySelector("textarea");if(!t)return;
+<script>document.addEventListener("click",function(e){{var b=e.target.closest(".embedcopy");if(!b)return;var t=b.previousElementSibling;while(t&&t.tagName!=="TEXTAREA")t=t.previousElementSibling;if(!t)return;
 var label=b.getAttribute("data-label")||"Copy code",done=function(){{b.textContent="Copied";setTimeout(function(){{b.textContent=label}},1500)}};
 if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t.value).then(done,function(){{t.select();document.execCommand("copy");done()}});
 else{{t.select();document.execCommand("copy");done()}}}});</script>
@@ -549,13 +617,16 @@ def _offer_pos(host, label, preview):
         raise RuntimeError(f"{label} is missing Copy code")
     if f'src="{preview}"' not in host:
         raise RuntimeError(f"{label} preview is not its embed URL")
-    hero, intro = host.find('class="hero lead"'), host.find('id="intro"')
+    intro = host.find('id="intro"')
     box = host.find('class="embedbox"')
     close = host.find("</section>", intro) if intro >= 0 else -1
-    if not (hero >= 0 and intro > hero and intro < box < close):
-        raise RuntimeError(f"{label} embed offer is not directly after the summary, under the ticker")
-    if "<p" not in host[intro:box] or "embedbox" in host[hero:intro]:
-        raise RuntimeError(f"{label} moved the ticker or the summary")
+    h1 = host.find("<h1", intro if intro >= 0 else 0)
+    if not (intro >= 0 and h1 > intro and intro < box < close):
+        raise RuntimeError(f"{label} embed offer is not inside the summary, after the official figure")
+    if "<p" not in host[intro:box]:
+        raise RuntimeError(f"{label} moved the summary")
+    if host.find("<h1") > box:
+        raise RuntimeError(f"{label} puts the embed offer before the official figure")
     if not _has_header_embed(host):
         raise RuntimeError(f"{label} header is missing the Embed link")
     dm = re.search(r'<meta name="description" content="([^"]*)"', host)
@@ -631,8 +702,10 @@ def _check(R, site, clocks, now, require_pages, milestones):
         code = html.unescape(re.search(r'class="embedbox"[\s\S]*?<textarea[^>]*>([\s\S]*?)</textarea>', host).group(1))
         if code != expect:
             raise RuntimeError(f"{rel} should offer the {'$41 trillion countdown' if use_cd else 'US clock'}")
-        if 'class="hero lead"' not in host.split('id="intro"', 1)[0]:
-            raise RuntimeError(f"{rel} ticker is not above the summary")
+        if 'class="hero lead"' not in host:
+            raise RuntimeError(f"{rel} is missing its ticker")
+        if host.find("<h1") > host.find('class="hero lead"'):
+            raise RuntimeError(f"{rel} ticker is above the official figure")
     cd_path = os.path.join(R, "embed", "41-trillion", "index.html")
     if not os.path.exists(cd_path):
         raise RuntimeError("embed/41-trillion/ is missing")
@@ -650,6 +723,21 @@ def _check(R, site, clocks, now, require_pages, milestones):
         raise RuntimeError("embed/41-trillion/ backlink is not the countdown page")
     if f'href="{site}/embed/" target="_blank"' not in cd_text or GET not in cd_text:
         raise RuntimeError("embed/41-trillion/ is missing the directory link")
+    share_path = os.path.join(R, "embed", "your-share", "index.html")
+    if not os.path.exists(share_path):
+        raise RuntimeError("embed/your-share/ is missing")
+    share_text = open(share_path).read()
+    if len(share_text.encode()) > LIMIT:
+        raise RuntimeError(f"embed/your-share/ is {len(share_text.encode())} bytes (limit {LIMIT})")
+    for bad in ("goatcounter", "gc.zgo.at", "fetch(", "XMLHttpRequest", "localStorage", "document.cookie",
+                "nofollow", "stylesheet", "core.js", "app.js", "data.json", "X-Frame-Options", "frame-ancestors",
+                "googletagmanager", "google-analytics"):
+        if bad in share_text:
+            raise RuntimeError(f"embed/your-share/ must not contain {bad}")
+    if 'content="noindex"' not in share_text or BYLINE not in share_text or 'get("theme")==="light"' not in share_text:
+        raise RuntimeError("embed/your-share/ missing noindex, byline, or light theme")
+    if f'href="{site}/your-share/" target="_top">{BYLINE}</a>' not in share_text:
+        raise RuntimeError("embed/your-share/ credit link is missing")
     directory = open(os.path.join(R, "embed", "index.html")).read()
     if 'content="noindex"' in directory or 'class="embedbox"' in directory:
         raise RuntimeError("/embed/ index must stay indexable and is not itself a clock panel")
@@ -661,8 +749,11 @@ def _check(R, site, clocks, now, require_pages, milestones):
     if "Free Debt Clock Widget" not in directory or "widget" not in re.search(r'<meta name="description" content="([^"]*)"', directory).group(1).lower():
         raise RuntimeError("/embed/ title or description does not mention the free widget")
     n_ex = sum(1 for s in EXAMPLES if any(c["slug"] == s for c in clocks))
-    if directory.count("<iframe ") != len(clocks) + n_ex:
+    if directory.count("<iframe ") != len(clocks) + n_ex + 2:
         raise RuntimeError("/embed/ index is missing a preview")
+    for bit in ("?theme=light", "embed/your-share/", "embed/41-trillion/", "Copy light code", "Copy dark code"):
+        if bit not in directory:
+            raise RuntimeError(f"/embed/ gallery is missing {bit}")
     if require_pages and n_ex != 3:
         raise RuntimeError("embed landing page needs live US, Texas, and World examples")
     for slug in EXAMPLES:
@@ -761,6 +852,10 @@ def apply(R, site, analytics_fn=None, require_pages=False, now=None, world=None)
     if len(cd_html.encode()) > LIMIT:
         raise RuntimeError(f"embed/41-trillion/ is {len(cd_html.encode())} bytes (limit {LIMIT})")
     _write(os.path.join(R, "embed", "41-trillion", "index.html"), cd_html)
+    share_html = _share_html(R, site, now, embed_home)
+    if len(share_html.encode()) > LIMIT:
+        raise RuntimeError(f"embed/your-share/ is {len(share_html.encode())} bytes (limit {LIMIT})")
+    _write(os.path.join(R, "embed", "your-share", "index.html"), share_html)
     cd_code = snippet(site, cd["embed_path"], cd["page_url"], cd["iframe_title"], cd["anchor"])
     cd_panel = panel_html(cd_code, f"{site}/{cd['embed_path']}", cd["iframe_title"])
     milestones = []

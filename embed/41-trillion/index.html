@@ -16,7 +16,7 @@ body{font:13px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica
 a.by,a.get{color:var(--link);text-decoration:underline;text-underline-offset:2px}a.by{font-size:12px}a.get{font-size:11px}
 </style><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%2307090d%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22%23ff4d5e%22 font-family=%22Arial%22 font-weight=%22900%22%3E$%3C/text%3E%3C/svg%3E"></head><body><div class="w">
 <div class="n" id="k">Until the US debt hits $41 trillion</div>
-<div class="v" id="v">43d 10h 41m 22s</div>
+<div class="v" id="v">43d 10h 41m 23s</div>
 <div class="when" id="w">Dec 31, 2026, 11:34:41 PM CT</div>
 <div class="s">Source: Treasury, Debt to the Penny</div>
 <div class="cr"><a class="by" href="https://everydebtclock.com/41-trillion/" target="_top">Live debt clock by EveryDebtClock.com</a><a class="get" href="https://everydebtclock.com/embed/" target="_blank" rel="noopener">Get this clock for your site</a></div>
@@ -31,9 +31,10 @@ function cd(sec){var s=Math.max(0,Math.floor(sec));return Math.floor(s/86400)+"d
 function when(ts){var p={};new Intl.DateTimeFormat("en-US",{timeZone:"America/Chicago",month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit",second:"2-digit",hour12:true}).formatToParts(new Date(Math.floor(ts+0.5)*1000)).forEach(function(x){if(x.type!=="literal")p[x.type]=x.value});return p.month+" "+p.day+", "+p.year+", "+p.hour+":"+p.minute+":"+p.second+" "+p.dayPeriod+" CT"}
 function fit(){if(!v.clientWidth)return;var s=26;v.style.fontSize=s+"px";while(v.scrollWidth>v.clientWidth+1&&s>11){s--;v.style.fontSize=s+"px"}}
 function paint(){var t=Date.now()/1000,x=val(t),ts=hit();
-if(C.b>=C.target){k.textContent="Treasury close is at or above $41 trillion";v.textContent=money(x);w.textContent="Official close "+C.asof}
-else if(x>=C.target){k.textContent="Live estimate is past $41 trillion";v.textContent=money(x-C.target)+" past";w.textContent="Treasury has not posted that close"}
-else if(ts){k.textContent="Until the US debt hits $41 trillion";v.textContent=cd(ts-t);w.textContent=when(ts)}
+var L="$"+"41"+" trillion";
+if(C.b>=C.target){k.textContent="Treasury close is at or above "+L;v.textContent=money(x);w.textContent="Official close "+C.asof}
+else if(x>=C.target){k.textContent="Live estimate is past "+L;v.textContent=money(x-C.target)+" past";w.textContent="Treasury has not posted that close"}
+else if(ts){k.textContent="Until the US debt hits "+L;v.textContent=cd(ts-t);w.textContent=when(ts)}
 else{k.textContent="No projected $41 trillion date";v.textContent=money(x);w.textContent="The clock is not projecting past the debt limit"}
 fit()}
 (function loop(){paint();requestAnimationFrame(loop)})()})();</script></body></html>

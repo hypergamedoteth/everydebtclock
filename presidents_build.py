@@ -238,7 +238,7 @@ def _page(R, SITE, with_analytics, stamp, p, H):
         "name": f"National debt under {name}", "description": desc, "url": url,
         "isAccessibleForFree": True,
         "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"},
-        "dateModified": dt.date.today().isoformat(),
+        "dateModified": last["date"],
         "temporalCoverage": f"{first['date'][:4]}/{last['date'][:4]}",
         "isBasedOn": [DTP, HDO],
         "keywords": [f"national debt under {name}", f"{name} national debt", "US debt by president"],
@@ -262,8 +262,8 @@ td .when{{display:block;color:#8a97ab;font-size:12px;font-weight:400;white-space
 </head><body><main>
 <a class="brand" href="{UP}/">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="{UP}/embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
 <p class="k"><a href="{UP}/">US debt clock</a> · <a href="../">National debt by president</a></p>
-<h1>National debt under {E(name)}</h1>
-<p><b>Answer.</b> {E(answer)}{E(per_sentence)}</p>
+<h1>As of {fdate(last['date'])}, the national debt was {_usd0(last['amount'])} (Treasury)</h1>
+<p class="answer"><b>Answer.</b> {E(answer)}{E(per_sentence)}</p>
 {chart_html}
 <h2>By term</h2>
 <div class="tw"><table><tr><th>Term</th><th>Dates</th><th>Debt at start</th><th>Per person</th><th>Debt at end</th><th>Per person</th><th>Change</th><th>Change %</th></tr>{"".join(rows)}</table></div>

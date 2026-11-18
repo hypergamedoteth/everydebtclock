@@ -139,7 +139,7 @@
   const d = info('debt_total');
   const hero = document.createElement('div'); hero.className = 'hero lead'; hero.id = 't-debt_total';
   if (d.status === 'ok') {
-    hero.innerHTML = `<div class="k">US national debt · ${d.held_at_limit ? 'held at the debt limit (official figure)' : 'live'}</div><div class="big num" id="hv">—</div>
+    hero.innerHTML = `<div class="k">Live estimate · US national debt${d.held_at_limit ? ' · held at the debt limit' : ''}</div><div class="big num" id="hv">—</div>
     <div class="sub"><span>${rateTxt(d.rate)}</span><span class="note">rate: 90-day least-squares trend (${d.calc?.n || '—'} daily closes), backtested vs next Treasury close, avg error ${d.validation?.mean_abs_error_pct != null ? d.validation.mean_abs_error_pct.toFixed(3) + '%' : 'n/a'}</span><span>Since you opened this page: <span class="num" id="hs">$0</span> more debt · <span class="num" id="hi">$0</span> in interest</span></div>
     <div class="trio"><div><span class="l" title="${esc(PPB)}">Per person (projected population)</span><span class="num" id="h1">—</span></div><div><span class="l">Per tax return filed</span><span class="num" id="h2">—</span></div><div><span class="l">Per household</span><span class="num" id="h3">—</span></div></div>
     <div class="meta" style="margin-top:10px">${badges(d)}<span class="badge">source: Treasury Debt to the Penny</span></div>`;
@@ -148,10 +148,10 @@
       h1.textContent = usd(x / pop(t), 2); h2.textContent = usd(x / tax(), 2); h3.textContent = usd(x / T.households.base, 2); });
     hero.onclick = () => openModal('debt_total');
   } else hero.innerHTML = `<div class="k">US national debt</div><div class="big">source unavailable</div>`;
+  if (intro) app.appendChild(intro);
   app.appendChild(hero);
-  if (intro) hero.after(intro);
   const cross41 = document.getElementById('cross41');
-  if (cross41) (intro || hero).after(cross41);
+  if (cross41) hero.after(cross41);
 
   // ---------- "Your state" card (server-rendered with the default place; see build.py place_card)
   const pc = document.getElementById('placecard');
