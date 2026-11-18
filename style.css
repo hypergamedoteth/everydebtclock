@@ -121,6 +121,10 @@ section,.tile,.hero{scroll-margin-top:96px}
 /* build-time text: intro (always shown), static fallback (removed by app.js), quick-answer links */
 .intro{max-width:1280px;margin:0 auto;padding:14px 14px 0}.intro h1{font-size:19px;margin:4px 0 6px;letter-spacing:.02em}
 .intro p{color:#c2ccda;font-size:13.5px;line-height:1.55;max-width:980px;margin:0}
+.intro .answer{font-size:15px;line-height:1.5}
+.faq h2{font-size:17px;margin:18px 0 6px}.faq h3{font-size:15.5px;margin:14px 0 4px}
+.faq p{color:#c2ccda;font-size:14.5px;line-height:1.55;margin:0 0 8px;max-width:980px}
+.answers .faq{margin:0 0 22px}
 .sharecta{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:14px 0 2px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--red);border-radius:14px;background:var(--panel);max-width:980px}
 .sharecta a{display:inline-flex;align-items:center;min-height:44px;background:var(--red);color:#fff;font-weight:750;border-radius:10px;padding:10px 14px;text-decoration:none}
 .sharecta a:hover{filter:brightness(1.08)}
