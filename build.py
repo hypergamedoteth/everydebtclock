@@ -914,6 +914,25 @@ if OFF_V and POP_OFF:
 
 # ---------------------------------------------------------------- sitemap + robots
 lm = gen_ct.date().isoformat()
+# Country pages use the date of the series they quote, not the US fetch timestamp.
+COUNTRY_LASTMOD = {}
+_weo_published = None
+if os.path.exists(f"{R}/data/world_weo_history.json"):
+    _weo_published = json.load(open(f"{R}/data/world_weo_history.json")).get("published")
+for _p in PLACES_LIVE:
+    if _p.get("kind") != "country":
+        continue
+    _as_of = ((_p.get("components") or [{}])[0].get("as_of") or "")[:10]
+    if _as_of:
+        COUNTRY_LASTMOD[_p["slug"]] = _as_of
+if _weo_published and os.path.exists(f"{R}/data/world_weo_debt.json"):
+    for _e in json.load(open(f"{R}/data/world_weo_debt.json")).get("economies") or []:
+        COUNTRY_LASTMOD.setdefault(_e["slug"], _weo_published)
+def _sitemap_lastmod(url):
+    m = re.search(r"/countries/([^/]+)/$", url)
+    if m and m.group(1) in COUNTRY_LASTMOD:
+        return COUNTRY_LASTMOD[m.group(1)]
+    return lm
 # /embed/ is indexable. Per-clock pages under /embed/ are noindex and stay out of this list.
 urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/embed/", "0.5", "weekly")] + data_hub.sitemap_entries(R, SITE) + [(f"{SITE}/{a}/", "0.9", "daily") for a, _ in ANSWERS if os.path.exists(f"{R}/{a}/index.html")] +
         [(u, "0.8", "weekly") for u in PLACE_URLS] +
@@ -923,7 +942,7 @@ urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/embed/", "0.5", "weekly")] + d
         [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None] +
         site_chrome.sitemap_entries(SITE))
 open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-    "".join(f"<url><loc>{u}</loc><lastmod>{lm}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
+    "".join(f"<url><loc>{u}</loc><lastmod>{_sitemap_lastmod(u)}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
 AI_BOTS = ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User",
            "PerplexityBot", "Google-Extended", "Applebot-Extended", "Bingbot")
 robots = "".join(f"User-agent: {b}\nAllow: /\n\n" for b in AI_BOTS)
@@ -1020,6 +1039,8 @@ for f in _pages:
 print("asset versions:", AV)
 
 site_chrome.finalize(R)
+import country_profile
+country_profile.assert_country_pages_differ(R)
 debt_by_year_build.check(R, SITE)
 presidents_build.check(R, SITE)
 state_per_person_build.check(R, SITE)
