@@ -68,7 +68,13 @@ def issues_or(issues, msg):
     issues.append(msg)
 
 
-def audit_states(doc, live, issues):
+def _error_page(data):
+    """Census sometimes answers HTTP 200 with an HTML rejection instead of the table."""
+    head = data[:800].lstrip().lower()
+    return head.startswith(b"<html") or b"request rejected" in head or b"<title>request rejected" in head
+
+
+def audit_states(doc, live, issues, notes=None):
     """2017–2024 must match the state clock file and, live, the Census API. Earlier years are re-parsed from the cited file."""
     import debt_by_year_build as b
     pages = {slug: rec for slug, rec in doc["places"].items() if rec.get("kind") == "state"}
@@ -119,6 +125,13 @@ def audit_states(doc, live, issues):
             data = get(url)
         except Exception as e:
             issues_or(issues, f"could not re-download {url} ({e})")
+            continue
+        if _error_page(data):
+            # Not a parsed table and not evidence the stored figure changed.
+            if notes is not None:
+                notes.append(f"not re-checked, Census returned an error page instead of the table: {url}")
+            else:
+                issues_or(issues, f"could not re-download {url} (error page)")
             continue
         name = url.rsplit("/", 1)[-1]
         if "slsstab1" in name or name.startswith("04slsstab1") or "stl001" in name:
@@ -287,7 +300,8 @@ def main():
     a = ap.parse_args()
     doc = json.load(open(os.path.join(ROOT, "data", "debt_by_year.json")))
     issues = []
-    audit_states(doc, not a.offline, issues)
+    notes = []
+    audit_states(doc, not a.offline, issues, notes)
     audit_imf(doc, not a.offline, issues)
     audit_presidents(not a.offline, issues)
     audit_per_person(issues)
@@ -299,6 +313,8 @@ def main():
         lines += [f"## {len(issues)} issue(s)"] + [f"- {i}" for i in issues]
     else:
         lines.append("## Clean." if not a.offline else "## Clean: internal checks passed (live source comparison not run).")
+    if notes:
+        lines += ["", "## Not re-checked"] + [f"- {n}" for n in notes]
     out = "\n".join(lines)
     print(out)
     if a.report:
