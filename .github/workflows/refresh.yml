@@ -132,6 +132,8 @@ jobs:
           python3 pipeline/fetch_world.py || echo "world fetch skipped"
           # Quarterly public-sector debt (World Bank / IMF QPSD, keyless). Keeps the last good file on failure.
           python3 pipeline/fetch_qpsd.py || echo "qpsd fetch skipped"
+          # BEA current-dollar GDP by state (SAGDP2). Used for debt-to-GDP on the state pages. Keeps the last file on failure.
+          python3 pipeline/fetch_state_gdp.py || echo "state gdp fetch skipped"
 
       - name: Build site
         env:

@@ -15,7 +15,8 @@ Outputs (all under data/, which GitHub Pages serves at /data/):
   data/country-debt.csv
   data/charts/*.png and *.svg
 """
-import csv, html, json, os
+import csv, datetime as dt, html, json, os
+from decimal import Decimal
 from PIL import Image, ImageDraw, ImageFont
 
 import topics_build
@@ -590,6 +591,186 @@ def draw_charts(R, year_rows, pres_rows, interest_rows, country_rows):
             os.remove(os.path.join(dest, name))
     return made
 
+# ---------------------------------------------------------------- Treasury history downloads
+ATTR_DAILY = "Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Debt to the Penny"
+ATTR_ANNUAL = "Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Historical Debt Outstanding"
+DAILY_API = "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/debt_to_penny"
+DAILY_FIELDS = ["record_date", "total_public_debt_outstanding_usd", "debt_held_by_the_public_usd",
+                "intragovernmental_holdings_usd", "parts_equal_total", "parts_gap_usd",
+                "source", "source_url", "attribution", "last_updated"]
+ANNUAL_FIELDS = ["fiscal_year", "record_date", "total_public_debt_outstanding_usd",
+                 "source", "source_url", "attribution", "last_updated"]
+HISTORY_SCHEDULE = ("Rewritten by the daily GitHub Action that refreshes this site from Treasury "
+                    "(every morning, weekday afternoons when Debt to the Penny has a new record date, and weekday end of day).")
+
+
+def _fetched_day(path):
+    try:
+        stamp = json.load(open(path))["fetched"]
+        return dt.datetime.fromtimestamp(stamp, dt.timezone.utc).date().isoformat()
+    except Exception:
+        return ""
+
+
+def _cents(raw):
+    return Decimal(format(float(raw), ".2f"))
+
+
+def _write_json(path, doc):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(doc, f, separators=(",", ":"))
+        f.write("\n")
+
+
+def build_treasury_history(R, T):
+    """Daily Debt to the Penny back to 1993-04-01, and Historical Debt Outstanding back to 1790.
+
+    Amounts are the official publications. Rows where Treasury's own parts do not add to the total
+    are kept and marked; they are not adjusted.
+    """
+    daily_path = os.path.join(R, "cache", "debt_to_penny_full.json")
+    annual_path = os.path.join(R, "cache", "debt_outstanding.json")
+    if not os.path.exists(daily_path):
+        raise SystemExit("data hub: cache/debt_to_penny_full.json is missing. Run pipeline/fetch_us_debt_history.py")
+    if not os.path.exists(annual_path):
+        raise SystemExit("data hub: cache/debt_outstanding.json is missing")
+    daily_blob = json.load(open(daily_path))
+    daily = daily_blob["data"]
+    rows = daily["rows"]
+    if len(rows) < 8000 or rows[0]["record_date"] > "1993-04-01":
+        raise SystemExit("data hub: Debt to the Penny history is not the full series")
+    td = (T or {}).get("debt_total") or {}
+    if td.get("status") == "ok" and td.get("as_of") and td.get("base") is not None:
+        last = rows[-1]
+        if last["record_date"] < td["as_of"]:
+            raise SystemExit(f"data hub: daily history ends {last['record_date']}, before the clock close {td['as_of']}")
+        if last["record_date"] == td["as_of"] and Decimal(last["total_public_debt_outstanding_usd"]) != _cents(td["base"]):
+            raise SystemExit("data hub: daily history total does not match the clock's Treasury close")
+    updated = _fetched_day(daily_path)
+    annual_updated = _fetched_day(annual_path) or updated
+    daily_rows = []
+    for r in rows:
+        daily_rows.append({
+            "record_date": r["record_date"],
+            "total_public_debt_outstanding_usd": r["total_public_debt_outstanding_usd"],
+            "debt_held_by_the_public_usd": r["debt_held_by_the_public_usd"],
+            "intragovernmental_holdings_usd": r["intragovernmental_holdings_usd"],
+            "parts_equal_total": r["parts_equal_total"],
+            "parts_gap_usd": r["parts_gap_usd"],
+            "source": daily["source_name"],
+            "source_url": daily["source_url"],
+            "attribution": ATTR_DAILY,
+            "last_updated": updated,
+        })
+    ann = json.load(open(annual_path))["data"]
+    if not ann or ann[0][0] != 1790:
+        raise SystemExit("data hub: Historical Debt Outstanding does not start at 1790")
+    annual_rows = []
+    by_day = {r["record_date"]: Decimal(r["total_public_debt_outstanding_usd"]) for r in rows}
+    overlap_diff = []
+    overlap_miss = 0
+    for year, day, amount in ann:
+        annual_rows.append({
+            "fiscal_year": year,
+            "record_date": day,
+            "total_public_debt_outstanding_usd": _num(amount),
+            "source": HDO_NAME,
+            "source_url": HDO_URL,
+            "attribution": ATTR_ANNUAL,
+            "last_updated": annual_updated,
+        })
+        if day < rows[0]["record_date"]:
+            continue
+        if day not in by_day:
+            overlap_miss += 1
+            continue
+        if by_day[day] != _cents(amount):
+            overlap_diff.append((year, day, _num(amount), f"{by_day[day]:.2f}"))
+    gaps = daily.get("parts_gap_rows") or []
+    gap_txt = ""
+    if gaps:
+        bits = []
+        for g in gaps:
+            bits.append(f"{g['record_date']} (parts minus total = ${Decimal(g['parts_gap_usd']):,.2f})")
+        gap_txt = (" On " + " and ".join(bits) + ", Treasury's published held-by-the-public and intragovernmental "
+                   "figures do not add to the published total. Those rows are copied as Treasury published them.")
+    split = daily.get("components_start") or ""
+    split_txt = (f" Held by the public and intragovernmental holdings are blank before {split}, "
+                 "when Treasury's file starts publishing that split.") if split else ""
+    diff_txt = ""
+    if overlap_diff:
+        shown = "; ".join(f"FY{y} {d}: annual ${a}, daily ${b}" for y, d, a, b in overlap_diff[:4])
+        diff_txt = f" On dates that appear in both files the totals match, except {shown}."
+    elif overlap_miss:
+        diff_txt = " On dates that appear in both files, the totals match."
+    data = os.path.join(R, "data")
+    _write_csv(os.path.join(data, "us-debt-daily.csv"), DAILY_FIELDS, daily_rows)
+    _write_json(os.path.join(data, "us-debt-daily.json"), {
+        "name": "US total public debt outstanding, daily",
+        "source": daily["source_name"],
+        "source_url": daily["source_url"],
+        "api_url": daily.get("api_url") or DAILY_API,
+        "attribution": ATTR_DAILY,
+        "last_updated": updated,
+        "series_start": rows[0]["record_date"],
+        "series_end": rows[-1]["record_date"],
+        "components_start": split,
+        "parts_gap_rows": gaps,
+        "unit": "US dollars",
+        "notes": ("Each row is an official Debt to the Penny close of business, not the live clock. "
+                  "A blank part means Treasury did not publish it that day. parts_gap_usd is "
+                  "debt held by the public plus intragovernmental holdings minus the total, and only "
+                  "when those published figures do not add up." + split_txt + gap_txt),
+        "rows": [{k: r[k] for k in DAILY_FIELDS if k not in ("source", "source_url", "attribution", "last_updated")} for r in daily_rows],
+    })
+    _write_csv(os.path.join(data, "us-debt-annual.csv"), ANNUAL_FIELDS, annual_rows)
+    _write_json(os.path.join(data, "us-debt-annual.json"), {
+        "name": "US total public debt outstanding, fiscal year",
+        "source": HDO_NAME,
+        "source_url": HDO_URL,
+        "attribution": ATTR_ANNUAL,
+        "last_updated": annual_updated,
+        "series_start": annual_rows[0]["record_date"],
+        "series_end": annual_rows[-1]["record_date"],
+        "unit": "US dollars",
+        "notes": ("One row per fiscal year in Treasury's Historical Debt Outstanding. record_date is the date "
+                  "Treasury publishes for that year. Early years are not all September 30. This is not the "
+                  "daily Debt to the Penny series and not the live clock." + diff_txt),
+        "rows": [{k: r[k] for k in ANNUAL_FIELDS if k not in ("source", "source_url", "attribution", "last_updated")} for r in annual_rows],
+    })
+    daily_about = (f"Every Debt to the Penny close from {rows[0]['record_date']} through {rows[-1]['record_date']} "
+                   f"({len(daily_rows)} rows). Total public debt outstanding, plus the held-by-public and "
+                   f"intragovernmental split when Treasury publishes it.")
+    annual_about = (f"Treasury Historical Debt Outstanding, fiscal years {annual_rows[0]['fiscal_year']} through "
+                    f"{annual_rows[-1]['fiscal_year']} ({len(annual_rows)} rows). One official total per fiscal year.")
+    note_daily = f"<p>{_esc(split_txt.strip())} {_esc(gap_txt.strip())}</p>"
+    note_annual = f"<p>{_esc(diff_txt.strip())} A fiscal-year-end date is not always a Debt to the Penny business day ({overlap_miss} annual dates after the daily series starts are not in the daily file).</p>"
+    print(f"data/us-debt-daily.csv: {len(daily_rows)} rows")
+    print(f"data/us-debt-annual.csv: {len(annual_rows)} rows")
+    common = {"schedule": HISTORY_SCHEDULE}
+    return [
+        {"file": "us-debt-daily.csv", "name": "US national debt, daily", "about": daily_about,
+         "rows": len(daily_rows), "source_url": DTP_URL, "source_name": DTP_NAME, "columns": DAILY_FIELDS,
+         "citation": ATTR_DAILY, "note": note_daily, **common},
+        {"file": "us-debt-daily.json", "name": "US national debt, daily (JSON)", "about": daily_about,
+         "rows": len(daily_rows), "source_url": DTP_URL, "source_name": DTP_NAME,
+         "columns": ["record_date", "total_public_debt_outstanding_usd", "debt_held_by_the_public_usd",
+                     "intragovernmental_holdings_usd", "parts_equal_total", "parts_gap_usd"],
+         "citation": ATTR_DAILY,
+         "note": note_daily + "<p>The JSON wrapper, not each row, carries source, source URL, attribution, and last_updated.</p>",
+         **common},
+        {"file": "us-debt-annual.csv", "name": "US national debt, fiscal year", "about": annual_about,
+         "rows": len(annual_rows), "source_url": HDO_URL, "source_name": HDO_NAME, "columns": ANNUAL_FIELDS,
+         "citation": ATTR_ANNUAL, "note": note_annual, **common},
+        {"file": "us-debt-annual.json", "name": "US national debt, fiscal year (JSON)", "about": annual_about,
+         "rows": len(annual_rows), "source_url": HDO_URL, "source_name": HDO_NAME,
+         "columns": ["fiscal_year", "record_date", "total_public_debt_outstanding_usd"],
+         "citation": ATTR_ANNUAL,
+         "note": note_annual + "<p>The JSON wrapper carries source, source URL, attribution, and last_updated.</p>",
+         **common},
+    ]
+
+
 # ---------------------------------------------------------------- page
 def _page(R, SITE, with_analytics, files, charts, modified):
     E = _esc
@@ -603,7 +784,7 @@ def _page(R, SITE, with_analytics, files, charts, modified):
         distributions.append({
             "@type": "DataDownload",
             "name": f["name"],
-            "encodingFormat": "text/csv",
+            "encodingFormat": "application/json" if f["file"].endswith(".json") else "text/csv",
             "contentUrl": f"{SITE}/data/{f['file']}",
         })
         if f.get("source_url") and f["source_url"] not in based:
@@ -616,11 +797,11 @@ def _page(R, SITE, with_analytics, files, charts, modified):
         "@context": "https://schema.org",
         "@type": "Dataset",
         "name": "Free US and world debt data",
-        "description": "CSV downloads of the US and world debt series published on EveryDebtClock.com: national debt by fiscal year, debt by presidential term, debt per person, household and tax return, interest, US state debt, and country debt. Free to use with credit.",
+        "description": "CSV and JSON downloads of the US and world debt series published on EveryDebtClock.com. The daily file is every Debt to the Penny close since 1993-04-01. The annual file is Treasury Historical Debt Outstanding since 1790. Also debt by presidential term, debt per person, interest, US state debt, and country debt. Free to use with credit.",
         "url": url,
         "isAccessibleForFree": True,
         "creator": {"@type": "Organization", "name": "EveryDebtClock.com", "url": credit_href},
-        "creditText": "Source: EveryDebtClock.com",
+        "creditText": "Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Debt to the Penny",
         "license": {"@type": "CreativeWork", "name": "Free to use with credit",
                     "text": "Free to use. Credit: Source: EveryDebtClock.com", "url": url},
         "dateModified": modified,
@@ -631,6 +812,19 @@ def _page(R, SITE, with_analytics, files, charts, modified):
         "variableMeasured": [{"@type": "PropertyValue", "name": f["name"]} for f in files],
     }
     ld_html = '<script type="application/ld+json">' + json.dumps(ld).replace("</", "<\\/") + "</script>"
+    explain = []
+    for f in files:
+        cols = ", ".join(f"<code>{E(c)}</code>" for c in (f.get("columns") or []))
+        cite = f.get("citation") or "Source: EveryDebtClock.com"
+        schedule = f.get("schedule") or "Rewritten when the daily refresh rebuilds the site from the figures it already publishes."
+        explain.append(
+            f'<h2 id="{E(f["file"])}">{E(f["file"])}</h2>'
+            f'<p>{E(f["about"])}</p>{f.get("note") or ""}'
+            f'<p><b>Columns.</b> {cols or "Named in the header row."}</p>'
+            f'<p><b>Source.</b> <a href="{E(f.get("source_url") or "")}">{E(f.get("source_name") or f.get("source_url") or "")}</a></p>'
+            f'<p><b>Updated.</b> {E(schedule)}</p>'
+            f'<p><b>Citation.</b> {E(cite)}</p>'
+        )
     figures = []
     for slug, meta in charts.items():
         png = f"charts/{slug}.png"
@@ -650,7 +844,7 @@ def _page(R, SITE, with_analytics, files, charts, modified):
     doc = f'''<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Free US &amp; World Debt Data (CSV + Charts)</title>
-<meta name="description" content="Free CSV files and charts of US debt by year, by president, per person, interest, state debt, and country debt. Free to use with credit: Source: EveryDebtClock.com.">
+<meta name="description" content="Free CSV and JSON of US debt, daily since 1993 and annually since 1790, plus debt by year, by president, per person, interest, state debt, and country debt. Citation: Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Debt to the Penny.">
 <link rel="canonical" href="{E(url)}">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Every Debt Clock"><meta property="og:url" content="{E(url)}">
 <meta property="og:title" content="Free US &amp; World Debt Data (CSV + Charts)"><meta property="og:description" content="Free CSV files and charts of the debt series published on EveryDebtClock.com. Free to use with credit.">
@@ -681,13 +875,15 @@ footer{{color:#5c687a;font-size:12px;margin-top:28px}}
 </head><body><main>
 <a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>
 <h1>Free US &amp; World Debt Data (CSV + Charts)</h1>
-<p>These files are free to use. Credit the source: <a href="{E(credit_href)}">Source: EveryDebtClock.com</a>.</p>
-<p>Each file is taken from figures this site already publishes, with the source and as-of date on every row. Dollar amounts are the official stocks, not the live clock. A blank cell means that source has not published the figure. OMB surplus is the Historical Tables balance: positive is a surplus, negative is a deficit. The country file is the same stock as the world debt clock: general government debt, from IMF, Eurostat, QPSD, or a national series. A country's own clock can be a narrower total. The United States row there is the IMF figure. Federal debt from Debt to the Penny is in the US files.</p>
+<p>These files are free to use. For the Treasury history files, the citation line is: {E(ATTR_DAILY)}.</p>
+<p><a href="#us-debt-daily.csv">us-debt-daily.csv</a> and <a href="#us-debt-daily.json">us-debt-daily.json</a> are every Debt to the Penny close from 1993-04-01. <a href="#us-debt-annual.csv">us-debt-annual.csv</a> and <a href="#us-debt-annual.json">us-debt-annual.json</a> are Historical Debt Outstanding from fiscal year 1790. Dollar amounts are the official stocks, not the live clock. A blank cell means that source has not published the figure. The other files are the series this site already publishes: debt by year with OMB ratios, debt by president, debt per person, interest, state debt, and country debt. OMB surplus is the Historical Tables balance: positive is a surplus, negative is a deficit. The country file is the same stock as the world debt clock. A country's own clock can be a narrower total. The United States row there is the IMF figure.</p>
 <h2>CSV files</h2>
 <div style="overflow-x:auto"><table>
 <tr><th>File</th><th>Series</th><th>What it contains</th><th>Rows</th></tr>
 {''.join(file_rows)}
 </table></div>
+<h2>Each file</h2>
+{''.join(explain)}
 <h2>Charts</h2>
 <p>Redrawn on every build from the CSV files. Each image carries the credit EveryDebtClock.com.</p>
 {''.join(figures)}
@@ -702,6 +898,10 @@ footer{{color:#5c687a;font-size:12px;margin-top:28px}}
 # Public downloads listed on /data/. Daily JSON snapshots and validation_log.csv
 # stay out of the sitemap; they are not offered as hub files.
 DATA_CSV = (
+    "us-debt-daily.csv",
+    "us-debt-daily.json",
+    "us-debt-annual.csv",
+    "us-debt-annual.json",
     "us-debt-by-year.csv",
     "us-debt-by-president.csv",
     "us-debt-per-person.csv",
@@ -762,12 +962,14 @@ def build(R, SITE, with_analytics, D, places, world):
          "One row per economy on the world debt clock, with the source (IMF, Eurostat, QPSD, or a national series) and the as-of date.",
          c_fields, c_rows, "https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO"),
     ]
-    files = []
+    files = build_treasury_history(R, T)
     for filename, name, about, fields, rows, src in specs:
         if filename == "country-debt.csv" and not rows:
             continue
         n = _write_csv(os.path.join(data, filename), fields, rows)
-        files.append({"file": filename, "name": name, "about": about, "rows": n, "source_url": src})
+        files.append({"file": filename, "name": name, "about": about, "rows": n, "source_url": src,
+                      "source_name": src, "columns": fields,
+                      "citation": "Source: EveryDebtClock.com"})
         print(f"data/{filename}: {n} rows")
     charts = draw_charts(R, y_rows, p_rows, i_rows, c_rows)
     print("charts:", ", ".join(charts) or "none")

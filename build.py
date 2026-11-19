@@ -928,7 +928,7 @@ def _lastmod(url):
 open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     "".join(f"<url><loc>{u}</loc><lastmod>{_lastmod(u)}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
 AI_BOTS = ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User",
-           "PerplexityBot", "Google-Extended", "Applebot-Extended", "Bingbot")
+           "PerplexityBot", "Google-Extended", "Applebot", "Applebot-Extended", "Bingbot")
 robots = "".join(f"User-agent: {b}\nAllow: /\n\n" for b in AI_BOTS)
 robots += f"User-agent: *\nAllow: /\nDisallow: /cache/\nDisallow: /pipeline/\nDisallow: /widget.html\n\nSitemap: {SITE}/sitemap.xml\n"
 open(f"{R}/robots.txt", "w").write(robots)
@@ -970,7 +970,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /privacy/ : Privacy policy, including analytics, data downloads, and cookies if ads are shown.",
     "- /contact/ : Email hello@everydebtclock.com.",
     "- /advertise/ : Sponsorship on the US clock and the national-debt-by-year page.",
-    "- /data/ : Free CSV files and charts of the US and world series this site publishes. Free to use with credit: Source: EveryDebtClock.com.",
+    "- /data/ : Free CSV and JSON of US debt. us-debt-daily is every Debt to the Penny close since 1993-04-01. us-debt-annual is Historical Debt Outstanding since 1790. Citation: Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Debt to the Penny.",
     "- /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.",
     "",
 ] + debt_by_year_build.llms_lines(R) + presidents_build.llms_lines(R) + [
@@ -982,6 +982,10 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.",
     "",
     "## Machine-readable",
+    f"- {SITE}/data/us-debt-daily.csv — every Debt to the Penny close since 1993-04-01",
+    f"- {SITE}/data/us-debt-daily.json — the same daily series",
+    f"- {SITE}/data/us-debt-annual.csv — Historical Debt Outstanding, fiscal years from 1790",
+    f"- {SITE}/data/us-debt-annual.json — the same annual series",
     f"- {SITE}/data/ — CSV downloads (debt by year, by president, per person, interest, states, countries) and chart images",
     f"- {SITE}/api/daily.json — latest official US total and daily changes",
     f"- {SITE}/data/data.json — all US tickers, official bases and rates",
@@ -1028,6 +1032,8 @@ freshness.write_urls(os.path.join(R, "pipeline", "indexnow-urls.txt"), freshness
 freshness.check(R, SITE, DATES, urls, OFF_D)
 import country_profile
 country_profile.assert_country_pages_differ(R)
+import state_facts
+state_facts.assert_state_pages_differ(R)
 debt_by_year_build.check(R, SITE)
 presidents_build.check(R, SITE)
 state_per_person_build.check(R, SITE)
@@ -1128,7 +1134,7 @@ def check_clock_first():
 
 def check_quotable():
     """The pages answer engines quote must be static HTML, with a dated answer and 3-6 FAQs."""
-    bots = ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "PerplexityBot", "Google-Extended", "ClaudeBot")
+    bots = ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "PerplexityBot", "Google-Extended", "ClaudeBot", "Applebot", "Bingbot")
     robots_txt = open(f"{R}/robots.txt").read()
     for b in bots:
         if f"User-agent: {b}\nAllow: /" not in robots_txt:
