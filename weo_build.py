@@ -288,9 +288,11 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
     gap = u["imf_gap"]
     as_of_long = dt.date.fromisoformat(u["as_of"]).strftime("%B %-d, %Y")
     import quotable
-    h1 = quotable.finish(
-        f"The {sector} gross debt of {name} was {stock_s} ({_money(u['usd'])}) on {as_of_long}, per the World Bank and IMF Quarterly Public Sector Debt database",
-        "the nominal value in the quarterly public sector debt series, a harmonized official stock")
+    h1 = quotable.official(
+        f"{name} {sector} gross debt was {stock_s}",
+        dt.date.fromisoformat(u["as_of"]).strftime("%b %-d, %Y"),
+        "World Bank and IMF",
+    )
     imf_peers, outside = _peers(e, D["economies"])
     imf_faqs = cp.faqs(profile, us_profile, imf_peers, outside)
     faqs = [
@@ -315,17 +317,17 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../countries/">All country debt clocks</a>'
              '<span>·</span><a href="../../world/">World debt clock</a></div>')
     hero = (f'<div class="hero lead" id="t-total" data-b="{u["usd"]}" data-r="{rate:.12g}" data-t="{u["t0"]:.0f}">'
-            f'<div class="big num" id="hv">{_money0(u["usd"])}</div></div>')
-    follow = (f'<div class="hero-follow"><div class="k" data-live="{E(f"Live estimate · {name} {sector} debt")}">Official · {E(u["as_of"])} · World Bank / IMF Quarterly Public Sector Debt</div>'
-            f'<div class="sub"><span>{_signed(rate)}/sec · {_signed(rate * 86400)}/day</span>'
-            f'<span class="note">{E(u["trend_note"])}; a projection, not a daily ledger</span>'
+            f'<div class="k" data-live="{E(f"Live estimate · {name} {sector} debt")}">Official · {E(u["as_of"])} · World Bank / IMF Quarterly Public Sector Debt</div>'
+            f'<div class="big num" id="hv">{_money0(u["usd"])}</div>'
+            f'<div class="sub"><span>{_signed(rate)}/sec · {_signed(rate * 86400)}/day</span> '
+            f'<span class="note">{E(u["trend_note"])}; a projection, not a daily ledger</span> '
             f'<span>Since you opened this page: <span class="num" id="hs">$0</span> {"more" if up else "less"} debt</span></div>'
             f'<div class="trio"><div><span class="l">QPSD stock · {E(u["as_of"])}</span><span class="num">{_money0(u["usd"])}</span></div>'
             f'<div><span class="l">Debt / GDP, IMF 2026</span><span class="num">{e["ratio_2026"]:.2f}%</span></div>'
             f'<div><span class="l">IMF end-2026 stock</span><span class="num">{_money0(e["debt_2026_usd"])}</span></div></div>'
             f'<div class="meta" style="margin-top:10px"><span class="badge proj">HARMONIZED · as of {E(u["as_of"])}</span><span class="badge">source tier: harmonized</span></div></div>')
     fx_bit = f'{E(u["quote"])}' + (f' on {E(u["rate_date"])}' if u.get("rate_date") else "")
-    intro = (f'<section class="intro" id="intro"><h1 class="quote">{E(h1)}</h1>{follow}'
+    intro = (f'<section class="intro" id="intro"><h1 class="quote">{E(h1)}</h1>'
              f'<p class="answer"><b>What this page counts.</b> {E(name)}\'s {E(sector)} gross debt, from the World Bank and IMF Quarterly Public Sector Debt database. '
              f'The stock is <b>{stock_s}</b> as of <b>{as_of_long}</b>. '
              f'Source tier: harmonized official dataset. '
@@ -407,10 +409,10 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../countries/">All country debt clocks</a>'
              '<span>·</span><a href="../../world/">World debt clock</a></div>')
     hero = (f'<div class="hero lead" id="t-total" data-b="{e["debt_2025_usd"]}" data-r="{rate:.12g}" data-t="{t0:.0f}">'
-            f'<div class="big num" id="hv">{_money0(e["debt_2026_usd"])}</div></div>')
-    follow = (f'<div class="hero-follow"><div class="k" data-live="{E(f"Live estimate · {name} general government debt")}">Official · end of 2026 · IMF October 2026 World Economic Outlook</div>'
-            f'<div class="sub"><span>{_signed(rate)}/sec · {_signed(rate * 86400)}/day</span>'
-            f'<span class="note">interpolated from the IMF end-2025 stock to the end-2026 estimate; not a live ledger</span>'
+            f'<div class="k" data-live="{E(f"Live estimate · {name} general government debt")}">Official · end of 2026 · IMF October 2026 World Economic Outlook</div>'
+            f'<div class="big num" id="hv">{_money0(e["debt_2026_usd"])}</div>'
+            f'<div class="sub"><span>{_signed(rate)}/sec · {_signed(rate * 86400)}/day</span> '
+            f'<span class="note">interpolated from the IMF end-2025 stock to the end-2026 estimate; not a live ledger</span> '
             f'<span>Since you opened this page: <span class="num" id="hs">$0</span> {"more" if up else "less"} debt</span></div>'
             f'<div class="trio"><div><span class="l">2026 IMF estimate</span><span class="num">{_money0(e["debt_2026_usd"])}</span></div>'
             f'<div><span class="l">Debt / GDP, 2026</span><span class="num">{e["ratio_2026"]:.2f}%</span></div>'
@@ -419,7 +421,7 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
     jump = _jump_note(e)
     kosovo = (" The IMF World Economic Outlook includes Kosovo in this vintage. The DataMapper code is UVK and the World Bank mirror uses XKX."
               if e["iso3"] == "XKX" else "")
-    intro = (f'<section class="intro" id="intro"><h1 class="quote">{E(h1)}</h1>{follow}'
+    intro = (f'<section class="intro" id="intro"><h1 class="quote">{E(h1)}</h1>'
              f'{cp.lead_html(profile, us_profile, peers, outside)}'
              f'{crumb}'
              f'<p class="answer"><b>What this page counts.</b> {E(name)}\'s general government gross debt, from the IMF World Economic Outlook, October 2026: '

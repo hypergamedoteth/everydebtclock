@@ -212,6 +212,7 @@ def meta_head(SITE, url, title, desc, img, depth, extra_css="", ld="", css_link=
 # small additions on top of style.css (kept here so the US homepage is untouched)
 PL_CSS = """.brand a,.brand{color:inherit}.tile .pp{grid-template-columns:1fr 1fr}.wcc .x b{color:var(--txt);font-weight:600}
 .trio>div,.grid>.tile{min-width:0}@media (min-width:641px){.tile.l1 .val{font-size:21px}.tile.l2 .val{font-size:18px}.tile.l3 .val{font-size:16px}}.meta .badge{white-space:normal}.trio .num{overflow-wrap:anywhere}
+.tw{overflow-x:auto;max-width:100%;min-width:0;-webkit-overflow-scrolling:touch}
 @media (max-width:640px){.grid.dense .tile .val{font-size:clamp(11px,3.1vw,16px);overflow-wrap:anywhere}#details,.det{overflow-x:auto}table.v td,table.v th{padding:6px 5px}table.v td.num{white-space:nowrap}}
 details.det{margin:8px 0}details.det summary{cursor:pointer;color:var(--blue);font-size:13px;margin:6px 0}
 table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:right}.dnote{color:var(--mut);font-size:12.5px}
@@ -257,7 +258,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     title = (f"{name} State & Local Debt Clock: {lv}Debt, Official Census Data" if is_state else f"{name} National Debt Clock: {lv}Debt, Official Data")
     if p.get("seo_title"): title = p["seo_title"].format(lv=lv)  # optional per-place override (District of Columbia: no state level)
     import quotable
-    h1 = quotable.stock(name, T["head_long"], c["total"], c["as_of"], pub, words=_usd0(c["total"]) if (p.get("currency") or {}).get("code", "USD") != "USD" else None)
+    h1 = quotable.stock(name, T["head_long"], c["total"], c["as_of"], pub, words=_b(c["total"]) if (p.get("currency") or {}).get("code", "USD") != "USD" else None)
     _dn = p.get("seo_desc_noun")  # optional: full noun phrase for the description's opening
     desc = ((f"{_dn[0].upper() + _dn[1:]}: {_b(c['total'])}, " if _dn else f"{name} {'state and local debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, ") + f"{'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
             f"{'Live ' if rate else 'Official '}{name} debt clock, {'about ' if rate else ''}{_usd0(proj / pop['value'])} per {dem}{' (projected)' if rate else ''}, with sources.")
@@ -333,22 +334,21 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         kicker = f"Official figure · {name} {T['head']}"
         live_attr = ""
     hero = (f'<div class="hero lead" id="t-total" data-b="{c["total"]}" data-r="{rate or 0}" data-t="{t0}" data-d=\'{E(json.dumps(hero_d), quote=True)}\'>'
-            f'<div class="big num" id="hv">{_usd0(c["total"])}</div></div>')
-    follow = f'<div class="hero-follow"><div class="k"{live_attr}>{E(kicker)}</div>'
+            f'<div class="k"{live_attr}>{E(kicker)}</div><div class="big num" id="hv">{_usd0(c["total"])}</div>')
     if rate:
-        follow += (f'<div class="sub"><span>{_rate_txt(rate)}</span><span class="note">rate: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}, so this is a projection</span>'
-                 + (f'<span class="note">{E(recent)}</span>' if recent else "") + f'<span>Since you opened this page: <span class="num" id="hs">{CUR}0</span> {"more" if up_ else "less"} debt</span></div>')
+        hero += (f'<div class="sub"><span>{_rate_txt(rate)}</span> <span class="note">rate: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}, so this is a projection</span>'
+                 + (f' <span class="note">{E(recent)}</span>' if recent else "") + f' <span>Since you opened this page: <span class="num" id="hs">{CUR}0</span> {"more" if up_ else "less"} debt</span></div>')
     else:
-        follow += f'<div class="sub"><span>fixed</span><span class="note">{E(rep)} reports {T["once"]}; {"shown fixed, not ticking" if p.get("hold_trend") else "one official figure available"}</span></div>'
+        hero += f'<div class="sub"><span>fixed</span> <span class="note">{E(rep)} reports {T["once"]}; {"shown fixed, not ticking" if p.get("hold_trend") else "one official figure available"}</span></div>'
     trio_x = [(x["short"] + " · official " + _fd(x["as_of"]), _usd0(x["value"])) for x in cs[:2]] if len(cs) > 1 else \
              [(f"Official · {_fd(c['as_of'])}", _usd0(c["total"]))]
     trio_x += [(h["label"], h["value"]) for h in p.get("hero_extra", [])]
-    follow += ('<div class="trio">' + f'<div><span class="l">Per {E(dem)} ({E(T["pop_tag"])}, {_fd(pop["as_of"])})</span><span class="num" data-pp="{pop["value"]}">{_usd2(c["total"] / pop["value"])}</span></div>'
+    hero += ('<div class="trio">' + f'<div><span class="l">Per {E(dem)} ({E(T["pop_tag"])}, {_fd(pop["as_of"])})</span><span class="num" data-pp="{pop["value"]}">{_usd2(c["total"] / pop["value"])}</span></div>'
              + "".join(f'<div><span class="l">{E(l)}</span><span class="num">{E(v)}</span></div>' for l, v in trio_x[:2]) + "</div>"
              + (f'<div class="sec2"><span class="l">{E(sec2["label"])} · official {E(_fd(sec2["as_of"]))}</span> <b class="num">{_usd0(sec2["value"])}</b> '
                 f'<span class="note">{E(sec2["publisher"])}. {E(sec2["scope"])}</span></div>' if sec2 else "")
              + f'<div class="meta" style="margin-top:10px">{proj_badge if rate else fix_badge(c["as_of"])}{ann_badge}<span class="badge">source: {E(pub)}</span></div></div>')
-    intro = (f'<section class="intro" id="intro"><h1 class="quote">{E(h1)}</h1>{follow}{crumb}'
+    intro = (f'<section class="intro" id="intro"><h1 class="quote">{E(h1)}</h1>{crumb}'
              f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
              + (f'on <b>{as_of}</b>' if T["periodic"] else f'in Census survey year {fy} (dated <b>{as_of}</b>)' if p.get("year_label") else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
              + " and ".join(("" if n_.startswith("Eurostat") else "the ") + f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))

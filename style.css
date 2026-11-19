@@ -3,8 +3,9 @@
 --mono:ui-monospace,"SF Mono","JetBrains Mono","Roboto Mono",Menlo,Consolas,monospace;
 --sans:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;background:radial-gradient(1200px 600px at 50% -200px,#14203a 0%,var(--bg) 60%) fixed;color:var(--txt);font-family:var(--sans);-webkit-font-smoothing:antialiased}
-a{color:var(--blue);text-decoration:none}
+html{overflow-x:clip}
+body{margin:0;max-width:100%;overflow-x:clip;background:radial-gradient(1200px 600px at 50% -200px,#14203a 0%,var(--bg) 60%) fixed;color:var(--txt);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--blue);text-decoration:none;overflow-wrap:anywhere}
 .num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap}
 header.top{position:sticky;top:0;z-index:20;backdrop-filter:blur(10px);background:rgba(7,9,13,.82);border-bottom:1px solid var(--line)}
 .topin{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
@@ -17,7 +18,7 @@ a.navembed{margin-left:12px;font-size:13px;font-weight:650}
 nav.jump{max-width:1280px;margin:0 auto;padding:0 12px 8px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
 nav.jump a{flex:none;font-size:12px;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:5px 11px;background:var(--panel)}
 nav.jump a:hover{color:var(--txt)}
-main{max-width:1280px;margin:0 auto;padding:12px 12px 60px}
+main{max-width:1280px;min-width:0;margin:0 auto;padding:12px 12px 60px}
 .banner{border:1px solid #5a3a12;background:#20170a;color:var(--amber);border-radius:10px;padding:10px 12px;font-size:13px;margin:8px 0}
 #cross41[hidden]{display:none!important}
 #cross41.preview{border-color:#1e3a5c}
@@ -27,9 +28,10 @@ main{max-width:1280px;margin:0 auto;padding:12px 12px 60px}
 .hero .k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
 .hero .big{font-size:clamp(24px,7.4vw,84px);font-weight:700;color:#fff;margin:4px 0 2px;line-height:1.05}
 .hero .big .c{color:var(--red)}
-.hero .sub{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--mut)}
+.hero .sub,.hero-follow .sub{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--mut);min-width:0;max-width:100%}
+.hero .sub>span,.hero-follow .sub>span{min-width:0;max-width:100%}
 .hero .sub .num{color:var(--txt)}
-.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px;min-width:0;max-width:100%}
 .trio div{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:9px 10px}
 .trio .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
 .trio .num{font-size:clamp(15px,4.2vw,30px);font-weight:600;margin-top:2px;display:block}
@@ -70,6 +72,7 @@ section{margin:22px 0}
 .htile{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--violet);border-radius:10px;padding:9px 10px;cursor:pointer}
 .htile .y{font-size:11px;color:var(--mut)}.htile .num{font-size:18px;color:#d9d2ff}
 .htile .t{font-size:10px;color:var(--dim)}
+.tw{overflow-x:auto;max-width:100%;min-width:0;-webkit-overflow-scrolling:touch}
 table.v{width:100%;border-collapse:collapse;font-size:12px}
 table.v td,table.v th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
 table.v th{color:var(--mut);font-weight:500}
@@ -80,7 +83,7 @@ dialog h3{margin:0 0 4px}dialog .big{font-size:26px;margin:6px 0}
 dialog p{color:#c2ccda;font-size:14px;line-height:1.5}
 dialog textarea{width:100%;background:#0a0e15;color:#c8d3e3;border:1px solid var(--line);border-radius:8px;font-family:var(--mono);font-size:11px;padding:8px;height:64px}
 dialog button{background:#1b2638;color:var(--txt);border:1px solid #2b3a55;border-radius:8px;padding:7px 12px;cursor:pointer;margin-right:6px}
-@media (max-width:640px){.grid{gap:8px}.tile{padding:10px 10px 8px}.tile .val{font-size:21px;margin:3px 0 5px}.pp{margin:2px 0 6px}.pp .num{font-size:13px}.pp div{padding:4px 7px}.trio{gap:6px}.trio div{padding:7px 7px}.trio .l{font-size:9.5px;letter-spacing:.04em}.trio .num{font-size:13.5px}.grid{grid-template-columns:1fr}main{padding:10px 10px 50px}.hero{padding:14px 12px}}
+@media (max-width:640px){.grid{gap:8px}.tile{padding:10px 10px 8px}.tile .val{font-size:21px;margin:3px 0 5px}.pp{margin:2px 0 6px}.pp .num{font-size:13px}.pp div{padding:4px 7px}.trio{gap:6px}.trio div{padding:7px 7px}.trio .l{font-size:9.5px;letter-spacing:.04em}.trio .num{font-size:11.5px;letter-spacing:-.04em}.grid{grid-template-columns:1fr}main{padding:10px 10px 50px}.hero{padding:14px 12px}}
 @media (min-width:1100px){.grid{grid-template-columns:repeat(4,1fr)}.grid .tile.wide{grid-column:span 2}}
 section,.tile,.hero{scroll-margin-top:96px}
 @media (max-width:640px){
@@ -123,17 +126,20 @@ section,.tile,.hero{scroll-margin-top:96px}
 #mf,.math .num{white-space:normal;overflow-wrap:anywhere}
 /* build-time text: intro (always shown), static fallback (removed by app.js), quick-answer links */
 .intro{max-width:1280px;margin:0 auto;padding:14px 14px 0}.intro h1{font-size:19px;margin:4px 0 6px;letter-spacing:.02em}
-h1.quote,.intro h1.quote{font-size:15px;font-weight:650;line-height:1.45;margin:8px 2px 14px;letter-spacing:0;max-width:44rem;color:var(--mut)}
+h1.quote,.intro h1.quote{font-size:15px;font-weight:650;line-height:1.45;margin:8px 2px 14px;letter-spacing:0;max-width:100%;color:var(--mut);overflow-wrap:anywhere}
 body.srclead{display:flex;flex-direction:column}
+body.srclead>*{min-width:0;max-width:100%}
 body.srclead>header.top{order:-5}
 body.srclead>#edc-a2hs{order:-4}
 body.srclead>.srchrow{order:-3}
-.intro p{color:#c2ccda;font-size:13.5px;line-height:1.55;max-width:980px;margin:0}
+.hero,.hero-follow,.intro{min-width:0;max-width:100%}
+.hero .big{max-width:100%}
+.intro p{color:#c2ccda;font-size:13.5px;line-height:1.55;max-width:980px;margin:0;overflow-wrap:anywhere}
 .intro .answer{font-size:15px;line-height:1.5}
 .faq h2{font-size:17px;margin:18px 0 6px}.faq h3{font-size:15.5px;margin:14px 0 4px}
 .faq p{color:#c2ccda;font-size:14.5px;line-height:1.55;margin:0 0 8px;max-width:980px}
 .answers .faq{margin:0 0 22px}
-.sharecta{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:14px 0 2px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--red);border-radius:14px;background:var(--panel);max-width:980px}
+.sharecta{display:none}
 .sharecta a{display:inline-flex;align-items:center;min-height:44px;background:var(--red);color:#fff;font-weight:750;border-radius:10px;padding:10px 14px;text-decoration:none}
 .sharecta a:hover{filter:brightness(1.08)}
 .sharecta span{color:#c2ccda;font-size:13.5px;line-height:1.45}
