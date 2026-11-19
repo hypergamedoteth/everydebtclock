@@ -238,18 +238,24 @@ def _by_slug(R):
     return {p["slug"]: p for p in all_profiles(R)}
 
 
-def _rank_sentence(p, key, label, of_what):
+# "the 50 states" is the state-government ranking. The other ranking is those 50 plus the District.
+GROUP_50 = "the 50 states"
+GROUP_51 = "the 50 states and the District of Columbia"
+
+
+def _rank_sentence(p, key, label, group):
     rank = p.get(key + "_rank")
     n = p.get(key + "_n")
     if not rank:
         return ""
     above, below = p.get(key + "_above"), p.get(key + "_below")
+    name = "The District of Columbia" if p["dc"] else p["name"]
     if rank == 1:
-        where = f"the largest {label} of {n} {of_what}"
+        where = f"{name} has the largest {label} of {group}"
     elif rank == n:
-        where = f"the smallest {label} of {n} {of_what}"
+        where = f"{name} has the smallest {label} of {group}"
     else:
-        where = f"{_ord(rank)} of {n} {of_what} by {label}"
+        where = f"{name} ranks {_ord(rank)} of {group} by {label}"
     extra = ""
     if above and below:
         extra = f" {_poss(above['name'])} debt is larger and {_poss(below['name'])} debt is smaller."
@@ -358,8 +364,8 @@ def faqs(p):
         ))
     rank_key = "total" if p["dc"] else "state_debt"
     label = "government debt" if p["dc"] else "state government debt"
-    of_what = "states and the District of Columbia" if p["dc"] else "states"
-    rank = _rank_sentence(p, rank_key, label, of_what)
+    group = GROUP_51 if p["dc"] else GROUP_50
+    rank = _rank_sentence(p, rank_key, label, group)
     if rank:
         out.append((f"Where does {p['name']} rank on government debt?", rank + f" Source: U.S. Census Bureau, as of {_date(p['total_as_of'])}."))
     out.append((f"How is the {p['name']} debt clock calculated?", _clock_sentence(p)))
@@ -484,14 +490,13 @@ def for_page(R, place):
         )
     rank_bits = []
     if not p["dc"] and p.get("state_debt_rank"):
-        rank_bits.append(_rank_sentence(p, "state_debt", "state government debt", "states"))
+        rank_bits.append(_rank_sentence(p, "state_debt", "state government debt", GROUP_50))
     if p.get("total_rank"):
-        rank_bits.append(_rank_sentence(p, "total", "state and local debt" if not p["dc"] else "government debt",
-                                        "states and the District of Columbia"))
+        rank_bits.append(_rank_sentence(p, "total", "state and local debt" if not p["dc"] else "government debt", GROUP_51))
     if p.get("per_total_rank"):
-        rank_bits.append(_rank_sentence(p, "per_total", "debt per resident", "states and the District of Columbia"))
+        rank_bits.append(_rank_sentence(p, "per_total", "debt per resident", GROUP_51))
     if p.get("ratio_state_rank"):
-        rank_bits.append(_rank_sentence(p, "ratio_state", "state-government debt to GDP", "states"))
+        rank_bits.append(_rank_sentence(p, "ratio_state", "state-government debt to GDP", GROUP_50))
     if rank_bits:
         med = ""
         if p["states_median"] is not None and not p["dc"]:
