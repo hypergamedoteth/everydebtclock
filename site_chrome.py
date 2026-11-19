@@ -19,6 +19,7 @@ NOTICE_MARK_END = "<!--/NOTICE-->"
 FOOTER_LINKS = (
     ("embed/", "Embed a clock"),
     ("data/", "Data"),
+    ("reports/", "Reports"),
     ("press/", "Press"),
     ("about/", "About"),
     ("advertise/", "Advertise"),
@@ -95,7 +96,7 @@ def upgrade_footer(foot: str, extra: tuple[tuple[str, str], ...] = ()) -> str:
     # last), leaving the sentence before it and the disclaimer after it.
     known = (
         r"(?:(?:\.\./)+|/)?(?:embed/|data/|press/|about/|advertise/|methodology/|"
-        r"privacy(?:\.html|/)|contact/|Home)"
+        r"privacy(?:\.html|/)|contact/|reports/|Home)"
     )
     run = re.search(
         rf'<a href="{known}"[^>]*>.*?(?:</a>(?:\s*·\s*<a href="{known}"[^>]*>.*?</a>)+)',
@@ -192,15 +193,19 @@ A2HS_BLOCK = A2HS_MARK_START + A2HS_INNER + A2HS_MARK_END
 
 
 def with_a2hs(page: str) -> str:
+    """Place the install prompt after the H1 so it is not the text a crawler quotes."""
     if A2HS_MARK_START in page:
         page = re.sub(
             re.escape(A2HS_MARK_START) + r".*?" + re.escape(A2HS_MARK_END),
-            lambda _m: A2HS_BLOCK,
+            "",
             page,
             count=1,
             flags=re.S,
         )
-        return page
+    h1 = re.search(r"</h1>", page, re.I)
+    if h1:
+        at = h1.end()
+        return page[:at] + A2HS_BLOCK + page[at:]
     header = re.search(r"</header>", page, re.I)
     if header:
         at = header.end()
