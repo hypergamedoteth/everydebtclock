@@ -6,6 +6,8 @@ Every number ticks like usdebtclock.org, but each one starts from an **official 
 | Path | What |
 |---|---|
 | `pipeline/fetch.py` | Pulls official data (no API keys), computes base + per-second rate per ticker, runs validation, writes `data/data.json` and appends `data/validation_log.csv` |
+| `pipeline/fetch_us_debt_history.py` | Full Debt to the Penny history and Historical Debt Outstanding, for `/data/us-debt-daily.*` and `/data/us-debt-annual.*` |
+| `pipeline/fetch_state_gdp.py` | BEA current-dollar GDP by state (Table SAGDP2), for the state debt-to-GDP lines |
 | `pipeline/run_daily.sh` | fetch → validate → build (cron entry point) |
 | `build.py` | Inlines CSS/JS/data into `dist/debtclock-standalone.html`; writes per-ticker share pages `t/<slug>.html` |
 | `index.html`, `style.css`, `app.js` | Static front end, no build step. `requestAnimationFrame` loop updates every ticker every frame |

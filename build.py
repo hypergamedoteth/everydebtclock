@@ -970,7 +970,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /privacy/ : Privacy policy, including analytics, data downloads, and cookies if ads are shown.",
     "- /contact/ : Email hello@everydebtclock.com.",
     "- /advertise/ : Sponsorship on the US clock and the national-debt-by-year page.",
-    "- /data/ : Free CSV files and charts of the US and world series this site publishes. Free to use with credit: Source: EveryDebtClock.com.",
+    "- /data/ : Free CSV and JSON downloads. /data/us-debt-daily.csv and /data/us-debt-daily.json are every Treasury Debt to the Penny record. /data/us-debt-annual.csv and /data/us-debt-annual.json are Historical Debt Outstanding back to 1790. Citation: Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Debt to the Penny.",
     "- /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.",
     "",
 ] + debt_by_year_build.llms_lines(R) + presidents_build.llms_lines(R) + [
@@ -982,7 +982,11 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.",
     "",
     "## Machine-readable",
-    f"- {SITE}/data/ — CSV downloads (debt by year, by president, per person, interest, states, countries) and chart images",
+    f"- {SITE}/data/us-debt-daily.csv — Debt to the Penny, full daily history, CSV",
+    f"- {SITE}/data/us-debt-daily.json — the same daily history, with source, license, and citation",
+    f"- {SITE}/data/us-debt-annual.csv — Historical Debt Outstanding, annual, CSV",
+    f"- {SITE}/data/us-debt-annual.json — the same annual history, with source, license, and citation",
+    f"- {SITE}/data/ — other CSV downloads (debt by year, by president, per person, interest, states, countries) and chart images",
     f"- {SITE}/api/daily.json — latest official US total and daily changes",
     f"- {SITE}/data/data.json — all US tickers, official bases and rates",
     f"- {SITE}/api/places.json — state and country clocks",
@@ -1028,6 +1032,8 @@ freshness.write_urls(os.path.join(R, "pipeline", "indexnow-urls.txt"), freshness
 freshness.check(R, SITE, DATES, urls, OFF_D)
 import country_profile
 country_profile.assert_country_pages_differ(R)
+import state_profile
+state_profile.check(R)
 debt_by_year_build.check(R, SITE)
 presidents_build.check(R, SITE)
 state_per_person_build.check(R, SITE)

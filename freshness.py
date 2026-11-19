@@ -253,6 +253,7 @@ def collect(R, off_d, world=None, today=None):
     data_dir = os.path.join(R, "data")
     csv_dates = {}
     for name in (
+        "us-debt-daily.csv", "us-debt-daily.json", "us-debt-annual.csv", "us-debt-annual.json",
         "us-debt-by-year.csv", "us-debt-by-president.csv", "us-debt-per-person.csv",
         "us-interest.csv", "us-state-debt.csv", "country-debt.csv",
     ):
