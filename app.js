@@ -34,7 +34,9 @@
   // ---------- formatting
   const nf0 = new Intl.NumberFormat('en-US', {maximumFractionDigits: 0});
   const nf2 = new Intl.NumberFormat('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  const nf4 = new Intl.NumberFormat('en-US', {minimumFractionDigits: 4, maximumFractionDigits: 4});
   const usd = (v, d = 0) => v == null ? '—' : (v < 0 ? '−$' : '$') + (d ? nf2 : nf0).format(Math.abs(v));
+  const usd4 = v => v == null || !isFinite(v) ? '—' : (v < 0 ? '−$' : '$') + nf4.format(Math.abs(v));
   const pct = (v, d = 4) => v == null ? '—' : v.toFixed(d) + '%';
   const short = v => { const a = Math.abs(v), s = v < 0 ? '−$' : '$';
     return a >= 1e12 ? s + (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? s + (a / 1e9).toFixed(2) + 'B' : a >= 1e6 ? s + (a / 1e6).toFixed(1) + 'M' : s + nf0.format(a); };
@@ -138,24 +140,34 @@
   if (DLS.at_limit) banners.push(`<div class="banner">At the debt limit: Treasury is using extraordinary measures. Debt subject to the limit was ${usd(DLS.subject_to_limit)} on ${fmtDate(DLS.as_of)}, ${usd(DLS.headroom)} under the ${usd(DLS.limit)} limit, so the debt counters hold at Treasury's latest official figures instead of projecting growth.</div>`);
   if ((M.flags || []).length) banners.push(`<div class="banner">Drift alert: ${M.flags.join(', ')} exceeded the validation threshold on the last check.</div>`);
 
-  // lead hero: the official total first, then the dated sentence, then the live labels
+  // lead hero: live clock card first (labels inside the card so they wrap), then the short official line
   const d = info('debt_total');
   const hero = document.createElement('div'); hero.className = 'hero lead'; hero.id = 't-debt_total';
-  const follow = document.createElement('div'); follow.className = 'hero-follow';
   if (d.status === 'ok') {
-    hero.innerHTML = `<div class="big num" id="hv">${usd(d.base)}</div>`;
-    follow.innerHTML = `<div class="k">Live estimate · US national debt${d.held_at_limit ? ' · held at the debt limit' : ''}</div>
-    <div class="sub"><span>${rateTxt(d.rate)}</span><span class="note">rate: 90-day least-squares trend (${d.calc?.n || '—'} daily closes), backtested vs next Treasury close, avg error ${d.validation?.mean_abs_error_pct != null ? d.validation.mean_abs_error_pct.toFixed(3) + '%' : 'n/a'}</span><span>Since you opened this page: <span class="num" id="hs">$0</span> more debt · <span class="num" id="hi">$0</span> in interest</span></div>
-    <div class="trio"><div><span class="l" title="${esc(PPB)}">Per person (projected population)</span><span class="num" id="h1">${usd(d.base / (T.population?.base || 1), 2)}</span></div><div><span class="l">Per tax return filed</span><span class="num" id="h2">${usd(d.base / (T.tax_returns?.base || 1), 2)}</span></div><div><span class="l">Per household</span><span class="num" id="h3">${usd(d.base / T.households.base, 2)}</span></div></div>
+    const tNow = now();
+    const xNow = val('debt_total', tNow);
+    const peopleNow = pop(tNow) || T.population?.base || 1;
+    hero.innerHTML = `<div class="k">Live estimate · US national debt${d.held_at_limit ? ' · held at the debt limit' : ''}</div>
+    <div class="big num" id="hv">${usd(xNow)}</div>
+    <div class="sub"><span>${rateTxt(d.rate)}</span> <span class="note">rate: 90-day least-squares trend (${d.calc?.n || '—'} daily closes), backtested vs next Treasury close, avg error ${d.validation?.mean_abs_error_pct != null ? d.validation.mean_abs_error_pct.toFixed(3) + '%' : 'n/a'}</span> <span>Since you opened this page: <span class="num" id="hs">$0</span> more debt · <span class="num" id="hi">$0</span> in interest</span></div>
+    <div class="trio"><div><span class="l" title="${esc(PPB)}">Per person (projected population)</span><span class="num" id="pp-person">${usd4(xNow / peopleNow)}</span></div><div><span class="l">Per tax return filed</span><span class="num" id="pp-return">${usd4(xNow / (T.tax_returns?.base || 1))}</span></div><div><span class="l">Per household</span><span class="num" id="pp-house">${usd4(xNow / T.households.base)}</span></div></div>
     <div class="meta" style="margin-top:10px">${badges(d)}<span class="badge">source: Treasury Debt to the Penny</span></div>`;
-    const hv = hero.querySelector('#hv'), hs = follow.querySelector('#hs'), h1 = follow.querySelector('#h1'), h2 = follow.querySelector('#h2'), h3 = follow.querySelector('#h3'), hi = follow.querySelector('#hi');
-    live.push(t => { const x = val('debt_total', t); hv.textContent = usd(x); hs.textContent = '+' + usd(x - val('debt_total', OPENED), 0); hi.textContent = usd(DER.interest_since_open(t), 0);
-      h1.textContent = usd(x / pop(t), 2); h2.textContent = usd(x / tax(), 2); h3.textContent = usd(x / T.households.base, 2); });
+    const hv = hero.querySelector('#hv'), hs = hero.querySelector('#hs'), hi = hero.querySelector('#hi');
+    const pp = hero.querySelector('#pp-person'), pr = hero.querySelector('#pp-return'), ph = hero.querySelector('#pp-house');
+    live.push(t => {
+      const x = val('debt_total', t);
+      if (hv) hv.textContent = usd(x);
+      if (hs) hs.textContent = '+' + usd(x - val('debt_total', OPENED), 0);
+      if (hi) hi.textContent = usd(DER.interest_since_open(t), 0);
+      const people = pop(t);
+      if (pp && people) pp.textContent = usd4(x / people);
+      if (pr && tax()) pr.textContent = usd4(x / tax());
+      if (ph && T.households?.base) ph.textContent = usd4(x / T.households.base);
+    });
     hero.onclick = () => openModal('debt_total');
   } else hero.innerHTML = `<div class="big">source unavailable</div>`;
   app.appendChild(hero);
   if (official) app.appendChild(official);
-  if (d.status === 'ok') app.appendChild(follow);
   if (banners.length) app.insertAdjacentHTML('beforeend', banners.join(''));
   if (intro) app.appendChild(intro);
   const cross41 = document.getElementById('cross41');
@@ -441,7 +453,11 @@
   const h = location.hash.match(/t=([\w]+)/); if (h) setTimeout(() => { jump(h[1]); openModal(h[1]); }, 300);
 
   // ---------- animation loop
-  function frame() { const t = now(); for (const f of live) f(t); tickSankey(t); if (modalTick) modalTick(t);
+  function frame() {
+    const t = now();
+    for (const f of live) { try { f(t); } catch (e) { if (!frame.logged) { console.error(e); frame.logged = 1; } } }
+    try { tickSankey(t); } catch (e) { if (!frame.logged) { console.error(e); frame.logged = 1; } }
+    if (modalTick) { try { modalTick(t); } catch (e) { modalTick = null; } }
     if (window.cross41Update && T.debt_total) window.cross41Update(val('debt_total', t), T.debt_total.base, T.debt_total.as_of);
     requestAnimationFrame(frame); }
   requestAnimationFrame(frame);

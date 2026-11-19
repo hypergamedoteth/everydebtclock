@@ -268,7 +268,7 @@ def _page(site, prefix, fact, clock, with_analytics):
 <p>The clock above is the latest Debt to the Penny close, which is after this month. The debt added in {E(fact['label'])} is the {quotable._long(end_iso)} close minus the {quotable._long(start_iso)} close, {_money(fact['added'], 2)}. The average per calendar day is that difference divided by {fact['days']}.</p>
 {intr_html}
 {proj_html}
-<table class="v"><tr><th>Figure</th><th>Amount</th><th>Date</th><th>Source</th></tr>{table}</table>
+<div class="tw"><table class="v"><tr><th>Figure</th><th>Amount</th><th>Date</th><th>Source</th></tr>{table}</table></div>
 <p class="cite"><b>Citation.</b> {E(citation)}</p>
 <p><a href="{prefix}reports/">All monthly reports</a> · <a href="{prefix}">U.S. debt clock</a> · <a href="{prefix}data/">Data</a></p>
 <footer class="site-foot">Every Debt Clock · <a href="{prefix}embed/">Embed a clock</a> · <a href="{prefix}data/">Data</a> · <a href="{prefix}reports/">Reports</a> · <a href="{prefix}press/">Press</a> · <a href="{prefix}about/">About</a> · <a href="{prefix}methodology/">Methodology</a> · <a href="{prefix}privacy/">Privacy</a> · <a href="{prefix}contact/">Contact</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>

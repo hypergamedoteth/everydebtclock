@@ -475,10 +475,11 @@ def person_paragraph(p, us):
 
 def h1_text(p):
     import quotable
-    core = (f"The general government gross debt of {p['name']} is {money(p['debt_2026'])} "
-            f"({money0(p['debt_2026'])}, {pct(p['ratio_2026'])} of GDP) "
-            f"for the end of 2026, per the IMF World Economic Outlook published on {PUBLISHED}")
-    return quotable.finish(core, "GGXWDG_NGDP times NGDPD, in current dollars, from the October 2026 edition")
+    return quotable.official(
+        f"{p['name']} general government gross debt was {money(p['debt_2026'])}",
+        "Dec 31, 2026",
+        "IMF",
+    )
 
 
 def distinct_reading(p):

@@ -284,7 +284,7 @@ intro = (f"""<!--INTRO--><h1 class="quote" id="official">{html.escape(LEAD)}</h1
 <p class="answer">{answer_s} The figure is from <a href="{DTP_URL}" rel="noopener">Treasury's Debt to the Penny</a>.</p>
 <p>That is <b>{usd2(PP_OFF)} per person</b>: the debt divided by the Census Bureau's estimate of
 {POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}. {proj_txt}</p>
-<div class="sharecta"><a href="your-share/">Your share of the national debt</a><span>Enter a birth year. Same Treasury total divided by the same Census population. Nothing is saved.</span></div><!--/INTRO-->""")
+<!--/INTRO-->""")
 # The World Debt Clock sentence is inserted after WORLD is computed, because the IMF general-government stock is not known yet.
 def row(slug):
     i = ALL.get(slug)
@@ -954,7 +954,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- / : US national debt clock. Official total {usd2(OFF_V)} as of {fdate(OFF_D)} (Treasury, Debt to the Penny). The live projection is re-based every business day.",
     "- /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.",
     f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
-    "- /your-share/ : Your share of that official total. Birth year, and optional state, household size, and income, are calculated in the browser and are not stored.",
+    "- /your-share/ : One equal share of the official total, the live national debt clock divided by population. No calculator.",
     "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
     "- /41-trillion/ : Live countdown to the next trillion, using the homepage clock's Debt to the Penny base and per-second rate, plus each trillion crossing in that daily series.",
     "- /press/ : Press kit for the $41 trillion crossing. Exact projected time from the homepage 90-day pace, 12-month and 3-year comparisons, and the countdown embed.",

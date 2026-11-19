@@ -854,9 +854,10 @@ def _page(R, SITE, with_analytics, files, charts, modified, lead):
 <meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg">
 <style>
-body{{margin:0;background:#07090d;color:#e8edf5;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;line-height:1.5}}
-main{{max-width:880px;margin:0 auto;padding:22px 16px 64px}}
-a{{color:#5aa9ff;text-decoration:none}}a:hover{{text-decoration:underline}}
+html{{overflow-x:clip}}
+body{{margin:0;max-width:100%;overflow-x:clip;background:#07090d;color:#e8edf5;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;line-height:1.5}}
+main{{max-width:880px;min-width:0;margin:0 auto;padding:22px 16px 64px}}
+a{{color:#5aa9ff;text-decoration:none;overflow-wrap:anywhere}}a:hover{{text-decoration:underline}}
 .brand{{font-weight:800;letter-spacing:.06em;font-size:14px;color:inherit;text-decoration:none}}.brand b{{color:#ff4d5e}}
 h1{{font-size:28px;line-height:1.25;margin:18px 0 8px}}h1.quote{{font-size:17px;font-weight:650;line-height:1.45;margin:0 0 12px}}h2{{font-size:18px;margin:0 0 8px}}
 p{{color:#c2ccda;font-size:15px}}

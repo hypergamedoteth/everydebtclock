@@ -379,9 +379,13 @@ def stamp_html(page, lastmod, url):
     if UPDATED_RE.search(page):
         page = UPDATED_RE.sub(block, page, count=1)
     elif "</h1>" in page:
-        # After the first paragraph, so the H1 and the opening sentence stay the official figure.
+        # After the first real paragraph. Skip the install prompt, which sits right after the H1.
         h1 = page.find("</h1>")
-        p = page.find("</p>", h1)
+        search_from = h1
+        end_a2 = page.find("<!--/A2HS-->", h1)
+        if 0 < end_a2 - h1 < 4000:
+            search_from = end_a2
+        p = page.find("</p>", search_from)
         if p >= 0:
             page = page[:p + 4] + block + page[p + 4:]
         else:
@@ -461,6 +465,6 @@ def check(R, site, dates, urls, off_d):
     if f'"dateModified": "{off_d}"' not in page:
         raise SystemExit("homepage JSON-LD dateModified is not the Treasury date")
     lead = visible_lead(page)
-    if not lead.startswith("The U.S. national debt was") or "per the U.S. Treasury" not in lead or off_d[0:4] not in lead:
+    if not lead.startswith("Official:") or "U.S. Treasury" not in lead or off_d[0:4] not in lead:
         raise SystemExit("homepage lead is not the dated official total: " + lead)
     print(f"freshness: {len(dates)} data dates, homepage {home}")

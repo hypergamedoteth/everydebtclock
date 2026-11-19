@@ -224,25 +224,11 @@ def growth_sentence(share_txt, year, year_debt, multiple):
 
 def page_html(site, root, asset, title, desc, canonical, og_image, og_alt, robots, sentence, year, data, v_css, v_share, v_js, stamp):
     E = html.escape
-    options = "".join(
-        f'<option value="{E(s["slug"])}">{E(s["name"])}</option>' for s in data["states"]
-    )
-    hh = data["households"]
-    share = data["debt"] / data["population"]
-    per_hh = data["debt"] / hh["count"]
-    born_attr = f' data-born="{year}"' if year else ""
-    robot = f'<meta name="robots" content="{robots}">' if robots else ""
-    year_note = ""
-    if year and str(year) in data["years"]:
-        amt, date, pop, _series = data["years"][str(year)]
-        pop_bit = (f" July 1, {year} population in the Census series used here: {pop:,}."
-                   if pop else f" No July 1, {year} population is in the Census series used here, so there is no per-person figure for {year}.")
-        year_note = (f"<p>Without JavaScript, the line above is the whole result. The {money_exact(amt)} is Treasury's total at the end of fiscal year {year} "
-                     f"({fdate(date)}), from Historical Debt Outstanding, not the debt on a birthday. "
-                     f"Growth is {money_exact(data['debt'])} ÷ {money_exact(amt)}. {pop_bit}</p>")
-    elif year:
-        year_note = f"<p>Historical Debt Outstanding on this site does not include {year}. That year is not estimated.</p>"
     src = data
+    c = data["clock"]
+    share = data["debt"] / data["population"]
+    robot = f'<meta name="robots" content="{robots}">' if robots else ""
+    lead = f"Official: {usd2(share)} on {fdate(src['debtDate'])} (U.S. Treasury)."
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{E(title)}</title>
@@ -255,70 +241,24 @@ def page_html(site, root, asset, title, desc, canonical, og_image, og_alt, robot
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{E(title)}">
 <meta name="twitter:description" content="{E(desc)}"><meta name="twitter:image" content="{E(og_image)}">
 <meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="{root}style.css?v={v_css}"><link rel="stylesheet" href="{asset}share.css?v={v_share}">
+<link rel="stylesheet" href="{root}style.css?v={v_css}"><link rel="stylesheet" href="share.css?v={v_share}">
 <!--ANALYTICS--><!--/ANALYTICS-->
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg">
-</head><body class="share"{born_attr}>
+</head><body class="share">
 <main>
 <a class="brand" href="{root}">EVERY <b>DEBT</b> CLOCK</a>
-<section class="result" id="share-clock">
-<p class="k">Official · your share of the US debt</p>
+<section class="result" id="share-clock" data-b="{c['b']}" data-r="{c['r']}" data-t0="{c['t0']}" data-pop="{c['pop']}" data-pr="{c['pr']}" data-pt="{c['pt']}">
+<p class="k">Your share · live</p>
 <p class="big" id="share-num">{usd2(share)}</p>
-<p class="asof official" id="asof">Official: {usd2(share)} as of {fdate(src['debtDate'])}, Treasury Debt to the Penny ÷ Census population</p>
 </section>
-<h1>Your share of the national debt: {usd2(share)} as of {fdate(src['debtDate'])}</h1>
-<p class="lede">One equal share of the official US total. Enter a birth year to see the debt that year and how many times it has grown. A state, a household size, and an income are optional. The math runs in your browser.</p>
-<form id="f" class="panel" action="" method="get" autocomplete="off">
-<div class="fields">
-<div class="span2"><label for="born">Birth year</label><input id="born" name="born" inputmode="numeric" autocomplete="bday-year" maxlength="4" placeholder="1985" aria-describedby="born-hint"><span class="hint" id="born-hint">The year you were born. The debt that year is the fiscal-year-end total, not your birthday.</span></div>
-<div><label for="state">State</label><select id="state" name="state"><option value="">No state</option>{options}</select></div>
-<div><label for="hh">Household size</label><input id="hh" name="hh" inputmode="numeric" maxlength="2" placeholder="Optional" aria-describedby="hh-hint"><span class="hint" id="hh-hint">1 to 20. Each person is one share.</span></div>
-<div class="span2"><label for="income">Annual income</label><input id="income" name="income" inputmode="decimal" placeholder="Optional" aria-describedby="inc-hint"><span class="hint" id="inc-hint">Compared with the share only. What you type is not a statistic, and it is not saved.</span></div>
-</div>
-<div class="actions"><button class="primary" type="submit">See your share</button></div>
-</form>
-<p id="status" class="status">Loading the official figures…</p>
-<section class="result" id="share-rest" aria-live="polite">
-<p class="sentence" id="sentence">{E(sentence)}</p>
-<noscript>{year_note}<p>Turn on JavaScript for a birth year, a state, or a household. The share above does not need it: it is already the official total divided by the official population.</p></noscript>
-<div class="cardwrap"><img id="preview" width="1200" height="630" alt="{E(og_alt)}" src="{E(og_image)}"><canvas id="card" hidden></canvas></div>
-<div class="actions">
-<button type="button" class="primary" id="native">Share</button>
-<button type="button" id="copy">Copy link</button>
-<a class="btn" id="x" href="https://x.com/intent/post?text={quote(sentence)}&amp;url={quote(canonical)}">Post on X</a>
-<a class="btn" id="dl-wide" download href="{E(og_image)}">Download 1200×630</a>
-<a class="btn" id="dl-sq" download href="{E(og_image.replace('.png', '-sq.png') if og_image.endswith('.png') else og_image)}">Download square</a>
-</div>
-<div class="linkrow"><label for="link" class="hint">Share link</label><input id="link" readonly value="{E(canonical)}" aria-label="Share link"></div>
-<div class="details" id="details"></div>
-<p class="note">A shared link keeps what you entered in the address, for example /your-share/?born=1985. Birth years {OG_MIN}–{OG_MAX} are shared as /your-share/born/YEAR/ so the preview image is that year’s card. State, household size, and income stay in the query string. This page does not send those inputs anywhere and does not store them. Anyone with the link can read them.</p>
-</section>
-<section class="math" id="method">
-<h2>How your share is calculated</h2>
-<p><b>Your share</b> = total public debt outstanding ÷ US resident population = {money_exact(src['debt'])} ÷ {src['population']:,.0f} = <b>{usd2(share)}</b>. The debt is Treasury’s Debt to the Penny close on {fdate(src['debtDate'])}. The population is the Census Bureau’s {src['population']:,.0f} residents on {fdate(src['populationDate'])}. Neither figure is projected. This is the official per-person figure on the <a href="{root}national-debt-per-person/">national debt per person</a> page, not the ticking clock.</p>
-<p><b>The year you were born.</b> The debt is Treasury’s <a href="{E(src['histSource'][1])}" rel="noopener">Historical Debt Outstanding</a> total at that fiscal year end (June 30 through FY1976, September 30 after that). Growth = the {fdate(src['debtDate'])} close ÷ that fiscal-year-end total. If the series has no row for the year, the page says so and does not fill one in.</p>
-<p><b>Per person that year</b> = the same fiscal-year-end total ÷ the Census July 1 resident population for that calendar year, and only when that July 1 count is already in the series used on the per-person page. The fiscal year end and July 1 are not the same day. A missing population is left missing.</p>
-<p><b>A state</b> = that state’s official debt total ÷ its Census resident population. The debt total is the sum of the official components on the state page (state and local, where the page has both), not the projected clock. It is that state’s own debt per resident. It is not a different share of the federal debt. The federal share is the same in every state.</p>
-<p><b>Household size</b> = the size you type × your share. Census’s own per-household figure is different: {money_exact(src['debt'])} ÷ {hh['count']:,.0f} households = {usd2(per_hh)} ({E(hh['sourceName'])}, {E(str(hh['asOf']))}).</p>
-<p><b>Income</b> = (the household total if you entered a size, otherwise your share) ÷ the annual income you typed. The income is not a published number.</p>
-<p>It is a way to scale a very large number, not a bill. The population counts every resident, including children.</p>
-<table id="worked"><tr><th>Figure</th><th>Amount</th><th>Division</th></tr>
-<tr><td>Your share</td><td class="num">{usd2(share)}</td><td>{money_exact(src['debt'])} ÷ {src['population']:,.0f}</td></tr>
-<tr><td>Per household, Census count</td><td class="num">{usd2(per_hh)}</td><td>{money_exact(src['debt'])} ÷ {hh['count']:,.0f} households</td></tr>
-</table>
-<h2>Sources</h2>
-<ul>
-<li><a href="{E(src['debtSource'][1])}" rel="noopener">{E(src['debtSource'][0])}</a>, close of {fdate(src['debtDate'])}: {money_exact(src['debt'])}.</li>
-<li><a href="{E(src['popSource'][1])}" rel="noopener">{E(src['popSource'][0])}</a>, {src['population']:,.0f} residents on {fdate(src['populationDate'])}.</li>
-<li><a href="{E(src['histSource'][1])}" rel="noopener">{E(src['histSource'][0])}</a>, fiscal-year-end totals.</li>
-<li><a href="{E(hh['sourceUrl'])}" rel="noopener">{E(hh['sourceName'])}</a>, {hh['count']:,.0f} households ({E(str(hh['asOf']))}).</li>
-</ul>
-</section>
-<p class="rel"><a href="{root}national-debt-per-person/">National debt per person</a> · <a href="{root}national-debt-by-year/">Debt by year</a> · <a href="{root}">Live debt clock</a></p>
+<h1>{E(lead)}</h1>
+<p>One equal share is the Treasury Debt to the Penny total divided by the Census resident population. The official figure is <b>{usd2(share)}</b> on <b>{fdate(src['debtDate'])}</b>: {money_exact(src['debt'])} ÷ {src['population']:,.0f} residents on {fdate(src['populationDate'])}. The number above is that national debt clock, projected forward, divided by the projected population.</p>
+<p class="rel"><a href="{root}national-debt-per-person/">National debt per person</a> · <a href="{root}">Live debt clock</a></p>
 {site_chrome.site_footer(root, lead=f"Treasury close {fdate(data['debtDate'])}. Page built {E(stamp)}.")}
 </main>
-<script src="{asset}share.js?v={v_js}"></script>
+<script src="share.js?v={v_js}"></script>
 </body></html>"""
+
 
 
 def build(root, site, with_analytics, stamp, off_d, off_v, pop, pop_date, households, population_ticker, debt_by_fy, debt_by_fy_source):
@@ -334,6 +274,12 @@ def build(root, site, with_analytics, stamp, off_d, off_v, pop, pop_date, househ
         raise SystemExit(f"your-share: DejaVu fonts not found at {FD}")
     data = load_inputs(root, off_d, off_v, pop, pop_date, households, population_ticker, debt_by_fy, debt_by_fy_source)
     data["site"] = site.rstrip("/")
+    td = json.load(open(os.path.join(root, "data", "data.json"), encoding="utf-8"))["tickers"]["debt_total"]
+    data["clock"] = {
+        "b": td["base"], "r": td["rate"], "t0": td["t0"],
+        "pop": population_ticker["base"], "pr": population_ticker.get("rate") or 0,
+        "pt": population_ticker.get("t0") or 0,
+    }
     out = os.path.join(root, "your-share")
     os.makedirs(out, exist_ok=True)
     og_dir = os.path.join(out, "og")
@@ -348,14 +294,14 @@ def build(root, site, with_analytics, stamp, off_d, off_v, pop, pop_date, househ
     base_notes = [
         f"Treasury Debt to the Penny, {fdate(off_d)}",
         f"÷ {pop:,.0f} Census residents, {fdate(pop_date)}",
-        "Enter a birth year for the debt then",
+        "Live clock ÷ projected population",
     ]
     render_card(os.path.join(og_dir, "default.png"), "Your share of the US debt", share_txt,
                 [("TOTAL PUBLIC DEBT", money_exact(off_v)), ("US RESIDENTS", f"{pop:,.0f}")], base_notes, False)
     render_card(os.path.join(og_dir, "default-sq.png"), "Your share of the US debt", share_txt,
                 [("TOTAL PUBLIC DEBT", money_exact(off_v)), ("US RESIDENTS", f"{pop:,.0f}")], base_notes, True)
     desc = (f"Your share of the US debt is {share_txt}: Treasury's {fdate(off_d)} total of {money_exact(off_v)} "
-            f"divided by the Census Bureau's {pop:,.0f} residents on {fdate(pop_date)}. Enter a birth year. Nothing is stored.")
+            f"divided by the Census Bureau's {pop:,.0f} residents on {fdate(pop_date)}.")
     title = f"Your Share of the US Debt: {share_txt}"
     v_css = hashlib.sha1(open(os.path.join(root, "style.css"), "rb").read()).hexdigest()[:10]
     v_share = hashlib.sha1(open(os.path.join(out, "share.css"), "rb").read()).hexdigest()[:10]
@@ -371,35 +317,26 @@ def build(root, site, with_analytics, stamp, off_d, off_v, pop, pop_date, househ
     write_page(os.path.join(out, "index.html"), root="../", asset="", title=title, desc=desc,
                canonical=f"{site}/your-share/", og_image=f"{site}/your-share/og/default.png",
                og_alt=f"Your share of the US debt is {share_txt} as of {fdate(off_d)}",
-               robots="", sentence=growth_sentence(share_txt, None, None, None), year=None)
+               robots="", sentence="", year=None)
     made = 0
+    redir = """<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="{site}/your-share/">
+<meta http-equiv="refresh" content="0; url=/your-share/">
+<title>Your share of the national debt</title>
+<script>location.replace("/your-share/")</script>
+</head><body><p><a href="/your-share/">Your share of the national debt</a></p></body></html>
+"""
     for y in range(OG_MIN, OG_MAX + 1):
-        row = data["years"].get(str(y))
-        if not row:
-            continue
-        amt, date, _pop_y, _series = row
-        multiple = off_v / amt if amt else None
-        sent = growth_sentence(share_txt, y, amt, multiple)
-        notes = [
-            f"Treasury Debt to the Penny, {fdate(off_d)}",
-            f"÷ Census residents, {fdate(pop_date)}",
-            f"FY{y} ended {fdate(date)}",
-        ]
-        chips = [(f"DEBT IN {y}", money_exact(amt)), ("SINCE THEN", (times(multiple) or "—") + "×")]
-        card_title = f"Born in {y}"
-        render_card(os.path.join(og_dir, f"{y}.png"), card_title, share_txt, chips, notes, False)
-        render_card(os.path.join(og_dir, f"{y}-sq.png"), card_title, share_txt, chips, notes, True)
-        y_title = f"Born in {y}: Your Share of the US Debt Is {share_txt}"
         ydir = os.path.join(born_dir, str(y))
         os.makedirs(ydir, exist_ok=True)
-        write_page(os.path.join(ydir, "index.html"), root="../../../", asset="../../", title=y_title, desc=sent,
-                   canonical=f"{site}/your-share/born/{y}/", og_image=f"{site}/your-share/og/{y}.png",
-                   og_alt=sent, robots="noindex", sentence=sent, year=y)
+        open(os.path.join(ydir, "index.html"), "w", encoding="utf-8").write(redir.format(site=site.rstrip("/")))
         made += 1
     blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
     open(os.path.join(out, "data.json"), "w", encoding="utf-8").write(blob)
     _check(root, data, share_txt)
-    print(f"your-share: {usd2(share)} as of {off_d}; {made} birth-year cards; stamp {stamp}")
+    print(f"your-share: {usd2(share)} as of {off_d}; {made} birth-year redirects; stamp {stamp}")
     return f"{site}/your-share/"
 
 
@@ -417,10 +354,11 @@ def _check(root, data, share_txt):
     cal = next(s for s in data["states"] if s["slug"] == "california")
     if cal["debt"] <= 0 or cal["pop"] <= 0:
         raise SystemExit("your-share: California official total is missing")
-    sent = growth_sentence(share_txt, 1985, y1985[0], data["debt"] / y1985[0])
-    script = os.path.join(root, "pipeline", "check_share.js")
-    subprocess.check_call(["node", script, share_txt, usd2(cal["debt"] / cal["pop"]),
-                           usd2(data["debt"] / data["households"]["count"]), sent], cwd=root)
+    page = open(os.path.join(root, "your-share", "index.html"), encoding="utf-8").read()
+    if "<form" in page or 'id="born"' in page or 'name="hh"' in page or 'name="income"' in page:
+        raise SystemExit("your-share: the calculator form is still on the page")
+    if 'id="share-num"' not in page or not page.split("<h1>", 1)[-1].startswith("Official:"):
+        raise SystemExit("your-share: missing the live share clock or the short official line")
 
 
 def _from_data_json(root):

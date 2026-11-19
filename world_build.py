@@ -375,10 +375,10 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
              f'<p>{gap_txt} The comparison is in the section below the table. '
              f'/world-government-debt/ and /global-debt-clock/ redirect here.</p></section>')
     hero = (f'<div class="hero lead" id="total" data-b="{big_now:.2f}" data-r="{W["rate_s"]:.6f}" data-t="{now:.0f}" style="cursor:default">'
-            f'<div class="big num" id="hv">{_usd0(W["total"])}</div></div>')
-    world_follow = (f'<div class="hero-follow"><div class="k" data-live="Live estimate · general government gross debt · {n} countries">Official · sum of latest figures</div>'
-            f'<div class="sub"><span>{_sgn(W["rate_s"])}/sec · {_sgn(W["rate_s"] * 86400 / 1e9, ",.1f")} billion/day</span>'
-            f'<span class="note">sum of each country\'s own trend; a projection, not one official figure</span>'
+            f'<div class="k" data-live="Live estimate · general government gross debt · {n} countries">Official · sum of latest figures</div>'
+            f'<div class="big num" id="hv">{_usd0(W["total"])}</div>'
+            f'<div class="sub"><span>{_sgn(W["rate_s"])}/sec · {_sgn(W["rate_s"] * 86400 / 1e9, ",.1f")} billion/day</span> '
+            f'<span class="note">sum of each country\'s own trend; a projection, not one official figure</span> '
             f'<span>Since you opened this page: <span class="num" id="hs">$0</span> more debt</span></div>'
             f'<div class="trio"><div><span class="l">Sum of latest figures</span><span class="num">{_usd0(W["total"])}</span></div>'
             f'<div><span class="l">Economies</span><span class="num">{n}</span></div>'
@@ -484,7 +484,6 @@ const rows=[].slice.call(tb.rows);rows.sort(function(a,b){const av=a.dataset[k],
 const c=(av!==''&&bv!==''&&!isNaN(an)&&!isNaN(bn))?an-bn:String(av).localeCompare(String(bv));return dir==='asc'?c:-c});
 rows.forEach(function(r){tb.appendChild(r)})})})})()</script>"""
     explore_html = ex.explore("../", places, pb.calc, cur=None, gdp=pb.GDP_BY_SLUG, usd={x["slug"]: x["usd"] for x in rows if x["slug"] != "united-states"}, kind_hint="world")
-    intro = intro.replace("</h1>", "</h1>" + world_follow, 1)
     page = (pb.meta_head(SITE, url, title, desc, img, 1, pb.PL_CSS + CSS, ld).replace("<body>", '<body class="srclead">', 1)
             + '<main id="app">' + hero + intro + covsent + table + imf_sec + meas + rates + faq_html + ex.search_box("../") + method + '</main>' + header + explore_html + links
             + '<footer class="site-foot">Every Debt Clock · mixed sources, projection labelled · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>' + script + "</body></html>")

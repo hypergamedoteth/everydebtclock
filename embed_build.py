@@ -445,7 +445,7 @@ fit()}}
 
 
 def _share_html(R, site, now, embed_home):
-    """Official per-person figure, plus birth year and household size. No network, no storage."""
+    """Live per-person share. No inputs, no network, no storage."""
     D = json.load(open(os.path.join(R, "data", "data.json")))
     td = (D.get("tickers") or {}).get("debt_total") or {}
     pop = (D.get("tickers") or {}).get("population") or {}
@@ -453,8 +453,8 @@ def _share_html(R, site, now, embed_home):
         raise RuntimeError("embed: your-share inputs are missing")
     debt, people = float(td["base"]), float(pop["base"])
     share = debt / people
-    years = {str(row[0]): int(row[2]) for row in (D.get("meta") or {}).get("debt_by_fy") or [] if len(row) > 2 and row[2]}
-    cfg = {"debt": debt, "pop": int(people), "date": td.get("as_of") or "", "popDate": pop.get("as_of") or "", "years": years}
+    cfg = {"b": debt, "r": float(td.get("rate") or 0), "t0": float(td.get("t0") or 0),
+           "pop": float(pop["base"]), "pr": float(pop.get("rate") or 0), "pt": float(pop.get("t0") or 0)}
     blob = json.dumps(cfg, separators=(",", ":")).replace("<", "\\u003c")
     shown = "$" + f"{share:,.2f}"
     page_url = site + "/your-share/"
@@ -468,32 +468,23 @@ html.light{{color-scheme:light;--bg:#f6f7fb;--fg:#161a22;--mut:#526074;--dim:#5c
 *{{box-sizing:border-box}}html,body{{margin:0;background:var(--bg);color:var(--fg)}}
 body{{font:13px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}}
 .w{{padding:8px 12px 7px;border-left:3px solid #ff4d5e}}
-.n{{font-size:12px;color:var(--mut)}}.v{{font:700 22px/1.15 ui-monospace,Menlo,Consolas,monospace;letter-spacing:-.03em}}
-.s,.out{{font-size:11px;color:var(--dim)}}.out{{color:var(--fg);min-height:1.3em;margin:4px 0}}
-label{{display:block;font-size:11px;color:var(--mut);margin-top:4px}}
-input{{width:100%;margin-top:2px;background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit}}
+.n{{font-size:12px;color:var(--mut)}}.v{{font:700 22px/1.15 ui-monospace,Menlo,Consolas,monospace;letter-spacing:-.03em;overflow-wrap:anywhere}}
+.s{{font-size:11px;color:var(--dim)}}
 .cr{{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:4px}}
 a.by,a.get{{color:var(--link);text-decoration:underline;text-underline-offset:2px}}a.by{{font-size:12px}}a.get{{font-size:11px}}
 </style>{ICON}</head><body><div class="w">
 <div class="n">Your share of the US debt</div>
 <div class="v" id="v">{E(shown)}</div>
-<div class="s">As of Treasury {E(td.get("as_of") or "")} · Census population {E(pop.get("as_of") or "")}. Not a projection.</div>
-<label>Birth year <input id="born" inputmode="numeric" maxlength="4" placeholder="1985"></label>
-<label>Household size <input id="hh" inputmode="numeric" maxlength="2" placeholder="1"></label>
-<div class="out" id="o"></div>
+<div class="s">Official {E(shown)} on Treasury {E(td.get("as_of") or "")}. The figure above ticks.</div>
 <div class="s">Source: Treasury, Debt to the Penny ÷ Census population</div>
 <div class="cr"><a class="by" href="{E(page_url, quote=True)}" target="_top">{BYLINE}</a><a class="get" href="{E(embed_home, quote=True)}" target="_blank" rel="noopener">{GET}</a></div>
 </div><script type="application/json" id="c">{blob}</script>
 <script>(function(){{var D=JSON.parse(document.getElementById("c").textContent);
-var nf=new Intl.NumberFormat("en-US",{{minimumFractionDigits:2,maximumFractionDigits:2}});
-var money=function(n){{return (n<0?"−$":"$")+nf.format(Math.abs(n))}};
-var v=document.getElementById("v"),o=document.getElementById("o"),born=document.getElementById("born"),hh=document.getElementById("hh");
-var share=D.debt/D.pop;v.textContent=money(share);
-function go(){{var bits=[],y=(born.value||"").trim(),h=(hh.value||"").trim();
-if(y){{if(!/^\\d{{4}}$/.test(y)||!D.years[y])bits.push("No fiscal-year total is stored for that year.");else{{var g=D.debt/D.years[y];bits.push("FY "+y+" total "+money(D.years[y])+". Grown "+(g>=10?g.toFixed(1):g.toFixed(2))+"× since.");}}}}
-if(h){{var n=+h;if(n>=1&&n<=20&&n===Math.round(n))bits.push("Household of "+n+": "+money(share*n)+".");else bits.push("Household size is 1 to 20.");}}
-o.textContent=bits.join(" ")}}
-born.addEventListener("input",go);hh.addEventListener("input",go)}})();</script></body></html>"""
+var nf=new Intl.NumberFormat("en-US",{{minimumFractionDigits:4,maximumFractionDigits:4}});
+var v=document.getElementById("v");
+function paint(){{var t=Date.now()/1000,debt=D.b+D.r*(t-D.t0),people=D.pop+D.pr*(t-D.pt);
+v.textContent=(debt<0?"−$":"$")+nf.format(Math.abs(debt/people));requestAnimationFrame(paint)}}
+requestAnimationFrame(paint)}})();</script></body></html>"""
 
 
 def _write(path, text):
@@ -565,7 +556,7 @@ def _directory(R, site, clocks, analytics_fn):
 <p>{E(PITCH)}</p>
 <p>Each card has a dark snippet and a light snippet. The light snippet adds <code>?theme=light</code> to the iframe address. The snippet is the iframe plus a plain link under it. The widget itself carries the credit “Live debt clock by EveryDebtClock.com”.</p>
 <h2>Countdown and your share</h2>
-<p>The $41 trillion countdown and the your-share calculator follow the same rules: no cookies and no analytics. Light and dark code is on each card.</p>
+<p>The $41 trillion countdown and the your-share clock follow the same rules: no cookies and no analytics. Light and dark code is on each card.</p>
 <div class="embgrid">{extra_cards}</div>
 <h2>Add this clock to your site</h2>
 <p>United States, Texas, and the world, live. Every other clock is listed below.</p>
