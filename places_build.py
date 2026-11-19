@@ -180,6 +180,8 @@ def index(places, now):
 
 def build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, stamp, now):
     places = load(R)
+    import state_profile
+    state_profile.prepare(R, places)
     urls = []
     os.makedirs(f"{R}/api", exist_ok=True)
     with open(f"{R}/api/places.json", "w") as f: json.dump(index(places, now), f, indent=1)
@@ -217,7 +219,13 @@ table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:righ
 .badge.ann{border-color:#5a3a12;color:var(--amber)}
 #details table.v td{color:var(--txt)}#details table.v tr.sub td{color:var(--mut);padding-left:22px}#details h3{color:var(--txt);margin:18px 0 4px}
 .hero .sec2{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:13px;color:var(--mut);line-height:1.45}.hero .sec2 b{color:var(--txt);font-size:15px;margin:0 4px}.hero .sec2 .l{color:var(--dim);text-transform:uppercase;letter-spacing:.04em;font-size:11px}.hero .sec2 .note{display:block;font-size:12px}
-.hero h1.figline{font-size:15px;font-weight:650;line-height:1.45;margin:8px 0 12px;max-width:40rem;letter-spacing:0}"""
+.hero h1.figline{font-size:15px;font-weight:650;line-height:1.45;margin:8px 0 12px;max-width:40rem;letter-spacing:0}
+.factgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:0 0 14px}
+.factgrid>div{background:#101828;border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.factgrid .l{display:block;color:var(--dim);font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.factgrid .n{display:block;font-size:22px;font-weight:750;margin:3px 0;letter-spacing:-.02em}
+.factgrid .s,.facts>p{color:var(--mut);font-size:13.5px;line-height:1.45}
+.facts .answer{color:var(--txt);font-size:16px;line-height:1.45;margin:2px 0 10px}"""
 
 def tile_html(tid, label, value_txt, acc, badge, rate_txt="fixed", pp=None, tick=None, dlg=None, wide=False):
     """One tile in the US homepage style. tick = (base, rate, t0) makes the value tick; dlg = dict for the tap dialog."""
@@ -249,6 +257,8 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     # Search-targeted wording, one rule for every place (the JSON "title" is no longer used): countries match "<name> national debt" and
     # "<name> debt clock"; states match "<state> debt", "<state> state debt" and "<state> debt clock".
     is_state = p["kind"] == "state"
+    if is_state:
+        import state_profile
     ticks = bool(rate)  # "Live" only where the number really ticks
     lv = "Live " if ticks else ""
     title = (f"{name} State & Local Debt Clock: {lv}Debt, Official Census Data" if is_state else f"{name} National Debt Clock: {lv}Debt, Official Data")
@@ -268,12 +278,16 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         "isAccessibleForFree": True, "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"},
         "spatialCoverage": {"@type": "Place", "name": name},
         "temporalCoverage": f"{min(h[0] for x in cs for h in x.get('history', [[x['as_of']]]))}/{c['as_of']}",
-        "isBasedOn": sorted({x["source_url"] for x in cs} | {pop["source_url"]})}).replace("</", "<\\/") + "</script>"
+        "isBasedOn": sorted({x["source_url"] for x in cs} | {pop["source_url"]} | ({u for _, u in (state_profile.extra_sources(p["slug"]) if is_state else [])}))}).replace("</", "<\\/") + "</script>"
+    if is_state:
+        ld += state_profile.faq_ld(p["slug"])
 
     proj_badge = f'<span class="badge proj" title="Projected every frame from the official figure of {E(as_of)}">PROJECTED · from {E(as_of)}</span>'
     fix_badge = lambda d_: f'<span class="badge fix" title="Official figure that does not change until the next official report">FIXED · {E(_fd(d_))}</span>'
     ann_badge = f'<span class="badge ann" title="{E(p.get("cadence", ""))}">{T["freq"].upper()} DATA · reported {T["once"]}</span>'
     src_list = list(dict.fromkeys([(x["source_name"], x["source_url"]) for x in cs])) + [(pop["source_name"], pop["source_url"])] + list(dict.fromkeys([(q["source_name"], q["source_url"]) for q in ([p["secondary"]] + p["secondary"].get("parts", []) if p.get("secondary") else [])])) + [(s_["name"], s_["url"]) for s_ in p.get("extra_sources", [])]
+    if is_state:
+        src_list += state_profile.extra_sources(p["slug"])
     sec2 = p.get("secondary")  # optional: the place's own, fresher official figure on a narrower scope, shown under the headline (never added to it)
 
     def dlg(label, method, src_name, src_url, locator="", base=None, r=None, official=None):
@@ -281,7 +295,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                 "o": official, "share": url, "img": f"{SITE}/{img}"}
 
     # ---- header (same as the US homepage), jump nav adapted to the place's sections
-    jump = [("changed", "What changed"), ("debt", "Debt")] + [(x["key"], x["short"]) for x in cs] + [("people", f"Per {dem}"), ("history", "History"), ("details", "Details"), ("method", "Method")]
+    jump = ([("facts", "Per resident"), ("faq", "Questions")] if is_state else []) + [("changed", "What changed"), ("debt", "Debt")] + [(x["key"], x["short"]) for x in cs] + [("people", f"Per {dem}"), ("history", "History"), ("details", "Details"), ("method", "Method")]
     header = (f'<header class="top"><div class="topin"><a class="brand" href="../../">EVERY <b>DEBT</b> CLOCK</a>{nav_html(places, 2, p["kind"], "plnav")}'
               f'<span class="live"><span class="dot"></span><span>Official data through {E(as_of)} · {T["freq"]}</span></span></div>'
               f'<nav class="jump">' + "".join(f'<a href="#{i}">{E(t)}</a>' for i, t in jump) + "</nav></header>")
@@ -511,7 +525,9 @@ ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);
         import country_profile as cp
         profile = cp.official_section(R, p)
     official = f'<p class="official">Official: {_usd0(c["total"])} as of {as_of}, {E(pub)}</p>'
-    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + ex.search_box("../../") + '<main id="app">' + hero + official + intro + wc + debt_sec + comp_secs + people + hist + details + profile + method
+    facts = state_profile.facts_html(p["slug"]) if is_state else ""
+    faq = state_profile.faq_html(p["slug"]) if is_state else ""
+    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + ex.search_box("../../") + '<main id="app">' + hero + official + facts + intro + wc + debt_sec + comp_secs + people + hist + details + profile + faq + method
             + '</main><dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))
@@ -570,13 +586,17 @@ ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='
     else:
         WTXT = ""
     explore_html = ex.explore("../", places, calc, kind_hint=("states" if kind == "state" else "countries"), gdp=GDP_BY_SLUG)
+    index_faq, index_ld = ("", "")
+    if kind == "state":
+        import state_profile
+        index_faq, index_ld = state_profile.index_parts(SITE)
     body = (f'{header}{ex.search_box("../")}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>{E(h1)}</h1><p>Every place with a debt clock, built from figures its own government publishes. A clock ticks only where the official trend is reliable; otherwise the official figure is shown as published. Each clock shows who publishes the numbers and how often, '
             f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p>{per_person}</section>'
-            f'<main id="app">{sort}{secs}' + ('<!--WEOCOUNTRIES-->' if WEO and kind == "country" else '') + '</main>'
+            f'<main id="app">{sort}{secs}' + ('<!--WEOCOUNTRIES-->' if WEO and kind == "country" else '') + index_faq + '</main>'
             + explore_html +
             f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section><footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')
     hub_css = PL_CSS + ".hubsort{display:flex;justify-content:flex-end;margin:4px 2px -14px;font-size:12px;color:var(--mut)}.hubsort select{margin-left:6px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit;font-size:12px}.tile.hubt .lab span:last-child{font-size:11px;color:var(--dim)}"
-    page = meta_head(SITE, url, title, desc, "og/home.png", 1, hub_css) + body
+    page = meta_head(SITE, url, title, desc, "og/home.png", 1, hub_css, index_ld) + body
     os.makedirs(f"{R}/{sec_dir}", exist_ok=True)
     open(f"{R}/{sec_dir}/index.html", "w").write(with_analytics(page))
     return url

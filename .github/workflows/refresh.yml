@@ -80,6 +80,9 @@ jobs:
         if: github.event_name != 'push'
         run: |
           python3 pipeline/fetch.py
+          # Full Debt to the Penny history and BEA state GDP. A source failure keeps the last good file.
+          python3 pipeline/fetch_us_debt_history.py || echo "us debt history fetch skipped"
+          python3 pipeline/fetch_state_gdp.py || echo "state gdp fetch skipped"
           # Canada: re-base places/canada.json to the Bank of Canada's latest month-end figure (Valet API, keyless). Never fails the run.
           python3 pipeline/fetch_canada.py || echo "canada fetch skipped"
           # Mexico: Banco de Mexico SIE table CG7 (net public sector debt, keyless CSV export). Never fails the run.

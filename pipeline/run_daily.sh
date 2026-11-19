@@ -5,5 +5,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 python3 pipeline/fetch.py
+python3 pipeline/fetch_us_debt_history.py || echo "us debt history fetch skipped"
+python3 pipeline/fetch_state_gdp.py || echo "state gdp fetch skipped"
 python3 build.py
 # deploy step goes here (e.g. `wrangler pages deploy .` or git push to the static host) — not run in the prototype
