@@ -132,26 +132,31 @@
   const age = (now() - M.generated_epoch) / 3600;
   const st = document.getElementById('status');
   st.textContent = `Recalibrated ${new Date(M.generated_epoch * 1000).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'})}`;
-  if (age > 36) app.insertAdjacentHTML('beforeend', `<div class="banner">Data last recalibrated ${Math.floor(age / 24)} day(s) ago. Tickers are still projecting from the last official figures.</div>`);
-  if (fyRolled()) app.insertAdjacentHTML('beforeend', `<div class="banner">New fiscal year FY${curFY()} started Oct 1 — fiscal-year counters reset to $0 and are projecting until the next official update.</div>`);
-  if (DLS.at_limit) app.insertAdjacentHTML('beforeend', `<div class="banner">At the debt limit: Treasury is using extraordinary measures. Debt subject to the limit was ${usd(DLS.subject_to_limit)} on ${fmtDate(DLS.as_of)}, ${usd(DLS.headroom)} under the ${usd(DLS.limit)} limit, so the debt counters hold at Treasury's latest official figures instead of projecting growth.</div>`);
-  if ((M.flags || []).length) app.insertAdjacentHTML('beforeend', `<div class="banner">Drift alert: ${M.flags.join(', ')} exceeded the validation threshold on the last check.</div>`);
+  const banners = [];
+  if (age > 36) banners.push(`<div class="banner">Data last recalibrated ${Math.floor(age / 24)} day(s) ago. Tickers are still projecting from the last official figures.</div>`);
+  if (fyRolled()) banners.push(`<div class="banner">New fiscal year FY${curFY()} started Oct 1 — fiscal-year counters reset to $0 and are projecting until the next official update.</div>`);
+  if (DLS.at_limit) banners.push(`<div class="banner">At the debt limit: Treasury is using extraordinary measures. Debt subject to the limit was ${usd(DLS.subject_to_limit)} on ${fmtDate(DLS.as_of)}, ${usd(DLS.headroom)} under the ${usd(DLS.limit)} limit, so the debt counters hold at Treasury's latest official figures instead of projecting growth.</div>`);
+  if ((M.flags || []).length) banners.push(`<div class="banner">Drift alert: ${M.flags.join(', ')} exceeded the validation threshold on the last check.</div>`);
 
-  // lead hero: total national debt
+  // lead hero: the official total first, then the dated sentence, then the live labels
   const d = info('debt_total');
   const hero = document.createElement('div'); hero.className = 'hero lead'; hero.id = 't-debt_total';
+  const follow = document.createElement('div'); follow.className = 'hero-follow';
   if (d.status === 'ok') {
-    hero.innerHTML = `<div class="k">Live estimate · US national debt${d.held_at_limit ? ' · held at the debt limit' : ''}</div><div class="big num" id="hv">—</div>
+    hero.innerHTML = `<div class="big num" id="hv">${usd(d.base)}</div>`;
+    follow.innerHTML = `<div class="k">Live estimate · US national debt${d.held_at_limit ? ' · held at the debt limit' : ''}</div>
     <div class="sub"><span>${rateTxt(d.rate)}</span><span class="note">rate: 90-day least-squares trend (${d.calc?.n || '—'} daily closes), backtested vs next Treasury close, avg error ${d.validation?.mean_abs_error_pct != null ? d.validation.mean_abs_error_pct.toFixed(3) + '%' : 'n/a'}</span><span>Since you opened this page: <span class="num" id="hs">$0</span> more debt · <span class="num" id="hi">$0</span> in interest</span></div>
-    <div class="trio"><div><span class="l" title="${esc(PPB)}">Per person (projected population)</span><span class="num" id="h1">—</span></div><div><span class="l">Per tax return filed</span><span class="num" id="h2">—</span></div><div><span class="l">Per household</span><span class="num" id="h3">—</span></div></div>
+    <div class="trio"><div><span class="l" title="${esc(PPB)}">Per person (projected population)</span><span class="num" id="h1">${usd(d.base / (T.population?.base || 1), 2)}</span></div><div><span class="l">Per tax return filed</span><span class="num" id="h2">${usd(d.base / (T.tax_returns?.base || 1), 2)}</span></div><div><span class="l">Per household</span><span class="num" id="h3">${usd(d.base / T.households.base, 2)}</span></div></div>
     <div class="meta" style="margin-top:10px">${badges(d)}<span class="badge">source: Treasury Debt to the Penny</span></div>`;
-    const hv = hero.querySelector('#hv'), hs = hero.querySelector('#hs'), h1 = hero.querySelector('#h1'), h2 = hero.querySelector('#h2'), h3 = hero.querySelector('#h3'), hi = hero.querySelector('#hi');
+    const hv = hero.querySelector('#hv'), hs = follow.querySelector('#hs'), h1 = follow.querySelector('#h1'), h2 = follow.querySelector('#h2'), h3 = follow.querySelector('#h3'), hi = follow.querySelector('#hi');
     live.push(t => { const x = val('debt_total', t); hv.textContent = usd(x); hs.textContent = '+' + usd(x - val('debt_total', OPENED), 0); hi.textContent = usd(DER.interest_since_open(t), 0);
       h1.textContent = usd(x / pop(t), 2); h2.textContent = usd(x / tax(), 2); h3.textContent = usd(x / T.households.base, 2); });
     hero.onclick = () => openModal('debt_total');
-  } else hero.innerHTML = `<div class="k">US national debt</div><div class="big">source unavailable</div>`;
+  } else hero.innerHTML = `<div class="big">source unavailable</div>`;
   app.appendChild(hero);
   if (official) app.appendChild(official);
+  if (d.status === 'ok') app.appendChild(follow);
+  if (banners.length) app.insertAdjacentHTML('beforeend', banners.join(''));
   if (intro) app.appendChild(intro);
   const cross41 = document.getElementById('cross41');
   if (cross41) (intro || official || hero).after(cross41);

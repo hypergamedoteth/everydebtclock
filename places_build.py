@@ -153,6 +153,7 @@ def nav_html(places, depth, current=None, cls="pl"):
     items += [(f"{up}{d}/", lab, current == k) for k, d, lab, _ in SECTIONS if k in kinds]
     if WORLD and "country" in kinds: items.append((f"{up}world/", "World", current == "world"))
     if WEALTH: items.append((f"{up}wealth/", "Wealth", current == "wealth"))
+    items.append((f"{up}reports/", "Reports", current == "reports"))
     items.append((f"{up}embed/", "Embed", current == "embed"))
     return f'<nav class="{cls}">' + "".join(f'<a href="{h}"{" class=on" if on else ""}>{lab}</a>' for h, lab, on in items) + "</nav>"
 
@@ -255,7 +256,8 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     lv = "Live " if ticks else ""
     title = (f"{name} State & Local Debt Clock: {lv}Debt, Official Census Data" if is_state else f"{name} National Debt Clock: {lv}Debt, Official Data")
     if p.get("seo_title"): title = p["seo_title"].format(lv=lv)  # optional per-place override (District of Columbia: no state level)
-    h1 = p.get("h1") or (f"As of {as_of}, {name} {T['head']} is {_usd0(c['total'])} ({pub})")
+    import quotable
+    h1 = quotable.stock(name, T["head_long"], c["total"], c["as_of"], pub, words=_usd0(c["total"]) if (p.get("currency") or {}).get("code", "USD") != "USD" else None)
     _dn = p.get("seo_desc_noun")  # optional: full noun phrase for the description's opening
     desc = ((f"{_dn[0].upper() + _dn[1:]}: {_b(c['total'])}, " if _dn else f"{name} {'state and local debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, ") + f"{'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
             f"{'Live ' if rate else 'Official '}{name} debt clock, {'about ' if rate else ''}{_usd0(proj / pop['value'])} per {dem}{' (projected)' if rate else ''}, with sources.")
@@ -320,16 +322,6 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     others = [o for o in places if o["slug"] != p["slug"]]
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span>'
              f'<a href="../../{sec_dir}/">All {"US state" if is_state else "country"} debt clocks</a>' + ('<span>·</span><a href="../../world/">World debt clock</a>' if WORLD else "") + '</div>')
-    intro = (f'<section class="intro" id="intro">{crumb}<h1>{E(h1)}</h1>'
-             f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
-             + (f'on <b>{as_of}</b>' if T["periodic"] else f'in Census survey year {fy} (dated <b>{as_of}</b>)' if p.get("year_label") else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
-             + " and ".join(("" if n_.startswith("Eurostat") else "the ") + f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
-             + (f': {parts}' if len(cs) > 1 else '') + f'. {E(p.get("scope_note", ""))}{" " if p.get("scope_note") else ""}That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by {E(T["pop_pos"])} estimate of {pop["value"]:,} {E(T['noun_full'])} on {_fd(pop["as_of"])}. {proj_txt}</p>'
-             + ("" if is_state else f'<p>Source tier: {"harmonized official dataset" if ("Eurostat" in pub or p.get("source_tier") == "harmonized") else "official national series"}. As of {as_of}. Coverage: {E(p.get("world_measure") or p.get("headline_long") or T["head"])}.</p>')
-             + (f'<p>{E(p["intro_extra"])}</p>' if p.get("intro_extra") else "")
-             + (_world_line(p, name, pub, as_of) if not is_state else "")
-             + _debt_year_link(p["slug"], name)
-             + '</section>')
 
     # ---- hero (same block and labels as the US hero)
     hero_d = dlg(f'{name} {T["head"]}', T["sum_note"], pub, cs[0]['source_url'], cs[0].get("source_locator", "") if len(cs) == 1 else "", base=c['total'], r=rate, official=f"{_usd0(c['total'])} official, {as_of}")
@@ -341,20 +333,31 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         kicker = f"Official figure · {name} {T['head']}"
         live_attr = ""
     hero = (f'<div class="hero lead" id="t-total" data-b="{c["total"]}" data-r="{rate or 0}" data-t="{t0}" data-d=\'{E(json.dumps(hero_d), quote=True)}\'>'
-            f'<div class="k"{live_attr}>{E(kicker)}</div><div class="big num" id="hv">{_usd0(c["total"])}</div>')
+            f'<div class="big num" id="hv">{_usd0(c["total"])}</div></div>')
+    follow = f'<div class="hero-follow"><div class="k"{live_attr}>{E(kicker)}</div>'
     if rate:
-        hero += (f'<div class="sub"><span>{_rate_txt(rate)}</span><span class="note">rate: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}, so this is a projection</span>'
+        follow += (f'<div class="sub"><span>{_rate_txt(rate)}</span><span class="note">rate: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}, so this is a projection</span>'
                  + (f'<span class="note">{E(recent)}</span>' if recent else "") + f'<span>Since you opened this page: <span class="num" id="hs">{CUR}0</span> {"more" if up_ else "less"} debt</span></div>')
     else:
-        hero += f'<div class="sub"><span>fixed</span><span class="note">{E(rep)} reports {T["once"]}; {"shown fixed, not ticking" if p.get("hold_trend") else "one official figure available"}</span></div>'
+        follow += f'<div class="sub"><span>fixed</span><span class="note">{E(rep)} reports {T["once"]}; {"shown fixed, not ticking" if p.get("hold_trend") else "one official figure available"}</span></div>'
     trio_x = [(x["short"] + " · official " + _fd(x["as_of"]), _usd0(x["value"])) for x in cs[:2]] if len(cs) > 1 else \
              [(f"Official · {_fd(c['as_of'])}", _usd0(c["total"]))]
     trio_x += [(h["label"], h["value"]) for h in p.get("hero_extra", [])]
-    hero += ('<div class="trio">' + f'<div><span class="l">Per {E(dem)} ({E(T["pop_tag"])}, {_fd(pop["as_of"])})</span><span class="num" data-pp="{pop["value"]}">{_usd2(c["total"] / pop["value"])}</span></div>'
+    follow += ('<div class="trio">' + f'<div><span class="l">Per {E(dem)} ({E(T["pop_tag"])}, {_fd(pop["as_of"])})</span><span class="num" data-pp="{pop["value"]}">{_usd2(c["total"] / pop["value"])}</span></div>'
              + "".join(f'<div><span class="l">{E(l)}</span><span class="num">{E(v)}</span></div>' for l, v in trio_x[:2]) + "</div>"
              + (f'<div class="sec2"><span class="l">{E(sec2["label"])} · official {E(_fd(sec2["as_of"]))}</span> <b class="num">{_usd0(sec2["value"])}</b> '
                 f'<span class="note">{E(sec2["publisher"])}. {E(sec2["scope"])}</span></div>' if sec2 else "")
              + f'<div class="meta" style="margin-top:10px">{proj_badge if rate else fix_badge(c["as_of"])}{ann_badge}<span class="badge">source: {E(pub)}</span></div></div>')
+    intro = (f'<section class="intro" id="intro"><h1 class="quote">{E(h1)}</h1>{follow}{crumb}'
+             f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
+             + (f'on <b>{as_of}</b>' if T["periodic"] else f'in Census survey year {fy} (dated <b>{as_of}</b>)' if p.get("year_label") else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
+             + " and ".join(("" if n_.startswith("Eurostat") else "the ") + f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
+             + (f': {parts}' if len(cs) > 1 else '') + f'. {E(p.get("scope_note", ""))}{" " if p.get("scope_note") else ""}That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by {E(T["pop_pos"])} estimate of {pop["value"]:,} {E(T['noun_full'])} on {_fd(pop["as_of"])}. {proj_txt}</p>'
+             + ("" if is_state else f'<p>Source tier: {"harmonized official dataset" if ("Eurostat" in pub or p.get("source_tier") == "harmonized") else "official national series"}. As of {as_of}. Coverage: {E(p.get("world_measure") or p.get("headline_long") or T["head"])}.</p>')
+             + (f'<p>{E(p["intro_extra"])}</p>' if p.get("intro_extra") else "")
+             + (_world_line(p, name, pub, as_of) if not is_state else "")
+             + _debt_year_link(p["slug"], name)
+             + '</section>')
 
     # ---- What changed: official annual figures, newest first, with a NOW card (mirrors the US recent-closes strip)
     wc = ""
@@ -501,7 +504,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
 const C='{CUR}',usd=(v,d)=>(v<0?'−':'')+C+(d?nf2:nf0).format(Math.abs(v)),short=v=>{{const a=Math.abs(v);return (v<0?'−':'')+C+(a>=1e12?(a/1e12).toFixed(2)+'T':a>=1e9?(a/1e9).toFixed(2)+'B':(a/1e6).toFixed(1)+'M')}},sg=v=>v<0?'−':'+';
 const now=()=>Date.now()/1000,OPENED=now(),H=document.getElementById('t-total'),B=+H.dataset.b,R=+H.dataset.r,T0=+H.dataset.t,tot=t=>B+R*(t-T0);
 const ticks=[...document.querySelectorAll('.tile[data-r]')].map(e=>({{v:e.querySelector('.val'),b:+e.dataset.b,r:+e.dataset.r,t:+e.dataset.t,pp:e.id==='t-pp_total',ppx:[...e.querySelectorAll('[data-pp]')]}}));
-const hv=document.getElementById('hv'),hs=document.getElementById('hs'),wcn=document.getElementById('wcn'),wcd=document.getElementById('wcd'),pps=[...document.querySelectorAll('.hero [data-pp],.wcc [data-pp]')];
+const hv=document.getElementById('hv'),hs=document.getElementById('hs'),wcn=document.getElementById('wcn'),wcd=document.getElementById('wcd'),pps=[...document.querySelectorAll('.hero [data-pp],.hero-follow [data-pp],.wcc [data-pp]')];
 const dlg=document.getElementById('dlg');let mt=null;
 function open(e){{const d=JSON.parse(e.dataset.d);const x='https://x.com/intent/post?text='+encodeURIComponent(d.l+': '+(d.r?short(d.b+d.r*(now()-d.t0))+' and ticking (projected from official data)':d.o))+'&url='+encodeURIComponent(d.share);
 dlg.innerHTML='<h3></h3><div class="big num" id="mv"></div><p class="mo"></p><p><b>Method.</b> <span class="mm"></span></p>'+(d.r?'<div class="math"><b>Show the math</b><table><tr><td>Base (official)</td><td class="num">'+usd(d.b)+'</td></tr><tr><td>Rate per second</td><td class="num">'+usd(d.r,2)+'</td></tr></table><p><b>Now</b> = base + rate × (now − t0) = <span class="num" id="mf">—</span></p></div>':'')+
@@ -511,7 +514,7 @@ const sl=dlg.querySelector('.sl');sl.href=d.share;sl.textContent=d.share;dlg.que
 const mv=dlg.querySelector('#mv'),mf=dlg.querySelector('#mf');mt=t=>{{const v=d.r?d.b+d.r*(t-d.t0):null;mv.textContent=v==null?(d.o||'').split(' ')[0]:usd(v);if(mf)mf.textContent=usd(d.b)+' + '+usd(d.r,4)+' × '+nf0.format(Math.round(t-d.t0))+' s = '+usd(v)}};
 dlg.querySelector('#cl').onclick=()=>dlg.close();dlg.querySelector('#cp').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(d.share);dlg.showModal()}}
 dlg.addEventListener('close',()=>mt=null);document.querySelectorAll('[data-d]').forEach(e=>e.onclick=()=>open(e));
-(function f(){{const t=now(),x=tot(t);if(R){{const hk=H.querySelector('.k');if(hk&&hk.dataset.live)hk.textContent=hk.dataset.live;hv.textContent=usd(x);if(hs)hs.textContent=(R<0?'':'+')+usd(Math.abs(x-tot(OPENED)));if(wcn)wcn.textContent=short(x);if(wcd)wcd.textContent=sg(x-B)+short(Math.abs(x-B));pps.forEach(e=>e.textContent=usd(x/+e.dataset.pp,e.closest('.hero')?2:0));
+(function f(){{const t=now(),x=tot(t);if(R){{const hk=document.querySelector('.k[data-live]');if(hk)hk.textContent=hk.dataset.live;hv.textContent=usd(x);if(hs)hs.textContent=(R<0?'':'+')+usd(Math.abs(x-tot(OPENED)));if(wcn)wcn.textContent=short(x);if(wcd)wcd.textContent=sg(x-B)+short(Math.abs(x-B));pps.forEach(e=>e.textContent=usd(x/+e.dataset.pp,e.closest('.hero, .hero-follow')?2:0));
 ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);k.ppx.forEach(e=>e.textContent=usd(v/+e.dataset.pp,2))}})}}if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
 
     explore_html = ex.explore("../../", places, calc, cur=p, gdp=GDP_BY_SLUG)
@@ -520,8 +523,9 @@ ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);
         import country_profile as cp
         profile = cp.official_section(R, p)
     official = f'<p class="official">Official: {_usd0(c["total"])} as of {as_of}, {E(pub)}</p>'
-    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld) + header + ex.search_box("../../") + '<main id="app">' + hero + official + facts_html + intro + wc + debt_sec + comp_secs + people + hist + details + profile + method
-            + '</main><dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
+    page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld).replace("<body>", '<body class="srclead">', 1)
+            + '<main id="app">' + hero + intro + facts_html + wc + debt_sec + comp_secs + people + hist + details + profile + method
+            + '</main>' + header + ex.search_box("../../") + '<dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))
     _cur({})
@@ -585,13 +589,26 @@ ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='
     else:
         WTXT = ""
     explore_html = ex.explore("../", places, calc, kind_hint=("states" if kind == "state" else "countries"), gdp=GDP_BY_SLUG)
-    body = (f'{header}{ex.search_box("../")}<section class="intro"><div class="crumb"><a href="../">← US national debt clock</a></div><h1>{E(h1)}</h1><p>Every place with a debt clock, built from figures its own government publishes. A clock ticks only where the official trend is reliable; otherwise the official figure is shown as published. Each clock shows who publishes the numbers and how often, '
-            f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p>{per_person}</section>'
-            f'<main id="app">{sort}{secs}' + ('<!--WEOCOUNTRIES-->' if WEO and kind == "country" else '') + '</main>'
+    if kind == "state":
+        import quotable
+        dates = {calc(p)["as_of"] for p in live}
+        if len(dates) == 1:
+            h1 = quotable.states_sum(sum(calc(p)["total"] for p in live), dates.pop())
+    h1_html = f'<h1 class="quote">{E(h1)}</h1>' if kind == "state" else f'<h1>{E(h1)}</h1>'
+    intro_html = (f'<section class="intro">{h1_html}<div class="crumb"><a href="../">← US national debt clock</a></div><p>Every place with a debt clock, built from figures its own government publishes. A clock ticks only where the official trend is reliable; otherwise the official figure is shown as published. Each clock shows who publishes the numbers and how often, '
+            f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p>{per_person}</section>')
+    rest = (f'<main id="app">{sort}{secs}' + ('<!--WEOCOUNTRIES-->' if WEO and kind == "country" else '') + '</main>'
             + explore_html +
             f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section>{state_faq}<footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')
+    if kind == "state":
+        body = intro_html + header + ex.search_box("../") + rest
+    else:
+        body = header + ex.search_box("../") + intro_html + rest
     hub_css = PL_CSS + ".hubsort{display:flex;justify-content:flex-end;margin:4px 2px -14px;font-size:12px;color:var(--mut)}.hubsort select{margin-left:6px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit;font-size:12px}.tile.hubt .lab span:last-child{font-size:11px;color:var(--dim)}"
-    page = meta_head(SITE, url, title, desc, "og/home.png", 1, hub_css, state_ld) + body
+    head = meta_head(SITE, url, title, desc, "og/home.png", 1, hub_css, state_ld)
+    if kind == "state":
+        head = head.replace("<body>", '<body class="srclead">', 1)
+    page = head + body
     os.makedirs(f"{R}/{sec_dir}", exist_ok=True)
     open(f"{R}/{sec_dir}/index.html", "w").write(with_analytics(page))
     return url

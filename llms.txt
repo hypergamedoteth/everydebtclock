@@ -34,6 +34,7 @@ These sentences are computed at build time from the same official figures as the
 - /contact/ : Email hello@everydebtclock.com.
 - /advertise/ : Sponsorship on the US clock and the national-debt-by-year page.
 - /data/ : Free CSV and JSON of US debt. us-debt-daily is every Debt to the Penny close since 1993-04-01. us-debt-annual is Historical Debt Outstanding since 1790. Citation: Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Debt to the Penny.
+- /reports/ : Monthly U.S. debt reports from Debt to the Penny. Each completed month states the debt added, the average per calendar day, interest per day when Treasury's interest-expense series has that month, and a labelled projection for the next trillion.
 - /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.
 
 ## Debt by year

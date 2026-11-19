@@ -772,7 +772,7 @@ def build_treasury_history(R, T):
 
 
 # ---------------------------------------------------------------- page
-def _page(R, SITE, with_analytics, files, charts, modified):
+def _page(R, SITE, with_analytics, files, charts, modified, lead):
     E = _esc
     url = f"{SITE}/data/"
     credit_href = f"{SITE}/"
@@ -858,7 +858,7 @@ body{{margin:0;background:#07090d;color:#e8edf5;font-family:-apple-system,BlinkM
 main{{max-width:880px;margin:0 auto;padding:22px 16px 64px}}
 a{{color:#5aa9ff;text-decoration:none}}a:hover{{text-decoration:underline}}
 .brand{{font-weight:800;letter-spacing:.06em;font-size:14px;color:inherit;text-decoration:none}}.brand b{{color:#ff4d5e}}
-h1{{font-size:28px;line-height:1.25;margin:18px 0 8px}}h2{{font-size:18px;margin:0 0 8px}}
+h1{{font-size:28px;line-height:1.25;margin:18px 0 8px}}h1.quote{{font-size:17px;font-weight:650;line-height:1.45;margin:0 0 12px}}h2{{font-size:18px;margin:0 0 8px}}
 p{{color:#c2ccda;font-size:15px}}
 table{{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0 18px}}
 th,td{{border-bottom:1px solid #1c2533;padding:8px 8px;text-align:left;vertical-align:top}}
@@ -873,8 +873,8 @@ footer{{color:#5c687a;font-size:12px;margin-top:28px}}
 {ld_html}
 <!--ANALYTICS--><!--/ANALYTICS-->
 </head><body><main>
+<h1 class="quote">{E(lead)}</h1>
 <a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>
-<h1>Free US &amp; World Debt Data (CSV + Charts)</h1>
 <p>These files are free to use. For the Treasury history files, the citation line is: {E(ATTR_DAILY)}.</p>
 <p><a href="#us-debt-daily.csv">us-debt-daily.csv</a> and <a href="#us-debt-daily.json">us-debt-daily.json</a> are every Debt to the Penny close from 1993-04-01. <a href="#us-debt-annual.csv">us-debt-annual.csv</a> and <a href="#us-debt-annual.json">us-debt-annual.json</a> are Historical Debt Outstanding from fiscal year 1790. Dollar amounts are the official stocks, not the live clock. A blank cell means that source has not published the figure. The other files are the series this site already publishes: debt by year with OMB ratios, debt by president, debt per person, interest, state debt, and country debt. OMB surplus is the Historical Tables balance: positive is a surplus, negative is a deficit. The country file is the same stock as the world debt clock. A country's own clock can be a narrower total. The United States row there is the IMF figure.</p>
 <h2>CSV files</h2>
@@ -973,6 +973,7 @@ def build(R, SITE, with_analytics, D, places, world):
         print(f"data/{filename}: {n} rows")
     charts = draw_charts(R, y_rows, p_rows, i_rows, c_rows)
     print("charts:", ", ".join(charts) or "none")
-    _page(R, SITE, with_analytics, files, charts, M.get("generated_iso") or "")
+    import quotable
+    _page(R, SITE, with_analytics, files, charts, off_d or "", quotable.us_close(off_v, off_d))
     print(f"data hub: {SITE}/data/")
     return f"{SITE}/data/"

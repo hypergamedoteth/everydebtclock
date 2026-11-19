@@ -123,6 +123,11 @@ section,.tile,.hero{scroll-margin-top:96px}
 #mf,.math .num{white-space:normal;overflow-wrap:anywhere}
 /* build-time text: intro (always shown), static fallback (removed by app.js), quick-answer links */
 .intro{max-width:1280px;margin:0 auto;padding:14px 14px 0}.intro h1{font-size:19px;margin:4px 0 6px;letter-spacing:.02em}
+h1.quote,.intro h1.quote{font-size:15px;font-weight:650;line-height:1.45;margin:8px 2px 14px;letter-spacing:0;max-width:44rem;color:var(--mut)}
+body.srclead{display:flex;flex-direction:column}
+body.srclead>header.top{order:-5}
+body.srclead>#edc-a2hs{order:-4}
+body.srclead>.srchrow{order:-3}
 .intro p{color:#c2ccda;font-size:13.5px;line-height:1.55;max-width:980px;margin:0}
 .intro .answer{font-size:15px;line-height:1.5}
 .faq h2{font-size:17px;margin:18px 0 6px}.faq h3{font-size:15.5px;margin:14px 0 4px}

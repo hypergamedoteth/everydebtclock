@@ -142,6 +142,32 @@ def _csv_date(path, today):
     return _max(parse(m, today) for m in ISO_RE.findall(text))
 
 
+def _data_date(path, today):
+    """The series date, not the day the file was written.
+
+    JSON history files carry series_end. CSV files carry record_date or as_of.
+    A last_updated stamp on every row is not a data date.
+    """
+    if not os.path.exists(path):
+        return None
+    if path.endswith(".json"):
+        try:
+            doc = json.load(open(path, encoding="utf-8"))
+        except Exception:
+            doc = None
+        if isinstance(doc, dict) and doc.get("series_end"):
+            return parse(doc["series_end"], today)
+    if path.endswith(".csv"):
+        import csv
+        with open(path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            fields = reader.fieldnames or []
+            col = "record_date" if "record_date" in fields else "as_of" if "as_of" in fields else None
+            if col:
+                return _max(parse(row.get(col), today) for row in reader)
+    return _csv_date(path, today)
+
+
 def collect(R, off_d, world=None, today=None):
     """Map a site path ('/states/texas/') to a lastmod string."""
     today = today or dt.date.today()
@@ -257,7 +283,7 @@ def collect(R, off_d, world=None, today=None):
         "us-debt-by-year.csv", "us-debt-by-president.csv", "us-debt-per-person.csv",
         "us-interest.csv", "us-state-debt.csv", "country-debt.csv",
     ):
-        csv_dates[name] = _csv_date(os.path.join(data_dir, name), today)
+        csv_dates[name] = _data_date(os.path.join(data_dir, name), today)
     # The per-person file carries the Treasury close. If a scan misses it, use that close.
     if debt and not _newer(csv_dates.get("us-debt-per-person.csv"), debt):
         csv_dates["us-debt-per-person.csv"] = _max([csv_dates.get("us-debt-per-person.csv"), debt])
@@ -273,6 +299,9 @@ def collect(R, off_d, world=None, today=None):
         for ext in ("png", "svg"):
             _put(out, f"/data/charts/{slug}.{ext}", csv_dates.get(csv_name))
     _put(out, "/data/", _max(csv_dates.values()))
+    import monthly_report
+    for path, day in monthly_report.lastmods(R, today).items():
+        _put(out, path, parse(day, today))
 
     cash = (T.get("interest_cash") or {}).get("as_of")
     _put(out, "/interest-on-the-national-debt/", parse(cash, today) or debt)
@@ -432,6 +461,6 @@ def check(R, site, dates, urls, off_d):
     if f'"dateModified": "{off_d}"' not in page:
         raise SystemExit("homepage JSON-LD dateModified is not the Treasury date")
     lead = visible_lead(page)
-    if not lead.startswith("As of") or off_d[0:4] not in lead:
+    if not lead.startswith("The U.S. national debt was") or "per the U.S. Treasury" not in lead or off_d[0:4] not in lead:
         raise SystemExit("homepage lead is not the dated official total: " + lead)
     print(f"freshness: {len(dates)} data dates, homepage {home}")

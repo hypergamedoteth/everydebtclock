@@ -277,8 +277,10 @@ if held:
 else:
     proj_txt = (f"The clock above starts from that official figure and projects forward at the 90-day trend (about {bil(rate_day)} a day). "
                 "It is re-based to Treasury's new figure every business day and never projects past the debt limit.")
+import quotable
+LEAD = quotable.us_close(OFF_V, OFF_D)
 answer_s = f"The US national debt was <b>{usd2(OFF_V)}</b> ({tril(OFF_V)}) as of <b>{fdate(OFF_D)}</b>, Treasury's Debt to the Penny close."
-intro = (f"""<!--INTRO--><h1>As of {fdate(OFF_D)}, the US national debt is {usd2(OFF_V)} (Treasury Debt to the Penny)</h1>
+intro = (f"""<!--INTRO--><h1 class="quote" id="official">{html.escape(LEAD)}</h1>
 <p class="answer">{answer_s} The figure is from <a href="{DTP_URL}" rel="noopener">Treasury's Debt to the Penny</a>.</p>
 <p>That is <b>{usd2(PP_OFF)} per person</b>: the debt divided by the Census Bureau's estimate of
 {POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}. {proj_txt}</p>
@@ -300,10 +302,7 @@ def row(slug):
             v = usd0(i["base"]) if i.get("kind") == "usd" else fmt(i, i["base"])
             asof = (i["basis_txt"] if i.get("basis_txt") else f"official, {fdate(i.get('as_of'))}")
     return f'<tr><td><a href="t/{slug}.html">{html.escape(label(slug, i))}</a></td><td class="num">{v}</td><td>{html.escape(asof)}</td></tr>'
-ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="k">Official · {fdate(OFF_D)} · Treasury Debt to the Penny</div><div class="big num">{usd2(OFF_V)}</div>
-<div class="trio"><div><span class="l">Per person (Census, {fdate(POP_OFF_DATE)})</span><span class="num">{usd2(PP_OFF)}</span></div>
-<div><span class="l">Per tax return filed</span><span class="num">{usd2(OFF_V / TAX)}</span></div><div><span class="l">Per household</span><span class="num">{usd2(OFF_V / HH)}</span></div></div></div>
-<p class="official" id="official">Official: {usd2(OFF_V)} as of {fdate(OFF_D)}, Treasury Debt to the Penny</p>
+ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="big num">{usd2(OFF_V)}</div></div>
 <section class="intro" id="intro">{intro}</section>
 {site_chrome.sponsor_slot("")}<section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
 {''.join(row(s_) for s_ in ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "spending", "revenue", "gdp"])}</table>
@@ -353,7 +352,7 @@ else: idx = idx.replace('<main id="app"></main>', f'<main id="app">{ssr}</main>'
 if "<!--LINKS-->" in idx: idx = re.sub(r"<!--LINKS-->.*?<!--/LINKS-->", lambda m: links, idx, flags=re.S)
 else: idx = idx.replace('<dialog id="dlg"></dialog>', f'<dialog id="dlg"></dialog>\n<section class="answers" id="answers">{links}</section>', 1)
 PLNAV = ("<!--PLNAV-->" + ('<nav class="plnav"><a href="./" class="on">United States</a>' + "".join(f'<a href="{d}/">{lab}</a>' for k, d, lab, _ in places_build.SECTIONS
-         if any(p["kind"] == k for p in PLACES_LIVE)) + ('<a href="world/">World</a>' if WORLD else "") + ('<a href="wealth/">Wealth</a>' if WEALTH_FUNDS else "") + '<a href="embed/">Embed</a></nav>' if PLACES_LIVE else "") + "<!--/PLNAV-->")
+         if any(p["kind"] == k for p in PLACES_LIVE)) + ('<a href="world/">World</a>' if WORLD else "") + ('<a href="wealth/">Wealth</a>' if WEALTH_FUNDS else "") + '<a href="reports/">Reports</a><a href="embed/">Embed</a></nav>' if PLACES_LIVE else "") + "<!--/PLNAV-->")
 SEARCH = "<!--SEARCH-->" + (explore.search_box("") if PLACES_LIVE else "") + "<!--/SEARCH-->"
 if "<!--SEARCH-->" in idx: idx = re.sub(r"<!--SEARCH-->.*?<!--/SEARCH-->", lambda m: SEARCH, idx, flags=re.S)
 else: idx = idx.replace("</header>", "</header>" + SEARCH, 1)
@@ -574,7 +573,8 @@ ANS_CSS = """table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8
 th{color:#8a97ab;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em}td.num{font-family:ui-monospace,Menlo,monospace;text-align:right;white-space:nowrap}
 h2{font-size:17px;margin:22px 0 6px}.k{color:#8a97ab;font-size:13px;margin:0}details summary{cursor:pointer;color:#5aa9ff;margin:8px 0}
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}code{overflow-wrap:anywhere}.note{border:1px solid #5a3a12;background:#20170a;color:#ffb547;border-radius:10px;padding:10px 12px;font-size:13.5px}
-.faq h3{font-size:15.5px;margin:16px 0 4px}.faq p{margin:0 0 8px}"""
+.faq h3{font-size:15.5px;margin:16px 0 4px}.faq p{margin:0 0 8px}
+h1.quote{font-size:17px;font-weight:650;line-height:1.45;margin:8px 0 10px}"""
 def src_links(items):
     return "<p><b>Sources.</b> " + " · ".join(f'<a href="{html.escape(u)}" rel="noopener">{html.escape(n)}</a>' for n, u in items) + "</p>"
 SRC_DTP = ("Treasury, Debt to the Penny", DTP_URL)
@@ -599,8 +599,7 @@ def answer_page(slug, title, desc, h1, body, ld="", og_img="og/debt_total.png", 
 <meta name="twitter:description" content="{html.escape(desc)}"><meta name="twitter:image" content="{SITE}/{og_img}">
 <meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><style>{PAGE_CSS}{ANS_CSS}{explore.RELATED_CSS}</style>
 {ld}</head><body><main>
-<a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
-<h1>{html.escape(h1)}</h1>
+{f'<h1 class="quote">{html.escape(h1)}</h1><a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>' if slug == "national-debt-by-year" else f'<a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a><h1>{html.escape(h1)}</h1>'}
 {held_note}{body}
 {faq_section(faqs) if faqs else ""}
 <a class="cta" href="../">Open the live national debt clock →</a>
@@ -771,7 +770,7 @@ The next trillion is the <a href="../41-trillion/">$41 trillion countdown</a>.</
         answer_page("national-debt-by-year",
                     f"US National Debt by Year: Totals and Debt-to-GDP, FY{min(BY)} to FY{ly}",
                     f"US national debt by fiscal year from Treasury: {tril(BY[ly][1])} as of {fdate(BY[ly][0])}, the end of FY{ly}. Debt-to-GDP and deficit-to-GDP by year from OMB Historical Tables, FY1940 on.",
-                    "US national debt by year", body, faqs=year_faqs,
+                    quotable.fy_close(BY[ly][1], BY[ly][0], ly), body, faqs=year_faqs,
                     ld=dataset_ld("US national debt by fiscal year", "Total public debt outstanding at each fiscal year end (Treasury Historical Debt Outstanding) with gross federal debt, debt held by the public and the deficit as a share of GDP (OMB Historical Tables 7.1 and 1.2).",
                                   f"{SITE}/national-debt-by-year/", based=[hdo_url, omb_url],
                                   temporal=f"{min(BY)}/{ly}") + faq_ld(year_faqs))
@@ -896,6 +895,8 @@ SP_URLS = state_per_person_build.build(R, SITE, with_analytics, STAMP)
 # ---------------------------------------------------------------- free data hub (/data/ CSVs, charts). New files only, plus the sitemap and footer links above.
 import data_hub
 data_hub.build(R, SITE, with_analytics, D, PLACES_LIVE, WORLD)
+import monthly_report
+REPORT_URLS = monthly_report.build(R, SITE, with_analytics, T["debt_total"])
 
 # ---------------------------------------------------------------- legal pages (/privacy/, /about/, /contact/)
 site_chrome.write_legal_pages(R, SITE, with_analytics)
@@ -918,6 +919,7 @@ urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/embed/", "0.5", "weekly")] + d
         [(u, "0.8", "weekly") for u in PRES_URLS] +
         [(u, "0.8", "weekly") for u in SP_URLS] +
         [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None] +
+        [(u, "0.8", "monthly") for u in REPORT_URLS] +
         site_chrome.sitemap_entries(SITE))
 def _lastmod(url):
     path = url[len(SITE):] if url.startswith(SITE) else url
@@ -971,6 +973,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /contact/ : Email hello@everydebtclock.com.",
     "- /advertise/ : Sponsorship on the US clock and the national-debt-by-year page.",
     "- /data/ : Free CSV and JSON of US debt. us-debt-daily is every Debt to the Penny close since 1993-04-01. us-debt-annual is Historical Debt Outstanding since 1790. Citation: Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Debt to the Penny.",
+    "- /reports/ : Monthly U.S. debt reports from Debt to the Penny. Each completed month states the debt added, the average per calendar day, interest per day when Treasury's interest-expense series has that month, and a labelled projection for the next trillion.",
     "- /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.",
     "",
 ] + debt_by_year_build.llms_lines(R) + presidents_build.llms_lines(R) + [
@@ -1212,4 +1215,28 @@ def check_crossing():
 check_quotable()
 check_crossing()
 check_clock_first()
+_quote_pages = [
+    ("index.html", "home"),
+    ("national-debt-by-year/index.html", "national debt by year"),
+    ("world/index.html", "world"),
+    ("states/index.html", "states"),
+    ("states/california/index.html", "California"),
+    ("states/texas/index.html", "Texas"),
+    ("states/new-york/index.html", "New York"),
+    ("countries/japan/index.html", "Japan"),
+    ("countries/china/index.html", "China"),
+    ("countries/germany/index.html", "Germany"),
+    ("countries/india/index.html", "India"),
+    ("countries/united-kingdom/index.html", "United Kingdom"),
+    ("countries/france/index.html", "France"),
+    ("data/index.html", "data"),
+    ("reports/index.html", "reports"),
+    ("reports/2026-10/index.html", "October 2026"),
+]
+for rel, name in _quote_pages:
+    path = os.path.join(R, rel)
+    if not os.path.exists(path):
+        raise SystemExit(f"quotable lead missing page: {rel}")
+    quotable.check_page(open(path, encoding="utf-8").read(), name)
+print(f"quotable leads ok ({len(_quote_pages)} pages)")
 
