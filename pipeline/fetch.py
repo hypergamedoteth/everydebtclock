@@ -260,6 +260,13 @@ if isinstance(debt, list): debt = {"rows": debt, "year_ago": None}     # pre-Pha
 # When the Debt to the Penny rows were actually pulled from Treasury (cache time if this run fell back to cache).
 try: META["debt_fetched_epoch"] = NOW if not debt_stale else json.load(open(os.path.join(CACHE, "debt_to_penny.json")))["fetched"]
 except Exception: META["debt_fetched_epoch"] = None
+# Full Debt to the Penny history (1993-04-01 on) for /data/us-debt-daily.csv. Separate from the 160-row clock window above.
+def src_debt_full():
+    import fetch_us_debt_history as _hist
+    return _hist.download()
+_full_debt, _full_debt_stale = cached("debt_to_penny_full", src_debt_full)
+if _full_debt_stale:
+    META["debt_history_stale"] = True
 if debt:
     year_ago = debt["year_ago"]; rows = sorted(debt["rows"], key=lambda r: r["record_date"])
     latest = rows[-1]; t_latest = eod_et(latest["record_date"])

@@ -1,20 +1,20 @@
 # Every Debt Clock
 https://everydebtclock.com/
 
-Live US, state, country and wealth-fund clocks built from official figures. The US national debt was $40,662,417,395,617.43 ($40.66 trillion) as of Nov 16, 2026 (Treasury, Debt to the Penny).
+Live US, state, country and wealth-fund clocks built from official figures. The US national debt was $40,714,946,316,573.34 ($40.71 trillion) as of Nov 17, 2026 (Treasury, Debt to the Penny).
 
 ## Answers
 These sentences are computed at build time from the same official figures as the pages. Projected figures say so.
-- How much is the US national debt right now? $40,662,417,395,617.43 ($40.66 trillion) as of Nov 16, 2026. Source: Treasury Debt to the Penny. https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny
-- How much is the national debt per person? $118,970.80 as of Nov 16, 2026, the official total divided by the Census estimate of 341,784,857 residents on Jul 1, 2025.
+- How much is the US national debt right now? $40,714,946,316,573.34 ($40.71 trillion) as of Nov 17, 2026. Source: Treasury Debt to the Penny. https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny
+- How much is the national debt per person? $119,124.49 as of Nov 17, 2026, the official total divided by the Census estimate of 341,784,857 residents on Jul 1, 2025.
 - How much interest does the US pay per day? Treasury's interest-expense dataset totaled $1,371,454,499,553 in the 12 months ending Oct 31, 2026, about $3.8 billion a day on an accrual basis. That is not the cash paid on a single day. Cash interest is paid in lumps. The live clock's per-day cost is the national debt times Treasury's average rate on interest-bearing debt, divided by 365.25, and it moves with the clock.
-- When will the US national debt hit $41 trillion? The debt was $40,662,417,395,617.43 as of Nov 16, 2026, $337.6 billion short of $41 trillion. At the homepage clock's 90-day pace, about $7.5 billion a day, $41 trillion falls on December 31, 2026. It is a projection, not a Treasury forecast.
+- When will the US national debt hit $41 trillion? The debt was $40,714,946,316,573.34 as of Nov 17, 2026, $285.1 billion short of $41 trillion. At the homepage clock's 90-day pace, about $7.7 billion a day, $41 trillion falls on December 25, 2026. It is a projection, not a Treasury forecast.
 - World government debt: the latest general-government stocks sum to $118,440,565,680,634 ($118.44 trillion). Each economy has its own as-of date. IMF rows are end-2026 projections. See /world/.
 
 ## Key pages
-- / : US national debt clock. Official total $40,662,417,395,617.43 as of Nov 16, 2026 (Treasury, Debt to the Penny). The live projection is re-based every business day.
+- / : US national debt clock. Official total $40,714,946,316,573.34 as of Nov 17, 2026 (Treasury, Debt to the Penny). The live projection is re-based every business day.
 - /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.
-- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ($118,970.80 per person).
+- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ($119,124.49 per person).
 - /your-share/ : Your share of that official total. Birth year, and optional state, household size, and income, are calculated in the browser and are not stored.
 - /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.
 - /41-trillion/ : Live countdown to the next trillion, using the homepage clock's Debt to the Penny base and per-second rate, plus each trillion crossing in that daily series.
@@ -33,7 +33,7 @@ These sentences are computed at build time from the same official figures as the
 - /privacy/ : Privacy policy, including analytics, data downloads, and cookies if ads are shown.
 - /contact/ : Email hello@everydebtclock.com.
 - /advertise/ : Sponsorship on the US clock and the national-debt-by-year page.
-- /data/ : Free CSV files and charts of the US and world series this site publishes. Free to use with credit: Source: EveryDebtClock.com.
+- /data/ : Free CSV and JSON of US debt. us-debt-daily is every Debt to the Penny close since 1993-04-01. us-debt-annual is Historical Debt Outstanding since 1790. Citation: Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Debt to the Penny.
 - /embed/ : Free debt clock widget. Paste-in clocks for the US, every state and Washington, DC, every country, and the world. Each one links back to its full page.
 
 ## Debt by year
@@ -186,6 +186,10 @@ These sentences are computed at build time from the same official figures as the
 US figures come from Treasury Fiscal Data (Debt to the Penny; Daily Treasury Statement Table III-C for debt subject to the limit) and Census Bureau population estimates. State, country and wealth pages name their own official sources. Every projected figure is labelled as a projection.
 
 ## Machine-readable
+- https://everydebtclock.com/data/us-debt-daily.csv — every Debt to the Penny close since 1993-04-01
+- https://everydebtclock.com/data/us-debt-daily.json — the same daily series
+- https://everydebtclock.com/data/us-debt-annual.csv — Historical Debt Outstanding, fiscal years from 1790
+- https://everydebtclock.com/data/us-debt-annual.json — the same annual series
 - https://everydebtclock.com/data/ — CSV downloads (debt by year, by president, per person, interest, states, countries) and chart images
 - https://everydebtclock.com/api/daily.json — latest official US total and daily changes
 - https://everydebtclock.com/data/data.json — all US tickers, official bases and rates
