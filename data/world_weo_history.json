@@ -1,5 +1,5 @@
 {
- "_doc": "IMF World Economic Outlook, October 2026. General government gross debt (GGXWDG_NGDP, percent of GDP) for every economy in data/world_weo_debt.json, plus population (LP, persons) for 2024-2026. The 2025 and 2026 ratios match that file. Years through 2025 are the published historical series. 2026 is the current-year estimate (the October 2026 outlook uses information through 30 September 2026, and 2026 is not a completed outturn). 2027-2031 are IMF projections. Dollar stocks for 2025 and 2026 stay in data/world_weo_debt.json.",
+ "_doc": "IMF World Economic Outlook, October 2026. General government gross debt (GGXWDG_NGDP, percent of GDP) for every economy in data/world_weo_debt.json, plus population (LP, persons) for 2024-2026. The 2025 and 2026 ratios match that file. Years through 2025 are the published historical series. 2026 is the current-year estimate (the October 2026 outlook uses information through 30 September 2026). 2027-2031 are IMF projections. Dollar stocks for 2025 and 2026 stay in data/world_weo_debt.json.",
  "vintage": "October 2026",
  "published": "2026-10-13",
  "information_through": "2026-09-30",
@@ -15,7 +15,7 @@
  "history_through": 2025,
  "estimate_year": 2026,
  "projection_from": 2027,
- "fetched": "2026-11-18",
+ "fetched": "2026-11-19",
  "economies": {
   "ALB": {
    "ratio": {
