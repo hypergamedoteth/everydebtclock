@@ -25,7 +25,7 @@
  "trend_why": "We use 12 months rather than the last month because month-to-month changes swing with gilt auctions, redemptions and Treasury-bill rollovers.",
  "legend": "The UK's government debt is reported monthly, at month-end, and the latest months are provisional. Borrowing happens in lumps at gilt auctions and redemptions, so the live number is a straight-line projection between official month-end figures, shown here next to them.",
  "cadence": "Monthly. The ONS publishes each month-end figure in its public sector finances release, about three weeks after the month ends (series BKPX). The latest months are provisional and are revised.",
- "next_update": "The October 2026 month-end figure is expected in the ONS public sector finances release about three weeks after the month ends; this page re-bases to it automatically on the next daily build after it appears.",
+ "next_update": "The November 2026 month-end figure is expected in the ONS public sector finances release about three weeks after the month ends; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
   "value": 69483900,
   "noun": "people",
@@ -43,10 +43,10 @@
    "key": "gg",
    "label": "UK general government gross debt",
    "short": "Government debt",
-   "value": 3231915000000,
-   "as_of": "2026-09-30",
-   "prior_value": 3056810000000,
-   "prior_as_of": "2025-09-30",
+   "value": 3233181000000,
+   "as_of": "2026-10-31",
+   "prior_value": 3065779000000,
+   "prior_as_of": "2025-10-31",
    "source_name": "ONS, GG: General government consolidated gross debt (Maastricht), £ million, series BKPX (public sector finances)",
    "source_url": "https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/bkpx/pusf",
    "source_locator": "Series BKPX, dataset PUSF; machine-readable: https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/bkpx/pusf/data",
@@ -55,10 +55,10 @@
     {
      "key": "psnd",
      "label": "Public sector net debt (excluding public sector banks)",
-     "value": 3005000000000,
+     "value": 3058300000000,
      "kind": "usd",
-     "as_of": "2026-09-30",
-     "note": "The headline UK measure: debt of the whole public sector minus liquid assets (cash, bank deposits and reserves), excluding public sector banks. A different, wider and net measure, shown for comparison and not added to the clock. A year earlier (2025-09-30) it was £2,913.3 billion.",
+     "as_of": "2026-10-31",
+     "note": "The headline UK measure: debt of the whole public sector minus liquid assets (cash, bank deposits and reserves), excluding public sector banks. A different, wider and net measure, shown for comparison and not added to the clock. A year earlier (2025-10-31) it was £2,896.5 billion.",
      "source_name": "ONS, PS: Net debt (excluding public sector banks), series HF6W",
      "source_url": "https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/hf6w/pusf",
      "source_locator": "Series HF6W, dataset PUSF"
@@ -66,20 +66,16 @@
     {
      "key": "psnd_exboe",
      "label": "Public sector net debt (excluding public sector banks and the Bank of England)",
-     "value": 2897800000000,
+     "value": 2925500000000,
      "kind": "usd",
-     "as_of": "2026-09-30",
-     "note": "The same net debt measure with the Bank of England also excluded, because its quantitative-easing operations move the figure for reasons unrelated to government borrowing. Shown for comparison and not added to the clock. A year earlier (2025-09-30) it was £2,742.6 billion.",
+     "as_of": "2026-10-31",
+     "note": "The same net debt measure with the Bank of England also excluded, because its quantitative-easing operations move the figure for reasons unrelated to government borrowing. Shown for comparison and not added to the clock. A year earlier (2025-10-31) it was £2,764.1 billion.",
      "source_name": "ONS, Public sector: PSND (ex PS banks ex BoE), series CPPH",
      "source_url": "https://www.ons.gov.uk/economy/governmentpublicsectorandtaxes/publicsectorfinance/timeseries/cpph/pusf",
      "source_locator": "Series CPPH, dataset PUSF"
     }
    ],
    "history": [
-    [
-     "2025-09-30",
-     3056810000000
-    ],
     [
      "2025-10-31",
      3065779000000
@@ -126,7 +122,11 @@
     ],
     [
      "2026-09-30",
-     3231915000000
+     3231875000000
+    ],
+    [
+     "2026-10-31",
+     3233181000000
     ]
    ]
   }
