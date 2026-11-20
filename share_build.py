@@ -300,6 +300,12 @@ def build(root, site, with_analytics, stamp, off_d, off_v, pop, pop_date, househ
                 [("TOTAL PUBLIC DEBT", money_exact(off_v)), ("US RESIDENTS", f"{pop:,.0f}")], base_notes, False)
     render_card(os.path.join(og_dir, "default-sq.png"), "Your share of the US debt", share_txt,
                 [("TOTAL PUBLIC DEBT", money_exact(off_v)), ("US RESIDENTS", f"{pop:,.0f}")], base_notes, True)
+    # Birth-year cards used to be committed as /your-share/og/YYYY.png and YYYY-sq.png.
+    # Meta still requests them. Copy the current card instead of storing 194 binaries.
+    wide, square = os.path.join(og_dir, "default.png"), os.path.join(og_dir, "default-sq.png")
+    for y in range(OG_MIN, OG_MAX + 1):
+        shutil.copyfile(wide, os.path.join(og_dir, f"{y}.png"))
+        shutil.copyfile(square, os.path.join(og_dir, f"{y}-sq.png"))
     desc = (f"Your share of the US debt is {share_txt}: Treasury's {fdate(off_d)} total of {money_exact(off_v)} "
             f"divided by the Census Bureau's {pop:,.0f} residents on {fdate(pop_date)}.")
     title = f"Your Share of the US Debt: {share_txt}"
