@@ -136,16 +136,76 @@ def imf_rows(rec):
     return rows
 
 
+def _clock_amount(slug, date, value):
+    """Whole currency units. Zero, negative, and non-numeric amounts are not a debt stock."""
+    if isinstance(value, bool):
+        raise RuntimeError(f"{slug}: impossible value {value!r} on {date}")
+    try:
+        n = int(value)
+    except (TypeError, ValueError):
+        raise RuntimeError(f"{slug}: impossible value {value!r} on {date}") from None
+    if n <= 0:
+        raise RuntimeError(f"{slug}: impossible value {n} on {date}")
+    return n
+
+
+def _persist_history_revisions(R, slug, updates):
+    """Write revised official amounts back into data/debt_by_year.json."""
+    path = os.path.join(R or ROOT, DATA)
+    with open(path) as f:
+        doc = json.load(f)
+    points = ((doc.get("places") or {}).get(slug) or {}).get("points")
+    if not points:
+        raise RuntimeError(f"{slug}: missing series in the history file")
+    seen = set()
+    for pt in points:
+        if pt["date"] in updates:
+            pt["amount"] = updates[pt["date"]]
+            seen.add(pt["date"])
+    missing = sorted(set(updates) - seen)
+    if missing:
+        raise RuntimeError(f"{slug}: missing series date {missing[0]} in the history file")
+    with open(path, "w") as f:
+        json.dump(doc, f, indent=1)
+        f.write("\n")
+
+
 def country_rows(R, slug, rec):
+    """Year rows for one national series.
+
+    The history file keeps the long series. Each refresh re-bases the clock from the same
+    official source, and that source can revise a month already stored. The clock figure
+    replaces the stored amount, and the change is logged. A missing series or an impossible
+    amount still stops the build.
+    """
     p = _place(R, slug)
-    c = p["components"][0]
-    series = {pt["date"]: int(pt["amount"]) for pt in rec["points"]}
-    hist = {d: int(v) for d, v in c["history"]}
-    hist[c["as_of"]] = int(c["value"])
+    comps = p.get("components") or []
+    if not comps:
+        raise RuntimeError(f"{slug}: missing series")
+    c = comps[0]
+    if "as_of" not in c or "value" not in c or "history" not in c:
+        raise RuntimeError(f"{slug}: missing series")
+    points = rec.get("points")
+    if not points:
+        raise RuntimeError(f"{slug}: missing series")
+    series = {pt["date"]: int(pt["amount"]) for pt in points}
+    hist = {d: _clock_amount(slug, d, v) for d, v in c["history"]}
+    hist[c["as_of"]] = _clock_amount(slug, c["as_of"], c["value"])
+    revised = {}
+    previous = {}
     for d, v in hist.items():
         if d in series and abs(series[d] - v) > 1:
-            raise RuntimeError(f"{slug}: {d} is {series[d]} in the history file and {v} on the clock")
+            previous[d] = series[d]
+            series[d] = v
+            revised[d] = v
         series.setdefault(d, v)
+    if revised:
+        for pt in points:
+            if pt["date"] in revised:
+                pt["amount"] = revised[pt["date"]]
+        _persist_history_revisions(R, slug, revised)
+        for d in sorted(revised):
+            print(f"{slug}: {d} updated in the history file from {previous[d]} to {revised[d]}, the newer figure on the clock")
     if c["as_of"] not in series or abs(series[c["as_of"]] - int(c["value"])) > 1:
         raise RuntimeError(f"{slug}: latest clock figure is not in the series")
     month = int(rec["year_end_month"])
