@@ -10,7 +10,7 @@
  "feed_ratio": "https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP",
  "feed_gdp": "https://www.imf.org/external/datamapper/api/v1/NGDPD",
  "fallback_feed": "https://data360files.worldbank.org/data360-data/data/IMF_WEO/IMF_WEO.csv",
- "fetched": "2026-11-14",
+ "fetched": "2026-11-20",
  "anchor": "2026-01-01T00:00:00+00:00",
  "seconds_2026": 31536000,
  "panel_count": 186,
@@ -19,7 +19,7 @@
  "broader_2025_count": 191,
  "broader_2025_usd": 110943981387577,
  "rate_usd_per_sec": 309630.51336608955,
- "world_gdp_2026_usd": 128003776000000,
+ "world_gdp_2026_usd": null,
  "usa": {
   "debt_2026_usd": 41387339300350,
   "ratio_2026": 126.790227
@@ -5512,6 +5512,5 @@
    "name": "Yemen",
    "reason": "2026 GGXWDG_NGDP is missing or not positive; 2025 GGXWDG_NGDP is missing or not positive"
   }
- ],
- "world_gdp_source": "imf_api"
+ ]
 }
