@@ -43,20 +43,16 @@
    "key": "cgdebt",
    "label": "Peru non-financial public sector debt",
    "short": "Public debt",
-   "value": 363367907543,
-   "as_of": "2026-06-30",
-   "prior_value": 365744263624,
-   "prior_as_of": "2025-06-30",
+   "value": 370699816618,
+   "as_of": "2026-09-30",
+   "prior_value": 364697043126,
+   "prior_as_of": "2025-09-30",
    "source_name": "Banco Central de Reserva del Perú, Saldo de la deuda del sector público no financiero (PN03371FQ), million soles",
    "source_url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/trimestrales/resultados/PN03371FQ/html",
    "source_locator": "BCRP statistical database series PN03371FQ, quarterly; machine-readable through the BCRP series API",
    "includes": "Gross debt of the non-financial public sector, domestic and external, in soles: central, regional and local government and non-financial public companies. Public financial institutions and the Central Bank are not included.",
    "facts": [],
    "history": [
-    [
-     "2025-06-30",
-     365744263624
-    ],
     [
      "2025-09-30",
      364697043126
@@ -67,11 +63,15 @@
     ],
     [
      "2026-03-31",
-     366661275291
+     366660556323
     ],
     [
      "2026-06-30",
-     363367907543
+     363337533373
+    ],
+    [
+     "2026-09-30",
+     370699816618
     ]
    ],
    "breakdown": []

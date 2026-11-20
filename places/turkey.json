@@ -25,7 +25,7 @@
  "legend": "Turkey's central government debt stock is reported monthly, at month-end. Issuance happens in lumps at auctions and maturities, so the live number is a straight-line projection between official month-end figures, shown here next to them.",
  "cadence": "Monthly. The Ministry of Treasury and Finance publishes each month-end debt stock in the following month (about the 20th).",
  "after_text": ", about three weeks after each month-end",
- "next_update": "The October 2026 month-end figure is expected from the Ministry of Treasury and Finance around the 20th of the following month; this page re-bases to it automatically on the next daily build after it appears.",
+ "next_update": "The November 2026 month-end figure is expected from the Ministry of Treasury and Finance around the 20th of the following month; this page re-bases to it automatically on the next daily build after it appears.",
  "population": {
   "value": 86092168,
   "noun": "people",
@@ -43,21 +43,21 @@
    "key": "cgdebt",
    "label": "Türkiye central government debt stock",
    "short": "Central government debt",
-   "value": 16202200000000,
-   "as_of": "2026-09-30",
-   "prior_value": 12964000000000,
-   "prior_as_of": "2025-09-30",
+   "value": 16439700000000,
+   "as_of": "2026-10-31",
+   "prior_value": 13172000000000,
+   "prior_as_of": "2025-10-31",
    "source_name": "Ministry of Treasury and Finance, Central Government Debt Stock (monthly release), TL billion",
-   "source_url": "https://en.hmb.gov.tr/2026/10/20/central-government-debt-stock-as-of-september-30th-2026/",
+   "source_url": "https://en.hmb.gov.tr/2026/11/20/central-government-debt-stock-as-of-october-31st-2026/",
    "source_locator": "Monthly release \"Central Government Debt Stock as of <date>\" on en.hmb.gov.tr (also readable through its public WordPress API: en.hmb.gov.tr/portal/v2/posts)",
    "includes": "Central government debt stock in lira: debt in lira and foreign-currency debt converted to lira. Excludes local governments, state economic enterprises and the Central Bank.",
    "facts": [
     {
      "key": "fxshare",
      "label": "Share of the stock denominated in foreign currency",
-     "value": 50.73,
+     "value": 49.95,
      "kind": "pct",
-     "as_of": "2026-09-30",
+     "as_of": "2026-10-31",
      "note": "As the Ministry states it in the same release: the part of the central government debt stock that is denominated in foreign currencies.",
      "source_name": "Ministry of Treasury and Finance, Central Government Debt Stock",
      "source_url": "https://en.hmb.gov.tr/",
@@ -65,10 +65,6 @@
     }
    ],
    "history": [
-    [
-     "2025-09-30",
-     12964000000000
-    ],
     [
      "2025-10-31",
      13172000000000
@@ -116,17 +112,21 @@
     [
      "2026-09-30",
      16202200000000
+    ],
+    [
+     "2026-10-31",
+     16439700000000
     ]
    ],
    "breakdown": [
     {
      "label": "Domestic debt (Turkish lira)",
-     "value": 7983200000000,
+     "value": 8227500000000,
      "group": "Currency"
     },
     {
      "label": "Foreign-currency debt (converted to lira)",
-     "value": 8219100000000,
+     "value": 8212200000000,
      "group": "Currency"
     }
    ]
