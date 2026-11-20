@@ -658,7 +658,7 @@ code{{font-family:ui-monospace,Menlo,monospace;font-size:13px}}
 <li><a href="../41-trillion/">$41 trillion countdown</a>. Same base and per-second rate as this page.</li>
 </ul>
 <h2>Contact</h2>
-<p>Questions and corrections: <a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a>.</p>
+<p>Questions and corrections: <!--email_off--><a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a><!--/email_off-->.</p>
 <footer class="site-foot">Every Debt Clock · <a href="../embed/">Embed a clock</a> · <a href="../data/">Data</a> · <a href="../press/">Press</a> · <a href="../about/">About</a> · <a href="../advertise/">Advertise</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · <a href="../contact/">Contact</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main>
 <script type="application/json" id="press-data">{data}</script>

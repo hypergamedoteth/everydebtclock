@@ -114,6 +114,9 @@ def compute(R, places, us, now):
             add_imf(e, _secondary(us["official"], "USD", 1.0, us["date"],
                                   "Federal debt, gross (Treasury Debt to the Penny, includes intragovernmental holdings)",
                                   "Treasury, Debt to the Penny", US_URL))
+            # The US clock is the homepage. An empty url makes the table link and the JSON row point at /,
+            # not /countries/united-states/ (that path is only a redirect for crawlers that already know it).
+            rows[-1]["url"] = ""
             continue
         if gg and gg.get("use_clock") and bits:
             c, rate = bits["c"], bits["c"]["rate"] or 0
@@ -313,7 +316,25 @@ def _faqs(W):
          + _named_differences(W)),
     ]
 
+def write_us_redirect(R, SITE):
+    """GitHub Pages cannot send a 301. Same stub as /t/taxpayers.html: canonical, noindex, instant refresh.
+
+    Crawlers already request /countries/united-states/ because older world-table links used that path.
+    The clock itself stays at /.
+    """
+    canon = f"{SITE}/"
+    page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moved | Every Debt Clock</title>
+<link rel="canonical" href="{canon}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=/">
+<script>location.replace("/" + location.hash)</script></head>
+<body><p>This page moved to <a href="/">the US national debt clock</a>.</p></body></html>
+"""
+    os.makedirs(f"{R}/countries/united-states", exist_ok=True)
+    open(f"{R}/countries/united-states/index.html", "w").write(page)
+
+
 def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
+    write_us_redirect(R, SITE)
     if not W: return []
     rows, cv = W["rows"], W["cov"]; n = len(rows); c = W["counts"]
     url = f"{SITE}/world/"

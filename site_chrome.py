@@ -263,17 +263,26 @@ ICON_LINKS = (
 )
 
 
+def _meta_email(tag: str, text: str) -> str:
+    """Cloudflare Email Obfuscation rewrites an address inside a meta tag too. The comments sit outside the tag so the content string stays the address."""
+    if "@" not in text:
+        return tag
+    return f"<!--email_off-->{tag}<!--/email_off-->"
+
+
 def _legal_shell(site: str, slug: str, title: str, desc: str, body: str, robots: str = "") -> str:
     url = f"{site}/{slug}/"
     robots_tag = f'<meta name="robots" content="{robots}">' if robots else ""
     foot = site_footer("../", absolute=False)
+    desc_tag = _meta_email(f'<meta name="description" content="{htmlmod.escape(desc)}">', desc)
+    og_desc = _meta_email(f'<meta property="og:description" content="{htmlmod.escape(desc)}">', desc)
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{htmlmod.escape(title)}</title>
-<meta name="description" content="{htmlmod.escape(desc)}">
+{desc_tag}
 <link rel="canonical" href="{url}">{robots_tag}
 <meta property="og:type" content="website"><meta property="og:site_name" content="Every Debt Clock">
 <meta property="og:url" content="{url}"><meta property="og:title" content="{htmlmod.escape(title)}">
-<meta property="og:description" content="{htmlmod.escape(desc)}">
+{og_desc}
 <meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <style>{LEGAL_CSS}</style>
 <!--ANALYTICS--><!--/ANALYTICS-->
@@ -337,7 +346,7 @@ def privacy_body() -> str:
 <p>If this policy changes, we'll update this page and the date above.</p>
 
 <h2>Contact</h2>
-<p>Questions about this policy: <a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a>. If you email us, we use your message and address only to reply. More ways to reach us are on the <a href="/contact/">contact page</a>.</p>
+<p>Questions about this policy: <!--email_off--><a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a><!--/email_off-->. If you email us, we use your message and address only to reply. More ways to reach us are on the <a href="/contact/">contact page</a>.</p>
 """
 
 
@@ -364,14 +373,14 @@ def about_body() -> str:
 <h2>Independence</h2>
 <p>We are not affiliated with the US government or any other government. Nothing on this site is financial, investment or legal advice.</p>
 
-<p>Questions, corrections, the free embed, or advertising: <a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a>.</p>
+<p>Questions, corrections, the free embed, or advertising: <!--email_off--><a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a><!--/email_off-->.</p>
 """
 
 
 def contact_body() -> str:
     return """
 <h1>Contact</h1>
-<p>Email <a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a>.</p>
+<p>Email <!--email_off--><a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a><!--/email_off-->.</p>
 <p>Use this address for questions about the figures, corrections, the free <a href="/embed/">embed</a>, or advertising. We use your message and address only to reply.</p>
 <p>If you are writing about a number on the site, include the page URL and the figure you want checked.</p>
 <p>The site is operated by Hypergame LLC, a Texas limited liability company. How we handle visitor information is in the <a href="/privacy/">privacy policy</a>. How the numbers are built is on the <a href="/methodology/">methodology</a> page.</p>
@@ -415,7 +424,7 @@ def advertise_body() -> str:
 <p>A sponsorship can appear as a short “Sponsored by” line below the summary on the <a href="/">US clock</a> and on <a href="/national-debt-by-year/">US national debt by year</a>.</p>
 <h2>Audience</h2>
 <p>About 1,380 visits in the 30 days ending November 16, 2026, mostly from the United States. The figures are from Cloudflare Web Analytics, which excludes bots. This is a small site. We will update these numbers as traffic changes.</p>
-<p>We do not publish prices here. If you want to sponsor the clock, email <a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a>.</p>
+<p>We do not publish prices here. If you want to sponsor the clock, email <!--email_off--><a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a><!--/email_off-->.</p>
 """
 
 
@@ -493,6 +502,36 @@ def _iter_html(R: str):
                 yield os.path.join(root, name)
 
 
+_MAILTO_RE = re.compile(r'<a href="mailto:[^"]*">.*?</a>', re.I | re.S)
+_META_RE = re.compile(r"<meta\b[^>]*>", re.I)
+
+
+def _inside_email_off(page: str, index: int) -> bool:
+    return page.rfind("<!--email_off-->", 0, index) > page.rfind("<!--/email_off-->", 0, index)
+
+
+def protect_emails(page: str) -> str:
+    """Keep mailto links as plain HTML.
+
+    Cloudflare Email Obfuscation rewrites an address to /cdn-cgi/l/email-protection, which is a 404
+    for clients that do not run Cloudflare's script. The email_off comments are Cloudflare's opt-out.
+    """
+    def wrap_mailto(m):
+        if _inside_email_off(page, m.start()):
+            return m.group(0)
+        return "<!--email_off-->" + m.group(0) + "<!--/email_off-->"
+
+    page = _MAILTO_RE.sub(wrap_mailto, page)
+
+    def wrap_meta(m):
+        tag = m.group(0)
+        if "@" not in tag or _inside_email_off(page, m.start()):
+            return tag
+        return "<!--email_off-->" + tag + "<!--/email_off-->"
+
+    return _META_RE.sub(wrap_meta, page)
+
+
 def finalize(R: str, extra: tuple[tuple[str, str], ...] = ()) -> None:
     """Refresh footers and inject the cookie notice on ordinary site pages."""
     for path in _iter_html(R):
@@ -513,5 +552,6 @@ def finalize(R: str, extra: tuple[tuple[str, str], ...] = ()) -> None:
             page = with_notice(page)
             if not _redirect(page):
                 page = with_a2hs(page)
+        page = protect_emails(page)
         if page != raw:
             open(path, "w", encoding="utf-8").write(page)

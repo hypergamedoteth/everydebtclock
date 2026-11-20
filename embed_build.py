@@ -792,7 +792,14 @@ def _check(R, site, clocks, now, require_pages, milestones):
             raise RuntimeError(f"{hub} is a list, not a single clock")
     if require_pages:
         state_dirs = _subdirs(os.path.join(R, "states")) - {"debt-per-person"}
-        country_dirs = _subdirs(os.path.join(R, "countries"))
+        country_dirs = set()
+        for name in _subdirs(os.path.join(R, "countries")):
+            index = os.path.join(R, "countries", name, "index.html")
+            head = open(index, encoding="utf-8", errors="replace").read(800) if os.path.isfile(index) else ""
+            # /countries/united-states/ is a noindex refresh to /, not a clock page.
+            if 'http-equiv="refresh"' in head and "noindex" in head:
+                continue
+            country_dirs.add(name)
         got_states = {c["slug"] for c in clocks if c["group"] == "States"}
         got_countries = {c["slug"] for c in clocks if c["group"] == "Countries"}
         if state_dirs != got_states:

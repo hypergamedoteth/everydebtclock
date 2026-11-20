@@ -7,13 +7,15 @@
  5) dist/debtclock-standalone.html (everything inlined, works offline)
  6) embed/ widgets (one noindex page per US, state, DC, country and world clock) and the indexable /embed/ directory
 Site URL defaults to https://everydebtclock.com; override with DEBTCLOCK_SITE_URL for previews."""
-import json, os, html, time, datetime as dt, re
+import json, os, html, shutil, time, datetime as dt, re
 from zoneinfo import ZoneInfo
 from PIL import Image, ImageDraw, ImageFont
 import site_chrome
 
 R = os.path.dirname(os.path.abspath(__file__))
 SITE = os.environ.get("DEBTCLOCK_SITE_URL", "https://everydebtclock.com").rstrip("/")
+# Old iOS asks for this name even when apple-touch-icon.png is linked.
+shutil.copyfile(f"{R}/apple-touch-icon.png", f"{R}/apple-touch-icon-precomposed.png")
 import freshness
 OLD_LASTMOD = freshness.read_lastmods(os.path.join(R, "sitemap.xml"))
 # Analytics hook: empty by default. Set ANALYTICS_HTML (raw HTML snippet) or put it in analytics.html next to build.py.
@@ -195,6 +197,11 @@ for slug, i in ALL.items():
     mt = mode_txt(i).split(" · ")
     og(f"{R}/og/{slug}.png", label(slug, i), fmt(i, x), lines, mt[0], GROUP_COL.get(i.get("group"), "#5aa9ff"),
        (mt[1] if len(mt) > 1 else "") + "\n" + short_src(i.get("source_name") or "Official US data"))
+# Crawlers still request URLs removed from git: taxpayers.png was renamed to tax_returns.png,
+# and the 14 historical-ratio cards were folded into /national-debt-by-year/ (og/debt_total.png).
+shutil.copyfile(f"{R}/og/tax_returns.png", f"{R}/og/taxpayers.png")
+for _h in sorted(HIST):
+    shutil.copyfile(f"{R}/og/debt_total.png", f"{R}/og/{_h}.png")
 
 # ---------------------------------------------------------------- index.html meta + build-time text (readable without JS)
 idx = open(f"{R}/index.html").read()
@@ -390,7 +397,9 @@ if os.path.exists(f"{R}/404.html"):
 
 # ---------------------------------------------------------------- share pages
 os.makedirs(f"{R}/t", exist_ok=True)
-for f in os.listdir(f"{R}/t"): os.remove(f"{R}/t/{f}")
+for f in os.listdir(f"{R}/t"):
+    path = f"{R}/t/{f}"
+    shutil.rmtree(path) if os.path.isdir(path) else os.remove(path)
 RELATED = {}
 for slug, i in ALL.items():
     if slug not in HIST: RELATED.setdefault(i.get("group"), []).append(slug)
@@ -487,6 +496,17 @@ for old, (rel, canon) in REDIRECTS.items():
     open(f"{R}/t/{old}.html", "w").write(f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Moved | Every Debt Clock</title>
 <link rel="canonical" href="{canon}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url={rel}">
 <script>location.replace("{rel}"{' + location.hash' if '#' not in rel else ''})</script></head><body><p>This page moved to <a href="{rel}">{rel}</a>.</p></body></html>
+""")
+# Directory form of the same pages. GitHub Pages does not map /t/tax_returns/ onto tax_returns.html.
+for folder, rel, canon in (
+    ("tax_returns", "../tax_returns.html", f"{SITE}/t/tax_returns.html"),
+    ("taxpayers", "../tax_returns.html", f"{SITE}/t/tax_returns.html"),
+):
+    os.makedirs(f"{R}/t/{folder}", exist_ok=True)
+    open(f"{R}/t/{folder}/index.html", "w").write(f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moved | Every Debt Clock</title>
+<link rel="canonical" href="{canon}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url={rel}">
+<script>location.replace("{rel}" + location.hash)</script></head><body><p>This page moved to <a href="{rel}">{rel}</a>.</p></body></html>
 """)
 
 # ---------------------------------------------------------------- /api/daily.json + /api/daily.txt
@@ -881,10 +901,46 @@ if OFF_V:
 # ---------------------------------------------------------------- place pages: /states/<slug>/, /countries/<slug>/ from places/*.json
 import places_build
 PLACE_URLS = places_build.build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, STAMP, NOW)
-PLACE_URLS += world_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE, WORLD, M.get("generated_iso")) if WORLD else []
+if WORLD:
+    PLACE_URLS += world_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE, WORLD, M.get("generated_iso"))
+else:
+    world_build.write_us_redirect(R, SITE)
 import weo_build
 PLACE_URLS += weo_build.build(R, SITE, with_analytics, og, STAMP, NOW, PLACES_LIVE)
 PLACE_URLS += wealth_build.build(R, SITE, with_analytics, og, PLACES_LIVE, WEALTH_D, WEALTH_FUNDS) if WEALTH_FUNDS else []
+
+def write_api_index():
+    """Directory index for /api/. GitHub Pages 404s a folder that has no index.html."""
+    feeds = [
+        ("daily.json", "Latest official US total and the one-day, 7-day and 30-day changes."),
+        ("daily.txt", "The same US total as one plain-English line."),
+        ("places.json", "State and country clocks."),
+        ("search.json", "Place names for the on-site search box."),
+        ("world.json", "World Debt Clock rows, with the source tier and as-of date."),
+        ("world_government_debt.json", "IMF general-government estimate for the same economies."),
+        ("wealth.json", "Sovereign wealth fund ranking."),
+    ]
+    items = "".join(
+        f'<li><a href="{name}">{html.escape(name)}</a> — {html.escape(blurb)}</li>'
+        for name, blurb in feeds if os.path.exists(f"{R}/api/{name}"))
+    page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data feeds | Every Debt Clock</title>
+<meta name="description" content="JSON and text feeds from Every Debt Clock, plus a link to the CSV downloads.">
+<link rel="canonical" href="{SITE}/api/"><meta name="robots" content="noindex">
+<meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>html{{overflow-x:clip}}body{{margin:0;background:#07090d;color:#e8edf5;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;line-height:1.5}}
+main{{max-width:760px;margin:0 auto;padding:22px 16px 60px}}a{{color:#5aa9ff;overflow-wrap:anywhere}}h1{{font-size:22px}}li{{margin:6px 0}}</style>
+</head><body><main>
+<a href="/" style="font-weight:800;letter-spacing:.06em;color:#e8edf5;text-decoration:none">EVERY <b style="color:#ff4d5e">DEBT</b> CLOCK</a>
+<h1>Data feeds</h1>
+<ul>{items}</ul>
+<p>CSV downloads and charts are on the <a href="/data/">data page</a>.</p>
+</main></body></html>
+"""
+    os.makedirs(f"{R}/api", exist_ok=True)
+    open(f"{R}/api/index.html", "w").write(page)
+
+write_api_index()
 import debt_by_year_build
 DY_URLS = debt_by_year_build.build(R, SITE, with_analytics, STAMP, M.get("generated_iso") or "")
 debt_by_year_build.patch_clocks(R)
