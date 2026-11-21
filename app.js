@@ -142,16 +142,19 @@
   // header status
   const age = (now() - M.generated_epoch) / 3600;
   const st = document.getElementById('status');
-  const staleList = Object.keys(T).filter(k => held(T[k])).map(k => T[k].label || k);
-  st.textContent = staleList.length
-    ? `Stale: ${staleList.join(', ')}`
-    : `Recalibrated ${new Date(M.generated_epoch * 1000).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'})}`;
+  const staleKeys = Object.keys(T).filter(k => held(T[k]));
+  st.textContent = `Recalibrated ${new Date(M.generated_epoch * 1000).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'})}`;
+  if (staleKeys.length && st.parentElement) {
+    st.parentElement.classList.add('stale');
+    const one = T[staleKeys[0]];
+    const short = staleKeys[0] === 'm2' ? 'M2' : String(one.label || staleKeys[0]).split(' ')[0];
+    st.textContent = staleKeys.length === 1 ? `${short} stale` : `${staleKeys.length} stale`;
+  }
   const banners = [];
   if (age > 36) banners.push(`<div class="banner">Data last recalibrated ${Math.floor(age / 24)} day(s) ago. Tickers are still projecting from the last official figures.</div>`);
   if (fyRolled()) banners.push(`<div class="banner">New fiscal year FY${curFY()} started Oct 1 — fiscal-year counters reset to $0 and are projecting until the next official update.</div>`);
   if (DLS.at_limit) banners.push(`<div class="banner">At the debt limit: Treasury is using extraordinary measures. Debt subject to the limit was ${usd(DLS.subject_to_limit)} on ${fmtDate(DLS.as_of)}, ${usd(DLS.headroom)} under the ${usd(DLS.limit)} limit, so the debt counters hold at Treasury's latest official figures instead of projecting growth.</div>`);
   if ((M.flags || []).length) banners.push(`<div class="banner">Drift alert: ${M.flags.join(', ')} exceeded the validation threshold on the last check.</div>`);
-  if (staleList.length) banners.push(`<div class="banner">Stale source: ${staleList.join(', ')}. ${staleList.length === 1 ? 'That figure stays' : 'Those figures stay'} on the last good release. A failed fetch is not a live official total.</div>`);
 
   // lead hero: live clock card first (labels inside the card so they wrap), then the short official line
   const d = info('debt_total');
@@ -245,7 +248,12 @@
   for (const s of S) {
     const sec = document.createElement('section'); sec.id = s.id;
     const title = typeof s.title === 'function' ? s.title() : s.title;
-    sec.innerHTML = `<div class="sh"><span class="bar" style="background:${s.color}"></span><h2>${esc(title)}</h2><span class="h2n">${esc(typeof s.note === 'function' ? s.note() : s.note)}</span></div><div class="grid"></div>`;
+    const staleHere = s.tiles.filter(slug => held(T[slug]));
+    const staleHtml = staleHere.length ? `<p class="stalenote">${staleHere.map(slug => {
+      const src = T[slug];
+      return `${esc(src.label || slug)} is the last good release (as of ${esc(fmtDate(src.as_of))}). The fetch failed, so this is not a live total.`;
+    }).join(' ')}</p>` : '';
+    sec.innerHTML = `<div class="sh"><span class="bar" style="background:${s.color}"></span><h2>${esc(title)}</h2><span class="h2n">${esc(typeof s.note === 'function' ? s.note() : s.note)}</span></div>${staleHtml}<div class="grid"></div>`;
     const g = sec.querySelector('.grid');
     if (s.dense) g.classList.add('dense');
     s.tiles.forEach(x => g.appendChild(tile(x, s.id)));
