@@ -217,7 +217,7 @@ for _h in sorted(HIST):
 idx = open(f"{R}/index.html").read()
 PP_OFF = OFF_V / POP_OFF if OFF_V and POP_OFF else None
 held = bool((T.get("debt_total") or {}).get("held_at_limit"))
-desc = (f"US national debt: {tril(OFF_V)} at Treasury's {fdate(OFF_D)} close, {usd0(PP_OFF)} per person. "
+desc = (f"US national debt: {tril(OFF_V)} at Treasury's {fdate(OFF_D)} close, {usd2(PP_OFF)} per person. "
         f"Live US debt clock projected from official Treasury data, with the deficit, interest, the debt limit and "
         f"{len(ALL) - len(HIST)} counters, checked daily against Treasury.")
 HOME_TITLE = "US Debt Clock: Live National Debt, Checked Daily Against Treasury"
@@ -1024,7 +1024,8 @@ def write_facts():
     if WORLD:
         dmin = min(x["as_of"] for x in WORLD["rows"])
         dmax = max(x["as_of"] for x in WORLD["rows"])
-        add("World government debt", f"The latest general-government stocks sum to {usd0(WORLD['total'])} ({tril(WORLD['total'])}). Each economy has its own as-of date, from {fdate(dmin) if len(dmin)==10 else dmin} through {fdate(dmax) if len(dmax)==10 else dmax}. Sources: national releases, Eurostat, and the <a href=\"https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO\" rel=\"noopener\">IMF World Economic Outlook</a>. See <a href=\"../world/\">the world debt clock</a>.")
+        _world_line = html.escape(world_build.lead_claim(WORLD, dt.date.today()))
+        add("World government debt", f"{_world_line} Source: national releases, Eurostat, and the <a href=\"https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO\" rel=\"noopener\">IMF World Economic Outlook</a>. See <a href=\"../world/\">the world debt clock</a>.")
     by = {int(r[0]): (r[1], r[2]) for r in (M.get("debt_by_fy") or [])}
     if by:
         ly = max(by)
@@ -1119,8 +1120,8 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- How much is the national debt per person? {usd2(PP_OFF)} as of {fdate(OFF_D)}, the official total divided by the Census estimate of {POP_OFF:,.0f} residents on {fdate(POP_OFF_DATE)}.",
     ("- How much interest does the US pay per day? " + INTEREST_DAY if INTEREST_DAY else "- How much interest does the US pay per day? Not available from the current interest-expense and average-rate inputs."),
     f"- When will the US national debt hit ${MILE['n']} trillion? {MILE['quote']}",
-    (f"- World government debt: the latest general-government stocks sum to {usd0(WORLD['total'])} ({tril(WORLD['total'])}). "
-     f"Each economy has its own as-of date. IMF rows are end-2026 projections. See /world/." if WORLD else
+    (f"- World government debt: {world_build.lead_claim(WORLD, dt.date.today())}. "
+     f"IMF rows are estimates for 2026, not a December 31 closing balance. See /world/." if WORLD else
      "- World government debt: the world page was not built on this run."),
     "",
     "## Key pages",
@@ -1350,6 +1351,31 @@ def check_quotable():
     home = open(f"{R}/index.html").read()
     if f'<div class="big num">{usd2(OFF_V)}</div>' not in home:
         raise SystemExit("homepage hero total changed")
+    official_pp = usd2(PP_OFF)
+    person = open(f"{R}/national-debt-per-person/index.html").read()
+    facts = open(f"{R}/facts/index.html").read()
+    for label, blob in (("homepage", home), ("per person", person), ("facts", facts), ("llms.txt", llms)):
+        if official_pp not in blob:
+            raise SystemExit(f"{label} is missing the official per-person figure {official_pp}")
+    proj_pp = usd2(val("debt_total") / val("population")) if val("debt_total") and val("population") else None
+    if proj_pp and proj_pp != official_pp:
+        for label, blob in (("homepage FAQ", home.split('id="faq"', 1)[-1].split("</section>", 1)[0]),
+                            ("per-person answer", person.split("<h1", 1)[-1].split("</h1>", 1)[0]),
+                            ("facts", facts), ("llms.txt", llms)):
+            if proj_pp in blob:
+                raise SystemExit(f"{label} quotes the live per-person projection {proj_pp}")
+    world_page = open(f"{R}/world/index.html").read()
+    world_h1 = re.search(r"<h1\b[^>]*>(.*?)</h1>", world_page, re.S | re.I)
+    world_lead = re.sub(r"<[^>]+>", " ", world_h1.group(1) if world_h1 else "")
+    if "IMF estimates for 2026" not in world_lead or re.search(r"As of .*(December|Dec) 31, 2026", world_lead):
+        raise SystemExit("world answer line treats a future IMF date as a record: " + world_lead[:240])
+    imf_sample = f"{R}/countries/burkina-faso/index.html"
+    if os.path.exists(imf_sample):
+        sample = open(imf_sample).read()
+        sample_h1 = re.search(r"<h1\b[^>]*>(.*?)</h1>", sample, re.S | re.I)
+        sample_lead = re.sub(r"<[^>]+>", " ", sample_h1.group(1) if sample_h1 else "")
+        if "IMF estimate for 2026" not in sample_lead or "Dec 31, 2026" in sample_lead:
+            raise SystemExit("IMF country answer line still uses a future record date: " + sample_lead[:240])
     if " PM CT" in home.split('id="faq"', 1)[-1].split("</section>", 1)[0]:
         raise SystemExit("homepage FAQ bakes a build-time clock timestamp")
     api = json.load(open(f"{R}/api/daily.json"))

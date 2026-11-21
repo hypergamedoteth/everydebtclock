@@ -395,10 +395,9 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
     url = f"{SITE}/countries/{slug}/"
     title = f"{name} National Debt Clock"
     import quotable
-    _plain, _html = quotable.asof_pair(
-        f"{name} general government gross debt is {_money(e['debt_2026_usd'])}, the end-2026 estimate",
-        "Oct 13, 2026",
-        [("IMF World Economic Outlook", RATIO_URL)])
+    _plain, _html = quotable.cited_pair(
+        f"{name}'s general government gross debt is {_money(e['debt_2026_usd'])} in the IMF estimate for 2026",
+        [("IMF World Economic Outlook, published Oct 13, 2026", RATIO_URL)])
     h1 = _plain
     peers, outside = _peers(e, D["economies"])
     faqs = cp.faqs(profile, us_profile, peers, outside)

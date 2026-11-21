@@ -289,18 +289,68 @@ def _named_differences(W):
             bits.append("Brazil's headline is Banco Central do Brasil SGS 13761/13762 (DBGG). The official stock differs from the IMF figure.")
     return " ".join(bits)
 
-def _faqs(W):
+def _row_date(x):
+    raw = str(x.get("as_of") or "")[:10]
+    try:
+        return dt.date.fromisoformat(raw)
+    except ValueError:
+        return None
+
+
+def lead_claim(W, today=None):
+    """One clause for the world total. A date after `today` is not called a record date."""
+    today = today or dt.date.today()
+    rows = W["rows"]
+    n = len(rows)
+    real, future_imf, future_other = [], 0, 0
+    for x in rows:
+        d = _row_date(x)
+        later = d is None or d > today
+        if x.get("tier") == "imf" or later:
+            if x.get("tier") == "imf":
+                future_imf += 1
+            else:
+                future_other += 1
+            continue
+        real.append(d)
+    total = _tn(W["total"])
+    extra = []
+    if future_imf:
+        extra.append("IMF estimates for 2026")
+    if future_other:
+        extra.append("estimates dated after this page was built")
+    if real:
+        a = min(real).strftime("%b %-d, %Y")
+        b = max(real).strftime("%b %-d, %Y")
+        span = a if a == b else f"{a} to {b}"
+        recorded = f"national and Eurostat figures dated {span}"
+        tail = (", and " + " and ".join(extra)) if extra else ""
+        return (f"World government debt across {n} economies totals {total}, "
+                f"using each country's latest stock: {recorded}{tail}")
+    if extra:
+        return f"World government debt across {n} economies totals {total}, using {' and '.join(extra)}"
+    return f"World government debt across {n} economies totals {total}"
+
+
+def _asof_cell(x, today):
+    d = _row_date(x)
+    if x.get("tier") == "imf" or (d and d > today):
+        return "IMF estimate for 2026"
+    return _fd(x["as_of"]) if d else str(x.get("as_of") or "")
+
+
+def _faqs(W, today=None):
     n = len(W["rows"]); c = W["counts"]; panel = (W.get("weo") or {}).get("panel_2026_usd")
     panel_s = _usd0(panel) if panel else "the IMF panel"
     gap = W.get("gap_vs_imf")
     gap_s = (f" The headline sum differs from that IMF total by {_sgn(gap, ',.0f', plus=False)} ({gap / panel * 100:+.2f}%)." if panel and gap is not None else "")
     top = sorted(W["rows"], key=lambda x: -x["usd"])[:5]
     top_s = "; ".join(f"{x['name']}, {_usd0(x['usd'])}" for x in top)
-    dmin, dmax = _fd(min(x["as_of"] for x in W["rows"])), _fd(max(x["as_of"] for x in W["rows"]))
+    claim = lead_claim(W, today)
     return [
         ("How much is world government debt?",
-         f"As of {dmin} through {dmax}, general government gross debt for these {n} economies is {_tn(W['total'])}. "
-         f"Source: national releases, Eurostat, and the IMF World Economic Outlook; {c['official']} rows are national, {c['harmonized']} are harmonized, and {c['imf']} are IMF estimates."),
+         f"{claim}. Source: national releases, Eurostat, and the IMF World Economic Outlook; "
+         f"{c['official']} rows are national, {c['harmonized']} are harmonized, and {c['imf']} are IMF estimates for 2026."),
         ("Which countries owe the most?",
          f"By the headline dollar stock on this page, the five largest are: {top_s}. "
          f"Source: the same general-government stocks, each dated on the world table."),
@@ -350,7 +400,8 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
            [("Official / harmonized / IMF", f"{c['official']} / {c['harmonized']} / {c['imf']}"), ("Latest sum", _usd0(W["total"]))],
            f"{_sgn(W['rate_s'] * 86400 / 1e9, ',.1f', 'B')}/day",
            "#ff4d5e", "General government gross debt\nNational stocks only when they match that perimeter")
-    faqs = _faqs(W)
+    today = dt.datetime.fromtimestamp(now, pb.CT).date()
+    faqs = _faqs(W, today)
     modified_iso = modified or dt.datetime.fromtimestamp(now, pb.CT).isoformat(timespec="seconds")
     faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "dateModified": modified_iso,
               "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faqs]}
@@ -381,20 +432,24 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
     crumb = '<div class="crumb"><a href="../">← US national debt clock</a><span>·</span><a href="../countries/">All country debt clocks</a><span>·</span><a href="#imf">IMF comparison</a></div>'
     gap = W.get("gap_vs_imf")
     gap_txt = (f' The pure IMF end-2026 sum for the same {n} economies is <b>{_usd0(panel)}</b> ({_tn(panel)}), a difference of {_sgn(gap, ",.0f", plus=False)} ({gap / panel * 100:+.2f}%).' if panel and gap is not None else "")
-    dmin, dmax = _fd(min(x["as_of"] for x in rows)), _fd(max(x["as_of"] for x in rows))
-    imf_note = (" An IMF row dated 31 December 2026 is an end-2026 World Economic Outlook projection, not a closing balance on that day."
-                if any(x["tier"] == "imf" and x["as_of"] == "2026-12-31" for x in rows) else "")
-    answer = (f'<p class="answer">The latest general-government gross debt figures on this page sum to <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}). '
-              f'Each figure is as of its own stock date, from {E(dmin)} through {E(dmax)}.{imf_note} '
-              f'{c["official"]} rows are national general-government releases, {c["harmonized"]} are Eurostat or the World Bank/IMF Quarterly Public Sector Debt database, and {c["imf"]} are IMF estimates. '
+    real_dates = [d for x in rows if (d := _row_date(x)) and d <= today and x.get("tier") != "imf"]
+    if real_dates:
+        span = _fd(min(real_dates).isoformat()) if min(real_dates) == max(real_dates) else f"{_fd(min(real_dates).isoformat())} to {_fd(max(real_dates).isoformat())}"
+        dated = f" Recorded national and Eurostat stocks are dated {E(span)}."
+    else:
+        dated = ""
+    imf_note = (" IMF rows are estimates for 2026, not a closing balance on December 31."
+                if any(x.get("tier") == "imf" or ((_row_date(x) or today) > today) for x in rows) else "")
+    answer = (f'<p class="answer">The general-government figures on this page sum to <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}).'
+              f'{dated}{imf_note} '
+              f'{c["official"]} rows are national general-government releases, {c["harmonized"]} are Eurostat or the World Bank/IMF Quarterly Public Sector Debt database, and {c["imf"]} are IMF estimates for 2026. '
               f'Sources: <a href="https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO" rel="noopener">IMF GGXWDG_NGDP</a> and '
               f'<a href="https://www.imf.org/external/datamapper/NGDPD@WEO" rel="noopener">NGDPD</a>, plus the national, Eurostat, and QPSD links in the table. '
               f'The clock above is a projection from those stocks, not one official world total.</p>')
     import quotable
     _imf = "https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO"
-    _wplain, _whtml = quotable.asof_pair(
-        f"world government debt for {n} economies is {_tn(W['total'])}",
-        f"{dmin} through {dmax}",
+    _wplain, _whtml = quotable.cited_pair(
+        lead_claim(W, today),
         [("national sources, Eurostat, and the IMF", _imf)])
     intro = (f'<section class="intro" id="intro"><h1 class="quote asof">{_whtml}</h1>{crumb}'
              f'{answer}'
@@ -427,7 +482,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
                  f'<td class="num" data-l="Debt, USD" title="${x["usd"]:,.0f}">${x["usd"]/1e12:,.3f}tn</td>'
                  f'<td class="num" data-l="Debt / GDP">{ratio}</td>'
                  f'<td data-l="Source tier">{TIER[x["tier"]]}</td>'
-                 f'<td data-l="As of">{E(_fd(x["as_of"]))}</td>'
+                 f'<td data-l="As of">{E(_asof_cell(x, today))}</td>'
                  f'<td class="m" data-l="Measure">{E(x["measure"])}</td></tr>')
     table = (f'<section id="table" class="wsec"><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>By country</h2><span class="h2n">Latest figure for each economy · click a column to sort · this table does not tick</span></div>'
              f'<div class="tw"><table class="wt wstk" id="debt-table"><thead><tr class="hd">'
@@ -436,7 +491,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
              f'<p class="dnote">The debt column is general government gross debt. It does not tick. '
              f'A national series listed under the country is narrower (central, federal, or a different perimeter) and is not added. '
              f'Debt / GDP uses the IMF 2026 GDP for official and harmonized rows, and the IMF debt ratio for IMF rows. '
-             f'As of is the stock date, or 31 December 2026 for an IMF end-2026 projection.</p></section>')
+             f'A recorded stock shows its date. An IMF row says IMF estimate for 2026, which is not a closing balance on December 31.</p></section>')
     # ---- measures
     drv = ""
     for x in W.get("drivers") or []:
@@ -463,7 +518,8 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
     meas = (f'<section id="measures" class="wsec"><div class="sh"><span class="bar" style="background:var(--amber)"></span><h2>One perimeter</h2></div>'
             f'<div class="wnote">Every headline row is general government gross debt. A central, federal or public-sector series is printed under the country name and is not in the sum. '
             + ("Russia's national series is internal debt only, so it leaves out external debt. " if any(x["slug"] == "russia" for x in rows) else "")
-            + f'Dates run from {E(_fd(min(x["as_of"] for x in rows)))} to {E(_fd(max(x["as_of"] for x in rows)))}.</div>'
+            + (f'Recorded stock dates run from {E(_fd(min(real_dates).isoformat()))} to {E(_fd(max(real_dates).isoformat()))}. ' if real_dates else "")
+            + f'IMF rows are estimates for 2026, not a December 31 record.</div>'
             f'<p class="dnote">{c["official"]} headlines are a national general-government stock. {c["harmonized"]} are Eurostat or QPSD general government. {c["imf"]} are the IMF estimate because the national series is narrower, missing, or a QPSD general-government stock more than 25% from the IMF figure.</p></section>')
     # ---- fx
     seen, fr = set(), ""

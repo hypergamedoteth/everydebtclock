@@ -29,6 +29,26 @@ def official(figure, when, source):
     return sentence
 
 
+def _sources(sources):
+    names, links = [], []
+    for name, url in sources:
+        name = " ".join(str(name).split()).strip(" .")
+        url = " ".join(str(url).split())
+        if not name or not url:
+            raise ValueError("cited source needs a name and a url")
+        names.append(name)
+        links.append(f'<a href="{html.escape(url, quote=True)}" rel="noopener">{html.escape(name)}</a>')
+    return names, links
+
+
+def _one_sentence(sentence, html_s):
+    if _SECOND.search(sentence):
+        raise ValueError("cited line is more than one sentence: " + sentence)
+    if len(sentence) > 320:
+        raise ValueError(f"cited line is {len(sentence)} characters: " + sentence)
+    return sentence, html_s
+
+
 def asof_pair(claim, when, sources):
     """One sentence a crawler can quote, plus the same sentence with linked sources.
 
@@ -37,22 +57,19 @@ def asof_pair(claim, when, sources):
     """
     claim = " ".join(str(claim).split()).rstrip(" .")
     when = " ".join(str(when).split())
-    names = []
-    links = []
-    for name, url in sources:
-        name = " ".join(str(name).split()).strip(" .")
-        url = " ".join(str(url).split())
-        if not name or not url:
-            raise ValueError("asof source needs a name and a url")
-        names.append(name)
-        links.append(f'<a href="{html.escape(url, quote=True)}" rel="noopener">{html.escape(name)}</a>')
+    names, links = _sources(sources)
     sentence = f"As of {when}, {claim} ({'; '.join(names)})."
-    if _SECOND.search(sentence):
-        raise ValueError("asof line is more than one sentence: " + sentence)
-    if len(sentence) > 320:
-        raise ValueError(f"asof line is {len(sentence)} characters: " + sentence)
     html_s = f"As of {html.escape(when)}, {html.escape(claim)} ({'; '.join(links)})."
-    return sentence, html_s
+    return _one_sentence(sentence, html_s)
+
+
+def cited_pair(claim, sources):
+    """One sentence that names the figure first, then the linked source. No 'As of' date."""
+    claim = " ".join(str(claim).split()).rstrip(" .")
+    names, links = _sources(sources)
+    sentence = f"{claim} ({'; '.join(names)})."
+    html_s = f"{html.escape(claim)} ({'; '.join(links)})."
+    return _one_sentence(sentence, html_s)
 
 
 def finish(core, clause=None):

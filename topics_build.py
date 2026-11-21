@@ -72,8 +72,7 @@ COUNT_JS = r"""
     } else if (mode === 'person') {
       const d = C.val('debt_total', t), pop = C.pop(t), per = usd2(d / pop);
       v.textContent = per;
-      const p = document.getElementById('pp-p'), h = document.getElementById('pp-h'), r = document.getElementById('pp-r');
-      if (p) p.textContent = per;
+      const h = document.getElementById('pp-h'), r = document.getElementById('pp-r');
       if (h) h.textContent = usd2(d / C.T.households.base);
       if (r) r.textContent = usd2(d / C.tax);
     } else if (mode === 'interest') {
@@ -529,10 +528,10 @@ def _person_page(ctx, H):
     live = debt_now / pop_now if debt_now and pop_now else pp
     hh, tax = ctx["HH"], ctx["TAX"]
     hero = f"""<div class="hero lead" id="lead" data-mode="person">
-<div class="k" id="lead-k" data-live="Live estimate · national debt per person">Official · {html.escape(fdate(ctx['OFF_D']))} · Treasury Debt to the Penny ÷ Census</div>
+<div class="k" id="lead-k" data-live="Live projection · per person">Official · {html.escape(fdate(ctx['OFF_D']))} · Treasury Debt to the Penny ÷ Census {html.escape(fdate(ctx['POP_OFF_DATE']))}</div>
 <div class="big num" id="lead-v">{usd2(pp)}</div>
-<div class="sub" id="lead-sub">Debt clock ÷ population projected from the Census estimate for {fdate(ctx['POP_OFF_DATE'])}. The official per-person figure is {usd2(pp)}.</div>
-<div class="trio"><div><span class="l">Per person</span><span class="n" id="pp-p">{usd2(pp)}</span></div>
+<div class="sub" id="lead-sub">Official per person is {usd2(pp)}: Treasury's {fdate(ctx['OFF_D'])} close divided by {ctx['POP_OFF']:,.0f} Census residents on {fdate(ctx['POP_OFF_DATE'])}. That figure is not projected.</div>
+<div class="trio"><div><span class="l">Official per person</span><span class="n">{usd2(pp)}</span></div>
 <div><span class="l">Per household</span><span class="n" id="pp-h">{usd2(ctx['OFF_V'] / hh)}</span></div>
 <div><span class="l">Per tax return filed</span><span class="n" id="pp-r">{usd2(ctx['OFF_V'] / tax)}</span></div></div>
 </div>"""

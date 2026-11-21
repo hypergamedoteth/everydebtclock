@@ -11,7 +11,7 @@ These sentences are computed at build time from the same official figures as the
 - How much is the national debt per person? $119,109.37 as of Nov 19, 2026, the official total divided by the Census estimate of 341,784,857 residents on Jul 1, 2025.
 - How much interest does the US pay per day? Treasury's interest-expense dataset totaled $1,371,454,499,553 in the 12 months ending Oct 31, 2026, about $3.8 billion a day on an accrual basis. Source: U.S. Treasury, Interest Expense on the Public Debt Outstanding; cash interest is paid in lumps, and the live clock instead multiplies the debt by Treasury's average rate and divides by 365.25.
 - When will the US national debt hit $41 trillion? The debt was $40,709,780,700,317.02 as of Nov 19, 2026, $290.2 billion short of $41 trillion, per U.S. Treasury Debt to the Penny. At the homepage clock's 90-day pace, about $8.0 billion a day, $41 trillion falls on December 26, 2026, which is a projection, not a Treasury forecast.
-- World government debt: the latest general-government stocks sum to $118,412,079,362,434 ($118.41 trillion). Each economy has its own as-of date. IMF rows are end-2026 projections. See /world/.
+- World government debt: World government debt across 186 economies totals $118.41 trillion, using each country's latest stock: national and Eurostat figures dated Mar 31, 2026 to Oct 31, 2026, and IMF estimates for 2026. IMF rows are estimates for 2026, not a December 31 closing balance. See /world/.
 
 ## Key pages
 - / : US national debt clock. Official total $40,709,780,700,317.02 as of Nov 19, 2026 (Treasury, Debt to the Penny). The live projection is re-based every business day.
