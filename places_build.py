@@ -86,6 +86,10 @@ def _b(x): return ("−" if x < 0 else "") + CUR + (f"{abs(x)/1e12:,.2f} trillio
 def _short(x):
     a, s = abs(x), ("−" if x < 0 else "") + CUR
     return s + (f"{a/1e12:.2f}T" if a >= 1e12 else f"{a/1e9:.2f}B" if a >= 1e9 else f"{a/1e6:.1f}M" if a >= 1e6 else f"{a:,.0f}")
+def coarse_series(freq):
+    """Annual, quarterly, and monthly stocks are not a daily or weekly ledger."""
+    return (freq or "annual") not in ("daily", "weekly")
+
 def _rate_txt(r):
     if not r: return "fixed"
     sg = "+" if r > 0 else "−"
@@ -253,8 +257,10 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     # Search-targeted wording, one rule for every place (the JSON "title" is no longer used): countries match "<name> national debt" and
     # "<name> debt clock"; states match "<state> debt", "<state> state debt" and "<state> debt clock".
     is_state = p["kind"] == "state"
-    ticks = bool(rate)  # "Live" only where the number really ticks
-    lv = "Live " if ticks else ""
+    coarse = coarse_series(p.get("frequency", "annual"))
+    # A daily or weekly series may tick. Anything coarser keeps the official stock as the headline.
+    ticks = bool(rate) and not coarse
+    lv = "" if coarse else ("Live " if ticks else "")
     title = (f"{name} State & Local Debt Clock: {lv}Debt, Official Census Data" if is_state else f"{name} National Debt Clock: {lv}Debt, Official Data")
     if p.get("seo_title"): title = p["seo_title"].format(lv=lv)  # optional per-place override (District of Columbia: no state level)
     import quotable
@@ -267,13 +273,14 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     h1 = _h1_plain
     _dn = p.get("seo_desc_noun")  # optional: full noun phrase for the description's opening
     desc = ((f"{_dn[0].upper() + _dn[1:]}: {_b(c['total'])}, " if _dn else f"{name} {'state and local debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, ") + f"{'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
-            f"{'Live ' if rate else 'Official '}{name} debt clock, {'about ' if rate else ''}{_usd0(proj / pop['value'])} per {dem}{' (projected)' if rate else ''}, with sources.")
+            f"{'Official ' if coarse or not rate else 'Live '}{name} debt clock, {_usd2(pp_off)} per {dem}{' (official stock)' if coarse or not rate else ' (projected)'}, with sources.")
     img = f"og/places/{p['slug']}.png"
     if og:
-        og(f"{R}/{img}", f"{name} {T['head']} · ticking live", _usd0(proj),
-           [(f"Per {dem} ({T['pop_tag']} pop.)", _usd2(proj / pop["value"])), (f"Official, {as_of}", _usd0(c["total"]))],
-           (f"{_sg(rate)}{_short(abs(rate) * 86400)}/day" if rate else "OFFICIAL"), "#ff4d5e",
-           f"{pub}, {_when(p, c['as_of'])} official\nprojected at {T['pace']} · {T['freq']} data" if rate else f"{pub}, {_when(p, c['as_of'])} official")
+        og_total = proj if ticks else c["total"]
+        og(f"{R}/{img}", f"{name} {T['head']} · {'projection' if ticks else 'as of ' + as_of}", _usd0(og_total),
+           [(f"Per {dem} ({T['pop_tag']} pop.)", _usd2((proj if ticks else c['total']) / pop["value"])), (f"Official, {as_of}", _usd0(c["total"]))],
+           (f"{_sg(rate)}{_short(abs(rate) * 86400)}/day" if ticks else "AS OF"), "#ff4d5e",
+           f"{pub}, {_when(p, c['as_of'])} official\nprojected at {T['pace']} · {T['freq']} data" if ticks else f"{pub}, as of {as_of}")
     _based = sorted({x["source_url"] for x in cs} | {pop["source_url"]})
     ld = '<script type="application/ld+json">' + json.dumps({
         "@context": "https://schema.org", "@type": "Dataset", "name": f"{name} {T['head_long']}", "description": desc, "url": url,
@@ -338,21 +345,27 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
              f'<a href="../../{sec_dir}/">All {"US state" if is_state else "country"} debt clocks</a>' + ('<span>·</span><a href="../../world/">World debt clock</a>' if WORLD else "") + '</div>')
 
     # ---- hero (same block and labels as the US hero)
-    hero_d = dlg(f'{name} {T["head"]}', T["sum_note"], pub, cs[0]['source_url'], cs[0].get("source_locator", "") if len(cs) == 1 else "", base=c['total'], r=rate, official=f"{_usd0(c['total'])} official, {as_of}")
-    live_k = f"Live estimate · {name} {T['head']}"
-    if rate:
-        kicker = f"Official · {as_of} · {pub}"
-        live_attr = f' data-live="{E(live_k)}"'
-    else:
-        kicker = f"Official figure · {name} {T['head']}"
+    hero_d = dlg(f'{name} {T["head"]}', T["sum_note"], pub, cs[0]['source_url'], cs[0].get("source_locator", "") if len(cs) == 1 else "", base=c['total'], r=rate if ticks else None, official=f"{_usd0(c['total'])} as of {as_of}")
+    if coarse:
+        kicker = f"As of {as_of}"
         live_attr = ""
-    hero = (f'<div class="hero lead" id="t-total" data-b="{c["total"]}" data-r="{rate or 0}" data-t="{t0}" data-d=\'{E(json.dumps(hero_d), quote=True)}\'>'
-            f'<div class="k"{live_attr}>{E(kicker)}</div><div class="big num" id="hv">{_usd0(c["total"])}</div>')
-    if rate:
-        hero += (f'<div class="sub"><span>{_rate_txt(rate)}</span> <span class="note">rate: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}, so this is a projection</span>'
+    elif rate:
+        kicker = f"Projection · as of {as_of}"
+        live_attr = f' data-live="{E(kicker)}"'
+    else:
+        kicker = f"As of {as_of}"
+        live_attr = ""
+    coarse_attr = ' data-coarse="1"' if coarse else ""
+    hero = (f'<div class="hero lead" id="t-total" data-b="{c["total"]}" data-r="{rate or 0}" data-t="{t0}"{coarse_attr} data-d=\'{E(json.dumps(hero_d), quote=True)}\'>'
+            f'<div class="k"{live_attr}>{E(kicker)}</div><div class="big num" id="hv">{_usd0(c["total"] if coarse or not rate else proj)}</div>')
+    if coarse and rate:
+        hero += (f'<div class="sub"><span class="badge proj">PROJECTION</span> <span class="num" id="hp">{_usd0(proj)}</span> '
+                 f'<span class="note">straight line from the {E(as_of)} stock ({_rate_txt(rate)}). {E(rep)} reports {T["once"]}, so this is not an official daily figure.</span></div>')
+    elif rate:
+        hero += (f'<div class="sub"><span>{_rate_txt(rate)}</span> <span class="note">projection: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}</span>'
                  + (f' <span class="note">{E(recent)}</span>' if recent else "") + f' <span>Since you opened this page: <span class="num" id="hs">{CUR}0</span> {"more" if up_ else "less"} debt</span></div>')
     else:
-        hero += f'<div class="sub"><span>fixed</span> <span class="note">{E(rep)} reports {T["once"]}; {"shown fixed, not ticking" if p.get("hold_trend") else "one official figure available"}</span></div>'
+        hero += f'<div class="sub"><span>as of {E(as_of)}</span> <span class="note">{E(rep)} reports {T["once"]}; {"shown fixed, not ticking" if p.get("hold_trend") else "one official figure available"}</span></div>'
     trio_x = [(x["short"] + " · official " + _fd(x["as_of"]), _usd0(x["value"])) for x in cs[:2]] if len(cs) > 1 else \
              [(f"Official · {_fd(c['as_of'])}", _usd0(c["total"]))]
     trio_x += [(h["label"], h["value"]) for h in p.get("hero_extra", [])]
@@ -360,7 +373,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
              + "".join(f'<div><span class="l">{E(l)}</span><span class="num">{E(v)}</span></div>' for l, v in trio_x[:2]) + "</div>"
              + (f'<div class="sec2"><span class="l">{E(sec2["label"])} · official {E(_fd(sec2["as_of"]))}</span> <b class="num">{_usd0(sec2["value"])}</b> '
                 f'<span class="note">{E(sec2["publisher"])}. {E(sec2["scope"])}</span></div>' if sec2 else "")
-             + f'<div class="meta" style="margin-top:10px">{proj_badge if rate else fix_badge(c["as_of"])}{ann_badge}<span class="badge">source: {E(pub)}</span></div></div>')
+             + f'<div class="meta" style="margin-top:10px">{proj_badge if ticks else fix_badge(c["as_of"])}{ann_badge}<span class="badge">source: {E(pub)}</span></div></div>')
     intro = (f'<section class="intro" id="intro"><h1 class="quote asof">{h1_html}</h1>{crumb}'
              f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
              + (f'on <b>{as_of}</b>' if T["periodic"] else f'in Census survey year {fy} (dated <b>{as_of}</b>)' if p.get("year_label") else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
@@ -393,16 +406,17 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
               f'<div class="legend">{E(p.get("legend", f"{name} debt is reported once a year, at fiscal year-end. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection between official reports, shown here next to the official totals."))}</div></section>')
 
     # ---- Debt overview tiles (mirror the US "National debt" grid where Texas has an equivalent)
-    tiles = [tile_html("combined", f"{name} {T['head']}", _usd0(proj), ACC[0], proj_badge if rate else fix_badge(c["as_of"]), _rate_txt(rate),
-                       pp=[(f"Per {dem} ({'projected total ÷ ' if rate else ''}{T['pop_tag']} pop.)", _usd2(proj / pop["value"]), pop["value"]), ("Official total", _short(c["total"]), None)],
-                       tick=(c["total"], rate, t0) if rate else None,
-                       dlg=dlg(f"{name} {T['head']}", "Sum of the official state and local totals." if len(cs) > 1 else T["sum_note"], pub, cs[0]["source_url"], base=c["total"], r=rate, official=f"{_usd0(c['total'])} official, {as_of}"))]
+    tiles = [tile_html("combined", f"{name} {T['head']}", _usd0(proj if ticks else c["total"]), ACC[0], proj_badge if ticks else fix_badge(c["as_of"]), _rate_txt(rate) if ticks else f"as of {as_of}",
+                       pp=[(f"Per {dem} ({'projected total ÷ ' if ticks else ''}{T['pop_tag']} pop.)", _usd2((proj if ticks else c['total']) / pop["value"]), pop["value"] if ticks else None), ("Official total", _short(c["total"]), None)],
+                       tick=(c["total"], rate, t0) if ticks else None,
+                       dlg=dlg(f"{name} {T['head']}", "Sum of the official state and local totals." if len(cs) > 1 else T["sum_note"], pub, cs[0]["source_url"], base=c["total"], r=rate if ticks else None, official=f"{_usd0(c['total'])} as of {as_of}"))]
     for i, x in enumerate(cs if len(cs) > 1 else []):
         r_ = c["rates"][i]
-        tiles.append(tile_html(f"{x['key']}_total", x["label"], _usd0(x["value"] + (r_ * (now - t0) if r_ else 0)), ACC[i + 1],
-                               proj_badge if r_ else fix_badge(x["as_of"]), _rate_txt(r_),
-                               pp=[(f"Per {dem} ({T['pop_tag']} pop.)", _usd2((x["value"] + (r_ * (now - t0) if r_ else 0)) / pop["value"]), pop["value"]), ("Official", _short(x["value"]), None)],
-                               tick=(x["value"], r_, t0) if r_ else None,
+        part_tick = bool(r_) and not coarse
+        tiles.append(tile_html(f"{x['key']}_total", x["label"], _usd0(x["value"] + (r_ * (now - t0) if part_tick else 0)), ACC[i + 1],
+                               proj_badge if part_tick else fix_badge(x["as_of"]), _rate_txt(r_) if part_tick else f"as of {_fd(x['as_of'])}",
+                               pp=[(f"Per {dem} ({T['pop_tag']} pop.)", _usd2((x["value"] + (r_ * (now - t0) if part_tick else 0)) / pop["value"]), pop["value"] if part_tick else None), ("Official", _short(x["value"]), None)],
+                               tick=(x["value"], r_, t0) if part_tick else None,
                                dlg=dlg(x["label"], x.get("includes", ""), x["source_name"], x["source_url"], x.get("source_locator", ""), base=x["value"], r=r_, official=f"{_usd0(x['value'])} official, {_fd(x['as_of'])}")))
     if sec2:
         tiles.append(tile_html("secondary", sec2["label"], _usd0(sec2["value"]), ACC[4], fix_badge(sec2["as_of"]), f"{_when(p, sec2['as_of'])} · not added to the total",
@@ -418,7 +432,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                                pp=[(f"Per {T['period']} (official)", _sg(yr_change) + _short(abs(yr_change)), None), (f"Per {dem} per {T['period']}", _sg(yr_change) + _usd2(abs(yr_change) / pop["value"]), None)],
                                dlg=dlg("Projected " + ("growth" if up_ else "decline") + " per day", f"Latest official {T['period']}'s change ÷ {days} days. This is the rate the clock ticks at; it is not an official daily figure.", pub, cs[0]["source_url"])))
     debt_sec = (f'<section id="debt"><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>{E(p.get('debt_heading', name + ' government debt'))}</h2>'
-                f'<span class="h2n">{E(pub)} · official as of {as_of} · {("projected at " + T["pace"].replace("'", "&#39;") + " between " + T["report"]) if rate else "fixed until the next report"}</span></div>'
+                f'<span class="h2n">{E(pub)} · as of {as_of} · {("projection labelled" if coarse else "projected at " + T["pace"].replace("'", "&#39;") + " between " + T["report"]) if rate else "fixed until the next report"}</span></div>'
                 f'<div class="grid">{"".join(tiles)}</div></section>')
 
     # ---- one section per component: its breakdown and facts as fixed tiles (dense grid, like the US detail grids)
@@ -439,10 +453,10 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                       f'<span class="h2n">{E(x["source_name"])} · official, {_fd(x["as_of"])} · fixed</span></div><div class="grid dense">{tl}</div></section>')
 
     # ---- per person & population (mirrors the US "Ratios & economy" grid)
-    pt = [tile_html("pp_total", f"Debt per {dem}", _usd2(proj / pop["value"]), "var(--teal)", proj_badge if rate else fix_badge(c["as_of"]),
-                    (f"{_sg(rate)}{_usd2(abs(rate) * 86400 / pop['value'])}/day" if rate else "fixed"), pp=[("Official basis", _usd2(pp_off), None), ("Population", f"{pop['value']:,}", None)],
-                    tick=(c["total"] / pop["value"], rate / pop["value"], t0) if rate else None,
-                    dlg=dlg(f"Debt per {dem}", f"Live total ÷ {pop['value']:,} {T['noun']} ({T['pop_tag']} estimate for {_fd(pop['as_of'])}, not projected). Official basis: {as_of} total ÷ the same population.", pop["source_name"], pop["source_url"]))]
+    pt = [tile_html("pp_total", f"Debt per {dem}", _usd2((proj if ticks else c["total"]) / pop["value"]), "var(--teal)", proj_badge if ticks else fix_badge(c["as_of"]),
+                    (f"{_sg(rate)}{_usd2(abs(rate) * 86400 / pop['value'])}/day" if ticks else f"as of {as_of}"), pp=[("Official basis", _usd2(pp_off), None), ("Population", f"{pop['value']:,}", None)],
+                    tick=(c["total"] / pop["value"], rate / pop["value"], t0) if ticks else None,
+                    dlg=dlg(f"Debt per {dem}", f"{'Projected total' if ticks else 'Official total'} ÷ {pop['value']:,} {T['noun']} ({T['pop_tag']} estimate for {_fd(pop['as_of'])}). The citable figure is the {as_of} total ÷ the same population: {_usd2(pp_off)}.", pop["source_name"], pop["source_url"]))]
     pt += [tile_html(f"pp_{x['key']}", f"{x['short']} per {dem}", _usd2(x["value"] / pop["value"]), "var(--teal)", fix_badge(x["as_of"]), "official basis",
                      dlg=dlg(f"{x['short']} per {dem}", f"Official {x['short'].lower()} ({_usd0(x['value'])}) ÷ {pop['value']:,} {T['noun']}.", x["source_name"], x["source_url"])) for x in (cs if len(cs) > 1 else [])]
     pt.append(tile_html("population", f"{name} population", f"{pop['value']:,}", "var(--teal)", fix_badge(pop["as_of"]),
@@ -552,8 +566,10 @@ const sl=dlg.querySelector('.sl');sl.href=d.share;sl.textContent=d.share;dlg.que
 const mv=dlg.querySelector('#mv'),mf=dlg.querySelector('#mf');mt=t=>{{const v=d.r?d.b+d.r*(t-d.t0):null;mv.textContent=v==null?(d.o||'').split(' ')[0]:usd(v);if(mf)mf.textContent=usd(d.b)+' + '+usd(d.r,4)+' × '+nf0.format(Math.round(t-d.t0))+' s = '+usd(v)}};
 dlg.querySelector('#cl').onclick=()=>dlg.close();dlg.querySelector('#cp').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(d.share);dlg.showModal()}}
 dlg.addEventListener('close',()=>mt=null);document.querySelectorAll('[data-d]').forEach(e=>e.onclick=()=>open(e));
-(function f(){{const t=now(),x=tot(t);if(R){{const hk=document.querySelector('.k[data-live]');if(hk)hk.textContent=hk.dataset.live;hv.textContent=usd(x);if(hs)hs.textContent=(R<0?'':'+')+usd(Math.abs(x-tot(OPENED)));if(wcn)wcn.textContent=short(x);if(wcd)wcd.textContent=sg(x-B)+short(Math.abs(x-B));pps.forEach(e=>e.textContent=usd(x/+e.dataset.pp,e.closest('.hero, .hero-follow')?2:0));
-ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);k.ppx.forEach(e=>e.textContent=usd(v/+e.dataset.pp,2))}})}}if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
+(function f(){{const t=now(),x=tot(t),coarse=H.dataset.coarse==='1';if(R){{if(!coarse){{const hk=document.querySelector('.k[data-live]');if(hk)hk.textContent=hk.dataset.live;hv.textContent=usd(x);if(hs)hs.textContent=(R<0?'':'+')+usd(Math.abs(x-tot(OPENED)));}}
+const hp=document.getElementById('hp');if(hp)hp.textContent=usd(x);if(wcn)wcn.textContent=short(x);if(wcd)wcd.textContent=sg(x-B)+short(Math.abs(x-B));
+pps.forEach(e=>{{if(coarse&&e.closest('.hero'))return;e.textContent=usd(x/+e.dataset.pp,e.closest('.hero, .hero-follow')?2:0)}});
+if(!coarse)ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);k.ppx.forEach(e=>e.textContent=usd(v/+e.dataset.pp,2))}})}}if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
 
     explore_html = ex.explore("../../", places, calc, cur=p, gdp=GDP_BY_SLUG)
     profile = ""
@@ -582,17 +598,19 @@ def index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, kind, sec_dir, lab, d
         tiles = ""
         for x in items:
             _cur({"currency": {"symbol": x["sym"]}})
-            v = x["base"] + x["rate"] * (now - x["t0"])
-            tiles += (f'<a class="tile hubt" href="{up}{x["url"]}" style="--acc:var(--red);display:block;color:inherit" data-name="{E(x["name"])}" data-b="{x["base"]}" data-r="{x["rate"]}" data-t="{x["t0"]}" data-pop="{x["population"]}" data-sym="{E(x["sym"])}">'
+            coarse = coarse_series(x.get("frequency"))
+            v = x["base"] if coarse or not x["rate"] else x["base"] + x["rate"] * (now - x["t0"])
+            coarse_attr = ' data-coarse="1"' if coarse else ""
+            tiles += (f'<a class="tile hubt" href="{up}{x["url"]}" style="--acc:var(--red);display:block;color:inherit" data-name="{E(x["name"])}" data-b="{x["base"]}" data-r="{x["rate"]}" data-t="{x["t0"]}" data-pop="{x["population"]}" data-sym="{E(x["sym"])}"{coarse_attr}>'
                       f'<div class="lab"><span>{E(x["name"])}</span><span>{E(x["label"])}</span></div>'
                       f'<div class="val num">{_usd0(v)}</div><div class="pp"><div><span class="l">Per {E(x["demonym"])}</span><span class="num hpp">{_usd2(v / x["population"])}</span></div>'
-                      f'<div><span class="l">Official total</span><span class="num">{_short(x["base"])}</span></div></div>'
-                      f'<div class="meta"><span class="rate{" up" if x["rate"] > 0 else ""}">{_rate_txt(x["rate"]) if x["rate"] else "official"}</span>'
-                      f'<span class="badge {"proj" if x["rate"] else "fix"}">{"PROJECTED" if x["rate"] else "OFFICIAL"} · from {_fd(x["base_date"])}</span></div></a>')
+                      f'<div><span class="l">As of {_fd(x["base_date"])}</span><span class="num">{_short(x["base"])}</span></div></div>'
+                      f'<div class="meta"><span class="rate{" up" if x["rate"] > 0 and not coarse else ""}">{_rate_txt(x["rate"]) if x["rate"] and not coarse else "as of " + _fd(x["base_date"])}</span>'
+                      f'<span class="badge {"proj" if x["rate"] and not coarse else "fix"}">{"PROJECTION" if x["rate"] and not coarse else "AS OF " + _fd(x["base_date"])}</span></div></a>')
         _cur({})
         if not items: continue
         secs += (f'<section id="{d}"><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>{E(lab_)}</h2>'
-                 f'<span class="h2n">{len(items)} live</span></div><div class="grid hub">{tiles}</div></section>')
+                 f'<span class="h2n">{len(items)}</span></div><div class="grid hub">{tiles}</div></section>')
     state_ld = ""
     state_faq = ""
     per_person = '<p>The same Census totals, divided by Census population, are ranked on <a href="debt-per-person/">debt per person by state</a>.</p>' if kind == "state" else ""
@@ -616,7 +634,7 @@ def index_page(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, kind, sec_dir, lab, d
 const usd=(v,d,c)=>(v<0?'−':'')+(c||'$')+(d?nf2:nf0).format(Math.abs(v)),T=[...document.querySelectorAll('.hubt')].map(e=>({e,v:e.querySelector('.val'),p:e.querySelector('.hpp'),b:+e.dataset.b,r:+e.dataset.r,t:+e.dataset.t,pop:+e.dataset.pop,c:e.dataset.sym}));
 const val=k=>k.b+k.r*(Date.now()/1000-k.t);document.getElementById('hsort').onchange=ev=>{const m=ev.target.value;document.querySelectorAll('.grid.hub').forEach(g=>{const ts=T.filter(k=>k.e.parentNode===g);
 ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='total'?val(b)-val(a):val(b)/b.pop-val(a)/a.pop);ts.forEach(k=>g.appendChild(k.e))})};
-(function f(){T.forEach(k=>{if(!k.r)return;const v=val(k);k.v.textContent=usd(v,0,k.c);k.p.textContent=usd(v/k.pop,2,k.c)});requestAnimationFrame(f)})()})()</script>"""
+(function f(){T.forEach(k=>{if(!k.r||k.e.dataset.coarse)return;const v=val(k);k.v.textContent=usd(v,0,k.c);k.p.textContent=usd(v/k.pop,2,k.c)});requestAnimationFrame(f)})()})()</script>"""
     WL1 = '<li><a href="../world/">World debt clock</a> (general government gross debt)</li>' if WORLD else ""
     if kind == "country" and WORLD and WEO:
         WTXT = (' What this list counts: the first section is each country\'s own published figure, in its own currency. '

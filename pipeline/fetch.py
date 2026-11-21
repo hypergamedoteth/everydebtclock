@@ -166,6 +166,11 @@ META = {"generated_epoch": NOW, "generated_iso": dt.datetime.fromtimestamp(NOW, 
 
 def add(slug, **kw):
     kw.setdefault("status", "ok"); kw["slug"] = slug
+    # A failed fetch that falls back to cache is not a current official read.
+    if kw.get("stale") and kw.get("status") == "ok":
+        kw["status"] = "stale"
+        kw["note"] = ((kw.get("note") or "") + " Source failed on the last run; this is the last good figure, not a live total.").strip()
+        kw["method"] = ((kw.get("method") or "") + " The source failed, so this stays on that release and is not ticked.").strip()
     if "calc" not in kw and kw.get("fixed"):
         kw["calc"] = {"type": "fixed", "base_src": [kw.get("as_of"), kw.get("base"), kw.get("source")]}
     T[slug] = kw

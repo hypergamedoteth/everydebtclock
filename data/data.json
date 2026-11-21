@@ -3243,10 +3243,11 @@
    "as_of": "2026-09",
    "source": "https://www.federalreserve.gov/releases/h6/current/default.htm",
    "source_name": "Federal Reserve H.6 Money Stock (M2, seasonally adjusted)",
-   "method": "Monthly average for 2026-09 = $23.414T; ticks at the 6-month trend, anchored mid-month.",
+   "method": "Monthly average for 2026-09 = $23.414T; anchored mid-month. The source failed, so this stays on that release and is not ticked.",
    "stale": true,
-   "status": "ok",
-   "slug": "m2"
+   "status": "stale",
+   "slug": "m2",
+   "note": "Source failed on the last run; this is the last good figure, not a live total."
   },
   "tf_socsec": {
    "calc": {
