@@ -2,7 +2,7 @@
 """Build step (no bundler):
  1) index.html <head> meta refreshed with today's official numbers (title/description/OG/Twitter/canonical)
  2) og/<slug>.png + og/home.png share cards (1200x630, Pillow)
- 3) t/<slug>.html real, indexable, live-ticking share pages (one per ticker)
+ 3) t/<slug>.html noindex snapshot pages (one per ticker; not in the sitemap)
  4) sitemap.xml + robots.txt
  5) dist/debtclock-standalone.html (everything inlined, works offline)
  6) embed/ widgets (one noindex page per US, state, DC, country and world clock) and the indexable /embed/ directory
@@ -37,7 +37,9 @@ ET = ZoneInfo("America/New_York")
 
 def val(s, t=NOW):
     x = T.get(s)
-    if not x or x.get("status") != "ok": return None
+    if not x or x.get("status") not in ("ok", "stale"): return None
+    # A failed or cached source stays on its last official figure. It does not tick.
+    if x.get("status") == "stale" or x.get("stale"): return x.get("base")
     if x.get("mode") == "fytd" and t >= M["fy_end_epoch"]: return x["rate"] * (t - M["fy_end_epoch"])
     if x.get("freeze_t") and t > x["freeze_t"]: t = x["freeze_t"]     # never project debt past the statutory limit
     return x["base"] + x["rate"] * (t - x["t0"]) + sum(a * min(1.0, max(0.0, (t - s0) / (s1 - s0))) for s0, s1, a, *_ in x.get("steps") or [])
@@ -57,7 +59,7 @@ DER = {
 def get(s):
     try: return DER[s]() if s in DER else val(s)
     except Exception: return None
-ALL = {k: v for k, v in T.items() if v.get("status") == "ok"}
+ALL = {k: v for k, v in T.items() if v.get("status") in ("ok", "stale")}
 ALL.update({k: dict(v, derived=True, status="ok") for k, v in DV.items() if k in DER})
 POP = val("population"); TAX = T["tax_returns"]["base"]
 POP_OFF = T["population"]["base"]; POP_OFF_DATE = T["population"]["as_of"]   # official Census Vintage 2025, Jul 1, 2025
@@ -136,6 +138,7 @@ def mode_txt(i):
     if i.get("badge"): return i["badge"]
     if i.get("fixed"): return f"FIXED · official {fdate(i.get('as_of'))}"
     if i.get("modeled"): return f"MODELED ESTIMATE · from {fdate(i.get('as_of'))}"
+    if i.get("stale") or i.get("status") == "stale": return f"STALE · as of {fdate(i.get('as_of'))}"
     return f"PROJECTED · from official {fdate(i.get('as_of'))}"
 GROUP_COL = {"debt": "#ff4d5e", "fytd": "#ffb547", "interest": "#ff8f5a", "spending": "#5aa9ff", "revenue": "#38d39f", "trust": "#a98bff",
              "money": "#2fd0d0", "economy": "#2fd0d0", "people": "#2fd0d0", "history": "#a98bff", "ratios": "#2fd0d0"}
@@ -325,7 +328,7 @@ def row(slug):
     return f'<tr><td><a href="t/{slug}.html">{html.escape(label(slug, i))}</a></td><td class="num">{v}</td><td>{html.escape(asof)}</td></tr>'
 ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="big num">{usd2(OFF_V)}</div></div>
 <section class="intro" id="intro">{intro}</section>
-{site_chrome.sponsor_slot("")}<section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
+<section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
 {''.join(row(s_) for s_ in ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "spending", "revenue", "gdp"])}</table>
 <noscript><p>Turn on JavaScript to watch these figures tick in real time.</p></noscript></section></div><!--/SSR-->""")
 import places_build
@@ -387,7 +390,12 @@ PIX = places_build.index(PLACES_LIVE, NOW)
 def place_card(ix):
     if not ix["places"]: return "<!--PLACES--><!--/PLACES-->"
     p = next(x for x in ix["places"] if x["slug"] == ix["default"])
-    v = p["base"] + p["rate"] * (NOW - p["t0"])
+    coarse = p.get("frequency") not in ("daily", "weekly")
+    v = p["base"] if coarse or not p["rate"] else p["base"] + p["rate"] * (NOW - p["t0"])
+    if not p["rate"] or coarse:
+        basis = f'as of {fdate(p["base_date"])}'
+    else:
+        basis = f'projection from {fdate(p["base_date"])}'
     cu = lambda s_: s_.replace("$", p.get("sym", "$"), 1)
     opts = "".join(f'<option value="{x["slug"]}"{" selected" if x is p else ""}>{html.escape(x["name"])}</option>' for x in ix["places"])
     js_ix = json.dumps(ix, separators=(",", ":")).replace("</", "<\\/")
@@ -395,7 +403,7 @@ def place_card(ix):
             f'<div class="k"><span id="pck">Featured {"country" if p["kind"] == "country" else "state"}</span> · <b id="pcn">{html.escape(p["name"])}</b> <span id="pclab">{html.escape(p["label"])}</span></div>'
             f'<div class="pcv num" id="pcv">{cu(usd0(v))}</div>'
             f'<div class="pcs"><span class="num" id="pcp">{cu(usd2(v / p["population"]))}</span> per <span id="pcd">{html.escape(p["demonym"])}</span> · '
-            f'<span id="pcb">projected from official {fdate(p["base_date"])} figures</span> · <span class="go">See <span id="pcg">{html.escape(p["name"])}</span> →</span></div></a>'
+            f'<span id="pcb">{basis}</span> · <span class="go">See <span id="pcg">{html.escape(p["name"])}</span> →</span></div></a>'
             f'<label class="pcchg">Change <select id="pcsel" aria-label="Pick a place">{opts}</select></label>'
             f'<script type="application/json" id="placesix">{js_ix}</script></div>'
             f'<a class="pchub" href="{ix["hub"]}">See {html.escape(ix["hub_label"].lower().replace("all ", "all ", 1))} →</a><!--/PLACES-->')
@@ -475,7 +483,7 @@ for slug, i in ALL.items():
                     based=[i.get("source") or "https://fiscaldata.treasury.gov/"], temporal=i.get("as_of") if re.match(r"^\d{4}-\d\d-\d\d$", i.get("as_of") or "") else None)
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)}</title>
-<meta name="description" content="{html.escape(d1)}"><link rel="canonical" href="{url}">
+<meta name="description" content="{html.escape(d1)}"><link rel="canonical" href="{SITE}/"><meta name="robots" content="noindex">
 <meta property="og:type" content="article"><meta property="og:site_name" content="Every Debt Clock"><meta property="og:url" content="{url}">
 <meta property="og:title" content="{html.escape(lab)}: {html.escape(fmt(i, x, True))} and ticking"><meta property="og:description" content="{html.escape(d1)}">
 <meta property="og:image" content="{SITE}/og/{slug}.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
@@ -550,7 +558,8 @@ def build_api():
         d0, d1 = dt.date.fromisoformat(cf["first"][0]), dt.date.fromisoformat(cf["last"][0])
         if (d1 - d0).days > 0:
             avg90 = {"amount_per_day": round((cf["last"][1] - cf["first"][1]) / (d1 - d0).days, 2),
-                     "from_date": cf["first"][0], "to_date": cf["last"][0], "method": "(last - first) / calendar days"}
+                     "from_date": cf["first"][0], "to_date": cf["last"][0],
+                     "method": "straight line: (last close − first close) / calendar days in the 90-day window. Not the least-squares rate the clock uses."}
     proj = val("debt_total")
     fe = M.get("debt_fetched_epoch") if "debt_fetched_epoch" in M else M.get("generated_epoch")   # older data.json: fetch-run time
     fetched_ct = dt.datetime.fromtimestamp(fe, ZoneInfo("America/Chicago")) if fe else None
@@ -569,6 +578,13 @@ def build_api():
         "per_second_rate": round(td["rate"], 2) if td.get("status") == "ok" else None,
         "held_at_debt_limit": bool(td.get("held_at_limit")),
         "per_second_rate_method": "90-day least-squares trend of Debt to the Penny" if td.get("status") == "ok" else None,
+        # Same dollars-per-day figure as per_second_rate. avg_daily_change_90d stays the endpoint line.
+        "clock_daily_change_90d": ({"amount_per_day": round(td["rate"] * 86400, 2),
+                                     "per_second": round(td["rate"], 2),
+                                     "from_date": (cf.get("first") or [None])[0],
+                                     "to_date": (cf.get("last") or [None])[0],
+                                     "method": "90-day least-squares slope of Debt to the Penny × 86,400. This is the live clock. per_second_rate is that slope rounded to the cent. avg_daily_change_90d is the straight line between the window's end points, not this slope."}
+                                    if td.get("status") == "ok" and td.get("rate") is not None else None),
         "debt_per_person_official": round(official / POP_OFF, 2) if official is not None and POP_OFF else None,
         "census_population_official": int(POP_OFF) if POP_OFF else None,
         "census_population_vintage": "Census Vintage 2025 (NST-EST2025)" if POP_OFF else None,
@@ -766,7 +782,6 @@ The total includes {usd0(DI.get('base'))} of intragovernmental debt that the gov
 The ratio columns are from OMB's Historical Tables (Table 7.1 for debt, Table 1.2 for the deficit). OMB's gross federal debt is measured a little differently
 from Treasury's total (it includes some agency debt and nets out unamortized discount), so its ratio won't exactly match the dollar column divided by GDP.
 "—" means the source has not published that year yet.</p>
-{site_chrome.sponsor_slot("../")}
 <h2>By fiscal year, FY1940 to FY{modern[0] if modern else ''}</h2>
 <table><tr><th>Fiscal year</th><th>Total debt (Treasury)</th><th>Record date</th><th>Gross debt % GDP (OMB)</th><th>Held by public % GDP (OMB)</th><th>Deficit % GDP (OMB)</th></tr>{''.join(rows)}</table>
 <details><summary>Earlier years, FY{older[0] if older else ''} back to FY{older[-1] if older else ''} (Treasury totals only)</summary>
@@ -893,13 +908,13 @@ if OFF_V:
 <h2>Accuracy</h2>
 <p><b>The official figure.</b> On the record date our starting figure is Treasury's number to the penny: the latest record is {fdate(OFF_D)}, {usd2(OFF_V)}, and the clock's base is {usd2(td_.get("base"))}. The live figure between records is a projection and is labelled one. It will differ slightly from the next Treasury figure; the table shows by how much.</p>
 {bt_html}
-<p>Each day's check against Treasury is stored in a public log (<code>data/validation_log.csv</code> in the <a href="https://github.com/hypergamedoteth/everydebtclock" rel="noopener">repository</a>) with the threshold it was judged against. If a check exceeds its threshold, the clock shows a warning badge and the site's automated run is marked failed. Thresholds: 0.25% for the national debt, 0.5% for intragovernmental debt, 3% for revenue and spending, 10% for the fiscal-year-to-date deficit (a difference of two re-based figures, so it moves more day to day), 5% for most monthly figures.</p>
+<p>Each day's check against Treasury is in <a href="../data/validation_log.csv">data/validation_log.csv</a> (the same file is in the <a href="https://github.com/hypergamedoteth/everydebtclock" rel="noopener">repository</a>), with the threshold it was judged against. If a check exceeds its threshold, the clock shows a warning badge and the site's automated run is marked failed. Thresholds: 0.25% for the national debt, 0.5% for intragovernmental debt, 3% for revenue and spending, 10% for the fiscal-year-to-date deficit (a difference of two re-based figures, so it moves more day to day), 5% for most monthly figures.</p>
 <h3>How other debt clocks compared on {SNAP["when"]}</h3>
 <p>For context, this is what two other US debt clocks showed when we read them on {SNAP["when"]}, against the latest record Treasury had published at that moment ({fdate(SNAP["treasury_date"])}: {usd0(SNAP["treasury"])}). Treasury had not yet published October 27's close, so each figure is compared with the latest published record. This is a one-time dated snapshot of what those pages displayed, not a live comparison, and those sites may have changed since.</p>
 <table><tr><th>Site</th><th>Figure shown</th><th>Versus Treasury's {fdate(SNAP["treasury_date"])} record</th><th>Note</th></tr>{snap_rows}</table>
 <p>We are an independent site and are not affiliated with any of the sites listed or with the U.S. government.</p>
 <h2>What this page does not claim</h2>
-<ul><li>Projected figures are estimates between official releases. Fiscal-year-to-date revenue, spending and the deficit are estimates on a budget basis until the next MTS; state and local clocks are straight-line projections from annual Census data that is about two years old.</li>
+<ul><li>Projected figures are estimates between official releases. Fiscal-year-to-date revenue, spending and the deficit are estimates on a budget basis until the next MTS. On state pages and on world country rows, the headline is the official stock as of its date. A ticking number on an annual, quarterly, monthly, or IMF series is labelled a projection.</li>
 <li>Per-person and per-household figures divide by population or household counts that Census publishes once a year, so they use different dates than the debt figure.</li>
 <li>Nothing here is financial advice.</li></ul>
 {src_links([SRC_DTP, SRC_DSL, SRC_POP, SRC_HH, SRC_IRS, ("Census, State and Local Government Finances", "https://www.census.gov/data/datasets/2024/econ/local/public-use-datasets.html")])}"""
@@ -1082,6 +1097,19 @@ h1.asof{{font-size:15px;font-weight:650;line-height:1.45;margin:8px 2px 14px;col
 if OFF_V:
     write_facts()
 
+# Short aliases people already request. GitHub Pages cannot send a 301.
+def write_alias(folder, canon, refresh, title, blurb):
+    os.makedirs(f"{R}/{folder}", exist_ok=True)
+    open(f"{R}/{folder}/index.html", "w").write(f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{html.escape(title)}</title>
+<link rel="canonical" href="{canon}"><meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0; url={refresh}">
+<script>location.replace("{refresh}")</script></head>
+<body><p>{blurb} <a href="{refresh}">{html.escape(refresh)}</a>.</p></body></html>
+""")
+write_alias("texas", f"{SITE}/states/texas/", "/states/texas/", "Texas debt clock", "This page moved to the Texas debt clock.")
+write_alias("uk", f"{SITE}/countries/united-kingdom/", "/countries/united-kingdom/", "UK debt clock", "This page moved to the United Kingdom debt clock.")
+
 # ---------------------------------------------------------------- sitemap + robots
 # /embed/ is indexable. Per-clock pages under /embed/ are noindex and stay out of this list.
 # lastmod is each page's data date, not the time this build ran.
@@ -1091,7 +1119,6 @@ urls = ([(f"{SITE}/", "1.0", "hourly"), (f"{SITE}/embed/", "0.5", "weekly")] + d
         [(u, "0.8", "weekly") for u in DY_URLS] +
         [(u, "0.8", "weekly") for u in PRES_URLS] +
         [(u, "0.8", "weekly") for u in SP_URLS] +
-        [(f"{SITE}/t/{s}.html", "0.7", "daily") for s in ALL if s not in HIST and get(s) is not None] +
         [(u, "0.8", "monthly") for u in REPORT_URLS] +
         site_chrome.sitemap_entries(SITE))
 def _lastmod(url):
@@ -1100,8 +1127,12 @@ def _lastmod(url):
     if not found:
         raise SystemExit(f"no data date for {url}")
     return found
-open(f"{R}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+_sitemap_xml = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     "".join(f"<url><loc>{u}</loc><lastmod>{_lastmod(u)}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
+for _banned in ("/t/", "/texas/", "/uk/", "/world-government-debt/", "/global-debt-clock/", "/countries/united-states/"):
+    if f"{SITE}{_banned}" in _sitemap_xml:
+        raise SystemExit(f"sitemap lists {_banned}")
+open(f"{R}/sitemap.xml", "w").write(_sitemap_xml)
 AI_BOTS = ("GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User",
            "PerplexityBot", "Google-Extended", "Applebot", "Applebot-Extended", "Bingbot")
 robots = "".join(f"User-agent: {b}\nAllow: /\n\n" for b in AI_BOTS)
@@ -1138,8 +1169,11 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /national-debt-by-president/ : Debt at the start and end of each term. Debt to the Penny on or before the date from 1993; Historical Debt Outstanding annual records before that.",
     "- /interest-on-the-national-debt/ : Cash interest paid this fiscal year, MTS net interest by fiscal year, and Treasury's interest-expense dataset by fiscal year.",
     "- /world/ : World Debt Clock. General government gross debt for every IMF economy. A national or Eurostat or QPSD stock is used only when it is general government gross debt; otherwise the row is the IMF World Economic Outlook estimate. Narrower official series are labeled and not added.",
-    "- /world-government-debt/ : Redirects to /world/. GitHub Pages serves this as an HTML refresh with a canonical link, not an HTTP 301.",
+    "- /world-government-debt/ : Redirects to /world/. GitHub Pages serves this as an HTML refresh with a canonical link and noindex, not an HTTP 301.",
     "- /global-debt-clock/ : Redirects to /world/ the same way.",
+    "- /countries/united-states/ : Redirects to /. Same canonical, noindex, and refresh. The US clock is the Treasury series, not the IMF row.",
+    "- /texas/ : Redirects to /states/texas/ the same way.",
+    "- /uk/ : Redirects to /countries/united-kingdom/ the same way.",
     "- /countries/ : National debt clocks by country. Economies with an official source keep that source; the rest are IMF World Economic Outlook estimates.",
     "- /states/ : State and local debt clocks for every US state and Washington, DC, from official Census figures.",
     "- /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.",
@@ -1386,6 +1420,7 @@ def check_quotable():
     expect = {"schema_version", "as_of", "fetched_at", "treasury_record_date", "total_debt_official",
               "total_debt_projected_now", "change_1d_official", "change_7d_official", "change_30d_official",
               "avg_daily_change_90d", "per_second_rate", "held_at_debt_limit", "per_second_rate_method",
+              "clock_daily_change_90d",
               "debt_per_person_official", "census_population_official", "census_population_vintage",
               "census_population_date", "debt_per_person_projected_now", "population_projected_now",
               "debt_per_household_official", "debt_per_household_projected_now", "households_official",
