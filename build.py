@@ -1121,8 +1121,8 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- How much is the national debt per person? {usd2(PP_OFF)} as of {fdate(OFF_D)}, the official total divided by the Census estimate of {POP_OFF:,.0f} residents on {fdate(POP_OFF_DATE)}.",
     ("- How much interest does the US pay per day? " + INTEREST_DAY if INTEREST_DAY else "- How much interest does the US pay per day? Not available from the current interest-expense and average-rate inputs."),
     f"- When will the US national debt hit ${MILE['n']} trillion? {MILE['quote']}",
-    (f"- World government debt: {world_build.lead_claim(WORLD, dt.date.today())}. "
-     f"The live clock adds each country's growth since that stock. An IMF row starts at the end-2025 stock and moves toward the IMF estimate for 2026; that estimate is not a December 31 closing balance. See /world/." if WORLD else
+    (f"- World government debt: {world_build.lead_claim(WORLD, dt.date.today())} "
+     f"An IMF row's published figure is the end-2025 stock; the end-2026 estimate is the year-end target the clock runs toward, not a December 31 closing balance. See /world/." if WORLD else
      "- World government debt: the world page was not built on this run."),
     "",
     "## Key pages",
@@ -1367,9 +1367,12 @@ def check_quotable():
                 raise SystemExit(f"{label} quotes the live per-person projection {proj_pp}")
     world_page = open(f"{R}/world/index.html").read()
     world_h1 = re.search(r"<h1\b[^>]*>(.*?)</h1>", world_page, re.S | re.I)
-    world_lead = re.sub(r"<[^>]+>", " ", world_h1.group(1) if world_h1 else "")
-    if "IMF estimates for 2026" not in world_lead or re.search(r"As of .*(December|Dec) 31, 2026", world_lead):
-        raise SystemExit("world answer line treats a future IMF date as a record: " + world_lead[:240])
+    world_lead = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", world_h1.group(1) if world_h1 else "")).strip()
+    if ("add up to" not in world_lead or "IMF figures for end-2025" not in world_lead
+            or "The live clock projects each country forward from its figure." not in world_lead
+            or "projected toward" in world_lead
+            or re.search(r"As of .*(December|Dec) 31, 2026", world_lead)):
+        raise SystemExit("world answer line mixes the stock sum with the projection: " + world_lead[:300])
     imf_sample = f"{R}/countries/burkina-faso/index.html"
     if os.path.exists(imf_sample):
         sample = open(imf_sample).read()

@@ -331,39 +331,56 @@ def _row_date(x):
         return None
 
 
-def lead_claim(W, today=None):
-    """One clause for the sum of anchored stocks. A future date is not called a record date.
+_CLOCK_SENTENCE = "The live clock projects each country forward from its figure."
 
-    IMF rows in the sum are the end-2025 stock. The end-2026 figure is the target the clock runs toward.
-    """
+def _recorded_span(dates):
+    a, b = min(dates), max(dates)
+    if a == b:
+        return a.strftime("%b %-d, %Y")
+    if a.year == b.year:
+        return f"{a.strftime('%b %-d')} to {b.strftime('%b %-d, %Y')}"
+    return f"{a.strftime('%b %-d, %Y')} to {b.strftime('%b %-d, %Y')}"
+
+def _stock_sentence(W, today=None):
+    """The sum of published stocks. No projection in this sentence."""
     today = today or dt.date.today()
     rows = W["rows"]
-    n = len(rows)
-    real, imf_n, future_other = [], 0, 0
+    real, imf_years, future_other = [], set(), 0
     for x in rows:
         d = _row_date(x)
         if x.get("tier") == "imf":
-            imf_n += 1
+            if d:
+                imf_years.add(d.year)
             continue
         if d is None or d > today:
             future_other += 1
             continue
         real.append(d)
-    total = _tn(W["total"])
-    imf_bit = "IMF end-2025 stocks projected toward IMF estimates for 2026" if imf_n else ""
-    if future_other:
-        imf_bit = (imf_bit + ", and " if imf_bit else "") + "estimates dated after this page was built"
+    bits = []
     if real:
-        a = min(real).strftime("%b %-d, %Y")
-        b = max(real).strftime("%b %-d, %Y")
-        span = a if a == b else f"{a} to {b}"
-        recorded = f"national and Eurostat figures dated {span}"
-        tail = (", and " + imf_bit) if imf_bit else ""
-        return (f"World government debt across {n} economies totals {total}, "
-                f"using each country's latest published stock: {recorded}{tail}")
-    if imf_bit:
-        return f"World government debt across {n} economies totals {total}, using {imf_bit}"
-    return f"World government debt across {n} economies totals {total}"
+        bits.append(f"national and Eurostat figures dated {_recorded_span(real)}")
+    if imf_years == {2025}:
+        bits.append("IMF figures for end-2025")
+    elif imf_years:
+        bits.append("IMF figures for " + " and ".join(f"end-{y}" for y in sorted(imf_years)))
+    if future_other:
+        bits.append("estimates dated after this page was built")
+    total = _tn(W["total"])
+    core = f"The latest published government debt figures for {len(rows)} economies add up to {total}"
+    return f"{core} ({'; '.join(bits)})" if bits else core
+
+def lead_claim(W, today=None):
+    """Two sentences: the published-stock sum, then the live clock. The sum is not a projection."""
+    return f"{_stock_sentence(W, today)}. {_CLOCK_SENTENCE}"
+
+def lead_html(W, today=None, imf_url="https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO"):
+    """Same two sentences, with the IMF name linked."""
+    clause = html.escape(_stock_sentence(W, today))
+    phrase = "IMF figures for end-"
+    if phrase in clause:
+        link = f'<a href="{html.escape(imf_url, quote=True)}" rel="noopener">IMF</a> figures for end-'
+        clause = clause.replace(phrase, link, 1)
+    return f"{clause}. {html.escape(_CLOCK_SENTENCE)}"
 
 
 def _asof_cell(x, today):
@@ -386,8 +403,8 @@ def _faqs(W, today=None):
     claim = lead_claim(W, today)
     return [
         ("How much is world government debt?",
-         f"{claim}. Source: national releases, Eurostat, and the IMF World Economic Outlook; "
-         f"{c['official']} rows are national, {c['harmonized']} are harmonized, and {c['imf']} are IMF end-2025 stocks projected toward the estimates for 2026."),
+         f"{claim} Source: national releases, Eurostat, and the IMF World Economic Outlook; "
+         f"{c['official']} rows are national, {c['harmonized']} are harmonized, and {c['imf']} are IMF end-2025 figures."),
         ("Which countries owe the most?",
          f"By the headline dollar stock on this page, the five largest are: {top_s}. "
          f"Source: the same general-government stocks, each dated on the world table."),
@@ -484,11 +501,8 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
               f'Sources: <a href="https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO" rel="noopener">IMF GGXWDG_NGDP</a> and '
               f'<a href="https://www.imf.org/external/datamapper/NGDPD@WEO" rel="noopener">NGDPD</a>, plus the national, Eurostat, and QPSD links in the table. '
               f'The clock above is those stocks projected forward, {_usd0(W["now_total"])} at the moment this page was built, not one official world total.</p>')
-    import quotable
     _imf = "https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO"
-    _wplain, _whtml = quotable.cited_pair(
-        lead_claim(W, today),
-        [("national sources, Eurostat, and the IMF", _imf)])
+    _whtml = lead_html(W, today, _imf)
     intro = (f'<section class="intro" id="intro"><h1 class="quote asof">{_whtml}</h1>{crumb}'
              f'{answer}'
              f'<p><b>What this page counts.</b> General government gross debt for each of {n} economies, in US dollars. '
