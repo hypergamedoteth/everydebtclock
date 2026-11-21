@@ -258,7 +258,13 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     title = (f"{name} State & Local Debt Clock: {lv}Debt, Official Census Data" if is_state else f"{name} National Debt Clock: {lv}Debt, Official Data")
     if p.get("seo_title"): title = p["seo_title"].format(lv=lv)  # optional per-place override (District of Columbia: no state level)
     import quotable
-    h1 = quotable.stock(name, T["head_long"], c["total"], c["as_of"], pub, words=_b(c["total"]) if (p.get("currency") or {}).get("code", "USD") != "USD" else None)
+    _src_url = cs[0].get("source_url") or ""
+    _claim = f"{name} {T['head_long']} is {_b(c['total'])}"
+    try:
+        _h1_plain, h1_html = quotable.asof_pair(_claim, as_of, [(pub, _src_url)])
+    except ValueError:
+        _h1_plain, h1_html = quotable.asof_pair(_claim, as_of, [(pub.split(" (")[0], _src_url)])
+    h1 = _h1_plain
     _dn = p.get("seo_desc_noun")  # optional: full noun phrase for the description's opening
     desc = ((f"{_dn[0].upper() + _dn[1:]}: {_b(c['total'])}, " if _dn else f"{name} {'state and local debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, ") + f"{'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
             f"{'Live ' if rate else 'Official '}{name} debt clock, {'about ' if rate else ''}{_usd0(proj / pop['value'])} per {dem}{' (projected)' if rate else ''}, with sources.")
@@ -268,12 +274,19 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
            [(f"Per {dem} ({T['pop_tag']} pop.)", _usd2(proj / pop["value"])), (f"Official, {as_of}", _usd0(c["total"]))],
            (f"{_sg(rate)}{_short(abs(rate) * 86400)}/day" if rate else "OFFICIAL"), "#ff4d5e",
            f"{pub}, {_when(p, c['as_of'])} official\nprojected at {T['pace']} · {T['freq']} data" if rate else f"{pub}, {_when(p, c['as_of'])} official")
+    _based = sorted({x["source_url"] for x in cs} | {pop["source_url"]})
     ld = '<script type="application/ld+json">' + json.dumps({
         "@context": "https://schema.org", "@type": "Dataset", "name": f"{name} {T['head_long']}", "description": desc, "url": url,
-        "isAccessibleForFree": True, "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"},
+        "isAccessibleForFree": True,
+        "creator": [{"@type": "Organization", "name": pub, "url": _src_url},
+                    {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"}],
+        "publisher": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"},
+        "creditText": pub, "dateModified": c["as_of"][:10],
+        "citation": {"@type": "CreativeWork", "name": pub, "url": _src_url,
+                     "creator": {"@type": "Organization", "name": pub, "url": _src_url}},
         "spatialCoverage": {"@type": "Place", "name": name},
         "temporalCoverage": f"{min(h[0] for x in cs for h in x.get('history', [[x['as_of']]]))}/{c['as_of']}",
-        "isBasedOn": sorted({x["source_url"] for x in cs} | {pop["source_url"]})}).replace("</", "<\\/") + "</script>"
+        "isBasedOn": _based}).replace("</", "<\\/") + "</script>"
     facts_html = ""
     if is_state:
         import state_facts
@@ -348,7 +361,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
              + (f'<div class="sec2"><span class="l">{E(sec2["label"])} · official {E(_fd(sec2["as_of"]))}</span> <b class="num">{_usd0(sec2["value"])}</b> '
                 f'<span class="note">{E(sec2["publisher"])}. {E(sec2["scope"])}</span></div>' if sec2 else "")
              + f'<div class="meta" style="margin-top:10px">{proj_badge if rate else fix_badge(c["as_of"])}{ann_badge}<span class="badge">source: {E(pub)}</span></div></div>')
-    intro = (f'<section class="intro" id="intro"><h1 class="quote">{E(h1)}</h1>{crumb}'
+    intro = (f'<section class="intro" id="intro"><h1 class="quote asof">{h1_html}</h1>{crumb}'
              f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
              + (f'on <b>{as_of}</b>' if T["periodic"] else f'in Census survey year {fy} (dated <b>{as_of}</b>)' if p.get("year_label") else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
              + " and ".join(("" if n_.startswith("Eurostat") else "the ") + f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
@@ -493,6 +506,31 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     method = (f'<section id="method"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>How it works</h2>'
               f'<span class="h2n">Official {T["freq"]} figures · projection labelled · sources linked</span></div><div class="sk foot">{meth}</div></section>')
 
+    country_faq = ""
+    if not is_state and _src_url:
+        pp_words = _usd2(pp_off)
+        pop_when = _fd(pop["as_of"])
+        if rate:
+            q3 = (f"Is the {name} debt clock an official daily figure?",
+                  f"No. The clock starts from the official {as_of} total and projects forward between reports. "
+                  f"Source: {pub}; the ticking number is a projection, not a new official release.")
+        else:
+            q3 = (f"Is the {name} debt clock an official daily figure?",
+                  f"The clock shows the official {as_of} total and does not tick it forward. Source: {pub}.")
+        pairs = [
+            (f"How much is {name} {T['head_long']}?",
+             f"As of {as_of}, {name} {T['head_long']} is {_b(c['total'])}. Source: {pub}."),
+            (f"How much is {name} debt per {dem}?",
+             f"{name} debt was {pp_words} per {dem} as of {as_of}, the official total divided by the population estimate of {pop['value']:,} on {pop_when}. "
+             f"Source: {pub} and {pop.get('source_name', T['pop_pub'])}."),
+            q3,
+        ]
+        country_faq = ('<section class="faq" id="faq"><div class="sh"><h2>Questions</h2></div>'
+                       + "".join(f"<h3>{E(q)}</h3><p>{E(a)}</p>" for q, a in pairs) + "</section>")
+        ld += '<script type="application/ld+json">' + json.dumps({
+            "@context": "https://schema.org", "@type": "FAQPage", "dateModified": c["as_of"][:10],
+            "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in pairs],
+        }).replace("</", "<\\/") + "</script>"
     WL2 = '<li><a href="../../world/">World debt clock</a></li>' if WORLD else ""
     links = (f'<section class="answers" id="answers"><div class="sh"><h2>More clocks</h2></div><ul>'
              f'<li><a href="../../">US national debt clock (live, checked daily against Treasury)</a></li>'
@@ -524,7 +562,7 @@ ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);
         profile = cp.official_section(R, p)
     official = f'<p class="official">Official: {_usd0(c["total"])} as of {as_of}, {E(pub)}</p>'
     page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld).replace("<body>", '<body class="srclead">', 1)
-            + '<main id="app">' + hero + intro + facts_html + wc + debt_sec + comp_secs + people + hist + details + profile + method
+            + '<main id="app">' + hero + intro + facts_html + wc + debt_sec + comp_secs + people + hist + details + profile + method + country_faq
             + '</main>' + header + ex.search_box("../../") + '<dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))

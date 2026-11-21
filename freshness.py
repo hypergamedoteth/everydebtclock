@@ -307,7 +307,7 @@ def collect(R, off_d, world=None, today=None):
     _put(out, "/interest-on-the-national-debt/", parse(cash, today) or debt)
     for path in ("/", "/how-much-is-the-national-debt/", "/national-debt-per-person/", "/your-share/",
                  "/41-trillion/", "/press/", "/methodology/", "/embed/", "/when-will-debt-hit-41-trillion/",
-                 "/widget.html"):
+                 "/facts/", "/widget.html"):
         _put(out, path, debt)
     for path, day in CONTENT.items():
         _put(out, path, parse(day, today))
@@ -465,6 +465,6 @@ def check(R, site, dates, urls, off_d):
     if f'"dateModified": "{off_d}"' not in page:
         raise SystemExit("homepage JSON-LD dateModified is not the Treasury date")
     lead = visible_lead(page)
-    if not lead.startswith("Official:") or "U.S. Treasury" not in lead or off_d[0:4] not in lead:
+    if not lead.startswith("As of ") or "U.S. Treasury, Debt to the Penny" not in lead or off_d[0:4] not in lead:
         raise SystemExit("homepage lead is not the dated official total: " + lead)
     print(f"freshness: {len(dates)} data dates, homepage {home}")

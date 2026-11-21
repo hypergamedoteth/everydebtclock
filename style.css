@@ -31,6 +31,7 @@ main{max-width:1280px;min-width:0;margin:0 auto;padding:12px 12px 60px}
 .hero .sub,.hero-follow .sub{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--mut);min-width:0;max-width:100%}
 .hero .sub>span,.hero-follow .sub>span{min-width:0;max-width:100%}
 .hero .sub .num{color:var(--txt)}
+.trio>div{min-width:0}.trio .note{display:block;margin-top:4px;font-size:11px;line-height:1.35;letter-spacing:0;text-transform:none;color:var(--mut);overflow-wrap:anywhere}
 .trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px;min-width:0;max-width:100%}
 .trio div{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:9px 10px}
 .trio .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
@@ -126,7 +127,8 @@ section,.tile,.hero{scroll-margin-top:96px}
 #mf,.math .num{white-space:normal;overflow-wrap:anywhere}
 /* build-time text: intro (always shown), static fallback (removed by app.js), quick-answer links */
 .intro{max-width:1280px;margin:0 auto;padding:14px 14px 0}.intro h1{font-size:19px;margin:4px 0 6px;letter-spacing:.02em}
-h1.quote,.intro h1.quote{font-size:15px;font-weight:650;line-height:1.45;margin:8px 2px 14px;letter-spacing:0;max-width:100%;color:var(--mut);overflow-wrap:anywhere}
+h1.quote,.intro h1.quote,p.asof{font-size:15px;font-weight:650;line-height:1.45;margin:8px 2px 14px;letter-spacing:0;max-width:100%;color:var(--mut);overflow-wrap:anywhere}
+h1.quote a,p.asof a{font-weight:650}
 body.srclead{display:flex;flex-direction:column}
 body.srclead>*{min-width:0;max-width:100%}
 body.srclead>header.top{order:-5}

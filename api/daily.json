@@ -1,42 +1,42 @@
 {
  "schema_version": 2,
- "as_of": "2026-11-19T02:54:28-06:00",
- "fetched_at": "2026-11-18T20:50:50-06:00",
- "treasury_record_date": "2026-11-17",
- "total_debt_official": 40714946316573.34,
- "total_debt_projected_now": 40723873771416,
+ "as_of": "2026-11-20T19:01:13-06:00",
+ "fetched_at": "2026-11-20T17:06:24-06:00",
+ "treasury_record_date": "2026-11-19",
+ "total_debt_official": 40709780700317.02,
+ "total_debt_projected_now": 40716453102277,
  "change_1d_official": {
-  "amount": 52528920955.91,
-  "from_date": "2026-11-16",
-  "from_value": 40662417395617.43
+  "amount": 19011061467.07,
+  "from_date": "2026-11-18",
+  "from_value": 40690769638849.95
  },
  "change_7d_official": {
-  "amount": 130816236300.45,
-  "from_date": "2026-11-10",
-  "from_value": 40584130080272.89
+  "amount": 101273843413.77,
+  "from_date": "2026-11-12",
+  "from_value": 40608506856903.25
  },
  "change_30d_official": {
-  "amount": 327437521341.67,
-  "from_date": "2026-10-16",
-  "from_value": 40387508795231.67
+  "amount": 270234684277.95,
+  "from_date": "2026-10-20",
+  "from_value": 40439546016039.08
  },
  "avg_daily_change_90d": {
-  "amount_per_day": 7659432919.2,
-  "from_date": "2026-08-20",
-  "to_date": "2026-11-17",
+  "amount_per_day": 7751673524.95,
+  "from_date": "2026-08-24",
+  "to_date": "2026-11-19",
   "method": "(last - first) / calendar days"
  },
- "per_second_rate": 88857.39,
+ "per_second_rate": 92577.07,
  "held_at_debt_limit": false,
  "per_second_rate_method": "90-day least-squares trend of Debt to the Penny",
- "debt_per_person_official": 119124.49,
+ "debt_per_person_official": 119109.37,
  "census_population_official": 341784857,
  "census_population_vintage": "Census Vintage 2025 (NST-EST2025)",
  "census_population_date": "2025-07-01",
- "debt_per_person_projected_now": 118805.91,
- "population_projected_now": 342776512,
- "debt_per_household_official": 302062.07,
- "debt_per_household_projected_now": 302128.3,
+ "debt_per_person_projected_now": 118783.12,
+ "population_projected_now": 342779786,
+ "debt_per_household_official": 302023.75,
+ "debt_per_household_projected_now": 302073.25,
  "households_official": 134790000,
  "households_source": "Census CPS ASEC 2025",
  "per_person_basis": "_official = Treasury close / official Census estimate (no projection); _projected_now = projected debt / population projected at Census's stated rate",

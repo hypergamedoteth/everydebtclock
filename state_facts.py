@@ -322,24 +322,22 @@ def _clock_sentence(p):
 
 
 def _answer(p):
-    """The one sentence an answer engine should quote."""
+    """Two sentences an answer engine should quote, with the date and the source."""
     if p["dc"]:
-        return (f"The District of Columbia's government debt was {_usd(p['total'])} as of {_date(p['total_as_of'])}, "
-                f"per the U.S. Census Bureau.")
-    return (f"{_poss(p['name'])} state government debt was {_usd(p['state_debt'])} as of {_date(p['state_as_of'])}, "
-            f"per the U.S. Census Bureau.")
+        return (f"The District of Columbia's government debt was {_usd(p['total'])} as of {_date(p['total_as_of'])}. "
+                f"Source: U.S. Census Bureau, which does not publish a separate state-government total for the District.")
+    return (f"{_poss(p['name'])} state government debt was {_usd(p['state_debt'])} as of {_date(p['state_as_of'])}. "
+            f"Source: U.S. Census Bureau.")
 
 
 def faqs(p):
     out = [(f"How much {'government' if p['dc'] else 'state government'} debt does {p['name']} have?", _answer(p))]
-    if p["dc"]:
-        out[0] = (out[0][0], out[0][1] + " Census does not publish a separate state-government total for the District; this figure is the local-government line.")
     if p["per_state"] is not None:
         out.append((
             f"How much is {_poss(p['name'])} state government debt per resident?",
-            (f"{_poss(p['name'])} state government debt was {_usd2(p['per_state'])} per resident: "
-             f"{_usd(p['state_debt'])} as of {_date(p['state_as_of'])}, divided by the Census estimate of "
-             f"{p['pop']:,} residents on {_date(p['pop_as_of'])}."),
+            (f"{_poss(p['name'])} state government debt was {_usd2(p['per_state'])} per resident as of {_date(p['state_as_of'])}, "
+             f"{_usd(p['state_debt'])} divided by the Census estimate of {p['pop']:,} residents on {_date(p['pop_as_of'])}. "
+             f"Source: U.S. Census Bureau."),
         ))
     elif p["dc"] and p["per_total"] is not None:
         out.append((
@@ -353,14 +351,14 @@ def faqs(p):
             f"What is {_poss(p['name'])} state government debt as a share of state GDP?",
             (f"{_poss(p['name'])} state government debt of {_usd(p['state_debt'])} as of {_date(p['state_as_of'])} "
              f"was {_pct(p['ratio_state'])} of BEA current-dollar GDP of {_usd(p['gdp_usd'])} for calendar year {p['gdp_year']}. "
-             f"The debt date is the Census survey year-end. The GDP figure is the calendar year. They are not the same twelve months."),
+             f"Source: U.S. Census Bureau and the Bureau of Economic Analysis; the debt date and the GDP year are not the same twelve months."),
         ))
     elif p["dc"] and p["ratio_total"] is not None:
         out.append((
             "What is District of Columbia government debt as a share of its GDP?",
             (f"The District of Columbia's government debt of {_usd(p['total'])} as of {_date(p['total_as_of'])} "
              f"was {_pct(p['ratio_total'])} of BEA current-dollar GDP of {_usd(p['gdp_usd'])} for calendar year {p['gdp_year']}. "
-             f"The debt date is the Census survey year-end. The GDP figure is the calendar year."),
+             f"Source: U.S. Census Bureau and the Bureau of Economic Analysis; the debt date and the GDP year are not the same twelve months."),
         ))
     rank_key = "total" if p["dc"] else "state_debt"
     label = "government debt" if p["dc"] else "state government debt"
@@ -529,7 +527,9 @@ def for_page(R, place):
                "name": f"{p['name']} government debt, U.S. Census Bureau",
                "description": _answer(p), "url": f"https://everydebtclock.com/states/{p['slug']}/",
                "dateModified": p["total_as_of"], "isAccessibleForFree": True,
-               "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": "https://everydebtclock.com/"},
+               "creator": [{"@type": "Organization", "name": "U.S. Census Bureau", "url": "https://www.census.gov/"},
+                           {"@type": "Organization", "name": "Every Debt Clock", "url": "https://everydebtclock.com/"}],
+               "publisher": {"@type": "Organization", "name": "Every Debt Clock", "url": "https://everydebtclock.com/"},
                "spatialCoverage": {"@type": "Place", "name": p["name"]},
                "isBasedOn": based,
                "creditText": CITE}

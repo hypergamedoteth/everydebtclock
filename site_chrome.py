@@ -18,6 +18,7 @@ NOTICE_MARK_END = "<!--/NOTICE-->"
 # so the sponsor pull request can add it without rewriting this list by hand.
 FOOTER_LINKS = (
     ("embed/", "Embed a clock"),
+    ("facts/", "Facts"),
     ("data/", "Data"),
     ("reports/", "Reports"),
     ("press/", "Press"),
