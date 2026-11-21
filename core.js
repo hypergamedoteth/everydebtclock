@@ -1,7 +1,8 @@
 /* Shared ticker math for share pages and the embed widget (same formulas as app.js). */
 window.DC = function (D) {
   const T = D.tickers, M = D.meta, OPENED = Date.now() / 1000;
-  const val = (s, t) => { const x = T[s]; if (!x || x.status !== 'ok') return null;
+  const val = (s, t) => { const x = T[s]; if (!x || (x.status !== 'ok' && x.status !== 'stale')) return null;
+    if (x.status === 'stale' || x.stale) return x.base;
     if (x.mode === 'fytd' && t >= M.fy_end_epoch) return x.rate * (t - M.fy_end_epoch);
     if (x.freeze_t && t > x.freeze_t) t = x.freeze_t;   // never project debt past the statutory limit
     return x.base + x.rate * (t - x.t0) + (x.steps || []).reduce((s, q) => s + q[2] * Math.min(1, Math.max(0, (t - q[0]) / (q[1] - q[0]))), 0); };   // steps: scheduled payment ramps [start, end, amount]

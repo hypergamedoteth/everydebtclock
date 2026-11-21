@@ -7,9 +7,11 @@
   const fyRolled = () => now() >= M.fy_end_epoch;      // client-side Oct 1 reset if data not refreshed yet
   const curFY = () => fyRolled() ? M.fy + 1 : M.fy;
 
+  function held(x) { return !!(x && (x.status === 'stale' || x.stale)); }
   function val(slug, t = now()) {
     const x = T[slug];
-    if (!x || x.status !== 'ok') return null;
+    if (!x || (x.status !== 'ok' && x.status !== 'stale')) return null;
+    if (held(x)) return x.base;
     if (x.mode === 'fytd' && t >= M.fy_end_epoch) return x.rate * (t - M.fy_end_epoch);
     if (x.freeze_t && t > x.freeze_t) t = x.freeze_t;   // never project debt past the statutory limit
     return x.base + x.rate * (t - x.t0) + (x.steps || []).reduce((s, q) => s + q[2] * Math.min(1, Math.max(0, (t - q[0]) / (q[1] - q[0]))), 0);   // steps: scheduled payment ramps [start, end, amount]
@@ -29,7 +31,12 @@
   const drate = slug => { const t = now(); const a = DER[slug](t), b = DER[slug](t + 60); return a == null || b == null ? null : (b - a) / 60; };
   const eodTs = d => Date.parse(d + 'T23:59:59-04:00') / 1000;
   const get = (slug, t) => DER[slug] ? DER[slug](t) : val(slug, t);
-  const info = slug => DER[slug] ? Object.assign({status: 'ok', slug, derived: true}, D.derived[slug]) : (T[slug] || {slug, status: 'unavailable', label: slug});
+  const info = slug => {
+    if (!DER[slug]) return T[slug] || {slug, status: 'unavailable', label: slug};
+    const row = Object.assign({status: 'ok', slug, derived: true}, D.derived[slug]);
+    if (slug === 'm2_debt_ratio' && held(T.m2)) Object.assign(row, {status: 'stale', stale: true, as_of: T.m2.as_of});
+    return row;
+  };
 
   // ---------- formatting
   const nf0 = new Intl.NumberFormat('en-US', {maximumFractionDigits: 0});
@@ -85,6 +92,7 @@
     if (i.historical) return `<span class="badge hist" title="Fixed historical figure (OMB Historical Tables)">HISTORICAL · fixed</span>`;
     if (i.derived) return `<span class="badge calc" title="${esc(i.method || '')}">LIVE CALC</span>`;
     if (i.badge) return `<span class="badge ${i.modeled ? 'proj' : 'fix'}" title="${esc(i.method || '')}">${esc(i.badge)}</span>`;
+    if (i.stale || i.status === 'stale') return `<span class="badge bad" title="The source failed or this is a cached release. The figure is the last good official number, not a live total.">STALE · as of ${esc(d)}</span>`;
     if (i.fixed) return `<span class="badge fix" title="Official figure that does not change until the next official release">FIXED · ${esc(d)}</span>`;
     if (i.modeled) return `<span class="badge proj" title="Modeled estimate: ${esc(i.method || '')}">MODELED ESTIMATE · from ${esc(d)}</span>`;
     return `<span class="badge proj" title="Projected every frame from the official figure of ${esc(fmtDate(i.as_of))}">PROJECTED · from ${esc(d)}</span>`;
@@ -97,14 +105,14 @@
       const who = /Daily Treasury/.test(v.against || '') ? 'DTS' : 'Treasury';
       b += `<span class="badge ${cls}" title="Yesterday's projection vs ${esc(v.against)}">${v.flag ? '⚠' : '✓'} vs ${who} ${v.last_error_pct >= 0 ? '+' : ''}${(+v.last_error_pct).toFixed(2)}%</span>`;
     }
-    if (i.stale) b += `<span class="badge warn" title="Source failed on the last run; showing the last good official figure">cached</span>`;
+    if ((i.stale || i.status === 'stale') && !/STALE/.test(b)) b += `<span class="badge bad" title="Source failed on the last run; showing the last good official figure">STALE</span>`;
     return b;
   }
   function tile(slug, sec) {
     const i = info(slug);
     const el = document.createElement('div');
     el.className = 'tile'; el.id = 't-' + slug; el.style.setProperty('--acc', ACC[sec]);
-    if (i.status !== 'ok') {
+    if (i.status !== 'ok' && i.status !== 'stale') {
       el.classList.add('na');
       el.innerHTML = `<div class="lab"><span>${esc(i.label)}</span></div><div class="val">source unavailable</div><div class="meta"><span class="badge bad">${esc(i.note || '')}</span></div>`;
       return el;
@@ -113,10 +121,11 @@
     const lbl = typeof i.label === 'function' ? i.label() : i.label;
     const rate = i.derived ? (i.kind === 'usd' ? drate(slug) : null) : i.rate;
     const fy = i.mode === 'fytd' ? `<span>FY${curFY()} to date</span>` : '';
+    const stale = i.stale || i.status === 'stale';
     el.innerHTML = `<div class="lab"><span>${esc(lbl)}</span>${fy}</div>
       <div class="val num">—</div>
       ${isUSD(i) && !NOPP.has(slug) ? `<div class="pp"><div><span class="l" title="${esc(PPB)}">Per person (proj. pop.)</span><span class="num pp1">—</span></div><div><span class="l">Per tax return filed</span><span class="num pp2">—</span></div></div>` : ''}
-      <div class="meta"><span class="rate ${/^(debt|deficit|interest|out_interest)/.test(slug) ? (rate > 0 ? 'up' : rate < 0 ? 'dn' : '') : ''}">${i.kind === 'count' && rate ? '+' + (rate * 86400).toFixed(0) + ' people/day' : i.kind === 'usd' && rate != null ? rateTxt(rate) : i.derived ? 'live ratio' : 'fixed'}</span>${badges(i, {short: 1})}</div>${slug === 'limit_headroom' ? '<div class="sub2" id="htl"></div>' : ''}`;
+      <div class="meta"><span class="rate ${stale ? '' : /^(debt|deficit|interest|out_interest)/.test(slug) ? (rate > 0 ? 'up' : rate < 0 ? 'dn' : '') : ''}">${stale ? 'held at last release' : i.kind === 'count' && rate ? '+' + (rate * 86400).toFixed(0) + ' people/day' : i.kind === 'usd' && rate != null ? rateTxt(rate) : i.derived ? 'live ratio' : 'fixed'}</span>${badges(i, {short: 1})}</div>${slug === 'limit_headroom' ? '<div class="sub2" id="htl"></div>' : ''}`;
     const v = el.querySelector('.val'), p1 = el.querySelector('.pp1'), p2 = el.querySelector('.pp2');
     const kind = i.kind;
     live.push(t => {
@@ -133,7 +142,14 @@
   // header status
   const age = (now() - M.generated_epoch) / 3600;
   const st = document.getElementById('status');
+  const staleKeys = Object.keys(T).filter(k => held(T[k]));
   st.textContent = `Recalibrated ${new Date(M.generated_epoch * 1000).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'})}`;
+  if (staleKeys.length && st.parentElement) {
+    st.parentElement.classList.add('stale');
+    const one = T[staleKeys[0]];
+    const short = staleKeys[0] === 'm2' ? 'M2' : String(one.label || staleKeys[0]).split(' ')[0];
+    st.textContent = staleKeys.length === 1 ? `${short} stale` : `${staleKeys.length} stale`;
+  }
   const banners = [];
   if (age > 36) banners.push(`<div class="banner">Data last recalibrated ${Math.floor(age / 24)} day(s) ago. Tickers are still projecting from the last official figures.</div>`);
   if (fyRolled()) banners.push(`<div class="banner">New fiscal year FY${curFY()} started Oct 1 — fiscal-year counters reset to $0 and are projecting until the next official update.</div>`);
@@ -186,7 +202,8 @@
       if (!p) return; cur = p; how = why;
       $('pck').textContent = why === 'default' ? 'Featured ' + kindWord(p) : 'Your ' + kindWord(p);
       $('pcn').textContent = p.name; $('pclab').textContent = p.label; $('pcd').textContent = p.demonym; $('pcg').textContent = p.name;
-      $('pcb').textContent = p.rate ? 'projected from official ' + fmtDate(p.base_date) + ' figures' : 'official, ' + fmtDate(p.base_date);
+      const coarse = p.frequency !== 'daily' && p.frequency !== 'weekly';
+      $('pcb').textContent = (!p.rate || coarse) ? 'as of ' + fmtDate(p.base_date) : 'projection from ' + fmtDate(p.base_date);
       $('pcl').href = p.url; sel.value = p.slug;
     }
     let saved = null; try { saved = by(localStorage.getItem(KEY)); } catch (e) {}
@@ -195,7 +212,7 @@
     sel.onchange = () => { const p = by(sel.value); if (!p) return; try { localStorage.setItem(KEY, p.slug); } catch (e) {} show(p, 'saved'); };
     const pv = $('pcv'), pp = $('pcp');
     const cu = (v, d) => { const s = usd(v, d), c = cur.sym || '$'; return c === '$' ? s : s.replace('$', c); };
-    live.push(t => { if (!cur) return; const x = cur.base + cur.rate * (t - cur.t0); pv.textContent = cu(x); pp.textContent = cu(x / cur.population, 2); });
+    live.push(t => { if (!cur) return; const coarse = cur.frequency !== 'daily' && cur.frequency !== 'weekly'; const x = (!cur.rate || coarse) ? cur.base : cur.base + cur.rate * (t - cur.t0); pv.textContent = cu(x); pp.textContent = cu(x / cur.population, 2); });
   }
 
   // secondary hero: debt-limit headroom (below the national debt)
@@ -231,7 +248,12 @@
   for (const s of S) {
     const sec = document.createElement('section'); sec.id = s.id;
     const title = typeof s.title === 'function' ? s.title() : s.title;
-    sec.innerHTML = `<div class="sh"><span class="bar" style="background:${s.color}"></span><h2>${esc(title)}</h2><span class="h2n">${esc(typeof s.note === 'function' ? s.note() : s.note)}</span></div><div class="grid"></div>`;
+    const staleHere = s.tiles.filter(slug => held(T[slug]));
+    const staleHtml = staleHere.length ? `<p class="stalenote">${staleHere.map(slug => {
+      const src = T[slug];
+      return `${esc(src.label || slug)} is the last good release (as of ${esc(fmtDate(src.as_of))}). The fetch failed, so this is not a live total.`;
+    }).join(' ')}</p>` : '';
+    sec.innerHTML = `<div class="sh"><span class="bar" style="background:${s.color}"></span><h2>${esc(title)}</h2><span class="h2n">${esc(typeof s.note === 'function' ? s.note() : s.note)}</span></div>${staleHtml}<div class="grid"></div>`;
     const g = sec.querySelector('.grid');
     if (s.dense) g.classList.add('dense');
     s.tiles.forEach(x => g.appendChild(tile(x, s.id)));
