@@ -1,9 +1,11 @@
 """World Debt Clock (/world/): every IMF economy, each on the most precise stock available.
 
 Order: a live national or Eurostat clock, then a World Bank / IMF QPSD quarterly stock within 25% of the IMF
-figure, then the IMF World Economic Outlook interpolation. One row per economy. Called from build.py.
+figure, then the IMF World Economic Outlook. One row per economy. Called from build.py.
 
-Ticking: each country's own trend where a year-ago official stock exists, otherwise that country's IMF interpolation.
+The live value starts at that stock on the stock's date and moves only at a documented rate.
+An IMF row's stock is the end-2025 figure. The end-2026 figure is the target the line reaches on
+1 January 2027, not a balance already recorded. A country sits below its own stock only when that series is falling.
 """
 import json, os, html, datetime as dt
 import places_build as pb
@@ -41,11 +43,19 @@ def usd_per_unit(code, fx):
     return None
 
 def _imf_row(e, now, anchor_ts):
+    """End-2025 stock at 2026-01-01 00:00 UTC, straight line to the end-2026 estimate at 2027-01-01 00:00 UTC.
+
+    The stock in the sum is the end-2025 figure. The end-2026 estimate is the target, not today's balance.
+    """
     projected = e["debt_2025_usd"] + e["rate_usd_per_sec"] * (now - anchor_ts)
+    falling = e["rate_usd_per_sec"] < 0
+    note = "IMF pace from the end-2025 stock toward the end-2026 estimate"
+    if falling:
+        note += "; that series is falling, so the clock is below the end-2025 stock"
     return {"slug": e["slug"], "name": e["name"], "url": f"countries/{e['slug']}/", "code": "USD", "iso3": e["iso3"],
-            "local": e["debt_2026_usd"], "as_of": "2026-12-31", "measure": "General government, gross (IMF end-2026 projection)",
+            "local": e["debt_2025_usd"], "as_of": "2025-12-31", "measure": "General government, gross (IMF end-2025 stock)",
             "rate": 1.0, "rate_date": None, "rate_src": "US dollar", "quote": "1", "pop": None, "pop_date": None,
-            "trend_local": e["rate_usd_per_sec"], "trend_from": "2025-12-31", "trend_note": "IMF interpolation from end-2025 to end-2026",
+            "trend_local": e["rate_usd_per_sec"], "trend_from": "2025-12-31", "trend_note": note,
             "now_local": projected, "source": "IMF World Economic Outlook, October 2026", "source_url": "https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO",
             "tier": "imf", "trend_kind": "imf"}
 
@@ -167,6 +177,9 @@ def compute(R, places, us, now):
         add_imf(e, line)
     for x in rows:
         x["usd"] = x["local"] * x["rate"]; x["now_usd"] = x["now_local"] * x["rate"]; x["rate_usd_s"] = x["trend_local"] * x["rate"]
+        # Same FX on the stock and the clock. Below the stock only when the documented rate is negative.
+        if x["now_usd"] < x["usd"] - 1 and x["rate_usd_s"] < 0:
+            x["below_anchor_reason"] = x.get("trend_note") or "Recorded series is falling"
         x["per_person"] = (x["usd"] / x["pop"]) if x.get("pop") else None
         e = by_iso.get(x.get("iso3") or "")
         x["imf_debt_2026"] = e["debt_2026_usd"] if e else None
@@ -174,7 +187,7 @@ def compute(R, places, us, now):
         if x.get("iso3") == "BRA":
             x["published_ratio"] = _pctgdp(by_place.get("BRA"))
         if x["tier"] == "imf":
-            x["ratio"] = e["ratio_2026"] if e else None
+            x["ratio"] = e.get("ratio_2025") if e else None
         elif e and e.get("gdp_2026_usd"):
             x["ratio"] = x["usd"] / e["gdp_2026_usd"] * 100
         else:
@@ -196,10 +209,26 @@ def compute(R, places, us, now):
     panel = weo.get("panel_2026_usd") or 0
     drivers = [x for x in rows if x.get("imf_debt_2026") and abs(x["usd"] - x["imf_debt_2026"]) >= 1e9]
     drivers.sort(key=lambda x: -abs(x["usd"] - x["imf_debt_2026"]))
-    return {"rows": rows, "skipped": skipped, "total": total, "now_total": sum(x["now_usd"] for x in rows), "rate_s": sum(x["rate_usd_s"] for x in rows),
-            "pop": sum(x["pop"] or 0 for x in rows), "cov": cov, "fx": fx, "gdp": gdp, "t0": now, "now": now,
-            "counts": counts, "review": review, "rejected": rejected, "weo": weo, "upgrades": upgrades,
-            "drivers": drivers, "gap_vs_imf": (total - panel) if panel else None}
+    out = {"rows": rows, "skipped": skipped, "total": total, "now_total": sum(x["now_usd"] for x in rows), "rate_s": sum(x["rate_usd_s"] for x in rows),
+           "pop": sum(x["pop"] or 0 for x in rows), "cov": cov, "fx": fx, "gdp": gdp, "t0": now, "now": now,
+           "counts": counts, "review": review, "rejected": rejected, "weo": weo, "upgrades": upgrades,
+           "drivers": drivers, "gap_vs_imf": (total - panel) if panel else None}
+    validate_anchors(out)
+    return out
+
+def validate_anchors(W):
+    """The live total may sit below the sum of stocks only by as much as the falling series explain."""
+    bad = []
+    for x in W["rows"]:
+        if x["now_usd"] < x["usd"] - 1 and not (x["rate_usd_s"] < 0 and x.get("below_anchor_reason")):
+            bad.append(f"{x.get('iso3')} live {x['now_usd']:.0f} stock {x['usd']:.0f} rate {x['rate_usd_s']}")
+    if bad:
+        raise RuntimeError("live value is below the anchored stock without a falling series: " + "; ".join(bad[:8]))
+    short = sum(x["usd"] - x["now_usd"] for x in W["rows"] if x["now_usd"] < x["usd"] and x["rate_usd_s"] < 0)
+    if W["now_total"] + short + len(W["rows"]) < W["total"]:
+        raise RuntimeError(
+            f"world live {W['now_total']:.0f} is below the sum of anchored stocks {W['total']:.0f} "
+            f"by more than the falling series ({short:.0f}) explain")
 
 # ------------------------------------------------------------------ formatting
 def _tn(x): return f"${x/1e12:,.2f} trillion"
@@ -216,12 +245,15 @@ def cov_line(W):
 
 def api_json(W, SITE, now):
     cv = W["cov"]; fx = W["fx"]; counts = W["counts"]
-    return {"_doc": "World Debt Clock. One row per IMF economy. debt_usd is the latest stock used on this page (official, QPSD, or the IMF end-2026 projection). "
-            "projected_now sums each row's own trend: the official year-ago change where that stock exists, otherwise the IMF interpolation. "
-            "Measures and dates differ. QPSD rows are kept only when they are within 25% of the IMF end-2026 stock.",
+    return {"_doc": "World Debt Clock. One row per IMF economy. debt_usd is the anchored stock: a national, Eurostat, or QPSD general-government stock, or the IMF end-2025 stock when that is the headline. "
+            "projected_usd starts at that stock on its date and adds only that country's growth since then. "
+            "An IMF row runs from the end-2025 stock at 2026-01-01 00:00 UTC to the end-2026 estimate at 2027-01-01 00:00 UTC. The end-2026 figure is the target, not the stock. "
+            "projected_usd is below debt_usd only when that series is falling; below_anchor_reason names the series. "
+            "The same exchange rate converts the stock and the clock. QPSD rows are kept only when they are within 25% of the IMF end-2026 stock.",
             "generated": dt.datetime.fromtimestamp(now, pb.CT).isoformat(timespec="seconds"), "url": f"{SITE}/world/",
             "countries_count": len(W["rows"]), "counts": counts,
             "total_latest_usd": round(W["total"]), "total_projected_now_usd": round(W["now_total"]), "rate_usd_per_sec": round(W["rate_s"], 2),
+            "anchor_method": "Each row starts at its latest published stock on that stock's date, converted at the stated FX rate, and projects forward at its documented rate. IMF rows anchor on the end-2025 stock. A live value below that stock requires a negative rate and below_anchor_reason.",
             "imf_panel_2026_usd": (W.get("weo") or {}).get("panel_2026_usd"),
             "gdp_coverage": ({"pct": round(cv["pct"], 2), "countries_gdp_usd_bn": round(cv["gdp_bn"], 3), "world_gdp_usd_bn": cv["world_bn"], "year": cv["year"], "source": cv["source"], "source_url": cv["source_url"], "unmatched": cv["unmatched"]} if cv else None),
             "fx": {"ecb_date": (fx.get("ecb") or {}).get("date"), "bank_of_russia_date": (fx.get("cbr") or {}).get("date"), "treasury_date": (fx.get("ust_broad") or fx.get("ust") or {}).get("date")},
@@ -233,6 +265,8 @@ def api_json(W, SITE, now):
             "countries": [{"slug": x["slug"], "name": x["name"], "iso3": x["iso3"], "tier": x["tier"], "currency": x["code"], "debt_local": round(x["local"]), "as_of": x["as_of"], "measure": x["measure"],
                            "usd_per_unit": x["rate"], "fx_date": x["rate_date"], "fx_source": x["rate_src"], "debt_usd": round(x["usd"]), "debt_to_gdp": (round(x["ratio"], 2) if x.get("ratio") is not None else None),
                            "share_pct": round(x["share"], 3), "population": x["pop"], "trend_usd_per_sec": round(x["rate_usd_s"], 2), "trend": x.get("trend_kind"),
+                           "projected_usd": round(x["now_usd"]),
+                           **({"below_anchor_reason": x["below_anchor_reason"]} if x.get("below_anchor_reason") else {}),
                            "source": x["source"], "source_url": x["source_url"], "imf_debt_2026_usd": x.get("imf_debt_2026"),
                            "url": f"{SITE}/{x['url']}" if x["url"] else f"{SITE}/"} for x in W["rows"]]}
 
@@ -297,45 +331,65 @@ def _row_date(x):
         return None
 
 
-def lead_claim(W, today=None):
-    """One clause for the world total. A date after `today` is not called a record date."""
+_CLOCK_SENTENCE = "The live clock projects each country forward from its figure."
+
+def _recorded_span(dates):
+    a, b = min(dates), max(dates)
+    if a == b:
+        return a.strftime("%b %-d, %Y")
+    if a.year == b.year:
+        return f"{a.strftime('%b %-d')} to {b.strftime('%b %-d, %Y')}"
+    return f"{a.strftime('%b %-d, %Y')} to {b.strftime('%b %-d, %Y')}"
+
+def _stock_sentence(W, today=None):
+    """The sum of published stocks. No projection in this sentence."""
     today = today or dt.date.today()
     rows = W["rows"]
-    n = len(rows)
-    real, future_imf, future_other = [], 0, 0
+    real, imf_years, future_other = [], set(), 0
     for x in rows:
         d = _row_date(x)
-        later = d is None or d > today
-        if x.get("tier") == "imf" or later:
-            if x.get("tier") == "imf":
-                future_imf += 1
-            else:
-                future_other += 1
+        if x.get("tier") == "imf":
+            if d:
+                imf_years.add(d.year)
+            continue
+        if d is None or d > today:
+            future_other += 1
             continue
         real.append(d)
-    total = _tn(W["total"])
-    extra = []
-    if future_imf:
-        extra.append("IMF estimates for 2026")
-    if future_other:
-        extra.append("estimates dated after this page was built")
+    bits = []
     if real:
-        a = min(real).strftime("%b %-d, %Y")
-        b = max(real).strftime("%b %-d, %Y")
-        span = a if a == b else f"{a} to {b}"
-        recorded = f"national and Eurostat figures dated {span}"
-        tail = (", and " + " and ".join(extra)) if extra else ""
-        return (f"World government debt across {n} economies totals {total}, "
-                f"using each country's latest stock: {recorded}{tail}")
-    if extra:
-        return f"World government debt across {n} economies totals {total}, using {' and '.join(extra)}"
-    return f"World government debt across {n} economies totals {total}"
+        bits.append(f"national and Eurostat figures dated {_recorded_span(real)}")
+    if imf_years == {2025}:
+        bits.append("IMF figures for end-2025")
+    elif imf_years:
+        bits.append("IMF figures for " + " and ".join(f"end-{y}" for y in sorted(imf_years)))
+    if future_other:
+        bits.append("estimates dated after this page was built")
+    total = _tn(W["total"])
+    core = f"The latest published government debt figures for {len(rows)} economies add up to {total}"
+    return f"{core} ({'; '.join(bits)})" if bits else core
+
+def lead_claim(W, today=None):
+    """Two sentences: the published-stock sum, then the live clock. The sum is not a projection."""
+    return f"{_stock_sentence(W, today)}. {_CLOCK_SENTENCE}"
+
+def lead_html(W, today=None, imf_url="https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO"):
+    """Same two sentences, with the IMF name linked."""
+    clause = html.escape(_stock_sentence(W, today))
+    phrase = "IMF figures for end-"
+    if phrase in clause:
+        link = f'<a href="{html.escape(imf_url, quote=True)}" rel="noopener">IMF</a> figures for end-'
+        clause = clause.replace(phrase, link, 1)
+    return f"{clause}. {html.escape(_CLOCK_SENTENCE)}"
 
 
 def _asof_cell(x, today):
     d = _row_date(x)
-    if x.get("tier") == "imf" or (d and d > today):
-        return "IMF estimate for 2026"
+    if d and d > today:
+        return "IMF estimate for 2026" if x.get("tier") == "imf" else "estimate"
+    if x.get("tier") == "imf":
+        when = _fd(x["as_of"]) if d else str(x.get("as_of") or "")
+        return f"{when} · IMF end-2025"
     return _fd(x["as_of"]) if d else str(x.get("as_of") or "")
 
 
@@ -349,8 +403,8 @@ def _faqs(W, today=None):
     claim = lead_claim(W, today)
     return [
         ("How much is world government debt?",
-         f"{claim}. Source: national releases, Eurostat, and the IMF World Economic Outlook; "
-         f"{c['official']} rows are national, {c['harmonized']} are harmonized, and {c['imf']} are IMF estimates for 2026."),
+         f"{claim} Source: national releases, Eurostat, and the IMF World Economic Outlook; "
+         f"{c['official']} rows are national, {c['harmonized']} are harmonized, and {c['imf']} are IMF end-2025 figures."),
         ("Which countries owe the most?",
          f"By the headline dollar stock on this page, the five largest are: {top_s}. "
          f"Source: the same general-government stocks, each dated on the world table."),
@@ -359,7 +413,8 @@ def _faqs(W, today=None):
          "A narrower federal or central series is shown under the country name and is not added; the IMF estimate supplies the general-government stock instead."),
         ("How is the IMF figure estimated?",
          "Each IMF stock is GGXWDG_NGDP divided by 100, times NGDPD, from the October 2026 World Economic Outlook. "
-         "The live number draws a straight line from the end-2025 stock to the end-2026 stock and is a projection, not a live ledger."),
+         "The row in the sum is the end-2025 stock. The live number draws a straight line from that stock on 1 January 2026 to the end-2026 estimate on 1 January 2027. "
+         "The end-2026 figure is a year-end target, not a balance already recorded. The line is below the end-2025 stock only when that series is falling. It is a projection, not a live ledger."),
         ("Why does a headline differ from the IMF number?",
          f"A national, Eurostat or QPSD stock can use a different date and exchange rate from the IMF end-2026 dollars, and the pure IMF sum for these economies is {panel_s}. "
          f"Source: IMF World Economic Outlook, October 2026."),
@@ -438,33 +493,31 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
         dated = f" Recorded national and Eurostat stocks are dated {E(span)}."
     else:
         dated = ""
-    imf_note = (" IMF rows are estimates for 2026, not a closing balance on December 31."
-                if any(x.get("tier") == "imf" or ((_row_date(x) or today) > today) for x in rows) else "")
-    answer = (f'<p class="answer">The general-government figures on this page sum to <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}).'
+    imf_note = (" IMF rows are the end-2025 stock. The clock moves from that stock toward the IMF estimate for 2026, and does not treat December 31, 2026 as a balance already recorded."
+                if any(x.get("tier") == "imf" for x in rows) else "")
+    answer = (f'<p class="answer">The published general-government stocks on this page sum to <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}).'
               f'{dated}{imf_note} '
-              f'{c["official"]} rows are national general-government releases, {c["harmonized"]} are Eurostat or the World Bank/IMF Quarterly Public Sector Debt database, and {c["imf"]} are IMF estimates for 2026. '
+              f'{c["official"]} rows are national general-government releases, {c["harmonized"]} are Eurostat or the World Bank/IMF Quarterly Public Sector Debt database, and {c["imf"]} are IMF end-2025 stocks. '
               f'Sources: <a href="https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO" rel="noopener">IMF GGXWDG_NGDP</a> and '
               f'<a href="https://www.imf.org/external/datamapper/NGDPD@WEO" rel="noopener">NGDPD</a>, plus the national, Eurostat, and QPSD links in the table. '
-              f'The clock above is a projection from those stocks, not one official world total.</p>')
-    import quotable
+              f'The clock above is those stocks projected forward, {_usd0(W["now_total"])} at the moment this page was built, not one official world total.</p>')
     _imf = "https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO"
-    _wplain, _whtml = quotable.cited_pair(
-        lead_claim(W, today),
-        [("national sources, Eurostat, and the IMF", _imf)])
+    _whtml = lead_html(W, today, _imf)
     intro = (f'<section class="intro" id="intro"><h1 class="quote asof">{_whtml}</h1>{crumb}'
              f'{answer}'
              f'<p><b>What this page counts.</b> General government gross debt for each of {n} economies, in US dollars. '
-             f'The latest sum is <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}). '
-             f'<b>{c["official"]}</b> rows are a national general-government stock, <b>{c["harmonized"]}</b> are Eurostat Maastricht debt or the World Bank/IMF Quarterly Public Sector Debt general-government stock, and <b>{c["imf"]}</b> are IMF World Economic Outlook estimates. '
+             f'The sum of those stocks is <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}). '
+             f'<b>{c["official"]}</b> rows are a national general-government stock, <b>{c["harmonized"]}</b> are Eurostat Maastricht debt or the World Bank/IMF Quarterly Public Sector Debt general-government stock, and <b>{c["imf"]}</b> are the IMF end-2025 stock. '
              f'A central, federal or otherwise narrower official series is named under the country and is not added in. Each economy is counted once. '
-             f'The live number moves at the general-government trend where that stock has a year-ago figure, and at the IMF interpolation otherwise. It is a projection.</p>'
+             f'The live number starts at each stock on that stock\'s date and adds only that country\'s growth since then. It is a projection.</p>'
              f'<p>{gap_txt} The comparison is in the section below the table. '
              f'/world-government-debt/ and /global-debt-clock/ redirect here.</p></section>')
+    live_k = f"Live estimate · general government gross debt · {n} countries"
     hero = (f'<div class="hero lead" id="total" data-b="{big_now:.2f}" data-r="{W["rate_s"]:.6f}" data-t="{now:.0f}" style="cursor:default">'
-            f'<div class="k" data-live="Live estimate · general government gross debt · {n} countries">Official · sum of latest figures</div>'
-            f'<div class="big num" id="hv">{_usd0(W["total"])}</div>'
+            f'<div class="k" data-live="{E(live_k)}">{E(live_k)}</div>'
+            f'<div class="big num" id="hv">{_usd0(big_now)}</div>'
             f'<div class="sub"><span>{_sgn(W["rate_s"])}/sec · {_sgn(W["rate_s"] * 86400 / 1e9, ",.1f")} billion/day</span> '
-            f'<span class="note">sum of each country\'s own trend; a projection, not one official figure</span> '
+            f'<span class="note">each country starts at its latest published stock and moves at its own rate; this is those clocks added up</span> '
             f'<span>Since you opened this page: <span class="num" id="hs">$0</span> more debt</span></div>'
             f'<div class="trio"><div><span class="l">Sum of latest figures</span><span class="num">{_usd0(W["total"])}</span></div>'
             f'<div><span class="l">Economies</span><span class="num">{n}</span></div>'
@@ -490,8 +543,8 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
              f'<th data-k="tier">Source tier</th><th data-k="asof">As of</th><th>Measure</th></tr></thead><tbody>{body}</tbody></table></div>'
              f'<p class="dnote">The debt column is general government gross debt. It does not tick. '
              f'A national series listed under the country is narrower (central, federal, or a different perimeter) and is not added. '
-             f'Debt / GDP uses the IMF 2026 GDP for official and harmonized rows, and the IMF debt ratio for IMF rows. '
-             f'A recorded stock shows its date. An IMF row says IMF estimate for 2026, which is not a closing balance on December 31.</p></section>')
+             f'Debt / GDP uses the IMF 2026 GDP for official and harmonized rows, and the IMF 2025 debt ratio for an IMF row, matching that end-2025 stock. '
+             f'A recorded stock shows its date. An IMF row is the end-2025 stock. The end-2026 estimate is the target the clock runs toward, not a closing balance on December 31.</p></section>')
     # ---- measures
     drv = ""
     for x in W.get("drivers") or []:
@@ -509,6 +562,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
                f'<p><b>What the IMF total counts.</b> General government gross debt for the same {n} economies, GGXWDG_NGDP times NGDPD, in current US dollars. '
                f'The end-2026 sum is <b>{_usd0(panel)}</b> ({_tn(panel)}). '
                f'This page\'s headline sum is {_usd0(W["total"])} ({_tn(W["total"])}), {gap / panel * 100:+.2f}% from that IMF total. '
+               f'IMF rows in that sum are the end-2025 stock, so they sit short of the end-2026 panel by the change the clock is still walking toward. '
                + ("That is more than 3% away. Every country whose headline stock differs from its IMF stock by at least $1 billion is listed." if over else
                   "That is within 3%. Countries whose general-government stock is not the IMF figure, and differs by at least $1 billion, are listed.")
                + f'</p><div class="tw"><table class="wt wstk" style="min-width:760px"><tr class="hd"><th>Country</th><th>Headline basis</th><th class="num">Headline</th><th class="num">IMF end-2026</th><th class="num">Difference</th><th>Why</th></tr>{drv}</table></div>'
@@ -519,8 +573,8 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
             f'<div class="wnote">Every headline row is general government gross debt. A central, federal or public-sector series is printed under the country name and is not in the sum. '
             + ("Russia's national series is internal debt only, so it leaves out external debt. " if any(x["slug"] == "russia" for x in rows) else "")
             + (f'Recorded stock dates run from {E(_fd(min(real_dates).isoformat()))} to {E(_fd(max(real_dates).isoformat()))}. ' if real_dates else "")
-            + f'IMF rows are estimates for 2026, not a December 31 record.</div>'
-            f'<p class="dnote">{c["official"]} headlines are a national general-government stock. {c["harmonized"]} are Eurostat or QPSD general government. {c["imf"]} are the IMF estimate because the national series is narrower, missing, or a QPSD general-government stock more than 25% from the IMF figure.</p></section>')
+            + f'IMF rows are the end-2025 stock. The end-2026 figure is where the clock arrives on 1 January 2027, not a December 31 record.</div>'
+            f'<p class="dnote">{c["official"]} headlines are a national general-government stock. {c["harmonized"]} are Eurostat or QPSD general government. {c["imf"]} are the IMF end-2025 stock, because the national series is narrower, missing, or a QPSD general-government stock more than 25% from the IMF figure. The clock on an IMF row runs from that stock toward the end-2026 estimate.</p></section>')
     # ---- fx
     seen, fr = set(), ""
     for x in rows:
@@ -546,10 +600,16 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
     kept = "".join(f'<li>{E(r["name"])} ({E(r["iso3"])}): {E(r["reason"])}</li>' for r in W["rejected"])
     skipped = (f'<p><b>Not converted.</b> No official rate is stored for: ' + ", ".join(f"{E(a)} ({E(b)})" for a, b, _iso in W["skipped"]) + '. Those clocks are left out of the sum.</p>' if W["skipped"] else "")
     method = (f'<section id="method" class="wsec"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>How it works</h2><span class="h2n">General government gross debt · projection labelled</span></div><div class="sk foot">'
-              f'<p><b>The sum</b> is {_usd0(W["total"])}. The headline is a national or Eurostat or QPSD general-government gross stock when that stock exists and, for QPSD, converts to within 25% of the IMF end-2026 stock. Otherwise the headline is the IMF end-2026 projection. '
-              f'{c["official"]} official, {c["harmonized"]} harmonized, {c["imf"]} IMF. One row per economy.</p>'
-              f'<p><b>The live number</b> adds each headline\'s trend from its own as-of date. A general-government trend is the change from about a year earlier when that earlier stock is stored. Otherwise the pace is the IMF interpolation from end-2025 to end-2026. '
-              f'The combined rate is {_sgn(W["rate_s"], ",.2f", plus=False)} per second. Exchange rates are held fixed. The live number is a projection. The US row uses the IMF pace, not Treasury\'s 90-day trend; Treasury Debt to the Penny is the national series under the United States.</p>'
+              f'<p><b>The sum</b> is {_usd0(W["total"])}. Each row is that economy\'s latest published general-government stock, in US dollars at the exchange rate in the table above. '
+              f'A national, Eurostat, or QPSD stock is used when one exists and, for QPSD, converts to within 25% of the IMF end-2026 stock. Otherwise the stock is the IMF end-2025 figure. '
+              f'{c["official"]} official, {c["harmonized"]} harmonized, {c["imf"]} IMF. One row per economy. The same exchange rate converts the stock and the clock.</p>'
+              f'<p><b>The live number</b> starts at each of those stocks on that stock\'s date and adds only that country\'s growth since then. '
+              f'Where an earlier stock about a year before is stored, the growth is that change. Otherwise the pace is the IMF change from the end-2025 stock to the end-2026 estimate, spread across 2026. '
+              f'The end-2026 figure is the target the line reaches on 1 January 2027, 00:00 UTC. It is not booked as money already owed. '
+              f'At the moment this page was built the live total was {_usd0(W["now_total"])}, {_tn(abs(W["now_total"] - W["total"]))} {"above" if W["now_total"] >= W["total"] else "below"} the sum of stocks. '
+              f'A country is below its own stock only when its recorded series is falling. '
+              f'The combined rate is {_sgn(W["rate_s"], ",.2f", plus=False)} per second. Exchange rates are held fixed. The world total is the sum of the country clocks. '
+              f'The US row uses the IMF pace from the end-2025 stock, not Treasury\'s 90-day trend; Treasury Debt to the Penny is the national series under the United States.</p>'
               + (f'<p><b>GDP.</b> The economies in this table account for {cv["pct"]:.1f}% of IMF {cv["year"]} world GDP. Debt / GDP on an official or harmonized row is the USD stock divided by that economy\'s IMF 2026 GDP, not a national ratio.</p>' if cv else '')
               + review
               + (f'<p><b>Still on the IMF estimate.</b></p><ul>{kept}</ul>' if kept else '')
