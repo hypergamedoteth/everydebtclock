@@ -6,6 +6,9 @@ The latest sum has to sit in a sane range of the IMF end-2026 panel (0.60x to 1.
 Official or harmonized stocks more than 25% from the IMF stock are printed for review.
 That gap does not fail the check: central government and general government are different perimeters.
 
+The live total may sit below the sum of anchored stocks only by as much as the rows
+that name a falling series. A row below its own stock with no below_anchor_reason fails.
+
 Reads api/world.json, data/world_weo_debt.json and world/index.html. Never invents a figure.
 """
 import json, os, re, sys
@@ -17,6 +20,35 @@ LO, HI = 0.60, 1.45
 def fail(msg):
     print("check_world:", msg, file=sys.stderr)
     sys.exit(1)
+
+def _check_anchors(api, rows):
+    """Fail when the live total is short of the anchored stocks for a reason the file does not name."""
+    if "total_projected_now_usd" not in api:
+        fail("api/world.json has no total_projected_now_usd")
+    projected_sum = 0
+    documented = 0.0
+    for r in rows:
+        if "projected_usd" not in r:
+            fail(f"{r.get('iso3')} has no projected_usd")
+        stock, live = r["debt_usd"], r["projected_usd"]
+        projected_sum += live
+        gap = stock - live
+        if gap > 1:
+            reason = r.get("below_anchor_reason") or ""
+            rate = r.get("trend_usd_per_sec") or 0
+            if rate < 0 and reason:
+                documented += gap
+            else:
+                fail(f"{r.get('iso3')} live ${live:,.0f} is ${gap:,.0f} below its anchored stock ${stock:,.0f} "
+                     f"without a falling series (rate {rate}, reason {reason!r})")
+    if abs(projected_sum - api["total_projected_now_usd"]) > len(rows):
+        fail(f"projected row sum {projected_sum} does not match total_projected_now_usd {api['total_projected_now_usd']}")
+    shortfall = api["total_latest_usd"] - api["total_projected_now_usd"]
+    if shortfall > documented + len(rows):
+        fail(f"world live ${api['total_projected_now_usd']:,.0f} is ${shortfall:,.0f} below the sum of anchored stocks "
+             f"${api['total_latest_usd']:,.0f}; falling series explain only ${documented:,.0f}")
+    print(f"anchors ok: live ${api['total_projected_now_usd']/1e12:.3f}T vs stocks ${api['total_latest_usd']/1e12:.3f}T, "
+          f"falling-series shortfall ${documented/1e9:.1f}B")
 
 def main():
     api_path = os.path.join(ROOT, "api", "world.json")
@@ -45,6 +77,7 @@ def main():
     summed = sum(r["debt_usd"] for r in rows)
     if abs(summed - total) > len(rows):
         fail(f"row sum {summed} does not match total_latest_usd {total}")
+    _check_anchors(api, rows)
     ratio = total / weo["panel_2026_usd"]
     explained = sum((r["debt_usd"] - r["imf_debt_2026_usd"]) for r in rows if r.get("imf_debt_2026_usd"))
     gap = total - weo["panel_2026_usd"]

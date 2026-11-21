@@ -192,7 +192,10 @@ def check_page(page, label):
     if not re.search(r"\d{4}", text):
         raise SystemExit(f"{label}: H1 has no year: {text}")
     if _SECOND.search(text):
-        raise SystemExit(f"{label}: H1 is more than one sentence: {text[:240]}")
+        parts = text.split(". ")
+        clock = "The live clock projects each country forward from its figure."
+        if not (len(parts) == 2 and parts[1] == clock):
+            raise SystemExit(f"{label}: H1 is more than one sentence: {text[:240]}")
     if "as published by that source" in text:
         raise SystemExit(f"{label}: H1 is still padded: {text[:180]}")
     return text

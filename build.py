@@ -339,8 +339,9 @@ places_build.WEO = os.path.exists(f"{R}/data/world_weo_debt.json")
 places_build.HEADLINE_BY_SLUG = {x["slug"]: x for x in WORLD["rows"]} if WORLD else {}
 if WORLD:
     _us = next(x for x in WORLD["rows"] if x["iso3"] == "USA")
-    _us_note = (f'<p><b>World Debt Clock.</b> The headline for the United States is general government gross debt, '
-                f'{usd0(_us["usd"])} as of {fdate(_us["as_of"]) if len(_us["as_of"]) == 10 else _us["as_of"]} (IMF World Economic Outlook). '
+    _us_note = (f'<p><b>World Debt Clock.</b> The United States row there starts at the IMF end-2025 general-government stock, '
+                f'{usd0(_us["usd"])} as of {fdate(_us["as_of"]) if len(_us["as_of"]) == 10 else _us["as_of"]}, '
+                f'and projects toward the IMF end-2026 estimate of {usd0(_us.get("imf_debt_2026") or 0)}. '
                 f'This page\'s clock is narrower and is not in that total: federal debt, gross, Treasury Debt to the Penny, as of {fdate(OFF_D)}.</p>')
     intro = intro.replace("<!--/INTRO-->", _us_note + "<!--/INTRO-->")
     ssr = ssr.replace("<!--/INTRO-->", _us_note + "<!--/INTRO-->")
@@ -1120,8 +1121,8 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- How much is the national debt per person? {usd2(PP_OFF)} as of {fdate(OFF_D)}, the official total divided by the Census estimate of {POP_OFF:,.0f} residents on {fdate(POP_OFF_DATE)}.",
     ("- How much interest does the US pay per day? " + INTEREST_DAY if INTEREST_DAY else "- How much interest does the US pay per day? Not available from the current interest-expense and average-rate inputs."),
     f"- When will the US national debt hit ${MILE['n']} trillion? {MILE['quote']}",
-    (f"- World government debt: {world_build.lead_claim(WORLD, dt.date.today())}. "
-     f"IMF rows are estimates for 2026, not a December 31 closing balance. See /world/." if WORLD else
+    (f"- World government debt: {world_build.lead_claim(WORLD, dt.date.today())} "
+     f"An IMF row's published figure is the end-2025 stock; the end-2026 estimate is the year-end target the clock runs toward, not a December 31 closing balance. See /world/." if WORLD else
      "- World government debt: the world page was not built on this run."),
     "",
     "## Key pages",
@@ -1366,9 +1367,12 @@ def check_quotable():
                 raise SystemExit(f"{label} quotes the live per-person projection {proj_pp}")
     world_page = open(f"{R}/world/index.html").read()
     world_h1 = re.search(r"<h1\b[^>]*>(.*?)</h1>", world_page, re.S | re.I)
-    world_lead = re.sub(r"<[^>]+>", " ", world_h1.group(1) if world_h1 else "")
-    if "IMF estimates for 2026" not in world_lead or re.search(r"As of .*(December|Dec) 31, 2026", world_lead):
-        raise SystemExit("world answer line treats a future IMF date as a record: " + world_lead[:240])
+    world_lead = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", world_h1.group(1) if world_h1 else "")).strip()
+    if ("add up to" not in world_lead or "IMF figures for end-2025" not in world_lead
+            or "The live clock projects each country forward from its figure." not in world_lead
+            or "projected toward" in world_lead
+            or re.search(r"As of .*(December|Dec) 31, 2026", world_lead)):
+        raise SystemExit("world answer line mixes the stock sum with the projection: " + world_lead[:300])
     imf_sample = f"{R}/countries/burkina-faso/index.html"
     if os.path.exists(imf_sample):
         sample = open(imf_sample).read()
