@@ -336,7 +336,7 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
              f'<p>The IMF World Economic Outlook published {cp.PUBLISHED} puts general government gross debt at '
              f'{_money0(e["debt_2026_usd"])} ({e["ratio_2026"]:.2f}% of GDP) for 2026, {gap:+.1%} from this quarterly stock. '
              + (f'This general-government stock is the <a href="../../world/">World Debt Clock</a> headline for {E(name)}.' if u.get("for_headline") else
-                f'This series is {E(sector)}, so it is not the World Debt Clock headline. That headline is the IMF general-government estimate of {_money0(e["debt_2026_usd"])}, compared on the <a href="../../world/#imf">World Debt Clock</a>.')
+                f'This series is {E(sector)}, so it is not the World Debt Clock headline. That headline starts at the IMF end-2025 stock of {_money0(e["debt_2025_usd"])} and projects toward the end-2026 estimate of {_money0(e["debt_2026_usd"])}, compared on the <a href="../../world/#imf">World Debt Clock</a>.')
              + f' The long debt-to-GDP path below is the IMF series, because the quarterly file does not carry it.</p>'
              f'{cp.lead_html(profile, us_profile, imf_peers, outside)}'
              f'{crumb}'
@@ -389,9 +389,11 @@ def _redirects(R, target):
 
 def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp, profile, us_profile):
     t0 = _t0(D)
+    t0_i = float(f"{t0:.0f}")
     name, slug = e["name"], e["slug"]
     rate = e["rate_usd_per_sec"]
-    projected = _now(e["debt_2025_usd"], rate, now, t0)
+    # Same integer anchor the page's data-t uses, so the first paint matches the ticking formula.
+    projected = _now(e["debt_2025_usd"], rate, now, t0_i)
     url = f"{SITE}/countries/{slug}/"
     title = f"{name} National Debt Clock"
     import quotable
@@ -412,16 +414,22 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
               f'<span class="live"><span class="dot"></span><span>IMF estimate</span></span></div></header>')
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../countries/">All country debt clocks</a>'
              '<span>·</span><a href="../../world/">World debt clock</a></div>')
-    hero = (f'<div class="hero lead" id="t-total" data-b="{e["debt_2025_usd"]}" data-r="{rate:.12g}" data-t="{t0:.0f}">'
-            f'<div class="k" data-live="{E(f"Live estimate · {name} general government debt")}">Official · end of 2026 · IMF October 2026 World Economic Outlook</div>'
-            f'<div class="big num" id="hv">{_money0(e["debt_2026_usd"])}</div>'
+    live_k = f"Live estimate · {name} general government debt"
+    if rate < 0:
+        clock_note = "Starts at the IMF end-2025 stock. That series is falling toward the 2026 estimate, so this clock is below the stock. Not a live ledger."
+    else:
+        clock_note = "Starts at the IMF end-2025 stock and moves toward the 2026 estimate. It is not below that stock. Not a live ledger."
+    hero = (f'<div class="hero lead" id="t-total" data-b="{e["debt_2025_usd"]}" data-r="{rate:.12g}" data-t="{t0_i:.0f}">'
+            f'<div class="k" data-live="{E(live_k)}">{E(live_k)}</div>'
+            f'<div class="big num" id="hv">{_money0(projected)}</div>'
             f'<div class="sub"><span>{_signed(rate)}/sec · {_signed(rate * 86400)}/day</span> '
-            f'<span class="note">interpolated from the IMF end-2025 stock to the end-2026 estimate; not a live ledger</span> '
+            f'<span class="note">{E(clock_note)}</span> '
+            f'<span>{_signed(projected - e["debt_2025_usd"])} versus the end-2025 stock</span> '
             f'<span>Since you opened this page: <span class="num" id="hs">$0</span> {"more" if up else "less"} debt</span></div>'
-            f'<div class="trio"><div><span class="l">2026 IMF estimate</span><span class="num">{_money0(e["debt_2026_usd"])}</span></div>'
-            f'<div><span class="l">Debt / GDP, 2026</span><span class="num">{e["ratio_2026"]:.2f}%</span></div>'
-            f'<div><span class="l">End-2025 IMF figure</span><span class="num">{_money0(e["debt_2025_usd"])}</span></div></div>'
-            f'<div class="meta" style="margin-top:10px"><span class="badge proj">IMF ESTIMATE · interpolated</span><span class="badge">not a live ledger</span></div></div>')
+            f'<div class="trio"><div><span class="l">End-2025 stock</span><span class="num">{_money0(e["debt_2025_usd"])}</span></div>'
+            f'<div><span class="l">2026 estimate, year-end target</span><span class="num">{_money0(e["debt_2026_usd"])}</span></div>'
+            f'<div><span class="l">Debt / GDP, 2026</span><span class="num">{e["ratio_2026"]:.2f}%</span></div></div>'
+            f'<div class="meta" style="margin-top:10px"><span class="badge proj">IMF ESTIMATE · from the end-2025 stock</span><span class="badge">not a live ledger</span></div></div>')
     jump = _jump_note(e)
     kosovo = (" The IMF World Economic Outlook includes Kosovo in this vintage. The DataMapper code is UVK and the World Bank mirror uses XKX."
               if e["iso3"] == "XKX" else "")
@@ -434,7 +442,8 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
              f'The end-2025 figure was {_money0(e["debt_2025_usd"])} ({e["ratio_2025"]:.2f}% of GDP). '
              f'Years through 2025 are the published series. 2026 is the current-year estimate, based on information through September 30, 2026. '
              f'2027–2031 are IMF projections. '
-             f'The live number above is that 2025 stock interpolated to the 2026 estimate, from 1 January 2026 to 1 January 2027. '
+             f'The live number above starts at the end-2025 stock on 1 January 2026 and reaches the 2026 estimate on 1 January 2027. '
+             f'It is below the end-2025 stock only when the IMF series from 2025 to 2026 is a decline. '
              f'It is not a live ledger. The dollar change includes exchange-rate effects, not only new borrowing. '
              f'This site has no official-source clock for {E(name)} yet, so this page uses IMF estimates.</p>'
              f'<p>This estimate is the general-government headline for {E(name)} on the <a href="../../world/">World Debt Clock</a>. '
@@ -450,7 +459,8 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
             f'<p><b>The stock.</b> End-year general government gross debt in US dollars = GGXWDG_NGDP ÷ 100 × NGDPD. '
             f'The 2026 estimate is {_money0(e["debt_2026_usd"])}. End-2025 is {_money0(e["debt_2025_usd"])}.</p>'
             f'<p><b>The live number</b> starts at the end-2025 stock on 1 January 2026, 00:00 UTC, and reaches the 2026 estimate on 1 January 2027, 00:00 UTC. '
-            f'2026 has {D["seconds_2026"]:,} seconds. The rate is ({_money0(e["debt_2026_usd"])} − {_money0(e["debt_2025_usd"])}) ÷ {D["seconds_2026"]:,} = {_signed(rate)} per second.</p>'
+            f'2026 has {D["seconds_2026"]:,} seconds. The rate is ({_money0(e["debt_2026_usd"])} − {_money0(e["debt_2025_usd"])}) ÷ {D["seconds_2026"]:,} = {_signed(rate)} per second. '
+            f'The clock shows that projection. It is below the end-2025 stock only when this rate is negative.</p>'
             f'<p><code>projected = {e["debt_2025_usd"]:,} + {rate:.6f} × (seconds since 2026-01-01 00:00 UTC)</code></p>'
             f'<p>The dollar change includes exchange-rate effects, because both stocks are current US dollars. This is not a live ledger of auctions and repayments.</p>'
             f'{_src_html()}<p>Page built from IMF data read {E(_stable_stamp(D))}. The World Economic Outlook edition was published {cp.PUBLISHED}.</p></div></section>')
