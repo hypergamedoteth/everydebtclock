@@ -403,26 +403,15 @@ def privacy_redirect() -> str:
 
 
 def sponsor_slot(prefix: str, absolute: bool = False) -> str:
-    """Quiet 'Sponsored by' slot for below a page summary. Never placed on the ticker."""
-    href = "/advertise/" if absolute or prefix == "/" else f"{prefix}advertise/"
-    return (
-        f'<aside class="edc-sponsor" aria-label="Sponsorship">'
-        f'<a href="{href}">Sponsored by — your brand here</a>'
-        f"</aside>\n"
-        "<style>"
-        ".edc-sponsor{margin:12px 0 8px;padding:8px 0;border-top:1px solid #1c2533;border-bottom:1px solid #1c2533;"
-        "font:13px/1.4 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif;color:#8a97ab}"
-        ".edc-sponsor a{color:#8a97ab;text-decoration:none}"
-        ".edc-sponsor a:hover{color:#5aa9ff}"
-        "</style>\n"
-    )
+    """No placeholder sponsor line. A real sponsor would be added here on purpose."""
+    return ""
 
 
 def advertise_body() -> str:
     return """
 <h1>Advertise</h1>
 <p>Every Debt Clock is an independent site that publishes a live US national debt clock, checked daily against Treasury, plus state, country and history pages.</p>
-<p>A sponsorship can appear as a short “Sponsored by” line below the summary on the <a href="/">US clock</a> and on <a href="/national-debt-by-year/">US national debt by year</a>.</p>
+<p>Email <!--email_off--><a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a><!--/email_off--> to ask about a sponsorship. There is no empty sponsor slot on the pages.</p>
 <h2>Audience</h2>
 <p>About 1,380 visits in the 30 days ending November 16, 2026, mostly from the United States. The figures are from Cloudflare Web Analytics, which excludes bots. This is a small site. We will update these numbers as traffic changes.</p>
 <p>We do not publish prices here. If you want to sponsor the clock, email <!--email_off--><a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a><!--/email_off-->.</p>

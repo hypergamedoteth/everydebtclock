@@ -389,8 +389,8 @@ def _asof_cell(x, today):
         return "IMF estimate for 2026" if x.get("tier") == "imf" else "estimate"
     if x.get("tier") == "imf":
         when = _fd(x["as_of"]) if d else str(x.get("as_of") or "")
-        return f"{when} · IMF end-2025"
-    return _fd(x["as_of"]) if d else str(x.get("as_of") or "")
+        return f"As of {when} · IMF end-2025"
+    return f"As of {_fd(x['as_of'])}" if d else str(x.get("as_of") or "")
 
 
 def _faqs(W, today=None):
@@ -476,7 +476,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
 
     jump = [("total", "Total"), ("table", "By country"), ("imf", "IMF comparison"), ("measures", "Measures"), ("faq", "Questions"), ("method", "Method")]
     header = (f'<header class="top"><div class="topin"><a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>{pb.nav_html(places, 1, "world", "plnav")}'
-              f'<span class="live"><span class="dot"></span><span>mixed sources</span></span></div>'
+              f'<span class="live"><span class="dot"></span><span>as of published stocks</span></span></div>'
               f'<nav class="jump">' + "".join(f'<a href="#{i}">{E(t)}</a>' for i, t in jump) + "</nav></header>")
     panel = (W.get("weo") or {}).get("panel_2026_usd")
     covsent = (f'<p class="cvl" id="coverage"><b>{c["official"]} official, {c["harmonized"]} harmonized, {c["imf"]} IMF.</b> '
@@ -500,7 +500,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
               f'{c["official"]} rows are national general-government releases, {c["harmonized"]} are Eurostat or the World Bank/IMF Quarterly Public Sector Debt database, and {c["imf"]} are IMF end-2025 stocks. '
               f'Sources: <a href="https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO" rel="noopener">IMF GGXWDG_NGDP</a> and '
               f'<a href="https://www.imf.org/external/datamapper/NGDPD@WEO" rel="noopener">NGDPD</a>, plus the national, Eurostat, and QPSD links in the table. '
-              f'The clock above is those stocks projected forward, {_usd0(W["now_total"])} at the moment this page was built, not one official world total.</p>')
+              f'The figure above is that sum of stocks. The projection under it was {_usd0(W["now_total"])} when this page was built. It is not one official world total.</p>')
     _imf = "https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO"
     _whtml = lead_html(W, today, _imf)
     intro = (f'<section class="intro" id="intro"><h1 class="quote asof">{_whtml}</h1>{crumb}'
@@ -512,17 +512,16 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
              f'The live number starts at each stock on that stock\'s date and adds only that country\'s growth since then. It is a projection.</p>'
              f'<p>{gap_txt} The comparison is in the section below the table. '
              f'/world-government-debt/ and /global-debt-clock/ redirect here.</p></section>')
-    live_k = f"Live estimate · general government gross debt · {n} countries"
-    hero = (f'<div class="hero lead" id="total" data-b="{big_now:.2f}" data-r="{W["rate_s"]:.6f}" data-t="{now:.0f}" style="cursor:default">'
-            f'<div class="k" data-live="{E(live_k)}">{E(live_k)}</div>'
-            f'<div class="big num" id="hv">{_usd0(big_now)}</div>'
-            f'<div class="sub"><span>{_sgn(W["rate_s"])}/sec · {_sgn(W["rate_s"] * 86400 / 1e9, ",.1f")} billion/day</span> '
-            f'<span class="note">each country starts at its latest published stock and moves at its own rate; this is those clocks added up</span> '
+    hero = (f'<div class="hero lead" id="total" data-b="{big_now:.2f}" data-r="{W["rate_s"]:.6f}" data-t="{now:.0f}" data-coarse="1" style="cursor:default">'
+            f'<div class="k">As of published stocks</div>'
+            f'<div class="big num" id="hv">{_usd0(W["total"])}</div>'
+            f'<div class="sub"><span class="badge proj">PROJECTION</span> <span class="num" id="hp">{_usd0(big_now)}</span> '
+            f'<span class="note">{_sgn(W["rate_s"])}/sec · each country moves from its own stock; not one official daily total</span> '
             f'<span>Since you opened this page: <span class="num" id="hs">$0</span> more debt</span></div>'
             f'<div class="trio"><div><span class="l">Sum of latest figures</span><span class="num">{_usd0(W["total"])}</span></div>'
             f'<div><span class="l">Economies</span><span class="num">{n}</span></div>'
             f'<div><span class="l">Official / harmonized / IMF</span><span class="num">{c["official"]} / {c["harmonized"]} / {c["imf"]}</span></div></div>'
-            f'<div class="meta" style="margin-top:10px"><span class="badge proj">PROJECTED · mixed sources</span><span class="badge">{c["official"]} official · {c["harmonized"]} harmonized · {c["imf"]} IMF</span></div></div>')
+            f'<div class="meta" style="margin-top:10px"><span class="badge fix">AS OF PUBLISHED STOCKS</span><span class="badge">{c["official"]} official · {c["harmonized"]} harmonized · {c["imf"]} IMF</span></div></div>')
     # ---- table
     body = ""
     for x in rows:
@@ -622,7 +621,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
              '<li><a href="../states/">All US state debt clocks</a></li><li><a href="../api/world.json">World debt clock as JSON</a></li></ul></section>')
     script = """<script>(function(){const nf0=new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
 const H=document.getElementById('total'),B=+H.dataset.b,R=+H.dataset.r,T0=+H.dataset.t,hv=document.getElementById('hv'),hs=document.getElementById('hs'),OPENED=Date.now()/1000;
-const tot=t=>B+R*(t-T0);(function f(){const t=Date.now()/1000,x=tot(t);const hk=document.querySelector('.k[data-live]');if(hk)hk.textContent=hk.dataset.live;hv.textContent=(x<0?'−$':'$')+nf0.format(Math.abs(x));
+const tot=t=>B+R*(t-T0);(function f(){const t=Date.now()/1000,x=tot(t);const hp=document.getElementById('hp');if(hp)hp.textContent=(x<0?'−$':'$')+nf0.format(Math.abs(x));
 hs.textContent=(R*(t-OPENED)<0?'−':'+')+'$'+nf0.format(Math.abs(R*(t-OPENED)));requestAnimationFrame(f)})();
 const table=document.getElementById('debt-table');if(!table)return;const tb=table.tBodies[0];
 table.querySelectorAll('th[data-k]').forEach(function(th){th.addEventListener('click',function(){const dir=th.dataset.dir==='asc'?'desc':'asc',k=th.dataset.k;

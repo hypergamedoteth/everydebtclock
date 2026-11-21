@@ -166,6 +166,11 @@ META = {"generated_epoch": NOW, "generated_iso": dt.datetime.fromtimestamp(NOW, 
 
 def add(slug, **kw):
     kw.setdefault("status", "ok"); kw["slug"] = slug
+    # A failed fetch that falls back to cache is not a current official read.
+    if kw.get("stale") and kw.get("status") == "ok":
+        kw["status"] = "stale"
+        kw["note"] = ((kw.get("note") or "") + " Source failed on the last run; this is the last good figure, not a live total.").strip()
+        kw["method"] = ((kw.get("method") or "") + " The source failed, so this stays on that release and is not ticked.").strip()
     if "calc" not in kw and kw.get("fixed"):
         kw["calc"] = {"type": "fixed", "base_src": [kw.get("as_of"), kw.get("base"), kw.get("source")]}
     T[slug] = kw
@@ -739,10 +744,24 @@ if soma:
 
 # ---- M2 money supply (Federal Reserve H.6, monthly, seasonally adjusted)
 H6_URL = "https://www.federalreserve.gov/releases/h6/current/default.htm"
-def src_m2():
-    txt = get("https://www.federalreserve.gov/datadownload/Output.aspx?rel=H6&series=798e2796917702a5f8423426ba7e6b42&lastobs=8&from=&to=&filetype=csv&label=include&layout=seriescolumn")
+H6_CSV = "https://www.federalreserve.gov/datadownload/Output.aspx?rel=H6&series=798e2796917702a5f8423426ba7e6b42&lastobs=8&from=&to=&filetype=csv&label=include&layout=seriescolumn"
+def _src_m2_once():
+    txt = get(H6_CSV, tries=1)
     r = list(csv.reader(io.StringIO(txt))); i = r[0].index("M2; Seasonally adjusted")
     return [[row[0], float(row[i]) * 1e9] for row in r if row and len(row) > i and re.match(r"^\d{4}-\d\d$", row[0] or "") and row[i] not in ("", "ND", "NA")]
+def src_m2():
+    # H.6 often returns 503 for a short stretch. A few spaced tries recover in this run.
+    # If they all fail, cached() keeps the last good release and marks it stale. The next
+    # full refresh calls this again; a successful read clears that flag.
+    last = None
+    for wait in (0, 8, 20):
+        if wait:
+            time.sleep(wait)
+        try:
+            return _src_m2_once()
+        except Exception as e:
+            last = e
+    raise last
 import re
 m2, m2_stale = cached("fed_h6_m2", src_m2)
 if m2:

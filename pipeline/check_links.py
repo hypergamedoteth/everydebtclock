@@ -151,6 +151,10 @@ def require_redirect(root, rel, canonical, refresh):
 
 def check_legacy(root):
     require_redirect(root, "countries/united-states/index.html", "https://everydebtclock.com/", "/")
+    require_redirect(root, "texas/index.html", "https://everydebtclock.com/states/texas/", "/states/texas/")
+    require_redirect(root, "uk/index.html", "https://everydebtclock.com/countries/united-kingdom/", "/countries/united-kingdom/")
+    require_redirect(root, "world-government-debt/index.html", "https://everydebtclock.com/world/", "../world/")
+    require_redirect(root, "global-debt-clock/index.html", "https://everydebtclock.com/world/", "../world/")
     require_redirect(root, "t/tax_returns/index.html", "https://everydebtclock.com/t/tax_returns.html", "../tax_returns.html")
     require_redirect(root, "t/taxpayers/index.html", "https://everydebtclock.com/t/tax_returns.html", "../tax_returns.html")
     for rel in ("apple-touch-icon-precomposed.png", "api/index.html", "og/taxpayers.png", "og/tax_returns.png", "og/debt_total.png",

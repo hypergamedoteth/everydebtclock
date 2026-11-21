@@ -89,8 +89,10 @@ table.wt tr.proj td{color:#8ec5ff}table.wt tr.est td{color:var(--amber)}
 
 TICK = """<script>(function(){const nf0=new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
 const H=document.getElementById('t-total'),B=+H.dataset.b,R=+H.dataset.r,T0=+H.dataset.t,hv=document.getElementById('hv'),hs=document.getElementById('hs'),OPENED=Date.now()/1000;
-const tot=t=>B+R*(t-T0);(function f(){const t=Date.now()/1000,x=tot(t);const hk=document.querySelector('.k[data-live]');if(hk)hk.textContent=hk.dataset.live;hv.textContent=(x<0?'−':'')+'$'+nf0.format(Math.abs(x));
-if(hs)hs.textContent=(R<0?'−':'+')+'$'+nf0.format(Math.abs(R*(t-OPENED)));requestAnimationFrame(f)})();
+const tot=t=>B+R*(t-T0);(function f(){const t=Date.now()/1000,x=tot(t),coarse=H.dataset.coarse==='1',money=(x<0?'−':'')+'$'+nf0.format(Math.abs(x));
+if(!coarse){const hk=document.querySelector('.k[data-live]');if(hk)hk.textContent=hk.dataset.live;hv.textContent=money;}
+const hp=document.getElementById('hp');if(hp)hp.textContent=money;
+if(hs&&!coarse)hs.textContent=(R<0?'−':'+')+'$'+nf0.format(Math.abs(R*(t-OPENED)));requestAnimationFrame(f)})();
 const table=document.getElementById('debt-table');if(!table)return;const tb=table.tBodies[0];
 table.querySelectorAll('th[data-k]').forEach(function(th){th.addEventListener('click',function(){const dir=th.dataset.dir==='asc'?'desc':'asc',k=th.dataset.k;
 table.querySelectorAll('th[data-k]').forEach(function(h){delete h.dataset.dir});th.dataset.dir=dir;
@@ -316,12 +318,11 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
               f'<span class="live"><span class="dot"></span><span>harmonized data through {E(u["as_of"])}</span></span></div></header>')
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../countries/">All country debt clocks</a>'
              '<span>·</span><a href="../../world/">World debt clock</a></div>')
-    hero = (f'<div class="hero lead" id="t-total" data-b="{u["usd"]}" data-r="{rate:.12g}" data-t="{u["t0"]:.0f}">'
-            f'<div class="k" data-live="{E(f"Live estimate · {name} {sector} debt")}">Official · {E(u["as_of"])} · World Bank / IMF Quarterly Public Sector Debt</div>'
+    hero = (f'<div class="hero lead" id="t-total" data-b="{u["usd"]}" data-r="{rate:.12g}" data-t="{u["t0"]:.0f}" data-coarse="1">'
+            f'<div class="k">As of {E(u["as_of"])}</div>'
             f'<div class="big num" id="hv">{_money0(u["usd"])}</div>'
-            f'<div class="sub"><span>{_signed(rate)}/sec · {_signed(rate * 86400)}/day</span> '
-            f'<span class="note">{E(u["trend_note"])}; a projection, not a daily ledger</span> '
-            f'<span>Since you opened this page: <span class="num" id="hs">$0</span> {"more" if up else "less"} debt</span></div>'
+            f'<div class="sub"><span class="badge proj">PROJECTION</span> <span class="num" id="hp">{_money0(projected)}</span> '
+            f'<span class="note">{_signed(rate)}/sec · {E(u["trend_note"])}. Not a daily ledger.</span></div>'
             f'<div class="trio"><div><span class="l">QPSD stock · {E(u["as_of"])}</span><span class="num">{_money0(u["usd"])}</span></div>'
             f'<div><span class="l">Debt / GDP, IMF 2026</span><span class="num">{e["ratio_2026"]:.2f}%</span></div>'
             f'<div><span class="l">IMF end-2026 stock</span><span class="num">{_money0(e["debt_2026_usd"])}</span></div></div>'
@@ -414,18 +415,16 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
               f'<span class="live"><span class="dot"></span><span>IMF estimate</span></span></div></header>')
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../countries/">All country debt clocks</a>'
              '<span>·</span><a href="../../world/">World debt clock</a></div>')
-    live_k = f"Live estimate · {name} general government debt"
     if rate < 0:
-        clock_note = "Starts at the IMF end-2025 stock. That series is falling toward the 2026 estimate, so this clock is below the stock. Not a live ledger."
+        clock_note = "Straight line from the end-2025 stock toward the IMF 2026 estimate. The series is falling, so the projection is below that stock. Not a live ledger."
     else:
-        clock_note = "Starts at the IMF end-2025 stock and moves toward the 2026 estimate. It is not below that stock. Not a live ledger."
-    hero = (f'<div class="hero lead" id="t-total" data-b="{e["debt_2025_usd"]}" data-r="{rate:.12g}" data-t="{t0_i:.0f}">'
-            f'<div class="k" data-live="{E(live_k)}">{E(live_k)}</div>'
-            f'<div class="big num" id="hv">{_money0(projected)}</div>'
-            f'<div class="sub"><span>{_signed(rate)}/sec · {_signed(rate * 86400)}/day</span> '
+        clock_note = "Straight line from the end-2025 stock toward the IMF 2026 estimate. Not a balance already recorded, and not a live ledger."
+    hero = (f'<div class="hero lead" id="t-total" data-b="{e["debt_2025_usd"]}" data-r="{rate:.12g}" data-t="{t0_i:.0f}" data-coarse="1">'
+            f'<div class="k">As of Dec 31, 2025 · IMF end-2025 stock</div>'
+            f'<div class="big num" id="hv">{_money0(e["debt_2025_usd"])}</div>'
+            f'<div class="sub"><span class="badge proj">PROJECTION</span> <span class="num" id="hp">{_money0(projected)}</span> '
             f'<span class="note">{E(clock_note)}</span> '
-            f'<span>{_signed(projected - e["debt_2025_usd"])} versus the end-2025 stock</span> '
-            f'<span>Since you opened this page: <span class="num" id="hs">$0</span> {"more" if up else "less"} debt</span></div>'
+            f'<span>{_signed(projected - e["debt_2025_usd"])} versus the end-2025 stock</span></div>'
             f'<div class="trio"><div><span class="l">End-2025 stock</span><span class="num">{_money0(e["debt_2025_usd"])}</span></div>'
             f'<div><span class="l">2026 estimate, year-end target</span><span class="num">{_money0(e["debt_2026_usd"])}</span></div>'
             f'<div><span class="l">Debt / GDP, 2026</span><span class="num">{e["ratio_2026"]:.2f}%</span></div></div>'

@@ -207,14 +207,18 @@ def _analytics(R):
 def _clock_html(c, now, embed_home):
     sym, rate = c["sym"], c["rate"] or 0
     frozen = c["freeze"] is not None and now > c["freeze"]
-    shown_rate = 0 if frozen else rate
-    cfg = {"b": c["base"], "r": rate, "t0": c["t0"], "sym": sym}
+    hold = bool(c.get("hold"))
+    shown_rate = 0 if frozen or hold else rate
+    cfg = {"b": c["base"], "r": 0 if hold else rate, "t0": c["t0"], "sym": sym}
     if c["freeze"] is not None:
         cfg["fz"] = c["freeze"]
     if c["steps"]:
         cfg["steps"] = [[q[0], q[1], q[2]] for q in c["steps"]]
     blob = json.dumps(cfg, separators=(",", ":")).replace("<", "\\u003c")
     klass = "r dn" if shown_rate < 0 else "r" if shown_rate > 0 else "r z"
+    rate_line = _rate(sym, shown_rate)
+    if hold and rate:
+        rate_line = f"As of {c.get('as_of') or 'published stock'} · projection {_rate(sym, rate)}"
     label, source = c["label"], c["source"]
     page_url = c["page_url"]
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
@@ -236,8 +240,8 @@ a.by{{color:var(--link);font-size:12px;text-decoration:underline;text-underline-
 a.get{{color:var(--link);font-size:11px;text-decoration:underline;text-underline-offset:2px}}
 </style>{ICON}</head><body><div class="w">
 <div class="n" title="{E(label, quote=True)}">{E(label)}</div>
-<div class="v" id="v">{E(_total(sym, project(c["base"], rate, c["t0"], now, c["freeze"], c["steps"])))}</div>
-<div class="{klass}" id="r">{E(_rate(sym, shown_rate))}</div>
+<div class="v" id="v">{E(_total(sym, c["base"] if hold else project(c["base"], rate, c["t0"], now, c["freeze"], c["steps"])))}</div>
+<div class="{klass}" id="r">{E(rate_line)}</div>
 <div class="s" title="{E("Source: " + source, quote=True)}">Source: {E(source)}</div>
 <div class="cr"><a class="by" href="{E(page_url, quote=True)}" target="_top">{BYLINE}</a><a class="get" href="{E(embed_home, quote=True)}" target="_blank" rel="noopener">{GET}</a></div>
 </div><script type="application/json" id="c">{blob}</script>
@@ -276,6 +280,7 @@ def _place_clock(p, site):
     return _entry(file=f"{sec}/{p['slug']}/index.html", group="States" if kind == "state" else "Countries",
                   name=name, headline=head, label=f"{name} {head}", source=p.get("publisher") or "official data",
                   sym=sym, base=c["total"], rate=c["rate"] or 0, t0=c["t0"],
+                  hold=places_build.coarse_series(p.get("frequency")), as_of=c["as_of"],
                   page_url=f"{site}/{sec}/{p['slug']}/", embed_path=f"embed/{sec}/{p['slug']}/",
                   preview=f"{sec}/{p['slug']}/", iframe_title=f"{name} debt clock",
                   anchor=f"{name} debt clock by EveryDebtClock.com", slug=p["slug"])
@@ -297,7 +302,8 @@ def _world_clock(R, site, now, world):
     return _entry(file="world/index.html", group="World", name="World", headline="general government gross debt",
                   label="World general government debt",
                   source="National releases, Eurostat, QPSD, and IMF WEO", sym="$",
-                  base=float(f"{world['now_total']:.2f}"), rate=float(f"{world['rate_s']:.6f}"), t0=float(f"{now:.0f}"),
+                  base=float(f"{world['total']:.2f}"), rate=float(f"{world['rate_s']:.6f}"), t0=float(f"{now:.0f}"),
+                  hold=True, as_of="published stocks",
                   page_url=f"{site}/world/", embed_path="embed/world/", preview="world/",
                   iframe_title="World debt clock", anchor="World debt clock by EveryDebtClock.com", slug="world")
 
@@ -329,6 +335,7 @@ def _weo_clocks(R, site):
             out.append(_entry(file=f"countries/{slug}/index.html", group="Countries", name=name, headline=f"{sector} debt",
                                label=f"{name} {sector} debt", source=u["source"], sym="$",
                                base=u["usd"], rate=rate or 0, t0=float(f"{u['t0']:.0f}"),
+                               hold=True, as_of=u["as_of"],
                                page_url=f"{site}/countries/{slug}/", embed_path=f"embed/countries/{slug}/",
                                preview=f"countries/{slug}/", iframe_title=f"{name} debt clock",
                                anchor=f"{name} debt clock by EveryDebtClock.com", slug=slug))
@@ -337,6 +344,7 @@ def _weo_clocks(R, site):
                                headline="general government debt", label=f"{name} general government debt",
                                source="IMF World Economic Outlook, October 2026", sym="$",
                                base=e["debt_2025_usd"], rate=float(f"{(e['rate_usd_per_sec'] or 0):.12g}"), t0=float(f"{t0:.0f}"),
+                               hold=True, as_of="Dec 31, 2025",
                                page_url=f"{site}/countries/{slug}/", embed_path=f"embed/countries/{slug}/",
                                preview=f"countries/{slug}/", iframe_title=f"{name} debt clock",
                                anchor=f"{name} debt clock by EveryDebtClock.com", slug=slug))
