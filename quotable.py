@@ -29,6 +29,32 @@ def official(figure, when, source):
     return sentence
 
 
+def asof_pair(claim, when, sources):
+    """One sentence a crawler can quote, plus the same sentence with linked sources.
+
+    `claim` is the figure clause, for example "US federal debt is $40.71 trillion".
+    `sources` is a list of (name, url). The plain sentence and the link text match.
+    """
+    claim = " ".join(str(claim).split()).rstrip(" .")
+    when = " ".join(str(when).split())
+    names = []
+    links = []
+    for name, url in sources:
+        name = " ".join(str(name).split()).strip(" .")
+        url = " ".join(str(url).split())
+        if not name or not url:
+            raise ValueError("asof source needs a name and a url")
+        names.append(name)
+        links.append(f'<a href="{html.escape(url, quote=True)}" rel="noopener">{html.escape(name)}</a>')
+    sentence = f"As of {when}, {claim} ({'; '.join(names)})."
+    if _SECOND.search(sentence):
+        raise ValueError("asof line is more than one sentence: " + sentence)
+    if len(sentence) > 320:
+        raise ValueError(f"asof line is {len(sentence)} characters: " + sentence)
+    html_s = f"As of {html.escape(when)}, {html.escape(claim)} ({'; '.join(links)})."
+    return sentence, html_s
+
+
 def finish(core, clause=None):
     """One sentence, unpadded. `clause` is ignored so old callers stay short."""
     core = " ".join(core.split()).rstrip(" .")

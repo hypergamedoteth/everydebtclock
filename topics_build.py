@@ -211,8 +211,7 @@ def interest_day_answer(T, val, now, fdate, usd0, bil, built_label):
     return (
         f"Treasury's interest-expense dataset totaled {usd0(ig['ttm'])} in the 12 months ending {fdate(ig['as_of'])}, "
         f"about {bil(daily)} a day on an accrual basis. "
-        "That is not the cash paid on a single day. Cash interest is paid in lumps. "
-        "The live clock's per-day cost is the national debt times Treasury's average rate on interest-bearing debt, divided by 365.25, and it moves with the clock."
+        "Source: U.S. Treasury, Interest Expense on the Public Debt Outstanding; cash interest is paid in lumps, and the live clock instead multiplies the debt by Treasury's average rate and divides by 365.25."
     )
 
 
@@ -281,9 +280,8 @@ def milestone_state(ctx, H, n):
         h1 = (f"As of {fdate(ctx['OFF_D'])}, the US national debt is {usd2(ctx['OFF_V'])}, "
               f"{bil(target - ctx['OFF_V'])} short of ${n} trillion (Treasury Debt to the Penny)")
         if when:
-            quote = (f"The debt was {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}, {bil(target - ctx['OFF_V'])} short of ${n} trillion. "
-                     f"At the homepage clock's 90-day pace, about {bil(per_day)} a day, ${n} trillion falls on {when}. "
-                     f"It is a projection, not a Treasury forecast.")
+            quote = (f"The debt was {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}, {bil(target - ctx['OFF_V'])} short of ${n} trillion, per U.S. Treasury Debt to the Penny. "
+                     f"At the homepage clock's 90-day pace, about {bil(per_day)} a day, ${n} trillion falls on {when}, which is a projection, not a Treasury forecast.")
             summary = (f"At the homepage clock's 90-day pace, about {bil(per_day)} a day, ${n} trillion falls on {when}. "
                        f"It is a projection, not a Treasury forecast. The figure above is a live estimate of what is left.")
         else:
@@ -537,9 +535,13 @@ def _person_page(ctx, H):
 <div class="trio"><div><span class="l">Per person</span><span class="n" id="pp-p">{usd2(pp)}</span></div>
 <div><span class="l">Per household</span><span class="n" id="pp-h">{usd2(ctx['OFF_V'] / hh)}</span></div>
 <div><span class="l">Per tax return filed</span><span class="n" id="pp-r">{usd2(ctx['OFF_V'] / tax)}</span></div></div>
-</div>
-<p class="official">Official: {usd2(pp)} as of {fdate(ctx['OFF_D'])}, Treasury Debt to the Penny ÷ Census population</p>"""
-    intro = (f"<h1>As of {fdate(ctx['OFF_D'])}, US debt per person is {usd2(pp)} (Treasury Debt to the Penny / Census population)</h1>"
+</div>"""
+    import quotable
+    _census = H["population_sources"][-1]["page"]
+    _pp_plain, _pp_html = quotable.asof_pair(
+        f"US debt per person is {usd2(pp)}", fdate(ctx["OFF_D"]),
+        [("U.S. Treasury, Debt to the Penny", ctx["DTP"]), ("U.S. Census Bureau", _census)])
+    intro = (f'<h1 class="asof">{_pp_html}</h1>'
              f"<p class=\"answer\">That is Treasury's total of {usd2(ctx['OFF_V'])} divided by the Census Bureau's {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])} (Vintage 2025), with no projection. "
              f"The live estimate above moves with the debt clock and with Census's stated population growth. "
              f"Per household is {usd2(ctx['OFF_V'] / hh)} ({hh:,.0f} households). "
@@ -585,20 +587,26 @@ def _person_page(ctx, H):
     desc = (f"US national debt per person: {usd2(pp)}, Treasury's {fdate(ctx['OFF_D'])} total divided by Census's {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}. "
             f"Live per person, per household, and per tax return, plus a by-year table.")
     faqs = [
-        ("How much is the national debt per person?",
-         f"{usd2(pp)} as of {fdate(ctx['OFF_D'])}. Treasury's total of {usd2(ctx['OFF_V'])} divided by the Census Vintage 2025 estimate of {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}."),
+        ("How much is the US debt per person?",
+         f"US debt per person is {usd2(pp)} as of {fdate(ctx['OFF_D'])}, Treasury's total of {usd2(ctx['OFF_V'])} divided by {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}. "
+         f"Source: U.S. Treasury, Debt to the Penny, and the U.S. Census Bureau, Vintage 2025."),
         ("What population is used?",
-         f"The official per-person figure uses the Census Vintage 2025 estimate of {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}, with no projection. The live estimate above that figure projects the population forward at the rate Census states. The by-year table uses the July 1 estimate from the Census series named in each row."),
+         f"The official per-person figure uses the Census Vintage 2025 estimate of {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}, with no projection. "
+         f"Source: U.S. Census Bureau; the live estimate above that figure projects population at the rate Census states."),
         ("How much is the national debt per household?",
-         f"{usd2(ctx['OFF_V'] / hh)} as of {fdate(ctx['OFF_D'])}. Treasury's {fdate(ctx['OFF_D'])} total divided by {hh:,.0f} households in Census CPS ASEC 2025."),
+         f"National debt per household is {usd2(ctx['OFF_V'] / hh)} as of {fdate(ctx['OFF_D'])}, Treasury's total divided by {hh:,.0f} households. "
+         f"Source: U.S. Treasury, Debt to the Penny, and Census CPS ASEC 2025."),
         ("How much is the national debt per tax return?",
-         f"{usd2(ctx['OFF_V'] / tax)} as of {fdate(ctx['OFF_D'])}. Treasury's {fdate(ctx['OFF_D'])} total divided by {tax:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2). A joint return counts once."),
+         f"National debt per tax return filed is {usd2(ctx['OFF_V'] / tax)} as of {fdate(ctx['OFF_D'])}, Treasury's total divided by {tax:,.0f} individual returns in FY2025. "
+         f"Source: U.S. Treasury, Debt to the Penny, and IRS Data Book Table 1-2; a joint return counts once."),
         ("Why is the live estimate different from the official per-person figure?",
-         f"The live estimate above the official figure divides the live debt clock by population projected from the Census estimate for {fdate(ctx['POP_OFF_DATE'])}. "
-         f"{usd2(pp)} divides the {fdate(ctx['OFF_D'])} Treasury close by the {ctx['POP_OFF']:,.0f} residents Census estimated for that date, with no projection."),
+         f"The live estimate divides the moving debt clock by population projected from the Census estimate for {fdate(ctx['POP_OFF_DATE'])}. "
+         f"The official {usd2(pp)} divides the {fdate(ctx['OFF_D'])} Treasury close by {ctx['POP_OFF']:,.0f} residents, with no projection."),
     ]
     ld = ctx["dataset_ld"]("US national debt per person", desc, f"{ctx['SITE']}/national-debt-per-person/",
-                           based=[ctx["DTP"], H["population_sources"][-1]["page"]]) + ctx["faq_ld"](faqs)
+                           based=[ctx["DTP"], H["population_sources"][-1]["page"]],
+                           source=("U.S. Department of the Treasury, Fiscal Data", "https://fiscaldata.treasury.gov/",
+                                   "U.S. Treasury, Debt to the Penny, divided by the U.S. Census Bureau population estimate")) + ctx["faq_ld"](faqs)
     _page(ctx, "national-debt-per-person",
           f"National Debt Per Person: {usd2(pp)} (Treasury ÷ Census)", desc, ld, hero, intro, body, faqs)
 

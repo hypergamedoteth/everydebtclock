@@ -296,24 +296,23 @@ def _faqs(W):
     gap_s = (f" The headline sum differs from that IMF total by {_sgn(gap, ',.0f', plus=False)} ({gap / panel * 100:+.2f}%)." if panel and gap is not None else "")
     top = sorted(W["rows"], key=lambda x: -x["usd"])[:5]
     top_s = "; ".join(f"{x['name']}, {_usd0(x['usd'])}" for x in top)
+    dmin, dmax = _fd(min(x["as_of"] for x in W["rows"])), _fd(max(x["as_of"] for x in W["rows"]))
     return [
         ("How much is world government debt?",
-         f"General government gross debt for these {n} economies sums to {_usd0(W['total'])} ({_tn(W['total'])}). "
-         f"{c['official']} rows use a national general-government stock, {c['harmonized']} use Eurostat or the Quarterly Public Sector Debt database, and {c['imf']} use the IMF World Economic Outlook. "
-         f"The same economies are {panel_s} on the pure IMF end-2026 sum.{gap_s}"),
+         f"As of {dmin} through {dmax}, general government gross debt for these {n} economies is {_tn(W['total'])}. "
+         f"Source: national releases, Eurostat, and the IMF World Economic Outlook; {c['official']} rows are national, {c['harmonized']} are harmonized, and {c['imf']} are IMF estimates."),
         ("Which countries owe the most?",
-         f"By the headline dollar stock on this page, the five largest are: {top_s}."),
+         f"By the headline dollar stock on this page, the five largest are: {top_s}. "
+         f"Source: the same general-government stocks, each dated on the world table."),
         ("What does general government mean?",
          "General government is central government plus state, local and social-security funds, gross of financial assets. "
-         "A federal or central-government series is narrower, so it is shown on the country page and under the country name here, and it is not added into the total. "
-         "The IMF estimate then supplies the general-government stock."),
+         "A narrower federal or central series is shown under the country name and is not added; the IMF estimate supplies the general-government stock instead."),
         ("How is the IMF figure estimated?",
          "Each IMF stock is GGXWDG_NGDP divided by 100, times NGDPD, from the October 2026 World Economic Outlook. "
-         "The live number draws a straight line from the end-2025 stock to the end-2026 stock. It includes exchange-rate effects and is not a live ledger."),
+         "The live number draws a straight line from the end-2025 stock to the end-2026 stock and is a projection, not a live ledger."),
         ("Why does a headline differ from the IMF number?",
-         "A general-government stock from Eurostat, a national statistics office or QPSD can use a different date and a different exchange rate from the IMF's end-2026 dollars. "
-         "A QPSD general-government stock more than 25% from the IMF figure is not used, because that gap is large enough to be a unit or perimeter problem. "
-         + _named_differences(W)),
+         f"A national, Eurostat or QPSD stock can use a different date and exchange rate from the IMF end-2026 dollars, and the pure IMF sum for these economies is {panel_s}. "
+         f"Source: IMF World Economic Outlook, October 2026."),
     ]
 
 def write_us_redirect(R, SITE):
@@ -355,8 +354,15 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
     modified_iso = modified or dt.datetime.fromtimestamp(now, pb.CT).isoformat(timespec="seconds")
     faq_ld = {"@context": "https://schema.org", "@type": "FAQPage", "dateModified": modified_iso,
               "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faqs]}
+    _imf_url = "https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO"
     ds_ld = {"@context": "https://schema.org", "@type": "Dataset", "name": f"Government debt of {n} countries in US dollars", "description": desc, "url": url, "isAccessibleForFree": True,
-             "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"}, "dateModified": modified_iso,
+             "creator": [{"@type": "Organization", "name": "International Monetary Fund", "url": "https://www.imf.org/"},
+                         {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"}],
+             "publisher": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"},
+             "creditText": "National sources, Eurostat, and the IMF World Economic Outlook",
+             "citation": {"@type": "CreativeWork", "name": "IMF World Economic Outlook, general government gross debt", "url": _imf_url,
+                          "creator": {"@type": "Organization", "name": "International Monetary Fund", "url": "https://www.imf.org/"}},
+             "dateModified": modified_iso,
              "temporalCoverage": f"{min(x['as_of'] for x in rows)}/{max(x['as_of'] for x in rows)}",
              "isBasedOn": sorted({x["source_url"] for x in rows})}
     ld = ('<script type="application/ld+json">' + json.dumps(faq_ld).replace("</", "<\\/") + "</script>"
@@ -385,8 +391,12 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
               f'<a href="https://www.imf.org/external/datamapper/NGDPD@WEO" rel="noopener">NGDPD</a>, plus the national, Eurostat, and QPSD links in the table. '
               f'The clock above is a projection from those stocks, not one official world total.</p>')
     import quotable
-    world_lead = quotable.world_sum(W["total"], dmin, dmax, n)
-    intro = (f'<section class="intro" id="intro"><h1 class="quote">{E(world_lead)}</h1>{crumb}'
+    _imf = "https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO"
+    _wplain, _whtml = quotable.asof_pair(
+        f"world government debt for {n} economies is {_tn(W['total'])}",
+        f"{dmin} through {dmax}",
+        [("national sources, Eurostat, and the IMF", _imf)])
+    intro = (f'<section class="intro" id="intro"><h1 class="quote asof">{_whtml}</h1>{crumb}'
              f'{answer}'
              f'<p><b>What this page counts.</b> General government gross debt for each of {n} economies, in US dollars. '
              f'The latest sum is <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}). '

@@ -288,11 +288,11 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
     gap = u["imf_gap"]
     as_of_long = dt.date.fromisoformat(u["as_of"]).strftime("%B %-d, %Y")
     import quotable
-    h1 = quotable.official(
-        f"{name} {sector} gross debt was {stock_s}",
+    _qplain, _qhtml = quotable.asof_pair(
+        f"{name} {sector} gross debt is {stock_s}",
         dt.date.fromisoformat(u["as_of"]).strftime("%b %-d, %Y"),
-        "World Bank and IMF",
-    )
+        [("World Bank and IMF Quarterly Public Sector Debt", u["source_url"])])
+    h1 = _qplain
     imf_peers, outside = _peers(e, D["economies"])
     imf_faqs = cp.faqs(profile, us_profile, imf_peers, outside)
     faqs = [
@@ -327,7 +327,7 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
             f'<div><span class="l">IMF end-2026 stock</span><span class="num">{_money0(e["debt_2026_usd"])}</span></div></div>'
             f'<div class="meta" style="margin-top:10px"><span class="badge proj">HARMONIZED · as of {E(u["as_of"])}</span><span class="badge">source tier: harmonized</span></div></div>')
     fx_bit = f'{E(u["quote"])}' + (f' on {E(u["rate_date"])}' if u.get("rate_date") else "")
-    intro = (f'<section class="intro" id="intro"><h1 class="quote">{E(h1)}</h1>'
+    intro = (f'<section class="intro" id="intro"><h1 class="quote asof">{_qhtml}</h1>'
              f'<p class="answer"><b>What this page counts.</b> {E(name)}\'s {E(sector)} gross debt, from the World Bank and IMF Quarterly Public Sector Debt database. '
              f'The stock is <b>{stock_s}</b> as of <b>{as_of_long}</b>. '
              f'Source tier: harmonized official dataset. '
@@ -394,7 +394,12 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
     projected = _now(e["debt_2025_usd"], rate, now, t0)
     url = f"{SITE}/countries/{slug}/"
     title = f"{name} National Debt Clock"
-    h1 = cp.h1_text(profile)
+    import quotable
+    _plain, _html = quotable.asof_pair(
+        f"{name} general government gross debt is {_money(e['debt_2026_usd'])}, the end-2026 estimate",
+        "Oct 13, 2026",
+        [("IMF World Economic Outlook", RATIO_URL)])
+    h1 = _plain
     peers, outside = _peers(e, D["economies"])
     faqs = cp.faqs(profile, us_profile, peers, outside)
     desc = h1 + " The live number is interpolated from IMF year-end figures, not a live ledger."
@@ -421,7 +426,7 @@ def _country_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, g
     jump = _jump_note(e)
     kosovo = (" The IMF World Economic Outlook includes Kosovo in this vintage. The DataMapper code is UVK and the World Bank mirror uses XKX."
               if e["iso3"] == "XKX" else "")
-    intro = (f'<section class="intro" id="intro"><h1 class="quote">{E(h1)}</h1>'
+    intro = (f'<section class="intro" id="intro"><h1 class="quote asof">{_html}</h1>'
              f'{cp.lead_html(profile, us_profile, peers, outside)}'
              f'{crumb}'
              f'<p class="answer"><b>What this page counts.</b> {E(name)}\'s general government gross debt, from the IMF World Economic Outlook, October 2026: '

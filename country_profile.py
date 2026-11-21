@@ -820,7 +820,10 @@ def dataset_ld(p, url, desc):
           "name": f"{p['name']} general government gross debt, IMF World Economic Outlook October 2026",
           "description": desc, "url": url, "dateModified": p["published"],
           "temporalCoverage": f"{y0}/{y1}", "isAccessibleForFree": True,
-          "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": "https://everydebtclock.com/"},
+          "creator": [{"@type": "Organization", "name": "International Monetary Fund", "url": "https://www.imf.org/"},
+                      {"@type": "Organization", "name": "Every Debt Clock", "url": "https://everydebtclock.com/"}],
+          "publisher": {"@type": "Organization", "name": "Every Debt Clock", "url": "https://everydebtclock.com/"},
+          "creditText": "IMF World Economic Outlook, October 2026, GGXWDG_NGDP",
           "isBasedOn": [RATIO_URL, POP_URL, PUB_URL],
           "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json",
                             "contentUrl": f"https://everydebtclock.com/country-series/{p['slug']}.json"}]}
