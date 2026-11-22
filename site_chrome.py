@@ -26,7 +26,9 @@ FOOTER_LINKS = (
     ("advertise/", "Advertise"),
     ("methodology/", "Methodology"),
     ("privacy/", "Privacy"),
+    ("terms/", "Terms"),
     ("contact/", "Contact"),
+    ("privacy/#do-not-sell", "Do Not Sell or Share My Personal Information"),
 )
 
 _FOOTER_RE = re.compile(r"<footer\b[^>]*>.*?</footer>", re.S | re.I)
@@ -35,10 +37,10 @@ _PRIVACY_HREF_RE = re.compile(
     re.I,
 )
 _PREFIX_RE = re.compile(
-    r'href="((?:\.\./)*)(?:embed/|data/|press/|about/|methodology/|privacy(?:\.html|/)|contact/|advertise/)"'
+    r'href="((?:\.\./)*)(?:embed/|facts/|data/|reports/|press/|about/|methodology/|terms/|privacy(?:\.html|/#do-not-sell|/)|contact/|advertise/)"'
 )
 _ABS_PREFIX_RE = re.compile(
-    r'href="/(?:embed/|data/|press/|about/|methodology/|privacy(?:\.html|/)|contact/|advertise/)"'
+    r'href="/(?:embed/|facts/|data/|reports/|press/|about/|methodology/|terms/|privacy(?:\.html|/#do-not-sell|/)|contact/|advertise/)"'
 )
 
 
@@ -96,8 +98,8 @@ def upgrade_footer(foot: str, extra: tuple[tuple[str, str], ...] = ()) -> str:
     # Replace the existing standard-link run (from the first known link to the
     # last), leaving the sentence before it and the disclaimer after it.
     known = (
-        r"(?:(?:\.\./)+|/)?(?:embed/|data/|press/|about/|advertise/|methodology/|"
-        r"privacy(?:\.html|/)|contact/|reports/|Home)"
+        r"(?:(?:\.\./)+|/)?(?:embed/|facts/|data/|reports/|press/|about/|advertise/|"
+        r"methodology/|terms/|privacy(?:\.html|/#do-not-sell|/)|contact/)"
     )
     run = re.search(
         rf'<a href="{known}"[^>]*>.*?(?:</a>(?:\s*·\s*<a href="{known}"[^>]*>.*?</a>)+)',
@@ -299,7 +301,7 @@ def _legal_shell(site: str, slug: str, title: str, desc: str, body: str, robots:
 def privacy_body() -> str:
     return """
 <h1>Privacy Policy</h1>
-<p class="eff">Effective October 26, 2026. Updated November 18, 2026.</p>
+<p class="eff">Effective October 26, 2026. Last updated November 22, 2026.</p>
 
 <p>This website, <a href="https://everydebtclock.com/">everydebtclock.com</a>, is operated by Hypergame LLC, a Texas limited liability company ("we", "us"). This page explains what happens to information about you when you visit. There are no accounts and no sign-ups, and we don't ask for your name or email to use the site.</p>
 
@@ -333,6 +335,10 @@ def privacy_body() -> str:
 <li>You can opt out of personalized advertising by visiting <a href="https://adssettings.google.com/" rel="noopener">Google Ads Settings</a>. You can also opt out of some third-party vendors' use of cookies for personalized advertising at <a href="https://youradchoices.com/" rel="noopener">youradchoices.com</a>.</li>
 </ul>
 <p>A short notice about cookies and ads appears at the bottom of site pages (not on the live ticker, and not on the embeddable clock widgets). We will keep this policy current if ads go live or if the vendors change.</p>
+
+<h2 id="do-not-sell">Do Not Sell or Share My Personal Information</h2>
+<p>Some US state privacy laws, including the California Consumer Privacy Act, give residents the right to opt out of the sale or sharing of personal information, including sharing for targeted advertising. We do not sell personal information for money. There are no accounts, and we don't ask for your name or email to use the site.</p>
+<p>If ads are shown, Google AdSense may use cookies to serve ads, which some of those laws treat as sharing. To opt out, use <a href="https://adssettings.google.com" rel="noopener">Google Ads Settings</a>, or send a request from the <a href="/contact/">contact page</a>. We will honor a request sent that way.</p>
 
 <h2>Data downloads</h2>
 <p>The site publishes free <a href="/data/">CSV files and charts</a> of official public figures (and projections labelled as such): US debt by year, by president, per person, interest, state debt, and country debt. These files do not include information about visitors. Anyone may download them. They are public data, not personal data.</p>
@@ -375,6 +381,36 @@ def about_body() -> str:
 <p>We are not affiliated with the US government or any other government. Nothing on this site is financial, investment or legal advice.</p>
 
 <p>Questions, corrections, the free embed, or advertising: <!--email_off--><a href="mailto:hello@everydebtclock.com">hello@everydebtclock.com</a><!--/email_off-->.</p>
+"""
+
+
+def terms_body() -> str:
+    return """
+<h1>Terms of Use</h1>
+<p class="eff">Last updated November 22, 2026.</p>
+
+<p>Every Debt Clock at <a href="https://everydebtclock.com/">everydebtclock.com</a> is operated by Hypergame LLC, a Texas limited liability company. By using the site you agree to these terms.</p>
+
+<h2>The site is information</h2>
+<p>The site is provided as-is, for general information. It is not financial, investment, tax, or legal advice, and it is not a recommendation to buy or sell anything.</p>
+
+<h2>Where the numbers come from</h2>
+<p>Figures come from official sources, including the U.S. Treasury's <a href="https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny" rel="noopener">Debt to the Penny</a> dataset, and from other official series named on each page. A source can update after we do, so a figure may lag. Figures can also contain errors. A live clock is a projection from the latest official number we have, not a new official release.</p>
+
+<h2>Ads and other sites</h2>
+<p>Pages may show third-party ads, including Google AdSense, and they link to other websites. We don't control those ads or sites, and we aren't responsible for them.</p>
+
+<h2>Embeds and tickers</h2>
+<p>You may embed a clock, or display a ticker, from this site. Credit Every Debt Clock and link back to the page you used. Don't present the clock as your own data, or as an official government display.</p>
+
+<h2>Limitation of liability</h2>
+<p>To the fullest extent the law allows, Hypergame LLC is not liable for any loss or damage from your use of the site, including errors, delays, or interruptions in the figures. The site is provided without warranties of any kind, including accuracy and fitness for a particular purpose.</p>
+
+<h2>Governing law</h2>
+<p>These terms are governed by the laws of the State of Texas, without regard to conflict-of-law rules.</p>
+
+<h2>Contact</h2>
+<p>Questions about these terms: the <a href="/contact/">contact page</a>.</p>
 """
 
 
@@ -444,6 +480,11 @@ def write_legal_pages(R: str, site: str, with_analytics=None) -> None:
             "Contact Every Debt Clock at hello@everydebtclock.com for questions, corrections, the free embed, or advertising.",
             contact_body(),
         ),
+        "terms": (
+            "Terms of Use | Every Debt Clock",
+            "Terms of use for Every Debt Clock, operated by Hypergame LLC. The site is information only and is not financial advice.",
+            terms_body(),
+        ),
     }
     wrap = with_analytics or (lambda p: p)
     for slug, (title, desc, body) in pages.items():
@@ -459,13 +500,15 @@ def sitemap_entries(site: str) -> list[tuple[str, str, str]]:
         (f"{site}/advertise/", "0.3", "yearly"),
         (f"{site}/contact/", "0.3", "yearly"),
         (f"{site}/privacy/", "0.2", "yearly"),
+        (f"{site}/terms/", "0.2", "yearly"),
     ]
 
 
 def llms_lines() -> list[str]:
     return [
         "- /about/ : Who runs the site (Hypergame LLC), the main data sources, and the update schedule.",
-        "- /privacy/ : Privacy policy, including analytics, data downloads, and cookies if ads are shown.",
+        "- /privacy/ : Privacy policy, including analytics, data downloads, cookies if ads are shown, and how to opt out of sale or sharing.",
+        "- /terms/ : Terms of use. The site is information only, operated by Hypergame LLC, a Texas limited liability company.",
         "- /contact/ : Email hello@everydebtclock.com.",
         "- /advertise/ : Sponsorship on the US clock and the national-debt-by-year page.",
     ]

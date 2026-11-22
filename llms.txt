@@ -33,7 +33,8 @@ These sentences are computed at build time from the same official figures as the
 - /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.
 - /methodology/ : Sources, how the live ticker is calculated, and how it is checked against Treasury.
 - /about/ : Who runs the site (Hypergame LLC), the main data sources, and the update schedule.
-- /privacy/ : Privacy policy, including analytics, data downloads, and cookies if ads are shown.
+- /privacy/ : Privacy policy, including analytics, data downloads, cookies if ads are shown, and how to opt out of sale or sharing.
+- /terms/ : Terms of use. The site is information only, operated by Hypergame LLC, a Texas limited liability company.
 - /contact/ : Email hello@everydebtclock.com.
 - /advertise/ : Sponsorship on the US clock and the national-debt-by-year page.
 - /data/ : Free CSV and JSON of US debt. us-debt-daily is every Debt to the Penny close since 1993-04-01. us-debt-annual is Historical Debt Outstanding since 1790. Citation: Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Debt to the Penny.
