@@ -184,6 +184,12 @@ def index(places, now):
     return {"_doc": "Live place clocks on everydebtclock.com. value(t) = base + rate * (t - t0), t in Unix seconds; rate 0 = official figure, not projected. url is relative to https://everydebtclock.com/.",
             "generated": dt.datetime.fromtimestamp(now, CT).isoformat(timespec="seconds"), "default": default, "hub": "states/", "hub_label": "All " + hub_label(places), "places": out}
 
+def _site_footer(prefix, lead="Every Debt Clock"):
+    """The shared footer (terms, privacy, do-not-sell). prefix is '../' or '../../'."""
+    import site_chrome
+    return site_chrome.site_footer(prefix, lead=lead)
+
+
 def build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, stamp, now):
     places = load(R)
     urls = []
@@ -226,7 +232,9 @@ table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:righ
 .hero .sec2{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:13px;color:var(--mut);line-height:1.45}.hero .sec2 b{color:var(--txt);font-size:15px;margin:0 4px}.hero .sec2 .l{color:var(--dim);text-transform:uppercase;letter-spacing:.04em;font-size:11px}.hero .sec2 .note{display:block;font-size:12px}
 .hero h1.figline{font-size:15px;font-weight:650;line-height:1.45;margin:8px 0 12px;max-width:40rem;letter-spacing:0}
 .facts{margin:8px 0 12px;padding-left:18px}.facts li{margin:6px 0}#facts .answer{font-size:16px;line-height:1.45;color:var(--txt)}
-.dchart{width:100%;height:auto;margin:8px 0;display:block}"""
+.dchart{width:100%;height:auto;margin:8px 0;display:block}
+#federal p,#federal li{overflow-wrap:anywhere}#federal h3{font-size:15px;margin:16px 0 6px}#federal .src{color:var(--mut);font-size:12.5px}#federal .val{overflow-wrap:anywhere}
+@media (max-width:640px){#federal .grid.dense{grid-template-columns:1fr}#federal .pp .num{overflow:visible;text-overflow:unset;white-space:normal}}"""
 
 def tile_html(tid, label, value_txt, acc, badge, rate_txt="fixed", pp=None, tick=None, dlg=None, wide=False):
     """One tile in the US homepage style. tick = (base, rate, t0) makes the value tick; dlg = dict for the tap dialog."""
@@ -296,10 +304,13 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         "temporalCoverage": f"{min(h[0] for x in cs for h in x.get('history', [[x['as_of']]]))}/{c['as_of']}",
         "isBasedOn": _based}).replace("</", "<\\/") + "</script>"
     facts_html = ""
+    federal_html = ""
     if is_state:
         import state_facts
+        import state_federal
         facts_html, facts_ld = state_facts.for_page(R, p)
         ld += facts_ld
+        federal_html = state_federal.section(R, p, now, tile_html, url, f"{SITE}/{img}")
 
     proj_badge = f'<span class="badge proj" title="Projected every frame from the official figure of {E(as_of)}">PROJECTED · from {E(as_of)}</span>'
     fix_badge = lambda d_: f'<span class="badge fix" title="Official figure that does not change until the next official report">FIXED · {E(_fd(d_))}</span>'
@@ -314,7 +325,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     # ---- header (same as the US homepage), jump nav adapted to the place's sections
     jump = [("changed", "What changed"), ("debt", "Debt")] + [(x["key"], x["short"]) for x in cs] + [("people", f"Per {dem}"), ("history", "History"), ("details", "Details"), ("method", "Method")]
     if is_state:
-        jump = [("facts", "Figures"), ("faq", "Questions")] + jump
+        jump = [("federal", "Federal"), ("facts", "Figures"), ("faq", "Questions")] + jump
     header = (f'<header class="top"><div class="topin"><a class="brand" href="../../">EVERY <b>DEBT</b> CLOCK</a>{nav_html(places, 2, p["kind"], "plnav")}'
               f'<span class="live"><span class="dot"></span><span>Official data through {E(as_of)} · {T["freq"]}</span></span></div>'
               f'<nav class="jump">' + "".join(f'<a href="#{i}">{E(t)}</a>' for i, t in jump) + "</nav></header>")
@@ -556,21 +567,22 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     script = f"""<script>(function(){{const nf0=new Intl.NumberFormat('en-US',{{maximumFractionDigits:0}}),nf2=new Intl.NumberFormat('en-US',{{minimumFractionDigits:2,maximumFractionDigits:2}});
 const C='{CUR}',usd=(v,d)=>(v<0?'−':'')+C+(d?nf2:nf0).format(Math.abs(v)),short=v=>{{const a=Math.abs(v);return (v<0?'−':'')+C+(a>=1e12?(a/1e12).toFixed(2)+'T':a>=1e9?(a/1e9).toFixed(2)+'B':(a/1e6).toFixed(1)+'M')}},sg=v=>v<0?'−':'+';
 const now=()=>Date.now()/1000,OPENED=now(),H=document.getElementById('t-total'),B=+H.dataset.b,R=+H.dataset.r,T0=+H.dataset.t,tot=t=>B+R*(t-T0);
-const ticks=[...document.querySelectorAll('.tile[data-r]')].map(e=>({{v:e.querySelector('.val'),b:+e.dataset.b,r:+e.dataset.r,t:+e.dataset.t,pp:e.id==='t-pp_total',ppx:[...e.querySelectorAll('[data-pp]')]}}));
+const ticks=[...document.querySelectorAll('.tile[data-r]')].map(e=>({{v:e.querySelector('.val'),b:+e.dataset.b,r:+e.dataset.r,t:+e.dataset.t,pp:e.id==='t-pp_total'||e.id==='t-fed_pp',ppx:[...e.querySelectorAll('[data-pp]')]}}));
 const hv=document.getElementById('hv'),hs=document.getElementById('hs'),wcn=document.getElementById('wcn'),wcd=document.getElementById('wcd'),pps=[...document.querySelectorAll('.hero [data-pp],.hero-follow [data-pp],.wcc [data-pp]')];
 const dlg=document.getElementById('dlg');let mt=null;
 function open(e){{const d=JSON.parse(e.dataset.d);const x='https://x.com/intent/post?text='+encodeURIComponent(d.l+': '+(d.r?short(d.b+d.r*(now()-d.t0))+' and ticking (projected from official data)':d.o))+'&url='+encodeURIComponent(d.share);
-dlg.innerHTML='<h3></h3><div class="big num" id="mv"></div><p class="mo"></p><p><b>Method.</b> <span class="mm"></span></p>'+(d.r?'<div class="math"><b>Show the math</b><table><tr><td>Base (official)</td><td class="num">'+usd(d.b)+'</td></tr><tr><td>Rate per second</td><td class="num">'+usd(d.r,2)+'</td></tr></table><p><b>Now</b> = base + rate × (now − t0) = <span class="num" id="mf">—</span></p></div>':'')+
+dlg.innerHTML='<h3></h3><div class="big num" id="mv"></div><p class="mo"></p><p><b>Method.</b> <span class="mm"></span></p>'+(d.r?'<div class="math"><b>Show the math</b><table><tr><td>Base (official)</td><td class="num">'+usd(d.b,d.cents?2:0)+'</td></tr><tr><td>Rate per second</td><td class="num">'+usd(d.r,d.cents?6:2)+'</td></tr></table><p><b>Now</b> = base + rate × (now − t0) = <span class="num" id="mf">—</span></p></div>':'')+
 '<p><b>Source.</b> <a target="_blank" rel="noopener"></a> <span class="ml"></span></p><p><b>Share:</b> <a class="sl"></a></p><p class="shr"><button id="cp">Copy link</button><a class="btn" target="_blank" rel="noopener" id="px">Post on X</a><a class="btn" target="_blank" id="pi">Share image</a></p><p><button id="cl">Close</button></p>';
 dlg.querySelector('h3').textContent=d.l;dlg.querySelector('.mo').textContent=d.o||'';dlg.querySelector('.mm').textContent=d.m||'';const a=dlg.querySelector('p a');a.href=d.u;a.textContent=d.s;dlg.querySelector('.ml').textContent=d.loc?'('+d.loc+')':'';
 const sl=dlg.querySelector('.sl');sl.href=d.share;sl.textContent=d.share;dlg.querySelector('#px').href=x;dlg.querySelector('#pi').href=d.img;
-const mv=dlg.querySelector('#mv'),mf=dlg.querySelector('#mf');mt=t=>{{const v=d.r?d.b+d.r*(t-d.t0):null;mv.textContent=v==null?(d.o||'').split(' ')[0]:usd(v);if(mf)mf.textContent=usd(d.b)+' + '+usd(d.r,4)+' × '+nf0.format(Math.round(t-d.t0))+' s = '+usd(v)}};
+const mv=dlg.querySelector('#mv'),mf=dlg.querySelector('#mf');mt=t=>{{const v=d.r?d.b+d.r*(t-d.t0):null;mv.textContent=v==null?(d.o||'').split(' ')[0]:usd(v,d.cents?2:0);if(mf)mf.textContent=usd(d.b,d.cents?2:0)+' + '+usd(d.r,d.cents?6:4)+' × '+nf0.format(Math.round(t-d.t0))+' s = '+usd(v,d.cents?2:0)}};
 dlg.querySelector('#cl').onclick=()=>dlg.close();dlg.querySelector('#cp').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(d.share);dlg.showModal()}}
 dlg.addEventListener('close',()=>mt=null);document.querySelectorAll('[data-d]').forEach(e=>e.onclick=()=>open(e));
 (function f(){{const t=now(),x=tot(t),coarse=H.dataset.coarse==='1';if(R){{if(!coarse){{const hk=document.querySelector('.k[data-live]');if(hk)hk.textContent=hk.dataset.live;hv.textContent=usd(x);if(hs)hs.textContent=(R<0?'':'+')+usd(Math.abs(x-tot(OPENED)));}}
 const hp=document.getElementById('hp');if(hp)hp.textContent=usd(x);if(wcn)wcn.textContent=short(x);if(wcd)wcd.textContent=sg(x-B)+short(Math.abs(x-B));
-pps.forEach(e=>{{if(coarse&&e.closest('.hero'))return;e.textContent=usd(x/+e.dataset.pp,e.closest('.hero, .hero-follow')?2:0)}});
-if(!coarse)ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);k.ppx.forEach(e=>e.textContent=usd(v/+e.dataset.pp,2))}})}}if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
+pps.forEach(e=>{{if(coarse&&e.closest('.hero'))return;e.textContent=usd(x/+e.dataset.pp,e.closest('.hero, .hero-follow')?2:0)}});}}
+ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);if(k.v)k.v.textContent=k.pp?usd(v,2):usd(v);k.ppx.forEach(e=>e.textContent=usd(v/+e.dataset.pp,2))}});
+if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
 
     explore_html = ex.explore("../../", places, calc, cur=p, gdp=GDP_BY_SLUG)
     profile = ""
@@ -579,8 +591,8 @@ if(!coarse)ticks.forEach(k=>{{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v
         profile = cp.official_section(R, p)
     official = f'<p class="official">Official: {_usd0(c["total"])} as of {as_of}, {E(pub)}</p>'
     page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld).replace("<body>", '<body class="srclead">', 1)
-            + '<main id="app">' + hero + intro + facts_html + wc + debt_sec + comp_secs + people + hist + details + profile + method + country_faq
-            + '</main>' + header + ex.search_box("../../") + '<dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
+            + '<main id="app">' + hero + intro + federal_html + facts_html + wc + debt_sec + comp_secs + people + hist + details + profile + method + country_faq
+            + '</main>' + header + ex.search_box("../../") + '<dialog id="dlg"></dialog>' + explore_html + links + _site_footer("../../", "Every Debt Clock · official data, projection labelled") + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))
     _cur({})
@@ -656,7 +668,7 @@ ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='
             f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p>{per_person}</section>')
     rest = (f'<main id="app">{sort}{secs}' + ('<!--WEOCOUNTRIES-->' if WEO and kind == "country" else '') + '</main>'
             + explore_html +
-            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section>{state_faq}<footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')
+            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section>{state_faq}{_site_footer("../")}{script}</body></html>')
     if kind == "state":
         body = intro_html + header + ex.search_box("../") + rest
     else:

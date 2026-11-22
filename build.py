@@ -1265,6 +1265,8 @@ import country_profile
 country_profile.assert_country_pages_differ(R)
 import state_facts
 state_facts.assert_state_pages_differ(R)
+import state_federal
+state_federal.check(R)
 debt_by_year_build.check(R, SITE)
 presidents_build.check(R, SITE)
 state_per_person_build.check(R, SITE)
