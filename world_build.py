@@ -193,6 +193,19 @@ def compute(R, places, us, now):
         else:
             x["ratio"] = None
         x["imf_gap"] = (x["usd"] / e["debt_2026_usd"] - 1) if e and e.get("debt_2026_usd") else None
+        # A stock more than 25% from the IMF end-2026 figure is already on review_over_25pct.
+        # Do not let that row's official trend run the world clock (Norway's quarter-to-quarter
+        # jump was projecting about 33% a year on top of a stock that was already 35% high).
+        if (x["tier"] != "imf" and x.get("imf_gap") is not None and abs(x["imf_gap"]) > 0.25
+                and x.get("trend_kind") == "official" and x.get("trend_local")):
+            x["trend_local"] = 0
+            x["now_local"] = x["local"]
+            x["now_usd"] = x["usd"]
+            x["rate_usd_s"] = 0
+            x["trend_kind"] = "fixed"
+            x["trend_from"] = None
+            x["trend_note"] = "Held fixed: this stock is more than 25% from the IMF end-2026 figure, so the world clock does not project it"
+            x.pop("below_anchor_reason", None)
     rows.sort(key=lambda x: -x["usd"])
     total = sum(x["usd"] for x in rows)
     for x in rows: x["share"] = x["usd"] / total * 100

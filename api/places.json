@@ -1,6 +1,6 @@
 {
  "_doc": "Live place clocks on everydebtclock.com. value(t) = base + rate * (t - t0), t in Unix seconds; rate 0 = official figure, not projected. url is relative to https://everydebtclock.com/.",
- "generated": "2026-11-20T19:01:13-06:00",
+ "generated": "2026-11-22T13:49:49-06:00",
  "default": "texas",
  "hub": "states/",
  "hub_label": "All state & country debt clocks",
@@ -76,7 +76,7 @@
    "base": 22591010000000,
    "base_date": "2026-03-31",
    "t0": 1775019599.0,
-   "rate": 48605.619762097864,
+   "rate": 0,
    "population": 175686899,
    "publisher": "Finance Division, Ministry of Finance of Bangladesh",
    "url": "countries/bangladesh/"
@@ -282,10 +282,10 @@
    "currency": "EGP",
    "sym": "E\u00a3",
    "frequency": "quarterly",
-   "base": 17850712000000,
-   "base_date": "2026-03-31",
-   "t0": 1775019599.0,
-   "rate": 100344.05124302385,
+   "base": 17633900000000,
+   "base_date": "2026-06-30",
+   "t0": 1782881999.0,
+   "rate": 84652.01674277017,
    "population": 109600000,
    "publisher": "Ministry of Finance of Egypt (Debt Management Unit)",
    "url": "countries/egypt/"
@@ -646,7 +646,7 @@
    "base": 18471420000000,
    "base_date": "2026-08-31",
    "t0": 1788238799.0,
-   "rate": 43473.49061390157,
+   "rate": 0,
    "population": 134407258,
    "publisher": "Banco de M\u00e9xico",
    "url": "countries/mexico/"
@@ -703,7 +703,7 @@
    "base": 3427445000000,
    "base_date": "2026-06-30",
    "t0": 1782881999.0,
-   "rate": 35654.14129883308,
+   "rate": 0,
    "population": 5627400,
    "publisher": "Eurostat (national statistical institutes' EDP data)",
    "url": "countries/norway/"
@@ -912,7 +912,7 @@
    "base": 6203942000000,
    "base_date": "2026-07-31",
    "t0": 1785560399.0,
-   "rate": 9634.322678843228,
+   "rate": 0,
    "population": 63522380,
    "publisher": "South African Reserve Bank (SARB), with National Treasury",
    "url": "countries/south-africa/"
@@ -1007,7 +1007,7 @@
    "base": 5936400000000,
    "base_date": "2026-10-22",
    "t0": 1792731599.0,
-   "rate": 1065.1963776963778,
+   "rate": 0,
    "population": 23213251,
    "publisher": "National Treasury Administration, Ministry of Finance, Taiwan",
    "url": "countries/taiwan/"

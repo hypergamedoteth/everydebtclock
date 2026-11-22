@@ -4,7 +4,7 @@ The page mirrors the US homepage clock (same style.css, header, hero, What-chang
 history tiles, How-it-works panel and tap-to-open share dialog), rendered at build time plus a small ticker.
 Ticking numbers are a labelled projection: latest official figure + (latest - prior) / (seconds between them)
 x (seconds since latest). Places without two consecutive official figures show the official figure, fixed."""
-import json, os, html, glob, datetime as dt
+import json, os, html, glob, re, datetime as dt
 from zoneinfo import ZoneInfo
 import explore as ex
 
@@ -140,14 +140,62 @@ def comp_rate(c):
         return (c["value"] - c["prior_value"]) / (_eod(c["as_of"]) - _eod(c["prior_as_of"]))
     return None
 
+# One reporting interval. A series older than twice this is stale and must not tick.
+PERIOD_DAYS = {"weekly": 7, "monthly": 31, "quarterly": 92, "annual": 366}
+
+def freshness(p, today=None):
+    """Age of the latest official stock against two reporting intervals.
+
+    Country series past that age are stale. The clock is held (rate 0) the same way a
+    volatile state is held: the official figure stays on the page and does not tick.
+    """
+    today = today or dt.datetime.now(CT).date()
+    freq = p.get("frequency") or "annual"
+    period = PERIOD_DAYS.get(freq, 366)
+    as_of = max(c["as_of"] for c in p["components"])
+    age = (today - _d(as_of)).days
+    stale = p.get("kind") == "country" and age > 2 * period
+    if stale:
+        why = (f"the latest official figure is {age} days old, more than twice the stated {freq} interval "
+               f"({period} days), so the series is stale and there is no current trend to project")
+    elif p.get("hold_trend"):
+        why = p.get("hold_why") or ""
+    else:
+        why = ""
+    return {"stale": stale, "age": age, "period": period, "freq": freq,
+            "held": bool(p.get("hold_trend") or stale), "hold_why": why}
+
+def _cv_hits(p):
+    """Census coefficients of variation at or above 10%, the point a sampling-error note is shown on the page."""
+    hits = []
+    for c in p.get("components") or []:
+        m = re.search(r"coefficient of variation for \d{4}: ([\d.]+)%", c.get("includes") or "")
+        if m and float(m.group(1)) >= 10:
+            hits.append((c.get("short") or "local debt", float(m.group(1))))
+    if p.get("total_cv") is not None and float(p["total_cv"]) >= 10:
+        hits.append(("the state and local total", float(p["total_cv"])))
+    return hits
+
+def sampling_note(p):
+    if p.get("kind") != "state":
+        return ""
+    hits = _cv_hits(p)
+    if not hits:
+        return ""
+    bits = ", ".join(f"{v:.2f}% on {n}" for n, v in hits)
+    return (f'<p class="src"><b>High sampling error.</b> Census coefficient of variation: {E(bits)}. '
+            f'The estimate can be far from the true amount.</p>')
+
 def calc(p):
-    """Totals and the labelled trend. The trend is None unless every component has a prior official figure."""
+    """Totals and the labelled trend. The trend is None when the series is held or stale, or a component has no prior figure."""
     cs = p["components"]
     total = sum(c["value"] for c in cs)
-    rates = [None if p.get("hold_trend") else comp_rate(c) for c in cs]  # hold_trend: components are shown fixed too, so they always sum to the headline
-    rate = sum(rates) if all(r is not None for r in rates) and not p.get("hold_trend") else None  # hold_trend: official figure shown fixed (change within sampling error)
+    fresh = freshness(p)
+    rates = [None if fresh["held"] else comp_rate(c) for c in cs]
+    rate = sum(rates) if all(r is not None for r in rates) and not fresh["held"] else None
     return {"total": total, "t0": max(_eod(c["as_of"]) for c in cs), "rate": rate, "rates": rates,
-            "as_of": max(c["as_of"] for c in cs), "same_date": len({c["as_of"] for c in cs}) == 1}
+            "as_of": max(c["as_of"] for c in cs), "same_date": len({c["as_of"] for c in cs}) == 1,
+            "held": fresh["held"], "stale": fresh["stale"], "hold_why": fresh["hold_why"], "age_days": fresh["age"]}
 
 def nav_html(places, depth, current=None, cls="pl"):
     """Place nav: United States, then one link per section that has a live place, then Embed."""
@@ -346,12 +394,20 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                     _sd = lambda v: ("+" if v >= 0 else "−") + _short(abs(v) * 86400)   # signed amount per day
                     recent = (f"Recent pace differs: over the latest {_g} days ({_fd(_p)} → {as_of}) the official figure changed {'+' if _r >= 0 else '−'}{_short(abs(_r) * _g * 86400)} "
                               f"({_sd(_r)}/day), while the clock runs at {_sd(rate)}/day, the trend over the latest {T['period']}, so the ticking number {'is moving against the latest change' if _r * rate < 0 else 'may run ahead of the latest change'}.")
-    proj_txt = (f"The clock above starts from that official figure and projects forward at {T['pace']} (about {_short(abs(rate) * 86400)} a day{'' if up_ else ' less'}), "
-                f"the official change from {_fd(cs[0]['prior_as_of'])} to {as_of}. {E(rep)} reports {E(rep_its)} debt {T['once']}, not daily, so the ticking number is a projection, not an official figure; "
-                f"it re-bases when the next {T['report']} come out." + (" " + E(recent) if recent else "")) if rate else \
-               (f"{E(rep)} reports {E(rep_its)} debt {T['once']}, not daily. This page shows the official figure for {as_of} and does not tick it forward, because {E(p['hold_why'])}. Earlier official years are in the What changed table."
-                if p.get("hold_trend") and p.get("hold_why") else
-                f"{E(rep)} reports {E(rep_its)} debt {T['once']} and only one official figure is available, so the clock shows the official figure without projecting.")
+    if rate and coarse:
+        proj_txt = (f"The large figure is the official {as_of} stock and does not tick. "
+                    f"The projection beside it continues {T['pace']} (about {_short(abs(rate) * 86400)} a day{'' if up_ else ' less'}), "
+                    f"the official change from {_fd(cs[0]['prior_as_of'])} to {as_of}. "
+                    f"That projection is not a new official total. {E(rep)} reports {E(rep_its)} debt {T['once']}, not daily."
+                    + (" " + E(recent) if recent else ""))
+    elif rate:
+        proj_txt = (f"The clock above starts from that official figure and projects forward at {T['pace']} (about {_short(abs(rate) * 86400)} a day{'' if up_ else ' less'}), "
+                    f"the official change from {_fd(cs[0]['prior_as_of'])} to {as_of}. {E(rep)} reports {E(rep_its)} debt {T['once']}, not daily, so the ticking number is a projection, not an official figure; "
+                    f"it re-bases when the next {T['report']} come out." + (" " + E(recent) if recent else ""))
+    elif c.get("held") and c.get("hold_why"):
+        proj_txt = (f"{E(rep)} reports {E(rep_its)} debt {T['once']}, not daily. This page shows the official figure for {as_of} and does not tick it forward, because {E(c['hold_why'])}. Earlier official years are in the What changed table.")
+    else:
+        proj_txt = (f"{E(rep)} reports {E(rep_its)} debt {T['once']} and only one official figure is available, so the clock shows the official figure without projecting.")
     others = [o for o in places if o["slug"] != p["slug"]]
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span>'
              f'<a href="../../{sec_dir}/">All {"US state" if is_state else "country"} debt clocks</a>' + ('<span>·</span><a href="../../world/">World debt clock</a>' if WORLD else "") + '</div>')
@@ -364,6 +420,9 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     elif rate:
         kicker = f"Projection · as of {as_of}"
         live_attr = f' data-live="{E(kicker)}"'
+    elif c.get("stale"):
+        kicker = f"STALE · as of {as_of}"
+        live_attr = ""
     else:
         kicker = f"As of {as_of}"
         live_attr = ""
@@ -372,12 +431,14 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
             f'<div class="k"{live_attr}>{E(kicker)}</div><div class="big num" id="hv">{_usd0(c["total"] if coarse or not rate else proj)}</div>')
     if coarse and rate:
         hero += (f'<div class="sub"><span class="badge proj">PROJECTION</span> <span class="num" id="hp">{_usd0(proj)}</span> '
-                 f'<span class="note">straight line from the {E(as_of)} stock ({_rate_txt(rate)}). {E(rep)} reports {T["once"]}, so this is not an official daily figure.</span></div>')
+                 f'<span class="note">This smaller figure is a straight line from the {E(as_of)} stock ({_rate_txt(rate)}). '
+                 f'The large figure above is the official stock and does not tick. {E(rep)} reports {T["once"]}, so the projection is not an official total.</span></div>')
     elif rate:
         hero += (f'<div class="sub"><span>{_rate_txt(rate)}</span> <span class="note">projection: official change over the latest {T["period"]} ({_fd(cs[0]["prior_as_of"])} → {as_of}, {days} days); {E(rep)} reports {T["once"]}</span>'
                  + (f' <span class="note">{E(recent)}</span>' if recent else "") + f' <span>Since you opened this page: <span class="num" id="hs">{CUR}0</span> {"more" if up_ else "less"} debt</span></div>')
     else:
-        hero += f'<div class="sub"><span>as of {E(as_of)}</span> <span class="note">{E(rep)} reports {T["once"]}; {"shown fixed, not ticking" if p.get("hold_trend") else "one official figure available"}</span></div>'
+        fixed_note = "STALE · shown fixed, not ticking" if c.get("stale") else ("shown fixed, not ticking" if c.get("held") else "one official figure available")
+        hero += f'<div class="sub"><span>as of {E(as_of)}</span> <span class="note">{E(rep)} reports {T["once"]}; {fixed_note}</span></div>'
     trio_x = [(x["short"] + " · official " + _fd(x["as_of"]), _usd0(x["value"])) for x in cs[:2]] if len(cs) > 1 else \
              [(f"Official · {_fd(c['as_of'])}", _usd0(c["total"]))]
     trio_x += [(h["label"], h["value"]) for h in p.get("hero_extra", [])]
@@ -385,7 +446,11 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
              + "".join(f'<div><span class="l">{E(l)}</span><span class="num">{E(v)}</span></div>' for l, v in trio_x[:2]) + "</div>"
              + (f'<div class="sec2"><span class="l">{E(sec2["label"])} · official {E(_fd(sec2["as_of"]))}</span> <b class="num">{_usd0(sec2["value"])}</b> '
                 f'<span class="note">{E(sec2["publisher"])}. {E(sec2["scope"])}</span></div>' if sec2 else "")
-             + f'<div class="meta" style="margin-top:10px">{proj_badge if ticks else fix_badge(c["as_of"])}{ann_badge}<span class="badge">source: {E(pub)}</span></div></div>')
+             + f'<div class="meta" style="margin-top:10px">{proj_badge if ticks else fix_badge(c["as_of"])}{ann_badge}'
+             + ('<span class="badge ann">STALE</span>' if c.get("stale") else "")
+             + f'<span class="badge">source: {E(pub)}</span></div>'
+             + sampling_note(p)
+             + '</div>')
     intro = (f'<section class="intro" id="intro"><h1 class="quote asof">{h1_html}</h1>{crumb}'
              f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
              + (f'on <b>{as_of}</b>' if T["periodic"] else f'in Census survey year {fy} (dated <b>{as_of}</b>)' if p.get("year_label") else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
@@ -514,7 +579,8 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
 
     # ---- How it works (mirrors the US method panel)
     if rate:
-        meth = (f'<p><b>The live number</b> = latest official total + ({T["rate_phrase"]} × seconds since that total). '
+        lead = ("<p><b>The large figure is the official stock and does not tick.</b> The projection beside it is a straight line. The projection method is unchanged.</p>" if coarse else "")
+        meth = (lead + f'<p><b>The live number</b> = latest official total + ({T["rate_phrase"]} × seconds since that total). '
                 f'{E(rep)} publishes {E(rep_its)} debt {T["once"]}, not daily, so this is a projection between {T["report"]}, not an official figure.</p>'
                 f'<p><code>projected = {c["total"]:,.0f} + {rate:,.4f} × (seconds since {as_of} 11:59:59 PM CT)</code></p>'
                 + (f'<p>The rate is each part\'s official change over its latest {T["period"]}, added up: ' + "; ".join(f'{E(x["short"].lower())} {_usd0(x["value"])} − {_usd0(x["prior_value"])} = {_usd0(x["value"] - x["prior_value"])}' for x in cs) + '; combined '
@@ -522,7 +588,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                 + f'{_usd0(yr_change)} over {days} days = {_usd2(rate)} per second. {E(p.get("trend_why", "")) + " " if p.get("trend_why") else ""}The actual path is lumpy (bonds are sold in batches and repaid on schedules), so the projection will drift; '
                 f'when new {T["report"]} come out, the clock re-bases to the new official figures.</p>')
     else:
-        meth = "<p><b>Why this number doesn't tick.</b> " + (f"Earlier official years are in the history table, but {E(p['hold_why'])}, so there is no defensible trend to project. The figure shown is the official total.</p>" if p.get("hold_trend") and p.get("hold_why") else "Only one official year is available, so there is no defensible trend to project. The figure shown is the official total.</p>")
+        meth = "<p><b>Why this number doesn't tick.</b> " + (f"Earlier official years are in the history table, but {E(c['hold_why'])}, so there is no defensible trend to project. The figure shown is the official total.</p>" if c.get("held") and c.get("hold_why") else "Only one official year is available, so there is no defensible trend to project. The figure shown is the official total.</p>")
     meth += (f'<p><b>How often it\'s published.</b> {E(p.get("cadence", ""))} {E(p.get("next_update", ""))}</p>'
              f'<p><b>Per {E(dem)}</b> divides by {E(T["pop_pos"])} estimate of {pop["value"]:,} {T["noun"]} on {_fd(pop["as_of"])}. It is not projected forward, so the live per-{E(dem)} figure {"rises" if (rate or 0) >= 0 else "falls"} only with the debt.</p>'
              + "".join(f"<p><b>Note.</b> {E(n)}</p>" for n in p.get("notes", []) + [p.get("fiscal_year_end_note", "")] if n)

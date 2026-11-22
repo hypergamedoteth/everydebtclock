@@ -136,6 +136,7 @@
    "url": "https://www.tesourotransparente.gov.br/"
   }
  ],
+ "imf_explain": "The IMF general-government stock counts Treasury bonds held by the central bank. Brazil's DBGG, the clock on this page, counts only the central bank's repo-linked holdings of those bonds, so the IMF figure is larger even though both are general government.",
  "notes": [
   "Why this measure: DBGG is the headline gross debt statistic in Brazil's fiscal reporting. It is broader than the federal Treasury debt alone because it includes state and municipal governments.",
   "Gross, not net: this is not net of the government's assets. The Banco Central do Brasil publishes net public sector debt separately."

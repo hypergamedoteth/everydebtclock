@@ -178,12 +178,24 @@ def dmdc_states():
     return out, us_total
 
 
-def usa_states():
+# Medicare fee-for-service is booked to the contractor's place of performance (Noridian in
+# North Dakota, and the same pattern in other contractor states). Social Security benefit
+# payments are direct payments, not grants performed in the state. Neither is dropped by
+# removing every MULTIPLE RECIPIENTS row: real grants can use that recipient label.
+MEDICARE_FFS = ["93.770", "93.773", "93.774"]
+SS_BENEFITS = ["96.001", "96.002", "96.004", "96.006", "96.007"]
+EXCLUDE_CFDA = MEDICARE_FFS + SS_BENEFITS
+
+
+def _usa_geo(program_numbers=None):
+    filters = {"time_period": [{"start_date": "2025-10-01", "end_date": "2026-09-30"}]}
+    if program_numbers:
+        filters["program_numbers"] = list(program_numbers)
     body = {
         "scope": "place_of_performance",
         "geo_layer": "state",
         "spending_level": "transactions",
-        "filters": {"time_period": [{"start_date": "2025-10-01", "end_date": "2026-09-30"}]},
+        "filters": filters,
     }
     req = urllib.request.Request(USA_API, data=json.dumps(body).encode(),
                                  headers={"Content-Type": "application/json", "User-Agent": UA})
@@ -197,20 +209,40 @@ def usa_states():
         if not code:
             continue
         by_code[code] = int(round(float(row["aggregated_amount"]) * 100))  # cents
+    return by_code
+
+
+def _by_slug(by_code, places, required=True):
+    out = {}
+    for p in places:
+        code = p["region_code"]
+        if code not in by_code:
+            if required:
+                raise SystemExit(f"USAspending has no row for {code}")
+            out[p["slug"]] = 0
+        else:
+            out[p["slug"]] = by_code[code]
+    return out
+
+
+def usa_states():
     places = []
     for fn in os.listdir(os.path.join(R, "places")):
         p = json.load(open(os.path.join(R, "places", fn)))
         if p.get("kind") == "state" and p.get("status") == "live":
             places.append(p)
-    out = {}
-    for p in places:
-        code = p["region_code"]
-        if code not in by_code:
-            raise SystemExit(f"USAspending has no row for {code}")
-        out[p["slug"]] = by_code[code]
-    if len(out) != 51:
-        raise SystemExit(f"USAspending states {len(out)}")
-    return out
+    gross = _by_slug(_usa_geo(), places, required=True)
+    medicare = _by_slug(_usa_geo(MEDICARE_FFS), places, required=False)
+    excluded = _by_slug(_usa_geo(EXCLUDE_CFDA), places, required=False)
+    if len(gross) != 51:
+        raise SystemExit(f"USAspending states {len(gross)}")
+    net = {}
+    for slug, g in gross.items():
+        cut = excluded.get(slug, 0)
+        if cut > g:
+            raise SystemExit(f"USAspending exclusion exceeds the total for {slug}: {cut} > {g}")
+        net[slug] = g - cut
+    return {"net": net, "gross": gross, "medicare": medicare, "excluded": excluded}
 
 
 def main():
@@ -221,7 +253,8 @@ def main():
     dmdc, us_total = dmdc_states()
     print("DMDC ok", len(dmdc), "US total", us_total, "states+DC", sum(dmdc.values()))
     usa = usa_states()
-    print("USAspending ok", len(usa), "states+DC cents", sum(usa.values()))
+    print("USAspending ok", len(usa["net"]), "states+DC net cents", sum(usa["net"].values()),
+          "excluded", sum(usa["excluded"].values()))
     doc = {
         "_doc": "Fixed official figures for the state-page federal section. The live federal-debt share and the interest share are computed at build time from data/data.json and data/us-interest.csv so they stay on the same Treasury figures as the rest of the site. Amounts from USAspending are integer cents.",
         "ssa": {
@@ -262,11 +295,15 @@ def main():
             "pulled": dt.datetime.now(CT).date().isoformat(),
             "scope": "place_of_performance",
             "spending_level": "transactions",
-            "measure": "Prime-award transaction amounts with a place of performance in the state during the fiscal year. Not most federal salaries. Not a full accounting of benefits paid to residents. Agencies can still file late records after the pull date.",
+            "exclude_cfda": EXCLUDE_CFDA,
+            "measure": "Prime-award transaction amounts with a place of performance in the state during the fiscal year, excluding Medicare fee-for-service (CFDA 93.770, 93.773, 93.774) and Social Security benefit payments (CFDA 96.001, 96.002, 96.004, 96.006, 96.007). Those payments are often booked to a contractor's place of performance. Federal salaries are mostly not in USAspending. Grants and contracts performed in the state are included. Agencies can still file late records after the pull date.",
             "source_name": "USAspending.gov",
             "source_url": "https://www.usaspending.gov/state/{slug}/2026",
             "api": USA_API,
-            "states_cents": usa,
+            "states_cents": usa["net"],
+            "states_gross_cents": usa["gross"],
+            "states_medicare_cents": usa["medicare"],
+            "states_excluded_cents": usa["excluded"],
         },
     }
     json.dump(doc, open(OUT, "w"), indent=1)
@@ -274,5 +311,29 @@ def main():
     print("wrote", OUT)
 
 
+def awards_only():
+    """Refresh only the USAspending block. SSA, OPM, and DMDC stay as committed."""
+    doc = json.load(open(OUT))
+    usa = usa_states()
+    block = doc["usaspending"]
+    block["pulled"] = dt.datetime.now(CT).date().isoformat()
+    block["exclude_cfda"] = EXCLUDE_CFDA
+    block["measure"] = ("Prime-award transaction amounts with a place of performance in the state during the fiscal year, "
+                        "excluding Medicare fee-for-service (CFDA 93.770, 93.773, 93.774) and Social Security benefit payments "
+                        "(CFDA 96.001, 96.002, 96.004, 96.006, 96.007). Those payments are often booked to a contractor's place of performance. "
+                        "Federal salaries are mostly not in USAspending. Grants and contracts performed in the state are included. "
+                        "Agencies can still file late records after the pull date.")
+    block["states_cents"] = usa["net"]
+    block["states_gross_cents"] = usa["gross"]
+    block["states_medicare_cents"] = usa["medicare"]
+    block["states_excluded_cents"] = usa["excluded"]
+    json.dump(doc, open(OUT, "w"), indent=1)
+    open(OUT, "a").write("\n")
+    print("wrote", OUT)
+
+
 if __name__ == "__main__":
-    main()
+    if "--awards-only" in sys.argv:
+        awards_only()
+    else:
+        main()

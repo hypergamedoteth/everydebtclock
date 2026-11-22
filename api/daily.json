@@ -1,10 +1,10 @@
 {
  "schema_version": 2,
- "as_of": "2026-11-21T00:12:01-06:00",
- "fetched_at": "2026-11-20T20:50:33-06:00",
+ "as_of": "2026-11-22T13:49:49-06:00",
+ "fetched_at": "2026-11-21T12:08:35-06:00",
  "treasury_record_date": "2026-11-19",
  "total_debt_official": 40709780700317.02,
- "total_debt_projected_now": 40718179494261,
+ "total_debt_projected_now": 40730720774800,
  "change_1d_official": {
   "amount": 19011061467.07,
   "from_date": "2026-11-18",
@@ -40,15 +40,29 @@
  "census_population_official": 341784857,
  "census_population_vintage": "Census Vintage 2025 (NST-EST2025)",
  "census_population_date": "2025-07-01",
- "debt_per_person_projected_now": 118788.01,
- "population_projected_now": 342780209,
+ "debt_per_person_projected_now": 118823.53,
+ "population_projected_now": 342783280,
  "debt_per_household_official": 302023.75,
- "debt_per_household_projected_now": 302086.06,
+ "debt_per_household_projected_now": 302179.1,
  "households_official": 134790000,
  "households_source": "Census CPS ASEC 2025",
  "per_person_basis": "_official = Treasury close / official Census estimate (no projection); _projected_now = projected debt / population projected at Census's stated rate",
+ "per_person_basis_code": "official_census",
  "stale": false,
  "source_url": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
  "source_api": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/debt_to_penny",
- "site_url": "https://everydebtclock.com"
+ "site_url": "https://everydebtclock.com",
+ "debt_subject_to_limit": 40507450000000.0,
+ "statutory_limit": 41103996000000.0,
+ "dts_record_date": "2026-11-19",
+ "debt_limit_headroom": 596546000000.0,
+ "debt_limit_reported_status": "in_force",
+ "days_to_limit_estimate": {
+  "days": 76.2,
+  "projected_date": "2027-02-04",
+  "per_day": 7826493286.36,
+  "from_date": "2026-11-19",
+  "method": "Estimate, not a Treasury forecast. Headroom (statutory limit minus debt subject to the limit) divided by the 90-day least-squares daily change in debt subject to the limit, from Daily Treasury Statement Table III-C. Debt does not rise in a straight line. This ignores the Treasury cash balance, tax season, and extraordinary measures, so it is not an X-date."
+ },
+ "extraordinary_measures": "not in use"
 }

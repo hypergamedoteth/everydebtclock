@@ -6,8 +6,29 @@ left untouched (exit 0)."""
 import re, sys
 from place_util import *
 
-PAGE = "https://mof.gov.eg/en/financial-data/citizens-budget/budget-sector-debt-bulletin/budget-sector-debt-bulletin"
+# The bulletin index moved in 2026. The old citizens-budget URL 404s. Try the current page, then the old one.
+PAGES = [
+    "https://mof.gov.eg/en/financial-data/budget-agencies-debt-management/budget-sector-debt-bulletin/budget-sector-debt-bulletin",
+    "https://mof.gov.eg/en/financial-data/citizens-budget/budget-sector-debt-bulletin/budget-sector-debt-bulletin",
+]
 M = 10**6
+
+def bulletin_html():
+    errors = []
+    for url in PAGES:
+        try:
+            html = get(url, ua=BROWSER_UA, timeout=45)
+        except Exception as e:
+            errors.append(f"{url}: {e}")
+            continue
+        if "Budget_Sector_Statistical_Debt_Bulletin_" in html:
+            return html
+        errors.append(f"{url}: no bulletin links")
+    raise RuntimeError("bulletin page not found; " + "; ".join(errors))
+
+def _millions(text):
+    """EGP billions as printed in the 2026 narrative bulletin, in the table's EGP-million unit."""
+    return int(round(float(text.replace(",", "")) * 1000))
 
 def read(url):
     t = pdf_text(get(url, ua=BROWSER_UA, raw=True))
@@ -15,13 +36,25 @@ def read(url):
         r = re.search(r"^\s*" + label + r"[^\n\d]*([\d,]{7,}(?:\s+[\d,]{7,})*)", t, re.M)
         if not r: raise RuntimeError(f"row {label!r} missing in {url}")
         return [int(x.replace(",", "")) for x in re.findall(r"[\d,]{7,}", r.group(1))]
-    tot, dom, ext = row("Total Budget Sector Debt Outstanding"), row("Total Domestic Budget Sector Debt"), row("Total External Budget Sector Debt")
-    # the table gives the reference date (usually the previous June) first and the bulletin quarter-end last
-    if abs(dom[-1] + ext[-1] - tot[-1]) > 5: raise RuntimeError("domestic + external != total")
-    return tot[-1], dom[-1], ext[-1]
+    try:
+        tot, dom, ext = row("Total Budget Sector Debt Outstanding"), row("Total Domestic Budget Sector Debt"), row("Total External Budget Sector Debt")
+        # the table gives the reference date (usually the previous June) first and the bulletin quarter-end last
+        if abs(dom[-1] + ext[-1] - tot[-1]) > 5: raise RuntimeError("domestic + external != total")
+        return tot[-1], dom[-1], ext[-1]
+    except RuntimeError:
+        pass
+    # June 2026 onward states the stock in the narrative instead of the old table.
+    tot_m = re.search(r"total budget sector debt stood at EGP ([\d,.]+) billion", t, re.I)
+    dom_m = re.search(r"Domestic budget sector debt was EGP ([\d,.]+) billion", t, re.I)
+    ext_m = re.search(r"External budget sector debt reached USD [\d,.]+ billion \(EGP ([\d,.]+) billion\)", t, re.I)
+    if not (tot_m and dom_m and ext_m):
+        raise RuntimeError(f"debt stock not found in {url}")
+    tot, dom, ext = _millions(tot_m.group(1)), _millions(dom_m.group(1)), _millions(ext_m.group(1))
+    if abs(dom + ext - tot) > 5: raise RuntimeError("domestic + external != total")
+    return tot, dom, ext
 
 def build(p):
-    h = get(PAGE, ua=BROWSER_UA)
+    h = bulletin_html()
     found = {}
     for u, mon, yr in re.findall(r'(https://media\.mof\.gov\.eg/mof-prd/Budget_Sector_Statistical_Debt_Bulletin_([A-Za-z]+)_(\d{4})_[0-9a-f]+\.pdf)', h):
         try: found[month_end(int(yr), MONTHS.index(mon) + 1)] = u

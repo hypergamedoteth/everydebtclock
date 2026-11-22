@@ -597,6 +597,7 @@ def build_api():
         "households_official": int(hh) if hh else None,
         "households_source": "Census CPS ASEC 2025" if hh else None,
         "per_person_basis": "_official = Treasury close / official Census estimate (no projection); _projected_now = projected debt / population projected at Census's stated rate",
+        "per_person_basis_code": "official_census",
         "stale": bool(td.get("stale") or M.get("debt_closes_stale")),
         "source_url": td.get("source") or "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
         "source_api": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/debt_to_penny",
@@ -1447,7 +1448,8 @@ def check_quotable():
               "debt_per_household_official", "debt_per_household_projected_now", "households_official",
               "households_source", "per_person_basis", "stale", "source_url", "source_api", "site_url"}
     added = {"debt_subject_to_limit", "statutory_limit", "dts_record_date", "debt_limit_headroom",
-             "debt_limit_reported_status", "days_to_limit_estimate", "extraordinary_measures"}
+             "debt_limit_reported_status", "days_to_limit_estimate", "extraordinary_measures",
+             "per_person_basis_code"}
     extra = set(api) - expect - added
     missing = expect - set(api)
     if missing or extra or api.get("schema_version") != 2:

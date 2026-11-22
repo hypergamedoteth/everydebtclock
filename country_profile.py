@@ -860,10 +860,19 @@ def official_section(R, place):
     peers, outside = weo_build._peers(e, economies)
     us = profiles["USA"]
     paras = "".join(f"<p>{E(text)}</p>" for text in paragraphs(p, us, peers, outside))
+    import world_sources
+    gg_clock = world_sources.is_gg_text(place.get("world_measure")) or world_sources.is_gg_text(place.get("headline_long"))
+    explain = (place.get("imf_explain") or "").strip()
+    if gg_clock:
+        wider = "This is general government gross debt, the same perimeter as this page's clock."
+        if explain:
+            wider += " " + explain
+    else:
+        wider = "This is general government gross debt, a wider measure than the clock on this page when the clock is central or federal debt."
     return (f'<section id="profile"><div class="sh"><span class="bar" style="background:var(--amber)"></span>'
             f'<h2>IMF debt to GDP, for comparison</h2>'
             f'<span class="h2n">{E(SOURCE)} · published {PUBLISHED}</span></div>'
-            f'<p>{E(h1_text(p))} This is general government gross debt, a wider measure than the clock on this page when the clock is central or federal debt.</p>'
+            f'<p>{E(h1_text(p))} {E(wider)}</p>'
             f'{paras}{history_section(p, "imf-history", "imf-path")}'
             f'{compare_section(p, peers, outside)}</section>')
 

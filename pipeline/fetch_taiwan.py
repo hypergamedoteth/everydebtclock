@@ -6,14 +6,26 @@ The trend is the official change over the latest twelve months (month-end observ
 import csv, io, sys, datetime as dt
 from place_util import *
 
-URL = "https://nss.nta.gov.tw/nss/files/opendata/D3-12F.csv"
+# The weekly file often times out. Try each URL; the outer refresh workflow also kills a hung fetch at 90s.
+URLS = [
+    "https://nss.nta.gov.tw/nss/files/opendata/D3-12F.csv",
+]
 YI = 10**8
+
+def _csv():
+    errors = []
+    for url in URLS:
+        try:
+            return get(url, ua=BROWSER_UA, raw=True, timeout=25)
+        except Exception as e:
+            errors.append(f"{url}: {e}")
+    raise RuntimeError("taiwan file not fetched; " + "; ".join(errors))
 
 def roc(s):
     s = s.strip(); return dt.date(int(s[:-4]) + 1911, int(s[-4:-2]), int(s[-2:])).isoformat()
 
 def build(p):
-    rows = list(csv.reader(io.StringIO(get(URL, ua=BROWSER_UA, raw=True).decode("utf-8-sig"))))[1:]
+    rows = list(csv.reader(io.StringIO(_csv().decode("utf-8-sig"))))[1:]
     series, pops = {}, {}
     for r in rows:
         if len(r) < 4 or not r[0].strip().isdigit(): continue
