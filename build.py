@@ -17,6 +17,7 @@ SITE = os.environ.get("DEBTCLOCK_SITE_URL", "https://everydebtclock.com").rstrip
 # Old iOS asks for this name even when apple-touch-icon.png is linked.
 shutil.copyfile(f"{R}/apple-touch-icon.png", f"{R}/apple-touch-icon-precomposed.png")
 import freshness
+import clocktime
 OLD_LASTMOD = freshness.read_lastmods(os.path.join(R, "sitemap.xml"))
 # Analytics hook: empty by default. Set ANALYTICS_HTML (raw HTML snippet) or put it in analytics.html next to build.py.
 # The env var wins if both exist. It is injected before </head> on index.html, every t/ page, 404.html and the standalone.
@@ -220,10 +221,9 @@ for _h in sorted(HIST):
 idx = open(f"{R}/index.html").read()
 PP_OFF = OFF_V / POP_OFF if OFF_V and POP_OFF else None
 held = bool((T.get("debt_total") or {}).get("held_at_limit"))
-desc = (f"US national debt: {tril(OFF_V)} at Treasury's {fdate(OFF_D)} close, {usd2(PP_OFF)} per person. "
-        f"Live US debt clock projected from official Treasury data, with the deficit, interest, the debt limit and "
-        f"{len(ALL) - len(HIST)} counters, checked daily against Treasury.")
-HOME_TITLE = "US Debt Clock: Live National Debt, Checked Daily Against Treasury"
+desc = (f"Every Debt Clock's US debt clock and national debt clock: {tril(OFF_V)} at Treasury's {fdate(OFF_D)} close, "
+        f"{usd2(PP_OFF)} per person. Official Treasury figures, checked daily.")
+HOME_TITLE = "Every Debt Clock: US debt clock and national debt clock"
 temporal = f"{CLOSES[-1][0]}/{CLOSES[0][0]}" if CLOSES else None
 home_ld = dataset_ld("US national debt, daily official closes and live projection",
     f"Total public debt outstanding from Treasury's Debt to the Penny (latest close {fdate(OFF_D)}: {usd2(OFF_V)}), debt held by the public, "
@@ -272,10 +272,10 @@ meta = f"""<!--META--><title>{HOME_TITLE}</title>
 <meta name="description" content="{html.escape(desc)}">
 <link rel="canonical" href="{SITE}/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Every Debt Clock"><meta property="og:url" content="{SITE}/">
-<meta property="og:title" content="Every Debt Clock: US national debt, live and verified daily"><meta property="og:description" content="{html.escape(desc)}">
+<meta property="og:title" content="{html.escape(HOME_TITLE)}"><meta property="og:description" content="{html.escape(desc)}">
 <meta property="og:image" content="{SITE}/og/home.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="US national debt counter with per-person and per-tax-return figures">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Every Debt Clock: US national debt, live and verified daily">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{html.escape(HOME_TITLE)}">
 <meta name="twitter:description" content="{html.escape(desc)}"><meta name="twitter:image" content="{SITE}/og/home.png">
 {home_ld}
 {faq_ld(HOME_FAQS)}
@@ -307,6 +307,7 @@ LEAD, LEAD_HTML = quotable.asof_pair(f"US federal debt is {tril(OFF_V)}", fdate(
 answer_s = f"The official total is <b>{usd2(OFF_V)}</b> as of <b>{fdate(OFF_D)}</b>."
 intro = (f"""<!--INTRO--><h1 class="quote asof" id="official">{LEAD_HTML}</h1>
 <p class="answer">{answer_s} The figure is from <a href="{DTP_URL}" rel="noopener">U.S. Treasury, Debt to the Penny</a>.</p>
+<p>Every Debt Clock publishes this US debt clock and national debt clock from that Treasury close. The live total is the number above.</p>
 <p>That is <b>{usd2(PP_OFF)} per person</b>: the debt divided by the Census Bureau's estimate of
 {POP_OFF:,.0f} US residents on {fdate(POP_OFF_DATE)}. {proj_txt}</p>
 <!--/INTRO-->""")
@@ -1001,7 +1002,7 @@ main{{max-width:760px;margin:0 auto;padding:22px 16px 60px}}a{{color:#5aa9ff;ove
 <a href="/" style="font-weight:800;letter-spacing:.06em;color:#e8edf5;text-decoration:none">EVERY <b style="color:#ff4d5e">DEBT</b> CLOCK</a>
 <h1>Data feeds</h1>
 <ul>{items}</ul>
-<p>CSV downloads and charts are on the <a href="/data/">data page</a>.</p>
+<p>CSV downloads and charts are on the <a href="/data/">data page</a>. The same feeds are described in <a href="/openapi.json">openapi.json</a> (OpenAPI 3, free, no API key).</p>
 </main></body></html>
 """
     os.makedirs(f"{R}/api", exist_ok=True)
@@ -1057,7 +1058,7 @@ def write_facts():
     if WORLD:
         dmin = min(x["as_of"] for x in WORLD["rows"])
         dmax = max(x["as_of"] for x in WORLD["rows"])
-        _world_line = html.escape(world_build.lead_claim(WORLD, dt.date.today()))
+        _world_line = html.escape(world_build.lead_claim(WORLD, clocktime.chicago_today()))
         add("World government debt", f"{_world_line} Source: national releases, Eurostat, and the <a href=\"https://www.imf.org/external/datamapper/GGXWDG_NGDP@WEO\" rel=\"noopener\">IMF World Economic Outlook</a>. See <a href=\"../world/\">the world debt clock</a>.")
     by = {int(r[0]): (r[1], r[2]) for r in (M.get("debt_by_fy") or [])}
     if by:
@@ -1169,7 +1170,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- How much is the national debt per person? {usd2(PP_OFF)} as of {fdate(OFF_D)}, the official total divided by the Census estimate of {POP_OFF:,.0f} residents on {fdate(POP_OFF_DATE)}.",
     ("- How much interest does the US pay per day? " + INTEREST_DAY if INTEREST_DAY else "- How much interest does the US pay per day? Not available from the current interest-expense and average-rate inputs."),
     f"- When will the US national debt hit ${MILE['n']} trillion? {MILE['quote']}",
-    (f"- World government debt: {world_build.lead_claim(WORLD, dt.date.today())} "
+    (f"- World government debt: {world_build.lead_claim(WORLD, clocktime.chicago_today())} "
      f"An IMF row's published figure is the end-2025 stock; the end-2026 estimate is the year-end target the clock runs toward, not a December 31 closing balance. See /world/." if WORLD else
      "- World government debt: the world page was not built on this run."),
     "",
@@ -1177,7 +1178,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- / : US national debt clock. Official total {usd2(OFF_V)} as of {fdate(OFF_D)} (Treasury, Debt to the Penny). The live projection is re-based every business day.",
     f"- /facts/ : Headline figures with the official record date and source for each number. Machine-readable feed: {SITE}/api/daily.json",
     "- /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.",
-    "- /debt-limit/ : X-date forecasts, extraordinary measures, and what a missed X-date would affect. The live limit, headroom, and the countdown to the ceiling are linked from here. They are not repeated.",
+    "- /debt-limit/ : Debt ceiling and X-date. Statutory limit, debt subject to the limit, and headroom are the daily.json figures, with the Daily Treasury Statement date. Extraordinary measures follow that feed's label and are not stated when the feed has none.",
     f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
     "- /your-share/ : One equal share of the official total, the live national debt clock divided by population. No calculator.",
     "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
@@ -1220,6 +1221,8 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- {SITE}/data/us-debt-annual.json — the same annual series",
     f"- {SITE}/data/ — CSV downloads (debt by year, by president, per person, interest, states, countries) and chart images",
     f"- {SITE}/api/daily.json — latest official US total and daily changes",
+    f"- {SITE}/openapi.json — OpenAPI 3 description of the JSON feeds. Free, no API key. Attribution: Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Debt to the Penny.",
+    f"- {SITE}/.well-known/ai-plugin.json — static plugin manifest pointing at that OpenAPI file",
     f"- {SITE}/data/data.json — all US tickers, official bases and rates",
     f"- {SITE}/api/places.json — state and country clocks",
     f"- {SITE}/api/world.json — best-source world total, with source tier and as-of date for each economy",
@@ -1229,6 +1232,8 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- {SITE}/llms.txt",
     "",
 ]))
+import openapi_build
+openapi_build.write(R, SITE)
 # IndexNow verification file: the key is both the filename and the file body.
 _idx_key_path = f"{R}/pipeline/indexnow.key"
 if os.path.exists(_idx_key_path):

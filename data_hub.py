@@ -605,9 +605,11 @@ HISTORY_SCHEDULE = ("Rewritten by the daily GitHub Action that refreshes this si
 
 
 def _fetched_day(path):
+    """Calendar day of a fetch timestamp, in America/Chicago. UTC would show the next day after 6 PM CT."""
     try:
+        import clocktime
         stamp = json.load(open(path))["fetched"]
-        return dt.datetime.fromtimestamp(stamp, dt.timezone.utc).date().isoformat()
+        return clocktime.chicago_today(stamp).isoformat()
     except Exception:
         return ""
 
@@ -889,6 +891,7 @@ footer{{color:#5c687a;font-size:12px;margin-top:28px}}
 <p>Redrawn on every build from the CSV files. Each image carries the credit EveryDebtClock.com.</p>
 {''.join(figures)}
 <p>The same figures, with the source notes, are on <a href="../national-debt-by-year/">national debt by year</a>, <a href="../national-debt-by-president/">debt by president</a>, <a href="../national-debt-per-person/">debt per person</a>, <a href="../interest-on-the-national-debt/">interest on the debt</a>, <a href="../states/">state debt clocks</a>, and the <a href="../world/">world debt clock</a>.</p>
+<p>The JSON feeds are described in <a href="../openapi.json">openapi.json</a> (OpenAPI 3, no API key). Country series files are listed at <a href="../country-series/">/country-series/</a>. The small daily feed is <a href="../api/daily.json">/api/daily.json</a>.</p>
 <footer class="site-foot">Every Debt Clock · <a href="../">Home</a> · <a href="../embed/">Embed a clock</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main></body></html>'''
     path = os.path.join(R, "data", "index.html")

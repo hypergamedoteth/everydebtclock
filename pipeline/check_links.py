@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Fail if the staged site (_site) has an internal link, src, or og:image that is not a file.
 
-Also requires the public URLs crawlers already request: the US country alias, the retired
-share and OG images, the precomposed touch icon, /api/, and the /t/ trailing-slash aliases.
-Those are not all linked from current pages, so a link scan alone would not keep them.
+Also reads sitemap.xml, llms.txt, CSS url(), and JSON feeds for internal URLs.
+Requires the public URLs crawlers already request, including /your-share.html,
+/your-share/born/, /country-series/, /openapi.json, and /.well-known/ai-plugin.json.
+
+External http(s) links are requested and printed, including 404s. They do not fail
+the check, because many official sites block automated requests.
 
 Run after the workflow copies public files into _site. Passing the repo root instead of
 _site does not catch a path that build.py wrote but the deploy copy list left behind.
@@ -11,13 +14,18 @@ _site does not catch a path that build.py wrote but the deploy copy list left be
 from __future__ import annotations
 
 import hashlib
+import json
 import os
+import re
 import sys
 from html.parser import HTMLParser
 from urllib.parse import unquote, urlparse
 
 HOSTS = {"everydebtclock.com", "www.everydebtclock.com"}
 SKIP_SCHEMES = {"mailto", "tel", "sms", "javascript", "data", "blob", "about"}
+CSS_URL = re.compile(r"url\(\s*['\"]?([^)'\"]+)['\"]?\s*\)", re.I)
+TEXT_URL = re.compile(r"https?://[^\s<>\"']+")
+LLMS_PATH = re.compile(r"(?<![\w/])(/[a-z0-9][a-z0-9._/-]*/)")
 # Offline snapshot of the homepage. Its relative URLs are written as if the file were
 # index.html, and nothing on the site links to /dist/.
 ROOT_SHAPED = {"dist/debtclock-standalone.html"}
@@ -286,16 +294,25 @@ def check_legacy(root):
         same(root, f"your-share/og/{year}.png", "your-share/og/default.png")
         same(root, f"your-share/og/{year}-sq.png", "your-share/og/default-sq.png")
     api = open(os.path.join(root, "api", "index.html"), encoding="utf-8").read()
-    for name in ("daily.json", "daily.txt", "world.json", "/data/"):
+    for name in ("daily.json", "daily.txt", "world.json", "/data/", "/openapi.json"):
         if name not in api:
             fail(f"/api/ index does not point at {name}")
+    for rel in ("your-share.html", "your-share/born/index.html", "country-series/index.html",
+                "openapi.json", ".well-known/ai-plugin.json"):
+        if not os.path.isfile(os.path.join(root, rel)):
+            fail(f"missing {rel}")
+    require_redirect(root, "your-share.html", "https://everydebtclock.com/your-share/", "/your-share/")
+    spec = json.load(open(os.path.join(root, "openapi.json"), encoding="utf-8"))
+    if not str(spec.get("openapi", "")).startswith("3."):
+        fail("openapi.json is not OpenAPI 3")
+    if "everydebtclock.com" not in json.dumps(spec.get("info", {})):
+        fail("openapi.json info does not name everydebtclock.com")
     check_world_table(root)
     world = open(os.path.join(root, "world", "index.html"), encoding="utf-8").read()
     if 'href="../countries/united-states/"' in world or 'href="/countries/united-states/"' in world:
         fail("world page still links to /countries/united-states/")
     if 'href="../">United States debt clock</a>' not in world:
         fail("world page does not link the United States row to /")
-    import json
     rows = json.load(open(os.path.join(root, "api", "world.json")))["countries"]
     usa = next(r for r in rows if r.get("iso3") == "USA")
     if usa.get("url", "").rstrip("/") != "https://everydebtclock.com":
@@ -311,34 +328,135 @@ def check_legacy(root):
         fail("404.html lost its noindex")
 
 
+def _walk_files(root):
+    for dirpath, dirs, files in os.walk(root):
+        dirs[:] = [d for d in dirs if d not in {".git", "cache", "pipeline", "__pycache__"}]
+        for name in files:
+            yield os.path.join(dirpath, name)
+
+
+def _json_strings(obj, out):
+    if isinstance(obj, dict):
+        for value in obj.values():
+            _json_strings(value, out)
+    elif isinstance(obj, list):
+        for value in obj:
+            _json_strings(value, out)
+    elif isinstance(obj, str) and (obj.startswith("http://") or obj.startswith("https://") or (obj.startswith("/") and " " not in obj and len(obj) < 300)):
+        out.append(obj)
+
+
+def collect_refs(root):
+    """Every internal reference the deploy should be able to serve, plus external URLs."""
+    refs = []
+    external = []
+    pages = 0
+    for path in _walk_files(root):
+        relf = os.path.relpath(path, root).replace("\\", "/")
+        name = os.path.basename(path)
+        if name.endswith(".html"):
+            pages += 1
+            text = open(path, encoding="utf-8", errors="replace").read()
+            parser = Refs()
+            try:
+                parser.feed(text)
+            except Exception as exc:
+                fail(f"could not read {relf}: {exc}")
+            refs.extend((path, kind, raw) for kind, raw in parser.found)
+            refs.extend((path, "css url", m.group(1)) for m in CSS_URL.finditer(text))
+        elif name.endswith(".css"):
+            text = open(path, encoding="utf-8", errors="replace").read()
+            refs.extend((path, "css url", m.group(1)) for m in CSS_URL.finditer(text))
+        elif name.endswith(".xml"):
+            text = open(path, encoding="utf-8", errors="replace").read()
+            refs.extend((path, "sitemap", loc.strip()) for loc in re.findall(r"<loc>\s*([^<]+)\s*</loc>", text))
+        elif name == "llms.txt" or (name.endswith(".txt") and relf in {"llms.txt", "robots.txt", "api/daily.txt"}):
+            text = open(path, encoding="utf-8", errors="replace").read()
+            refs.extend((path, "text", m.rstrip(".,);")) for m in TEXT_URL.findall(text))
+            if name == "llms.txt":
+                refs.extend((path, "llms path", m) for m in LLMS_PATH.findall(text))
+        elif name.endswith(".json") and (relf.startswith("api/") or relf.startswith("country-series/") or relf.startswith("data/") or relf in {"openapi.json", ".well-known/ai-plugin.json"}):
+            try:
+                doc = json.loads(open(path, encoding="utf-8").read())
+            except Exception:
+                continue
+            found = []
+            _json_strings(doc, found)
+            refs.extend((path, "json", raw) for raw in found)
+    kept = []
+    for path, kind, raw in refs:
+        host = ""
+        if raw.startswith("http"):
+            host = (urlparse(raw).hostname or "").lower()
+        if host and host not in HOSTS:
+            external.append(raw.split("#")[0].rstrip(".,);"))
+            continue
+        kept.append((path, kind, raw))
+    return pages, kept, sorted(set(external))
+
+
+def check_external(urls):
+    """Print external failures, including 404s. They do not fail the check."""
+    if os.environ.get("CHECK_LINKS_SKIP_EXTERNAL") == "1" or not urls:
+        print(f"external links skipped ({len(urls)} urls)")
+        return
+    import ssl
+    import urllib.error
+    import urllib.request
+    from concurrent.futures import ThreadPoolExecutor
+    ctx = ssl.create_default_context()
+
+    def one(url):
+        req = urllib.request.Request(url, method="GET", headers={"User-Agent": "everydebtclock-linkcheck/1.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=8, context=ctx) as resp:
+                resp.read(64)
+                return url, getattr(resp, "status", 200), ""
+        except urllib.error.HTTPError as exc:
+            return url, exc.code, ""
+        except Exception as exc:
+            return url, 0, type(exc).__name__
+
+    gone = []
+    other = []
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        for url, code, err in pool.map(one, urls):
+            if code in (404, 410):
+                gone.append(f"{code} {url}")
+            elif not code or code >= 400:
+                other.append(f"{code or err} {url}")
+    print(f"external links: {len(urls)} checked, {len(gone)} not found, {len(other)} other failures")
+    for line in gone:
+        print("external 404: " + line)
+    for line in other[:30]:
+        print("external: " + line)
+    if len(other) > 30:
+        print(f"external: ... and {len(other) - 30} more non-404 failures")
+
+
 def main():
     root = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else "_site")
     if not os.path.isdir(root):
         fail(f"{root} is not a directory (stage the site before this check)")
     missing = []
-    pages = links = 0
-    for html_path in iter_html(root):
-        pages += 1
-        parser = Refs()
-        try:
-            parser.feed(open(html_path, encoding="utf-8", errors="replace").read())
-        except Exception as exc:
-            fail(f"could not read {os.path.relpath(html_path, root)}: {exc}")
-        for kind, raw in parser.found:
-            links += 1
-            rel = resolve(root, html_path, raw)
-            if rel is None:
-                continue
-            found = target_file(root, rel)
-            if found is None:
-                missing.append(f"{os.path.relpath(html_path, root)}: {kind}={raw} -> {rel}")
-            elif found.endswith(".png") and not is_png(found):
-                missing.append(f"{os.path.relpath(html_path, root)}: {raw} is not a PNG")
+    pages, refs, external = collect_refs(root)
+    links = 0
+    for html_path, kind, raw in refs:
+        links += 1
+        rel = resolve(root, html_path, raw)
+        if rel is None:
+            continue
+        found = target_file(root, rel)
+        if found is None:
+            missing.append(f"{os.path.relpath(html_path, root)}: {kind}={raw} -> {rel}")
+        elif found.endswith(".png") and not is_png(found):
+            missing.append(f"{os.path.relpath(html_path, root)}: {raw} is not a PNG")
     if missing:
         preview = "\n".join(missing[:40])
         extra = f"\n... and {len(missing) - 40} more" if len(missing) > 40 else ""
         fail(f"{len(missing)} internal target(s) missing under {root}:\n{preview}{extra}")
     check_legacy(root)
+    check_external(external)
     print(f"check_links ok: {pages} pages, {links} refs, legacy image and redirect URLs present")
 
 

@@ -528,7 +528,7 @@ def _api(R, SITE, D, economies, now, t0):
     out = {
         "_doc": "IMF World Economic Outlook general government gross debt, GGXWDG_NGDP times NGDPD, current US dollars. "
                 "projected_now interpolates from panel_2025 on the anchor to panel_2026 one year later. Not a live ledger. Not the Treasury US total.",
-        "generated": dt.datetime.fromtimestamp(now, dt.timezone.utc).isoformat(timespec="seconds"),
+        "generated": dt.datetime.fromtimestamp(now, __import__("clocktime").CT).isoformat(timespec="seconds"),
         "url": f"{SITE}/world/#imf",
         "vintage": D.get("vintage"), "source": D.get("source"), "source_url": D.get("source_url"),
         "gdp_source_url": D.get("gdp_source_url"), "precision_source": D.get("precision_source"),
@@ -650,4 +650,5 @@ def build(R, SITE, with_analytics, og, stamp, now, places):
     _patch_countries(R, economies, upgrades)
     _patch_search(R, economies)
     _api(R, SITE, D, economies, now, _t0(D))
+    cp.write_series_index(R)
     return urls

@@ -802,6 +802,30 @@ def write_series(R, p):
     open(path, "a").write("\n")
 
 
+def write_series_index(R):
+    """Directory index so /country-series/ is a page, not a 404."""
+    folder = os.path.join(R, "country-series")
+    os.makedirs(folder, exist_ok=True)
+    names = sorted(n for n in os.listdir(folder) if n.endswith(".json"))
+    items = "".join(f'<li><a href="{html.escape(n)}">{html.escape(n[:-5].replace("-", " "))}</a></li>' for n in names)
+    page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Country debt series | Every Debt Clock</title>
+<meta name="description" content="JSON debt-to-GDP series for country pages on Every Debt Clock. Each file names the IMF source.">
+<link rel="canonical" href="https://everydebtclock.com/country-series/">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#07090d">
+<style>body{{margin:0;background:#07090d;color:#e8edf5;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;line-height:1.5}}
+main{{max-width:760px;margin:0 auto;padding:22px 16px 60px}}a{{color:#5aa9ff}}h1{{font-size:22px}}li{{margin:4px 0}}</style>
+</head><body><main>
+<a href="/" style="font-weight:800;letter-spacing:.06em;color:#e8edf5;text-decoration:none">EVERY <b style="color:#ff4d5e">DEBT</b> CLOCK</a>
+<h1>Country debt series</h1>
+<p>One JSON file per economy whose country page uses the IMF debt-to-GDP series. The file names the indicator, the vintage, and the source. <a href="/data/">CSV downloads</a> are separate.</p>
+<ul>{items}</ul>
+</main></body></html>
+"""
+    open(os.path.join(folder, "index.html"), "w", encoding="utf-8").write(page)
+
+
 def faq_ld(pairs):
     ld = {"@context": "https://schema.org", "@type": "FAQPage", "dateModified": "2026-10-13",
           "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in pairs]}

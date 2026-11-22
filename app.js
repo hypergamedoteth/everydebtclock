@@ -140,7 +140,7 @@
   // header status. A failed source stays on its own tile (STALE badge + section note). It does not replace the public nav status.
   const age = (now() - M.generated_epoch) / 3600;
   const st = document.getElementById('status');
-  st.textContent = `Recalibrated ${new Date(M.generated_epoch * 1000).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'})}`;
+  st.textContent = `Recalibrated ${new Date(M.generated_epoch * 1000).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago'})} CT`;
   const banners = [];
   if (age > 36) banners.push(`<div class="banner">Data last recalibrated ${Math.floor(age / 24)} day(s) ago. Tickers are still projecting from the last official figures.</div>`);
   if (fyRolled()) banners.push(`<div class="banner">New fiscal year FY${curFY()} started Oct 1 — fiscal-year counters reset to $0 and are projecting until the next official update.</div>`);

@@ -253,6 +253,7 @@ def page_html(site, root, asset, title, desc, canonical, og_image, og_alt, robot
 </section>
 <h1>{E(lead)}</h1>
 <p>One equal share is the Treasury Debt to the Penny total divided by the Census resident population. The official figure is <b>{usd2(share)}</b> on <b>{fdate(src['debtDate'])}</b>: {money_exact(src['debt'])} ÷ {src['population']:,.0f} residents on {fdate(src['populationDate'])}. The number above is that national debt clock, projected forward, divided by the projected population.</p>
+<p>Birth-year addresses, from 1930 on, are listed at <a href="born/">/your-share/born/</a>. Each one opens this page.</p>
 <p class="rel"><a href="{root}national-debt-per-person/">National debt per person</a> · <a href="{root}">Live debt clock</a></p>
 {site_chrome.site_footer(root, lead=f"Treasury close {fdate(data['debtDate'])}. Page built {E(stamp)}.")}
 </main>
@@ -339,6 +340,36 @@ def build(root, site, with_analytics, stamp, off_d, off_v, pop, pop_date, househ
         os.makedirs(ydir, exist_ok=True)
         open(os.path.join(ydir, "index.html"), "w", encoding="utf-8").write(redir.format(site=site.rstrip("/")))
         made += 1
+    years = "".join(f'<li><a href="{y}/">{y}</a></li>' for y in range(OG_MIN, OG_MAX + 1))
+    born_index = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your share by birth year | Every Debt Clock</title>
+<meta name="description" content="Birth-year addresses for your share of the US debt. Each year opens the same official per-person figure.">
+<link rel="canonical" href="{site.rstrip('/')}/your-share/born/">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#07090d">
+<style>body{{margin:0;background:#07090d;color:#e8edf5;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;line-height:1.5}}
+main{{max-width:760px;margin:0 auto;padding:22px 16px 60px}}a{{color:#5aa9ff}}ul{{columns:4;padding-left:18px}}li{{margin:2px 0}}</style>
+</head><body><main>
+<a href="../" style="font-weight:800;letter-spacing:.06em;color:#e8edf5;text-decoration:none">EVERY <b style="color:#ff4d5e">DEBT</b> CLOCK</a>
+<h1>Your share by birth year</h1>
+<p>Each year opens <a href="../">your share of the national debt</a>, the Treasury total divided by the Census population. The year pages do not calculate a different share.</p>
+<ul>{years}</ul>
+</main></body></html>
+"""
+    open(os.path.join(born_dir, "index.html"), "w", encoding="utf-8").write(born_index)
+    # /your-share.html is a real file. GitHub Pages 404s that URL when only the directory exists,
+    # and GoatCounter then records the 404 title against that path.
+    slashless = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your share of the national debt</title>
+<link rel="canonical" href="{site.rstrip('/')}/your-share/">
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0; url=/your-share/">
+<script>location.replace("/your-share/")</script>
+</head><body><p>This page is <a href="/your-share/">your share of the national debt</a>.</p></body></html>
+"""
+    open(os.path.join(root, "your-share.html"), "w", encoding="utf-8").write(slashless)
     blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
     open(os.path.join(out, "data.json"), "w", encoding="utf-8").write(blob)
     _check(root, data, share_txt)

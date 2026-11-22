@@ -20,6 +20,7 @@ import calendar, json, os, re, sys, urllib.request
 from datetime import date
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "pipeline"))
 import census_state
 import xlsx_min
@@ -878,7 +879,7 @@ def main():
         skipped.append({"slug": "imf", "reason": f"IMF World Economic Outlook history could not be fetched or checked: {e}"})
     doc = {
         "_doc": "Year-by-year debt fetched by pipeline/fetch_debt_by_year.py. Amounts are whole currency units. State rows before 2017 are Census summary tables; the page builder adds 2017–2024 from places/<state>.json (Census time series GS00LOCALFIN), the same figures as the state clocks. Country points with kind country are that clock's own official series. kind imf is IMF general government gross debt (GGXWDG_NGDP times NGDPD) and is not the country clock when that clock uses a different measure.",
-        "fetched": date.today().isoformat(),
+        "fetched": __import__("clocktime").chicago_today().isoformat(),
         "places": places_out,
         "skipped": skipped,
     }
