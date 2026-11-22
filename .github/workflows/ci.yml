@@ -51,7 +51,7 @@ jobs:
         run: |
           mkdir -p _site
           cp -r index.html 404.html privacy.html privacy about contact advertise favicon.ico favicon-32.png icon-192.png icon.svg manifest.json sw.js CNAME robots.txt llms.txt sitemap.xml style.css app.js core.js cross41.js widget.html \
-                apple-touch-icon.png apple-touch-icon-precomposed.png icon-512.png data og t api dist how-much-is-the-national-debt national-debt-per-person your-share national-debt-by-year 41-trillion press national-debt-by-president interest-on-the-national-debt when-will-debt-hit-41-trillion methodology facts states countries country-series world world-government-debt global-debt-clock texas uk wealth embed reports _site/
+                apple-touch-icon.png apple-touch-icon-precomposed.png icon-512.png data og t api dist how-much-is-the-national-debt debt-limit national-debt-per-person your-share national-debt-by-year 41-trillion press national-debt-by-president interest-on-the-national-debt when-will-debt-hit-41-trillion methodology facts states countries country-series world world-government-debt global-debt-clock texas uk wealth embed reports _site/
           KEY=$(tr -d ' \n' < pipeline/indexnow.key)
           if [ -f "$KEY.txt" ]; then cp "$KEY.txt" _site/; fi
           python3 pipeline/check_links.py _site
