@@ -27,10 +27,10 @@ table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:righ
 <button type="button" id="edc-a2hs-x">Not now</button>
 </aside>
 <style>
-#edc-a2hs{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;padding:8px 16px;background:#101828;color:#c2ccda;border-bottom:1px solid #1c2533;font:13px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+#edc-a2hs{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;margin:6px 0 0;padding:6px 8px;background:#101828;color:#c2ccda;border:1px solid #1c2533;border-radius:8px;font:12px/1.3 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
 #edc-a2hs[hidden]{display:none!important}
-#edc-a2hs p{margin:0;flex:1 1 180px}
-#edc-a2hs button{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+#edc-a2hs p{margin:0;flex:1 1 auto;min-width:0}
+#edc-a2hs button{appearance:none;flex:none;white-space:nowrap;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 8px;font:inherit;cursor:pointer}
 #edc-a2hs-go{color:#9fd0ff}
 </style>
 <script>
@@ -47,10 +47,15 @@ table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:righ
     try{localStorage.setItem(key,"1");}catch(e){}
     return;
   }
-  var deferred=null,shown=false;
-  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown)show(true);});
+  var deferred=null,shown=false,waiting=false;
+  function noticePending(){
+    try{if(localStorage.getItem("edc.notice")==="1")return false;}catch(e){}
+    var notice=document.getElementById("edc-notice");
+    return !!(notice&&!notice.hidden);
+  }
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown&&!noticePending()&&!waiting)show(true);});
   function show(install){
-    if(shown)return;shown=true;
+    if(shown||noticePending())return;shown=true;
     try{localStorage.setItem(key,"1");}catch(e){}
     if(install&&deferred){text.textContent="Add this live clock to your home screen.";go.hidden=false;}
     else if(/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)){
@@ -60,7 +65,16 @@ table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:righ
   }
   if(go)go.addEventListener("click",function(){if(!deferred)return;deferred.prompt();deferred=null;n.hidden=true;});
   if(x)x.addEventListener("click",function(){try{localStorage.setItem(key,"1");}catch(e){}n.hidden=true;});
-  setTimeout(function(){if(!shown)show(false);},1500);
+  function arm(){
+    if(shown)return;
+    if(noticePending()){
+      if(waiting)return;waiting=true;
+      document.addEventListener("edc-notice-closed",function(){waiting=false;show(!!deferred);},{once:true});
+      return;
+    }
+    show(!!deferred);
+  }
+  setTimeout(arm,1500);
 })();
 </script>
 <!--/A2HS--><div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../states/">All US state debt clocks</a><span>·</span><a href="../../world/">World debt clock</a></div><p>Vermont state and local governments owed <b>$4,149,711,000</b> ($4.15 billion) at the end of fiscal year 2024 (<b>Jun 30, 2024</b>), according to the <a href="https://data.census.gov/table/GOVSLOCALFINTIMESERIES.GS00LOCALFIN?q=GS00LOCALFIN&amp;g=040XX00US50" rel="noopener">US Census Bureau, Annual Survey of State and Local Government Finances, table GS00LOCALFIN</a>: $2.67 billion of state government debt and $1.48 billion of local government debt. That is <b>$6,437.02 per Vermonter</b>: the debt divided by the Census Bureau&#x27;s estimate of 644,663 Vermont residents on Jul 1, 2025. The Census Bureau reports Vermont&#x27;s state + local debt once a year, not daily. This page shows the official figure for Jun 30, 2024 and does not tick it forward, because the 2023→2024 change (+5.9%) is too large to carry forward as a trend. Earlier official years are in the What changed table.</p><p class="updated" data-updated="2024-06-30">Updated Jun 30, 2024</p><p><a href="debt-by-year/">Vermont debt by year</a>, from the same official source as this clock.</p><aside class="embedbox" aria-label="Add this clock to your site"><div class="embedhd"><b>Add this clock to your site</b><button type="button" class="embedcopy">Copy code</button></div><div class="embedrow"><iframe src="https://everydebtclock.com/embed/states/vermont/" title="Vermont debt clock" width="100%" height="148" style="border:0" loading="lazy"></iframe><textarea readonly rows="4" spellcheck="false" aria-label="Embed code">&lt;iframe src=&quot;https://everydebtclock.com/embed/states/vermont/&quot; width=&quot;100%&quot; height=&quot;160&quot; style=&quot;border:0&quot; title=&quot;Vermont debt clock&quot;&gt;&lt;/iframe&gt;
@@ -98,24 +112,24 @@ ticks.forEach(k=>{const v=k.b+k.r*(t-k.t);k.v.textContent=k.pp?usd(v,2):usd(v);k
 <button type="button" id="edc-notice-ok">OK</button>
 </aside>
 <style>
-#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-sizing:border-box;margin:0;padding:10px 14px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:13.5px/1.4 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
+#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:nowrap;box-sizing:border-box;margin:0;padding:6px 10px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:12px/1.3 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
 #edc-notice[hidden]{display:none!important}
-#edc-notice p{margin:0;flex:1 1 220px}
+#edc-notice p{margin:0;flex:1 1 auto;min-width:0}
 #edc-notice a{color:#5aa9ff;text-decoration:none}
-#edc-notice-ok{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:6px 12px;font-weight:650;cursor:pointer}
+#edc-notice-ok{appearance:none;flex:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 10px;font:inherit;font-weight:650;cursor:pointer}
 </style>
 <script>
 (function(){
   var n=document.getElementById("edc-notice");
   if(!n)return;
+  function pad(){if(document.body)document.body.style.paddingBottom=n.hidden?"":(n.offsetHeight+"px");}
+  function close(){n.hidden=true;pad();document.dispatchEvent(new Event("edc-notice-closed"));}
   try{if(localStorage.getItem("edc.notice")==="1")return;}catch(e){}
-  n.hidden=false;
-  if(document.body) document.body.style.paddingBottom="72px";
+  n.hidden=false;pad();
   var b=document.getElementById("edc-notice-ok");
   if(b)b.addEventListener("click",function(){
     try{localStorage.setItem("edc.notice","1")}catch(e){}
-    n.hidden=true;
-    if(document.body) document.body.style.paddingBottom="";
+    close();
   });
 })();
 </script>

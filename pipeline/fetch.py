@@ -648,14 +648,13 @@ def src_dsl():
     oldest = min(r["record_date"] for r in rows)        # page cut may split the oldest day: drop it
     return [r for r in rows if r["record_date"] != oldest]
 dsl, dsl_stale = cached("dts_dsl", src_dsl)
-if dsl:
-    by = {}
-    for r in dsl:
-        d = by.setdefault(r["record_date"], {"subj": 0.0, "limit": None}); v = float(r["close_today_bal"] or 0) * 1e6
-        c = r["debt_catg"]
-        if c in ("Debt Held by the Public", "Intragovernmental Holdings", "Other Debt Subject to Limit"): d["subj"] += v
-        elif c == "Debt Not Subject to Limit": d["subj"] -= v
-        elif c == "Statutory Debt Limit": d["limit"] = v
+import debt_limit as _debt_limit
+_dsl_summary = _debt_limit.summarize(dsl) if dsl else None
+if _dsl_summary and not dsl_stale and _dsl_summary.get("as_of") == "2026-11-19":
+    _debt_limit.check_verified(dsl)
+if dsl and _dsl_summary:
+    folded = _dsl_summary["by"]
+    by = {d: {"subj": folded[d]["subject"], "limit": folded[d]["limit"]} for d in folded}
     ds = sorted(by); last = ds[-1]; tl = eod_et(last)
     win = [d for d in ds if tl - eod_et(d) <= 90 * 86400]
     rate = ols_slope([eod_et(d) for d in win], [by[d]["subj"] for d in win])
@@ -682,7 +681,13 @@ if dsl and T.get("debt_subject_limit", {}).get("status") == "ok" and T.get("debt
     at_limit = head <= AT_LIMIT_MARGIN or (len(last5) >= 5 and rng <= FLAT_RANGE and head <= FLAT_NEAR)
     held = ("debt_total", "debt_public", "debt_intragov", "debt_subject_limit")
     st = {"at_limit": at_limit, "limit": lim, "subject_to_limit": sl["base"], "headroom": head, "as_of": sl["as_of"],
-          "last5_range": rng, "margin": AT_LIMIT_MARGIN, "source": DSL_URL, "freeze_t": None}
+          "last5_range": rng, "margin": AT_LIMIT_MARGIN, "source": DSL_URL, "freeze_t": None,
+          "reported_status": _dsl_summary["status"] if _dsl_summary else None,
+          "limit_reported": _dsl_summary["limit_reported"] if _dsl_summary else None,
+          "components": ({"public": _dsl_summary["public"], "intragov": _dsl_summary["intragov"],
+                          "not_subject": _dsl_summary["not_subject"], "other": _dsl_summary["other"]}
+                         if _dsl_summary and _dsl_summary["as_of"] == sl["as_of"] else None),
+          "extraordinary_measures": _debt_limit.EXTRAORDINARY_MEASURES["label"]}
     if at_limit:
         note = (f" At the debt limit: debt subject to the limit was ${sl['base']/1e12:,.3f}T on {sl['as_of']}, "
                 f"${head/1e9:,.1f}B under the ${lim/1e12:,.3f}T limit. Treasury is using extraordinary measures, so this ticker "
@@ -696,6 +701,17 @@ if dsl and T.get("debt_subject_limit", {}).get("status") == "ok" and T.get("debt
         for k in held:
             if T.get(k, {}).get("status") == "ok": T[k]["freeze_t"] = ft
     META["debt_limit_status"] = st
+elif _dsl_summary:
+    # No dollar ceiling on this statement (suspended, missing, or inconsistent). Keep the
+    # rows Treasury did publish so the debt-limit page can say so. Do not invent a limit.
+    META["debt_limit_status"] = {
+        "at_limit": False, "limit": _dsl_summary["limit"], "limit_reported": _dsl_summary["limit_reported"],
+        "subject_to_limit": _dsl_summary["subject"], "headroom": _dsl_summary["headroom"],
+        "as_of": _dsl_summary["as_of"], "source": DSL_URL, "reported_status": _dsl_summary["status"],
+        "components": {"public": _dsl_summary["public"], "intragov": _dsl_summary["intragov"],
+                       "not_subject": _dsl_summary["not_subject"], "other": _dsl_summary["other"]},
+        "extraordinary_measures": _debt_limit.EXTRAORDINARY_MEASURES["label"], "freeze_t": None,
+    }
 
 # ---- Treasury Historical Debt Outstanding (fiscal-year end totals, 1790 to latest), for the by-year page
 DO_URL = "https://fiscaldata.treasury.gov/datasets/historical-debt-outstanding/historical-debt-outstanding"

@@ -27,10 +27,10 @@ table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:righ
 <button type="button" id="edc-a2hs-x">Not now</button>
 </aside>
 <style>
-#edc-a2hs{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;padding:8px 16px;background:#101828;color:#c2ccda;border-bottom:1px solid #1c2533;font:13px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+#edc-a2hs{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;margin:6px 0 0;padding:6px 8px;background:#101828;color:#c2ccda;border:1px solid #1c2533;border-radius:8px;font:12px/1.3 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
 #edc-a2hs[hidden]{display:none!important}
-#edc-a2hs p{margin:0;flex:1 1 180px}
-#edc-a2hs button{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+#edc-a2hs p{margin:0;flex:1 1 auto;min-width:0}
+#edc-a2hs button{appearance:none;flex:none;white-space:nowrap;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 8px;font:inherit;cursor:pointer}
 #edc-a2hs-go{color:#9fd0ff}
 </style>
 <script>
@@ -47,10 +47,15 @@ table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:righ
     try{localStorage.setItem(key,"1");}catch(e){}
     return;
   }
-  var deferred=null,shown=false;
-  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown)show(true);});
+  var deferred=null,shown=false,waiting=false;
+  function noticePending(){
+    try{if(localStorage.getItem("edc.notice")==="1")return false;}catch(e){}
+    var notice=document.getElementById("edc-notice");
+    return !!(notice&&!notice.hidden);
+  }
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown&&!noticePending()&&!waiting)show(true);});
   function show(install){
-    if(shown)return;shown=true;
+    if(shown||noticePending())return;shown=true;
     try{localStorage.setItem(key,"1");}catch(e){}
     if(install&&deferred){text.textContent="Add this live clock to your home screen.";go.hidden=false;}
     else if(/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)){
@@ -60,7 +65,16 @@ table.v tr.sub td{color:var(--mut);font-size:12px}table.v td.num{text-align:righ
   }
   if(go)go.addEventListener("click",function(){if(!deferred)return;deferred.prompt();deferred=null;n.hidden=true;});
   if(x)x.addEventListener("click",function(){try{localStorage.setItem(key,"1");}catch(e){}n.hidden=true;});
-  setTimeout(function(){if(!shown)show(false);},1500);
+  function arm(){
+    if(shown)return;
+    if(noticePending()){
+      if(waiting)return;waiting=true;
+      document.addEventListener("edc-notice-closed",function(){waiting=false;show(!!deferred);},{once:true});
+      return;
+    }
+    show(!!deferred);
+  }
+  setTimeout(arm,1500);
 })();
 </script>
 <!--/A2HS--><div class="crumb"><a href="../">← US national debt clock</a></div><p>Every place with a debt clock, built from figures its own government publishes. A clock ticks only where the official trend is reliable; otherwise the official figure is shown as published. Each clock shows who publishes the numbers and how often, with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency. The <a href="../world/">World Debt Clock</a> adds one stock per economy in US dollars, using the best source available.</p><p class="updated" data-updated="2024-06-30">Updated Jun 30, 2024</p><p>The same Census totals, divided by Census population, are ranked on <a href="debt-per-person/">debt per person by state</a>.</p><p>Each state page leads with a debt clock. Under it, the page quotes state government debt from the <a href="https://www.census.gov/data/datasets/2024/econ/local/public-use-datasets.html" rel="noopener">U.S. Census Bureau Annual Survey of State and Local Government Finances</a>, debt per resident using the Census population estimate, and that debt as a share of <a href="https://www.bea.gov/data/gdp/gdp-state" rel="noopener">BEA current-dollar GDP</a> when both years exist. The District of Columbia has no state-government total in the Census tables, so its page quotes the District government total instead. The same Census totals are in <a href="../data/us-state-debt.csv">us-state-debt.csv</a>.</p></section><header class="top"><div class="topin"><a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a><nav class="plnav"><a href="../">United States</a><a href="../states/" class=on>States</a><a href="../countries/">Countries</a><a href="../world/">World</a><a href="../wealth/">Wealth</a><a href="../reports/">Reports</a><a href="../embed/">Embed</a></nav><span class="live"><span class="dot"></span><span>official data</span></span></div></header><div class="srchrow"><form class="srch" id="qf" data-up="../" role="search" action="../states/" autocomplete="off"><label for="q">Find a clock</label><input id="q" type="search" placeholder="Type a country, state or wealth fund, e.g. Texas, Singapore or Norway" aria-expanded="false" aria-controls="qr" aria-autocomplete="list" enterkeyhint="go"><button type="submit" aria-label="Go">Go</button><ul id="qr" role="listbox" hidden></ul></form></div><script>(function(){var f=document.getElementById('qf'),q=document.getElementById('q'),ul=document.getElementById('qr'),up=f.dataset.up,ix=null,cur=-1,shown=[];
@@ -85,24 +99,24 @@ ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='
 <button type="button" id="edc-notice-ok">OK</button>
 </aside>
 <style>
-#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-sizing:border-box;margin:0;padding:10px 14px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:13.5px/1.4 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
+#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:nowrap;box-sizing:border-box;margin:0;padding:6px 10px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:12px/1.3 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
 #edc-notice[hidden]{display:none!important}
-#edc-notice p{margin:0;flex:1 1 220px}
+#edc-notice p{margin:0;flex:1 1 auto;min-width:0}
 #edc-notice a{color:#5aa9ff;text-decoration:none}
-#edc-notice-ok{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:6px 12px;font-weight:650;cursor:pointer}
+#edc-notice-ok{appearance:none;flex:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 10px;font:inherit;font-weight:650;cursor:pointer}
 </style>
 <script>
 (function(){
   var n=document.getElementById("edc-notice");
   if(!n)return;
+  function pad(){if(document.body)document.body.style.paddingBottom=n.hidden?"":(n.offsetHeight+"px");}
+  function close(){n.hidden=true;pad();document.dispatchEvent(new Event("edc-notice-closed"));}
   try{if(localStorage.getItem("edc.notice")==="1")return;}catch(e){}
-  n.hidden=false;
-  if(document.body) document.body.style.paddingBottom="72px";
+  n.hidden=false;pad();
   var b=document.getElementById("edc-notice-ok");
   if(b)b.addEventListener("click",function(){
     try{localStorage.setItem("edc.notice","1")}catch(e){}
-    n.hidden=true;
-    if(document.body) document.body.style.paddingBottom="";
+    close();
   });
 })();
 </script>

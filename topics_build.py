@@ -402,7 +402,8 @@ def _milestone_pages(ctx, H):
                 if when and not passed and freeze and goal_ts and freeze < goal_ts:
                     limit += " That is before the projected date, so the crossing may wait until Congress acts."
             limit += (" Once the limit binds, Treasury uses extraordinary measures and the debt goes roughly flat; our clock then stops projecting growth and holds at the official figure. "
-                      f"This page counts toward ${n+1} trillion only if Congress raises or suspends the limit before then.</p>")
+                      f"This page counts toward ${n+1} trillion only if Congress raises or suspends the limit before then. "
+                      f"Extraordinary measures and outside X-date forecasts are on the <a href=\"../debt-limit/\">debt-limit page</a>.</p>")
         body_press = ('<p>The exact projected time, the 12-month and 3-year paces, charts and a countdown embed are on the '
                       '<a href="../press/">press page</a>.</p>') if n == 41 else ""
         body = f"""{body_press}<h2>How fast the debt is growing</h2>

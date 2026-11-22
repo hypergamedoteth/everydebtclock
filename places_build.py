@@ -157,6 +157,7 @@ def nav_html(places, depth, current=None, cls="pl"):
     items += [(f"{up}{d}/", lab, current == k) for k, d, lab, _ in SECTIONS if k in kinds]
     if WORLD and "country" in kinds: items.append((f"{up}world/", "World", current == "world"))
     if WEALTH: items.append((f"{up}wealth/", "Wealth", current == "wealth"))
+    items.append((f"{up}debt-limit/", "Debt limit", current == "debt-limit"))
     items.append((f"{up}reports/", "Reports", current == "reports"))
     items.append((f"{up}embed/", "Embed", current == "embed"))
     return f'<nav class="{cls}">' + "".join(f'<a href="{h}"{" class=on" if on else ""}>{lab}</a>' for h, lab, on in items) + "</nav>"

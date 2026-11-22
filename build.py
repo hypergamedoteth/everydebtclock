@@ -125,7 +125,7 @@ def fmt(i, x, short=False):
     return f"{s}{a:,.2f}" if a < 1000 else f"{s}{a:,.0f}"
 def ppf(v):
     a = abs(v); s = "−$" if v < 0 else "$"
-    return f"{s}{a:.6f}" if a < 0.01 else f"{s}{a:.4f}" if a < 100 else f"{s}{a:,.2f}"
+    return f"{s}{a:.6f}" if a < 0.01 else f"{s}{a:,.2f}"
 def fdate(s):
     if not s: return ""
     if re.match(r"^\d{4}-\d\d-\d\d$", s): return dt.date.fromisoformat(s).strftime("%b %-d, %Y")
@@ -285,7 +285,8 @@ idx = re.sub(r'<meta property="og:title" content="US Debt Clock — live &amp; v
 idx = idx.replace('<meta property="og:title" content="US Debt Clock — live & verified"><meta property="og:type" content="website">\n', "")
 idx = re.sub(r'<script type="application/ld\+json">\{"@context":"https://schema.org","@type":"Dataset","name":"Every Debt Clock: US live tickers".*?</script>\n?', "", idx, flags=re.S)
 
-ANSWERS = [("how-much-is-the-national-debt", "How much is the national debt?"), ("national-debt-per-person", "National debt per person"),
+ANSWERS = [("how-much-is-the-national-debt", "How much is the national debt?"), ("debt-limit", "Debt limit and the X-date"),
+           ("national-debt-per-person", "National debt per person"),
            ("facts", "Headline figures"),
            ("your-share", "Your share of the national debt"),
            ("national-debt-by-year", "US national debt by year"), ("41-trillion", "When will the US debt hit $41 trillion?"),
@@ -377,7 +378,7 @@ else: idx = idx.replace('<main id="app"></main>', f'<main id="app">{ssr}</main>'
 if "<!--LINKS-->" in idx: idx = re.sub(r"<!--LINKS-->.*?<!--/LINKS-->", lambda m: links, idx, flags=re.S)
 else: idx = idx.replace('<dialog id="dlg"></dialog>', f'<dialog id="dlg"></dialog>\n<section class="answers" id="answers">{links}</section>', 1)
 PLNAV = ("<!--PLNAV-->" + ('<nav class="plnav"><a href="./" class="on">United States</a>' + "".join(f'<a href="{d}/">{lab}</a>' for k, d, lab, _ in places_build.SECTIONS
-         if any(p["kind"] == k for p in PLACES_LIVE)) + ('<a href="world/">World</a>' if WORLD else "") + ('<a href="wealth/">Wealth</a>' if WEALTH_FUNDS else "") + '<a href="reports/">Reports</a><a href="embed/">Embed</a></nav>' if PLACES_LIVE else "") + "<!--/PLNAV-->")
+         if any(p["kind"] == k for p in PLACES_LIVE)) + ('<a href="world/">World</a>' if WORLD else "") + ('<a href="wealth/">Wealth</a>' if WEALTH_FUNDS else "") + '<a href="debt-limit/">Debt limit</a><a href="reports/">Reports</a><a href="embed/">Embed</a></nav>' if PLACES_LIVE else "") + "<!--/PLNAV-->")
 SEARCH = "<!--SEARCH-->" + (explore.search_box("") if PLACES_LIVE else "") + "<!--/SEARCH-->"
 if "<!--SEARCH-->" in idx: idx = re.sub(r"<!--SEARCH-->.*?<!--/SEARCH-->", lambda m: SEARCH, idx, flags=re.S)
 else: idx = idx.replace("</header>", "</header>" + SEARCH, 1)
@@ -601,6 +602,13 @@ def build_api():
         "source_api": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/debt_to_penny",
         "site_url": SITE,
     }
+    # Additive debt-limit fields. Existing keys stay. See pipeline/debt_limit.py.
+    import debt_limit_page
+    _sum, _subj, _lim_t = debt_limit_page._summary(R, T)
+    _slope = float(_subj.get("rate") or 0) if _subj else 0.0
+    if _slope <= 0 and _subj and _subj.get("rate_trend"):
+        _slope = float(_subj["rate_trend"])
+    api.update(debt_limit_page.debt_limit.api_fields(_sum, _slope or None, (_subj or {}).get("t0")))
     os.makedirs(f"{R}/api", exist_ok=True)
     json.dump(api, open(f"{R}/api/daily.json", "w"), indent=1)
     # one plain-English, nonpartisan line
@@ -705,6 +713,7 @@ if OFF_V:
 <h2>Recent official closes</h2>{closes_table(10)}
 <h2>When Treasury updates it</h2><p>Treasury publishes Debt to the Penny each business day, usually in the afternoon, for the previous business day's close. This page and the
 <a href="../">live clock</a> are rebuilt after each release.</p>
+<p>Headroom, extraordinary measures, and X-date forecasts are on the <a href="../debt-limit/">debt limit page</a>.</p>
 {src_links([SRC_DTP, SRC_DSL, SRC_POP])}"""
     answer_page("how-much-is-the-national-debt",
                 f"How Much Is the National Debt? {tril(OFF_V)} (Treasury, {fdate(OFF_D)})",
@@ -856,6 +865,13 @@ The next trillion is the <a href="../41-trillion/">$41 trillion countdown</a>.</
 """
     os.makedirs(f"{R}/when-will-debt-hit-41-trillion", exist_ok=True)
     open(f"{R}/when-will-debt-hit-41-trillion/index.html", "w").write(redir)
+
+    import debt_limit_page
+    debt_limit_page.build({
+        "R": R, "SITE": SITE, "T": T, "M": M, "answer_page": answer_page, "faq_ld": faq_ld, "dataset_ld": dataset_ld,
+        "fdate": fdate, "usd0": usd0, "usd2": usd2, "bil": bil, "OFF_V": OFF_V, "OFF_D": OFF_D,
+        "quotable": quotable, "DTP": DTP_URL,
+    })
 
 # ---------------------------------------------------------------- 5) Methodology and accuracy (/methodology/)
 # Dated snapshot of two other debt clocks, read in a browser on Oct 27, 2026 (values verified by hand that day; not updated automatically).
@@ -1034,7 +1050,7 @@ def write_facts():
     if pub.get("base") is not None and igov.get("base") is not None:
         add("Held by the public", f"As of {fdate(pub.get('as_of'))}, {usd0(pub['base'])} was held by the public and {usd0(igov['base'])} was intragovernmental. Source: <a href=\"{DTP_URL}\" rel=\"noopener\">U.S. Treasury, Debt to the Penny</a>.")
     if subj.get("base") is not None and (T.get("debt_limit") or {}).get("base"):
-        add("Debt limit", f"Debt subject to the statutory limit was {usd0(subj['base'])} as of {fdate(subj.get('as_of'))}, against a limit of {usd0(T['debt_limit']['base'])}. Source: <a href=\"{html.escape(SRC_DSL[1])}\" rel=\"noopener\">U.S. Treasury, Daily Treasury Statement</a>.")
+        add("Debt limit", f"Debt subject to the statutory limit was {usd0(subj['base'])} as of {fdate(subj.get('as_of'))}, against a limit of {usd0(T['debt_limit']['base'])}. Source: <a href=\"{html.escape(SRC_DSL[1])}\" rel=\"noopener\">U.S. Treasury, Daily Treasury Statement</a>. See <a href=\"../debt-limit/\">the debt limit and X-date</a>.")
     if MILE and MILE.get("when"):
         add(f"${MILE['n']} trillion", html.escape(MILE["quote"]) + f" The pace is the homepage clock, not a Treasury forecast. See <a href=\"../41-trillion/\">the countdown</a>.")
     if WORLD:
@@ -1160,6 +1176,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     f"- / : US national debt clock. Official total {usd2(OFF_V)} as of {fdate(OFF_D)} (Treasury, Debt to the Penny). The live projection is re-based every business day.",
     f"- /facts/ : Headline figures with the official record date and source for each number. Machine-readable feed: {SITE}/api/daily.json",
     "- /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.",
+    "- /debt-limit/ : X-date forecasts, extraordinary measures, and what a missed X-date would affect. The live limit, headroom, and the countdown to the ceiling are linked from here. They are not repeated.",
     f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
     "- /your-share/ : One equal share of the official total, the live national debt clock divided by population. No calculator.",
     "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
@@ -1366,6 +1383,7 @@ def check_quotable():
         f"{R}/national-debt-by-president/index.html": "debt by president",
         f"{R}/national-debt-per-person/index.html": "per person",
         f"{R}/interest-on-the-national-debt/index.html": "interest",
+        f"{R}/debt-limit/index.html": "debt limit",
     }
     for sample in ("states/california/debt-by-year/index.html", "countries/japan/debt-by-year/index.html"):
         if os.path.exists(f"{R}/{sample}"):
@@ -1426,8 +1444,16 @@ def check_quotable():
               "census_population_date", "debt_per_person_projected_now", "population_projected_now",
               "debt_per_household_official", "debt_per_household_projected_now", "households_official",
               "households_source", "per_person_basis", "stale", "source_url", "source_api", "site_url"}
-    if set(api) != expect or api.get("schema_version") != 2:
-        raise SystemExit("api/daily.json format changed: " + " ".join(sorted(set(api) ^ expect)))
+    added = {"debt_subject_to_limit", "statutory_limit", "dts_record_date", "debt_limit_headroom",
+             "debt_limit_reported_status", "days_to_limit_estimate", "extraordinary_measures"}
+    extra = set(api) - expect - added
+    missing = expect - set(api)
+    if missing or extra or api.get("schema_version") != 2:
+        raise SystemExit("api/daily.json format changed: missing " + " ".join(sorted(missing)) + " extra " + " ".join(sorted(extra)))
+    if "debt_subject_to_limit" not in api or "statutory_limit" not in api or "dts_record_date" not in api:
+        raise SystemExit("api/daily.json is missing the debt-limit fields")
+    if api.get("debt_limit_reported_status") == "in_force" and (api.get("statutory_limit") is None or api.get("debt_limit_headroom") is None):
+        raise SystemExit("in-force debt limit is missing a ceiling or headroom")
     print("quotable pages ok")
 
 def check_crossing():

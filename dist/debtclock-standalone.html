@@ -237,10 +237,10 @@ p.official{margin:0 2px 14px;color:var(--mut);font-size:13.5px;line-height:1.45}
 <button type="button" id="edc-a2hs-x">Not now</button>
 </aside>
 <style>
-#edc-a2hs{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;padding:8px 16px;background:#101828;color:#c2ccda;border-bottom:1px solid #1c2533;font:13px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+#edc-a2hs{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;margin:6px 0 0;padding:6px 8px;background:#101828;color:#c2ccda;border:1px solid #1c2533;border-radius:8px;font:12px/1.3 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
 #edc-a2hs[hidden]{display:none!important}
-#edc-a2hs p{margin:0;flex:1 1 180px}
-#edc-a2hs button{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+#edc-a2hs p{margin:0;flex:1 1 auto;min-width:0}
+#edc-a2hs button{appearance:none;flex:none;white-space:nowrap;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 8px;font:inherit;cursor:pointer}
 #edc-a2hs-go{color:#9fd0ff}
 </style>
 <script>
@@ -257,10 +257,15 @@ p.official{margin:0 2px 14px;color:var(--mut);font-size:13.5px;line-height:1.45}
     try{localStorage.setItem(key,"1");}catch(e){}
     return;
   }
-  var deferred=null,shown=false;
-  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown)show(true);});
+  var deferred=null,shown=false,waiting=false;
+  function noticePending(){
+    try{if(localStorage.getItem("edc.notice")==="1")return false;}catch(e){}
+    var notice=document.getElementById("edc-notice");
+    return !!(notice&&!notice.hidden);
+  }
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown&&!noticePending()&&!waiting)show(true);});
   function show(install){
-    if(shown)return;shown=true;
+    if(shown||noticePending())return;shown=true;
     try{localStorage.setItem(key,"1");}catch(e){}
     if(install&&deferred){text.textContent="Add this live clock to your home screen.";go.hidden=false;}
     else if(/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)){
@@ -270,7 +275,16 @@ p.official{margin:0 2px 14px;color:var(--mut);font-size:13.5px;line-height:1.45}
   }
   if(go)go.addEventListener("click",function(){if(!deferred)return;deferred.prompt();deferred=null;n.hidden=true;});
   if(x)x.addEventListener("click",function(){try{localStorage.setItem(key,"1");}catch(e){}n.hidden=true;});
-  setTimeout(function(){if(!shown)show(false);},1500);
+  function arm(){
+    if(shown)return;
+    if(noticePending()){
+      if(waiting)return;waiting=true;
+      document.addEventListener("edc-notice-closed",function(){waiting=false;show(!!deferred);},{once:true});
+      return;
+    }
+    show(!!deferred);
+  }
+  setTimeout(arm,1500);
 })();
 </script>
 <!--/A2HS-->
@@ -314,9 +328,11 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
   const fyRolled = () => now() >= M.fy_end_epoch;      // client-side Oct 1 reset if data not refreshed yet
   const curFY = () => fyRolled() ? M.fy + 1 : M.fy;
 
+  function held(x) { return !!(x && (x.status === 'stale' || x.stale)); }
   function val(slug, t = now()) {
     const x = T[slug];
-    if (!x || x.status !== 'ok') return null;
+    if (!x || (x.status !== 'ok' && x.status !== 'stale')) return null;
+    if (held(x)) return x.base;
     if (x.mode === 'fytd' && t >= M.fy_end_epoch) return x.rate * (t - M.fy_end_epoch);
     if (x.freeze_t && t > x.freeze_t) t = x.freeze_t;   // never project debt past the statutory limit
     return x.base + x.rate * (t - x.t0) + (x.steps || []).reduce((s, q) => s + q[2] * Math.min(1, Math.max(0, (t - q[0]) / (q[1] - q[0]))), 0);   // steps: scheduled payment ramps [start, end, amount]
@@ -336,14 +352,17 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
   const drate = slug => { const t = now(); const a = DER[slug](t), b = DER[slug](t + 60); return a == null || b == null ? null : (b - a) / 60; };
   const eodTs = d => Date.parse(d + 'T23:59:59-04:00') / 1000;
   const get = (slug, t) => DER[slug] ? DER[slug](t) : val(slug, t);
-  const info = slug => DER[slug] ? Object.assign({status: 'ok', slug, derived: true}, D.derived[slug]) : (T[slug] || {slug, status: 'unavailable', label: slug});
+  const info = slug => {
+    if (!DER[slug]) return T[slug] || {slug, status: 'unavailable', label: slug};
+    const row = Object.assign({status: 'ok', slug, derived: true}, D.derived[slug]);
+    if (slug === 'm2_debt_ratio' && held(T.m2)) Object.assign(row, {status: 'stale', stale: true, as_of: T.m2.as_of});
+    return row;
+  };
 
   // ---------- formatting
   const nf0 = new Intl.NumberFormat('en-US', {maximumFractionDigits: 0});
   const nf2 = new Intl.NumberFormat('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-  const nf4 = new Intl.NumberFormat('en-US', {minimumFractionDigits: 4, maximumFractionDigits: 4});
   const usd = (v, d = 0) => v == null ? '—' : (v < 0 ? '−$' : '$') + (d ? nf2 : nf0).format(Math.abs(v));
-  const usd4 = v => v == null || !isFinite(v) ? '—' : (v < 0 ? '−$' : '$') + nf4.format(Math.abs(v));
   const pct = (v, d = 4) => v == null ? '—' : v.toFixed(d) + '%';
   const short = v => { const a = Math.abs(v), s = v < 0 ? '−$' : '$';
     return a >= 1e12 ? s + (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? s + (a / 1e9).toFixed(2) + 'B' : a >= 1e6 ? s + (a / 1e6).toFixed(1) + 'M' : s + nf0.format(a); };
@@ -351,7 +370,7 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
     return a >= 1 ? `${sg}${short(a).slice(1)}/sec · ${sg}${short(a * 86400).slice(1)}/day` : `${sg}$${(a * 86400).toFixed(2)}/day`; };
   const fmtDate = s => { if (/^\d{4}-\d\d$/.test(s || '')) { const [y, m] = s.split('-'); return new Date(+y, m - 1, 1).toLocaleDateString('en-US', {month: 'short', year: 'numeric'}); }
     if (!s || !/^\d{4}-\d\d-\d\d$/.test(s)) return s; const [y, m, d] = s.split('-'); return new Date(+y, m - 1, +d).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}); };
-  const ppf = v => { if (v == null || !isFinite(v)) return '—'; const a = Math.abs(v); return a < 0.01 ? usd(v, 0).replace(/[\d,]+$/, '') + a.toFixed(6) : a < 100 ? (v < 0 ? '−$' : '$') + a.toFixed(4) : usd(v, 2); };
+  const ppf = v => { if (v == null || !isFinite(v)) return '—'; const a = Math.abs(v); return a < 0.01 ? usd(v, 0).replace(/[\d,]+$/, '') + a.toFixed(6) : usd(v, 2); };
   const shortDate = s => { const f = fmtDate(s); return /^\d{4}-\d\d-\d\d$/.test(s || '') ? f.replace(/, \d{4}$/, '') : f; };
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
@@ -392,6 +411,7 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
     if (i.historical) return `<span class="badge hist" title="Fixed historical figure (OMB Historical Tables)">HISTORICAL · fixed</span>`;
     if (i.derived) return `<span class="badge calc" title="${esc(i.method || '')}">LIVE CALC</span>`;
     if (i.badge) return `<span class="badge ${i.modeled ? 'proj' : 'fix'}" title="${esc(i.method || '')}">${esc(i.badge)}</span>`;
+    if (i.stale || i.status === 'stale') return `<span class="badge bad" title="The source failed or this is a cached release. The figure is the last good official number, not a live total.">STALE · as of ${esc(d)}</span>`;
     if (i.fixed) return `<span class="badge fix" title="Official figure that does not change until the next official release">FIXED · ${esc(d)}</span>`;
     if (i.modeled) return `<span class="badge proj" title="Modeled estimate: ${esc(i.method || '')}">MODELED ESTIMATE · from ${esc(d)}</span>`;
     return `<span class="badge proj" title="Projected every frame from the official figure of ${esc(fmtDate(i.as_of))}">PROJECTED · from ${esc(d)}</span>`;
@@ -404,14 +424,14 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
       const who = /Daily Treasury/.test(v.against || '') ? 'DTS' : 'Treasury';
       b += `<span class="badge ${cls}" title="Yesterday's projection vs ${esc(v.against)}">${v.flag ? '⚠' : '✓'} vs ${who} ${v.last_error_pct >= 0 ? '+' : ''}${(+v.last_error_pct).toFixed(2)}%</span>`;
     }
-    if (i.stale) b += `<span class="badge warn" title="Source failed on the last run; showing the last good official figure">cached</span>`;
+    if ((i.stale || i.status === 'stale') && !/STALE/.test(b)) b += `<span class="badge bad" title="Source failed on the last run; showing the last good official figure">STALE</span>`;
     return b;
   }
   function tile(slug, sec) {
     const i = info(slug);
     const el = document.createElement('div');
     el.className = 'tile'; el.id = 't-' + slug; el.style.setProperty('--acc', ACC[sec]);
-    if (i.status !== 'ok') {
+    if (i.status !== 'ok' && i.status !== 'stale') {
       el.classList.add('na');
       el.innerHTML = `<div class="lab"><span>${esc(i.label)}</span></div><div class="val">source unavailable</div><div class="meta"><span class="badge bad">${esc(i.note || '')}</span></div>`;
       return el;
@@ -420,10 +440,11 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
     const lbl = typeof i.label === 'function' ? i.label() : i.label;
     const rate = i.derived ? (i.kind === 'usd' ? drate(slug) : null) : i.rate;
     const fy = i.mode === 'fytd' ? `<span>FY${curFY()} to date</span>` : '';
+    const stale = i.stale || i.status === 'stale';
     el.innerHTML = `<div class="lab"><span>${esc(lbl)}</span>${fy}</div>
       <div class="val num">—</div>
       ${isUSD(i) && !NOPP.has(slug) ? `<div class="pp"><div><span class="l" title="${esc(PPB)}">Per person (proj. pop.)</span><span class="num pp1">—</span></div><div><span class="l">Per tax return filed</span><span class="num pp2">—</span></div></div>` : ''}
-      <div class="meta"><span class="rate ${/^(debt|deficit|interest|out_interest)/.test(slug) ? (rate > 0 ? 'up' : rate < 0 ? 'dn' : '') : ''}">${i.kind === 'count' && rate ? '+' + (rate * 86400).toFixed(0) + ' people/day' : i.kind === 'usd' && rate != null ? rateTxt(rate) : i.derived ? 'live ratio' : 'fixed'}</span>${badges(i, {short: 1})}</div>${slug === 'limit_headroom' ? '<div class="sub2" id="htl"></div>' : ''}`;
+      <div class="meta"><span class="rate ${stale ? '' : /^(debt|deficit|interest|out_interest)/.test(slug) ? (rate > 0 ? 'up' : rate < 0 ? 'dn' : '') : ''}">${stale ? 'held at last release' : i.kind === 'count' && rate ? '+' + (rate * 86400).toFixed(0) + ' people/day' : i.kind === 'usd' && rate != null ? rateTxt(rate) : i.derived ? 'live ratio' : 'fixed'}</span>${badges(i, {short: 1})}</div>${slug === 'limit_headroom' ? '<div class="sub2" id="htl"></div>' : ''}`;
     const v = el.querySelector('.val'), p1 = el.querySelector('.pp1'), p2 = el.querySelector('.pp2');
     const kind = i.kind;
     live.push(t => {
@@ -437,7 +458,7 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
     return el;
   }
 
-  // header status
+  // header status. A failed source stays on its own tile (STALE badge + section note). It does not replace the public nav status.
   const age = (now() - M.generated_epoch) / 3600;
   const st = document.getElementById('status');
   st.textContent = `Recalibrated ${new Date(M.generated_epoch * 1000).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'})}`;
@@ -457,7 +478,7 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
     hero.innerHTML = `<div class="k">Live estimate · US national debt${d.held_at_limit ? ' · held at the debt limit' : ''}</div>
     <div class="big num" id="hv">${usd(xNow)}</div>
     <div class="sub"><span>${rateTxt(d.rate)}</span> <span class="note">rate: 90-day least-squares trend (${d.calc?.n || '—'} daily closes), backtested vs next Treasury close, avg error ${d.validation?.mean_abs_error_pct != null ? d.validation.mean_abs_error_pct.toFixed(3) + '%' : 'n/a'}</span> <span>Since you opened this page: <span class="num" id="hs">$0</span> more debt · <span class="num" id="hi">$0</span> in interest</span></div>
-    <div class="trio"><div><span class="l" title="${esc(PPB)}">Live projection per person</span><span class="num" id="pp-person">${usd4(xNow / peopleNow)}</span><span class="note">Official ${usd((T.debt_total?.base || 0) / (T.population?.base || 1), 2)} · Census ${esc(fmtDate(T.population?.as_of))}</span></div><div><span class="l">Per tax return filed</span><span class="num" id="pp-return">${usd4(xNow / (T.tax_returns?.base || 1))}</span></div><div><span class="l">Per household</span><span class="num" id="pp-house">${usd4(xNow / T.households.base)}</span></div></div>
+    <div class="trio"><div><span class="l" title="${esc(PPB)}">Live projection per person</span><span class="num" id="pp-person">${usd(xNow / peopleNow, 2)}</span><span class="note">Official ${usd((T.debt_total?.base || 0) / (T.population?.base || 1), 2)} · Census ${esc(fmtDate(T.population?.as_of))}</span></div><div><span class="l">Per tax return filed</span><span class="num" id="pp-return">${usd(xNow / (T.tax_returns?.base || 1), 2)}</span></div><div><span class="l">Per household</span><span class="num" id="pp-house">${usd(xNow / T.households.base, 2)}</span></div></div>
     <div class="meta" style="margin-top:10px">${badges(d)}<span class="badge">source: Treasury Debt to the Penny</span></div>`;
     const hv = hero.querySelector('#hv'), hs = hero.querySelector('#hs'), hi = hero.querySelector('#hi');
     const pp = hero.querySelector('#pp-person'), pr = hero.querySelector('#pp-return'), ph = hero.querySelector('#pp-house');
@@ -467,9 +488,9 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
       if (hs) hs.textContent = '+' + usd(x - val('debt_total', OPENED), 0);
       if (hi) hi.textContent = usd(DER.interest_since_open(t), 0);
       const people = pop(t);
-      if (pp && people) pp.textContent = usd4(x / people);
-      if (pr && tax()) pr.textContent = usd4(x / tax());
-      if (ph && T.households?.base) ph.textContent = usd4(x / T.households.base);
+      if (pp && people) pp.textContent = usd(x / people, 2);
+      if (pr && tax()) pr.textContent = usd(x / tax(), 2);
+      if (ph && T.households?.base) ph.textContent = usd(x / T.households.base, 2);
     });
     hero.onclick = () => openModal('debt_total');
   } else hero.innerHTML = `<div class="big">source unavailable</div>`;
@@ -493,7 +514,8 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
       if (!p) return; cur = p; how = why;
       $('pck').textContent = why === 'default' ? 'Featured ' + kindWord(p) : 'Your ' + kindWord(p);
       $('pcn').textContent = p.name; $('pclab').textContent = p.label; $('pcd').textContent = p.demonym; $('pcg').textContent = p.name;
-      $('pcb').textContent = p.rate ? 'projected from official ' + fmtDate(p.base_date) + ' figures' : 'official, ' + fmtDate(p.base_date);
+      const coarse = p.frequency !== 'daily' && p.frequency !== 'weekly';
+      $('pcb').textContent = (!p.rate || coarse) ? 'as of ' + fmtDate(p.base_date) : 'projection from ' + fmtDate(p.base_date);
       $('pcl').href = p.url; sel.value = p.slug;
     }
     let saved = null; try { saved = by(localStorage.getItem(KEY)); } catch (e) {}
@@ -502,7 +524,7 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
     sel.onchange = () => { const p = by(sel.value); if (!p) return; try { localStorage.setItem(KEY, p.slug); } catch (e) {} show(p, 'saved'); };
     const pv = $('pcv'), pp = $('pcp');
     const cu = (v, d) => { const s = usd(v, d), c = cur.sym || '$'; return c === '$' ? s : s.replace('$', c); };
-    live.push(t => { if (!cur) return; const x = cur.base + cur.rate * (t - cur.t0); pv.textContent = cu(x); pp.textContent = cu(x / cur.population, 2); });
+    live.push(t => { if (!cur) return; const coarse = cur.frequency !== 'daily' && cur.frequency !== 'weekly'; const x = (!cur.rate || coarse) ? cur.base : cur.base + cur.rate * (t - cur.t0); pv.textContent = cu(x); pp.textContent = cu(x / cur.population, 2); });
   }
 
   // secondary hero: debt-limit headroom (below the national debt)
@@ -538,7 +560,12 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
   for (const s of S) {
     const sec = document.createElement('section'); sec.id = s.id;
     const title = typeof s.title === 'function' ? s.title() : s.title;
-    sec.innerHTML = `<div class="sh"><span class="bar" style="background:${s.color}"></span><h2>${esc(title)}</h2><span class="h2n">${esc(typeof s.note === 'function' ? s.note() : s.note)}</span></div><div class="grid"></div>`;
+    const staleHere = s.tiles.filter(slug => held(T[slug]));
+    const staleHtml = staleHere.length ? `<p class="stalenote">${staleHere.map(slug => {
+      const src = T[slug];
+      return `${esc(src.label || slug)} is the last good release (as of ${esc(fmtDate(src.as_of))}). The fetch failed, so this is not a live total.`;
+    }).join(' ')}</p>` : '';
+    sec.innerHTML = `<div class="sh"><span class="bar" style="background:${s.color}"></span><h2>${esc(title)}</h2><span class="h2n">${esc(typeof s.note === 'function' ? s.note() : s.note)}</span></div>${staleHtml}<div class="grid"></div>`;
     const g = sec.querySelector('.grid');
     if (s.dense) g.classList.add('dense');
     s.tiles.forEach(x => g.appendChild(tile(x, s.id)));
@@ -775,24 +802,24 @@ document.addEventListener('click',function(e){if(!f.contains(e.target))ul.hidden
 <button type="button" id="edc-notice-ok">OK</button>
 </aside>
 <style>
-#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-sizing:border-box;margin:0;padding:10px 14px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:13.5px/1.4 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
+#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:nowrap;box-sizing:border-box;margin:0;padding:6px 10px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:12px/1.3 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
 #edc-notice[hidden]{display:none!important}
-#edc-notice p{margin:0;flex:1 1 220px}
+#edc-notice p{margin:0;flex:1 1 auto;min-width:0}
 #edc-notice a{color:#5aa9ff;text-decoration:none}
-#edc-notice-ok{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:6px 12px;font-weight:650;cursor:pointer}
+#edc-notice-ok{appearance:none;flex:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 10px;font:inherit;font-weight:650;cursor:pointer}
 </style>
 <script>
 (function(){
   var n=document.getElementById("edc-notice");
   if(!n)return;
+  function pad(){if(document.body)document.body.style.paddingBottom=n.hidden?"":(n.offsetHeight+"px");}
+  function close(){n.hidden=true;pad();document.dispatchEvent(new Event("edc-notice-closed"));}
   try{if(localStorage.getItem("edc.notice")==="1")return;}catch(e){}
-  n.hidden=false;
-  if(document.body) document.body.style.paddingBottom="72px";
+  n.hidden=false;pad();
   var b=document.getElementById("edc-notice-ok");
   if(b)b.addEventListener("click",function(){
     try{localStorage.setItem("edc.notice","1")}catch(e){}
-    n.hidden=true;
-    if(document.body) document.body.style.paddingBottom="";
+    close();
   });
 })();
 </script>
