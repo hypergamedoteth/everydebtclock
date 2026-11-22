@@ -5,7 +5,7 @@
   if (!box || !el) return;
   var b = +box.dataset.b, r = +box.dataset.r, t0 = +box.dataset.t0;
   var pop = +box.dataset.pop, pr = +box.dataset.pr, pt = +box.dataset.pt;
-  var nf = new Intl.NumberFormat("en-US", {minimumFractionDigits: 4, maximumFractionDigits: 4});
+  var nf = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
   function frame() {
     var t = Date.now() / 1000;
     var debt = b + r * (t - t0);
