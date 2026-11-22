@@ -330,7 +330,7 @@ def _answer(p):
             f"Source: U.S. Census Bureau.")
 
 
-def faqs(p):
+def faqs(p, R=None):
     out = [(f"How much {'government' if p['dc'] else 'state government'} debt does {p['name']} have?", _answer(p))]
     if p["per_state"] is not None:
         out.append((
@@ -367,7 +367,12 @@ def faqs(p):
     if rank:
         out.append((f"Where does {p['name']} rank on government debt?", rank + f" Source: U.S. Census Bureau, as of {_date(p['total_as_of'])}."))
     out.append((f"How is the {p['name']} debt clock calculated?", _clock_sentence(p)))
-    return out[:5]
+    if R is not None:
+        import state_federal
+        extra = state_federal.faq(R, p)
+        if extra:
+            out.append(extra)
+    return out[:6]
 
 
 def _mil(x):
@@ -514,15 +519,23 @@ def for_page(R, place):
         local = ("<p>Census tables have no state-government level for the District of Columbia, so this page does not "
                  "quote a state-government figure. The clock is the District government total Census classifies as local. "
                  "It does not include a share of the federal debt.</p>")
-    pairs = faqs(p)
+    pairs = faqs(p, R)
     faq_html = "".join(f"<h3>{E(q)}</h3><p>{E(a)}</p>" for q, a in pairs)
-    ld = {"@context": "https://schema.org", "@type": "FAQPage", "dateModified": p["total_as_of"],
-          "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in pairs]}
     based = [p["source_url"], CENSUS_RELEASE]
     if p["pop_source_url"]:
         based.append(p["pop_source_url"])
     if p["gdp_url"] and (p["ratio_state"] is not None or p["ratio_total"] is not None):
         based.append(p["gdp_url"])
+    import state_federal
+    for u in state_federal.source_urls(R):
+        if u not in based:
+            based.append(u)
+    faq_date = p["total_as_of"]
+    debt_date = state_federal.record_date(R)
+    if debt_date and debt_date > faq_date:
+        faq_date = debt_date
+    ld = {"@context": "https://schema.org", "@type": "FAQPage", "dateModified": faq_date,
+          "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in pairs]}
     dataset = {"@context": "https://schema.org", "@type": "Dataset",
                "name": f"{p['name']} government debt, U.S. Census Bureau",
                "description": _answer(p), "url": f"https://everydebtclock.com/states/{p['slug']}/",
