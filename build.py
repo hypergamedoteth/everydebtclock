@@ -1020,7 +1020,7 @@ data_hub.build(R, SITE, with_analytics, D, PLACES_LIVE, WORLD)
 import monthly_report
 REPORT_URLS = monthly_report.build(R, SITE, with_analytics, T["debt_total"])
 
-# ---------------------------------------------------------------- legal pages (/privacy/, /about/, /contact/)
+# ---------------------------------------------------------------- legal pages (/privacy/, /about/, /contact/, /terms/)
 site_chrome.write_legal_pages(R, SITE, with_analytics)
 site_chrome.write_advertise_page(R, SITE, with_analytics)
 
@@ -1196,7 +1196,8 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /wealth/ : Sovereign wealth funds ranked by assets and assets per citizen.",
     "- /methodology/ : Sources, how the live ticker is calculated, and how it is checked against Treasury.",
     "- /about/ : Who runs the site (Hypergame LLC), the main data sources, and the update schedule.",
-    "- /privacy/ : Privacy policy, including analytics, data downloads, and cookies if ads are shown.",
+    "- /privacy/ : Privacy policy, including analytics, data downloads, cookies if ads are shown, and how to opt out of sale or sharing.",
+    "- /terms/ : Terms of use. The site is information only, operated by Hypergame LLC, a Texas limited liability company.",
     "- /contact/ : Email hello@everydebtclock.com.",
     "- /advertise/ : Sponsorship on the US clock and the national-debt-by-year page.",
     "- /data/ : Free CSV and JSON of US debt. us-debt-daily is every Debt to the Penny close since 1993-04-01. us-debt-annual is Historical Debt Outstanding since 1790. Citation: Source: Every Debt Clock (everydebtclock.com), from U.S. Treasury Debt to the Penny.",
@@ -1245,7 +1246,7 @@ AV = {a: hashlib.sha1(open(f"{R}/{a}", "rb").read()).hexdigest()[:10] for a in (
 _vre = re.compile(r'((?:href|src)=")((?:\.\./)*)(' + "|".join(re.escape(a) for a in AV) + r')(?:\?v=[^"]*)?"')
 # Per-clock files under embed/ are self-contained (no site CSS, no favicon request). Only the directory is versioned.
 _pages = ([f"{R}/{f}" for f in ("index.html", "404.html", "privacy.html", "widget.html", "embed/index.html")] + _glob.glob(f"{R}/t/*.html")
-          + [f for d in ["states", "countries", "world", "world-government-debt", "global-debt-clock", "wealth", "about", "contact", "privacy", "advertise", "facts"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
+          + [f for d in ["states", "countries", "world", "world-government-debt", "global-debt-clock", "wealth", "about", "contact", "privacy", "terms", "advertise", "facts"] + [a for a, _ in ANSWERS] for f in _glob.glob(f"{R}/{d}/**/*.html", recursive=True)])
 # Every page gets real icon files (favicon.ico, a 32px PNG and the SVG), replacing the old inline data-URI icon. Made by pipeline/make_favicon.py.
 ICON_LINKS = '<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/svg+xml" href="/icon.svg">'
 _icon_re = re.compile(r'<link rel="icon"[^>]*>')
