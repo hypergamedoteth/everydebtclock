@@ -20,7 +20,7 @@ a.by,a.get{color:var(--link);text-decoration:underline;text-underline-offset:2px
 <div class="cr"><a class="by" href="https://everydebtclock.com/your-share/" target="_top">Live debt clock by EveryDebtClock.com</a><a class="get" href="https://everydebtclock.com/embed/" target="_blank" rel="noopener">Get this clock for your site</a></div>
 </div><script type="application/json" id="c">{"b":40709780700317.02,"r":92577.06517287245,"t0":1795150799.0,"pop":341784857.0,"pr":0.02267361111111111,"pt":1751342400.0}</script>
 <script>(function(){var D=JSON.parse(document.getElementById("c").textContent);
-var nf=new Intl.NumberFormat("en-US",{minimumFractionDigits:4,maximumFractionDigits:4});
+var nf=new Intl.NumberFormat("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 var v=document.getElementById("v");
 function paint(){var t=Date.now()/1000,debt=D.b+D.r*(t-D.t0),people=D.pop+D.pr*(t-D.pt);
 v.textContent=(debt<0?"−$":"$")+nf.format(Math.abs(debt/people));requestAnimationFrame(paint)}

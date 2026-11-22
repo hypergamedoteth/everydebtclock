@@ -41,9 +41,7 @@
   // ---------- formatting
   const nf0 = new Intl.NumberFormat('en-US', {maximumFractionDigits: 0});
   const nf2 = new Intl.NumberFormat('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-  const nf4 = new Intl.NumberFormat('en-US', {minimumFractionDigits: 4, maximumFractionDigits: 4});
   const usd = (v, d = 0) => v == null ? '—' : (v < 0 ? '−$' : '$') + (d ? nf2 : nf0).format(Math.abs(v));
-  const usd4 = v => v == null || !isFinite(v) ? '—' : (v < 0 ? '−$' : '$') + nf4.format(Math.abs(v));
   const pct = (v, d = 4) => v == null ? '—' : v.toFixed(d) + '%';
   const short = v => { const a = Math.abs(v), s = v < 0 ? '−$' : '$';
     return a >= 1e12 ? s + (a / 1e12).toFixed(2) + 'T' : a >= 1e9 ? s + (a / 1e9).toFixed(2) + 'B' : a >= 1e6 ? s + (a / 1e6).toFixed(1) + 'M' : s + nf0.format(a); };
@@ -51,7 +49,7 @@
     return a >= 1 ? `${sg}${short(a).slice(1)}/sec · ${sg}${short(a * 86400).slice(1)}/day` : `${sg}$${(a * 86400).toFixed(2)}/day`; };
   const fmtDate = s => { if (/^\d{4}-\d\d$/.test(s || '')) { const [y, m] = s.split('-'); return new Date(+y, m - 1, 1).toLocaleDateString('en-US', {month: 'short', year: 'numeric'}); }
     if (!s || !/^\d{4}-\d\d-\d\d$/.test(s)) return s; const [y, m, d] = s.split('-'); return new Date(+y, m - 1, +d).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}); };
-  const ppf = v => { if (v == null || !isFinite(v)) return '—'; const a = Math.abs(v); return a < 0.01 ? usd(v, 0).replace(/[\d,]+$/, '') + a.toFixed(6) : a < 100 ? (v < 0 ? '−$' : '$') + a.toFixed(4) : usd(v, 2); };
+  const ppf = v => { if (v == null || !isFinite(v)) return '—'; const a = Math.abs(v); return a < 0.01 ? usd(v, 0).replace(/[\d,]+$/, '') + a.toFixed(6) : usd(v, 2); };
   const shortDate = s => { const f = fmtDate(s); return /^\d{4}-\d\d-\d\d$/.test(s || '') ? f.replace(/, \d{4}$/, '') : f; };
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
@@ -139,17 +137,10 @@
     return el;
   }
 
-  // header status
+  // header status. A failed source stays on its own tile (STALE badge + section note). It does not replace the public nav status.
   const age = (now() - M.generated_epoch) / 3600;
   const st = document.getElementById('status');
-  const staleKeys = Object.keys(T).filter(k => held(T[k]));
   st.textContent = `Recalibrated ${new Date(M.generated_epoch * 1000).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'})}`;
-  if (staleKeys.length && st.parentElement) {
-    st.parentElement.classList.add('stale');
-    const one = T[staleKeys[0]];
-    const short = staleKeys[0] === 'm2' ? 'M2' : String(one.label || staleKeys[0]).split(' ')[0];
-    st.textContent = staleKeys.length === 1 ? `${short} stale` : `${staleKeys.length} stale`;
-  }
   const banners = [];
   if (age > 36) banners.push(`<div class="banner">Data last recalibrated ${Math.floor(age / 24)} day(s) ago. Tickers are still projecting from the last official figures.</div>`);
   if (fyRolled()) banners.push(`<div class="banner">New fiscal year FY${curFY()} started Oct 1 — fiscal-year counters reset to $0 and are projecting until the next official update.</div>`);
@@ -166,7 +157,7 @@
     hero.innerHTML = `<div class="k">Live estimate · US national debt${d.held_at_limit ? ' · held at the debt limit' : ''}</div>
     <div class="big num" id="hv">${usd(xNow)}</div>
     <div class="sub"><span>${rateTxt(d.rate)}</span> <span class="note">rate: 90-day least-squares trend (${d.calc?.n || '—'} daily closes), backtested vs next Treasury close, avg error ${d.validation?.mean_abs_error_pct != null ? d.validation.mean_abs_error_pct.toFixed(3) + '%' : 'n/a'}</span> <span>Since you opened this page: <span class="num" id="hs">$0</span> more debt · <span class="num" id="hi">$0</span> in interest</span></div>
-    <div class="trio"><div><span class="l" title="${esc(PPB)}">Live projection per person</span><span class="num" id="pp-person">${usd4(xNow / peopleNow)}</span><span class="note">Official ${usd((T.debt_total?.base || 0) / (T.population?.base || 1), 2)} · Census ${esc(fmtDate(T.population?.as_of))}</span></div><div><span class="l">Per tax return filed</span><span class="num" id="pp-return">${usd4(xNow / (T.tax_returns?.base || 1))}</span></div><div><span class="l">Per household</span><span class="num" id="pp-house">${usd4(xNow / T.households.base)}</span></div></div>
+    <div class="trio"><div><span class="l" title="${esc(PPB)}">Live projection per person</span><span class="num" id="pp-person">${usd(xNow / peopleNow, 2)}</span><span class="note">Official ${usd((T.debt_total?.base || 0) / (T.population?.base || 1), 2)} · Census ${esc(fmtDate(T.population?.as_of))}</span></div><div><span class="l">Per tax return filed</span><span class="num" id="pp-return">${usd(xNow / (T.tax_returns?.base || 1), 2)}</span></div><div><span class="l">Per household</span><span class="num" id="pp-house">${usd(xNow / T.households.base, 2)}</span></div></div>
     <div class="meta" style="margin-top:10px">${badges(d)}<span class="badge">source: Treasury Debt to the Penny</span></div>`;
     const hv = hero.querySelector('#hv'), hs = hero.querySelector('#hs'), hi = hero.querySelector('#hi');
     const pp = hero.querySelector('#pp-person'), pr = hero.querySelector('#pp-return'), ph = hero.querySelector('#pp-house');
@@ -176,9 +167,9 @@
       if (hs) hs.textContent = '+' + usd(x - val('debt_total', OPENED), 0);
       if (hi) hi.textContent = usd(DER.interest_since_open(t), 0);
       const people = pop(t);
-      if (pp && people) pp.textContent = usd4(x / people);
-      if (pr && tax()) pr.textContent = usd4(x / tax());
-      if (ph && T.households?.base) ph.textContent = usd4(x / T.households.base);
+      if (pp && people) pp.textContent = usd(x / people, 2);
+      if (pr && tax()) pr.textContent = usd(x / tax(), 2);
+      if (ph && T.households?.base) ph.textContent = usd(x / T.households.base, 2);
     });
     hero.onclick = () => openModal('debt_total');
   } else hero.innerHTML = `<div class="big">source unavailable</div>`;

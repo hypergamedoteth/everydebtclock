@@ -488,7 +488,7 @@ a.by,a.get{{color:var(--link);text-decoration:underline;text-underline-offset:2p
 <div class="cr"><a class="by" href="{E(page_url, quote=True)}" target="_top">{BYLINE}</a><a class="get" href="{E(embed_home, quote=True)}" target="_blank" rel="noopener">{GET}</a></div>
 </div><script type="application/json" id="c">{blob}</script>
 <script>(function(){{var D=JSON.parse(document.getElementById("c").textContent);
-var nf=new Intl.NumberFormat("en-US",{{minimumFractionDigits:4,maximumFractionDigits:4}});
+var nf=new Intl.NumberFormat("en-US",{{minimumFractionDigits:2,maximumFractionDigits:2}});
 var v=document.getElementById("v");
 function paint(){{var t=Date.now()/1000,debt=D.b+D.r*(t-D.t0),people=D.pop+D.pr*(t-D.pt);
 v.textContent=(debt<0?"−$":"$")+nf.format(Math.abs(debt/people));requestAnimationFrame(paint)}}

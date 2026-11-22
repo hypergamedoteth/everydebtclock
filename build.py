@@ -125,7 +125,7 @@ def fmt(i, x, short=False):
     return f"{s}{a:,.2f}" if a < 1000 else f"{s}{a:,.0f}"
 def ppf(v):
     a = abs(v); s = "−$" if v < 0 else "$"
-    return f"{s}{a:.6f}" if a < 0.01 else f"{s}{a:.4f}" if a < 100 else f"{s}{a:,.2f}"
+    return f"{s}{a:.6f}" if a < 0.01 else f"{s}{a:,.2f}"
 def fdate(s):
     if not s: return ""
     if re.match(r"^\d{4}-\d\d-\d\d$", s): return dt.date.fromisoformat(s).strftime("%b %-d, %Y")
