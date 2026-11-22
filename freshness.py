@@ -25,7 +25,8 @@ CONTENT = {
     "/about/": "2026-11-17",
     "/contact/": "2026-11-17",
     "/advertise/": "2026-11-16",
-    "/privacy/": "2026-11-18",
+    "/privacy/": "2026-11-22",
+    "/terms/": "2026-11-22",
     "/404.html": "2026-11-17",
 }
 
@@ -309,6 +310,10 @@ def collect(R, off_d, world=None, today=None):
                  "/41-trillion/", "/press/", "/methodology/", "/embed/", "/when-will-debt-hit-41-trillion/",
                  "/facts/", "/widget.html"):
         _put(out, path, debt)
+    import debt_limit
+    dsl_day = parse((T.get("debt_subject_limit") or {}).get("as_of"), today)
+    checked = parse(debt_limit.EXTRAORDINARY_MEASURES.get("checked"), today)
+    _put(out, "/debt-limit/", _max([dsl_day, checked, debt]))
     for path, day in CONTENT.items():
         _put(out, path, parse(day, today))
     return out

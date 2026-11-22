@@ -191,7 +191,7 @@
   "fiscal_year": 2026,
   "start": "2025-10-01",
   "end": "2026-09-30",
-  "pulled": "2026-11-22",
+   "pulled": "2026-11-21",
   "scope": "place_of_performance",
   "spending_level": "transactions",
   "measure": "Prime-award transaction amounts with a place of performance in the state during the fiscal year. Not most federal salaries. Not a full accounting of benefits paid to residents. Agencies can still file late records after the pull date.",

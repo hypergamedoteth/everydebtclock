@@ -5,7 +5,7 @@
 <link rel="canonical" href="https://everydebtclock.com/reports/2026-05/">
 <meta property="og:title" content="U.S. national debt in May 2026"><meta property="og:description" content="The U.S. national debt rose by $239.93 billion in May 2026, from $38.97 trillion on Apr 30, 2026 to $39.21 trillion on May 29, 2026, per the U.S. Trea">
 <meta property="og:url" content="https://everydebtclock.com/reports/2026-05/"><meta property="og:type" content="article">
-<link rel="stylesheet" href="../../style.css">
+<link rel="stylesheet" href="../../style.css?v=86e606b949">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "The U.S. national debt rose by $239.93 billion in May 2026, from $38.97 trillion on Apr 30, 2026 to $39.21 trillion on May 29, 2026, per the U.S. Treasury Debt to the Penny.", "datePublished": "2026-05-29", "dateModified": "2026-05-29", "url": "https://everydebtclock.com/reports/2026-05/", "isAccessibleForFree": true, "author": {"@type": "Organization", "name": "Every Debt Clock", "url": "https://everydebtclock.com/"}, "publisher": {"@type": "Organization", "name": "Every Debt Clock", "url": "https://everydebtclock.com/"}, "citation": "U.S. Treasury, Debt to the Penny, closes of April 30, 2026 ($38,967,833,861,543.11) and May 29, 2026 ($39,207,759,598,302.62). https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny Treasury, Interest Expense on the Public Debt Outstanding, May 31, 2026 ($132,622,551,433.83). https://fiscaldata.treasury.gov/datasets/interest-expense-debt-outstanding/interest-expense Next-trillion date: projection from that trailing trend, not a Treasury forecast. Window 2026-03-02 to 2026-05-29.", "isBasedOn": ["https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny", "https://fiscaldata.treasury.gov/datasets/interest-expense-debt-outstanding/interest-expense"]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "U.S. national debt in May 2026", "description": "The U.S. national debt rose by $239.93 billion in May 2026, from $38.97 trillion on Apr 30, 2026 to $39.21 trillion on May 29, 2026, per the U.S. Treasury Debt to the Penny.", "url": "https://everydebtclock.com/reports/2026-05/", "dateModified": "2026-05-29", "isAccessibleForFree": true, "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": "https://everydebtclock.com/"}, "isBasedOn": ["https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny"], "temporalCoverage": "2026-04-30/2026-05-29", "creditText": "U.S. Treasury, Debt to the Penny, closes of April 30, 2026 ($38,967,833,861,543.11) and May 29, 2026 ($39,207,759,598,302.62). https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny Treasury, Interest Expense on the Public Debt Outstanding, May 31, 2026 ($132,622,551,433.83). https://fiscaldata.treasury.gov/datasets/interest-expense-debt-outstanding/interest-expense Next-trillion date: projection from that trailing trend, not a Treasury forecast. Window 2026-03-02 to 2026-05-29."}</script>
 <!--ANALYTICS--><script data-goatcounter="https://everydebtclock.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script><!--/ANALYTICS-->
 <link rel="manifest" href="/manifest.json"></head><body class="srclead"><main>
@@ -16,10 +16,10 @@
 <button type="button" id="edc-a2hs-x">Not now</button>
 </aside>
 <style>
-#edc-a2hs{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;padding:8px 16px;background:#101828;color:#c2ccda;border-bottom:1px solid #1c2533;font:13px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+#edc-a2hs{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;margin:6px 0 0;padding:6px 8px;background:#101828;color:#c2ccda;border:1px solid #1c2533;border-radius:8px;font:12px/1.3 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
 #edc-a2hs[hidden]{display:none!important}
-#edc-a2hs p{margin:0;flex:1 1 180px}
-#edc-a2hs button{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+#edc-a2hs p{margin:0;flex:1 1 auto;min-width:0}
+#edc-a2hs button{appearance:none;flex:none;white-space:nowrap;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 8px;font:inherit;cursor:pointer}
 #edc-a2hs-go{color:#9fd0ff}
 </style>
 <script>
@@ -36,10 +36,15 @@
     try{localStorage.setItem(key,"1");}catch(e){}
     return;
   }
-  var deferred=null,shown=false;
-  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown)show(true);});
+  var deferred=null,shown=false,waiting=false;
+  function noticePending(){
+    try{if(localStorage.getItem("edc.notice")==="1")return false;}catch(e){}
+    var notice=document.getElementById("edc-notice");
+    return !!(notice&&!notice.hidden);
+  }
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown&&!noticePending()&&!waiting)show(true);});
   function show(install){
-    if(shown)return;shown=true;
+    if(shown||noticePending())return;shown=true;
     try{localStorage.setItem(key,"1");}catch(e){}
     if(install&&deferred){text.textContent="Add this live clock to your home screen.";go.hidden=false;}
     else if(/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)){
@@ -49,7 +54,16 @@
   }
   if(go)go.addEventListener("click",function(){if(!deferred)return;deferred.prompt();deferred=null;n.hidden=true;});
   if(x)x.addEventListener("click",function(){try{localStorage.setItem(key,"1");}catch(e){}n.hidden=true;});
-  setTimeout(function(){if(!shown)show(false);},1500);
+  function arm(){
+    if(shown)return;
+    if(noticePending()){
+      if(waiting)return;waiting=true;
+      document.addEventListener("edc-notice-closed",function(){waiting=false;show(!!deferred);},{once:true});
+      return;
+    }
+    show(!!deferred);
+  }
+  setTimeout(arm,1500);
 })();
 </script>
 <!--/A2HS-->
@@ -59,7 +73,7 @@
 <div class="tw"><table class="v"><tr><th>Figure</th><th>Amount</th><th>Date</th><th>Source</th></tr><tr><td>Debt at the previous close</td><td class="num">$38,967,833,861,543.11</td><td>April 30, 2026</td><td>U.S. Treasury, Debt to the Penny</td></tr><tr><td>Debt at the month&#x27;s last close</td><td class="num">$39,207,759,598,302.62</td><td>May 29, 2026</td><td>U.S. Treasury, Debt to the Penny</td></tr><tr><td>Debt added in the month</td><td class="num">$239,925,736,759.51</td><td>April 30, 2026 to May 29, 2026</td><td>Difference of those two closes</td></tr><tr><td>Average per calendar day</td><td class="num">$8,273,301,267.57</td><td>29 days between the closes</td><td>The difference divided by the number of calendar days between the two record dates</td></tr><tr><td>Interest expense in the month</td><td class="num">$132,622,551,433.83</td><td>May 31, 2026</td><td>Treasury, Interest Expense on the Public Debt Outstanding</td></tr><tr><td>Interest per day</td><td class="num">$4,278,146,820.45</td><td>31 days in the month</td><td>That official month total divided by the days in the month. Not cash paid on one day.</td></tr></table></div>
 <p class="cite"><b>Citation.</b> U.S. Treasury, Debt to the Penny, closes of April 30, 2026 ($38,967,833,861,543.11) and May 29, 2026 ($39,207,759,598,302.62). https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny Treasury, Interest Expense on the Public Debt Outstanding, May 31, 2026 ($132,622,551,433.83). https://fiscaldata.treasury.gov/datasets/interest-expense-debt-outstanding/interest-expense Next-trillion date: projection from that trailing trend, not a Treasury forecast. Window 2026-03-02 to 2026-05-29.</p>
 <p><a href="../../reports/">All monthly reports</a> · <a href="../../">U.S. debt clock</a> · <a href="../../data/">Data</a></p>
-<footer class="site-foot">Every Debt Clock · <a href="../../embed/">Embed a clock</a> · <a href="../../facts/">Facts</a> · <a href="../../data/">Data</a> · <a href="../../reports/">Reports</a> · <a href="../../press/">Press</a> · <a href="../../about/">About</a> · <a href="../../advertise/">Advertise</a> · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · <a href="../../contact/">Contact</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
+<footer class="site-foot">Every Debt Clock · <a href="../../embed/">Embed a clock</a> · <a href="../../facts/">Facts</a> · <a href="../../data/">Data</a> · <a href="../../reports/">Reports</a> · <a href="../../press/">Press</a> · <a href="../../about/">About</a> · <a href="../../advertise/">Advertise</a> · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · <a href="../../terms/">Terms</a> · <a href="../../contact/">Contact</a> · <a href="../../privacy/#do-not-sell">Do Not Sell or Share My Personal Information</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main>
 <header class="top"><div class="topin"><a class="brand" href="../../">EVERY <b>DEBT</b> CLOCK</a>
 <nav class="plnav"><a href="../../">United States</a><a href="../../states/">States</a><a href="../../world/">World</a><a href="../../reports/">Reports</a><a href="../../data/">Data</a><a href="../../embed/">Embed</a></nav></div></header>
@@ -70,24 +84,24 @@ function f(){var x=B+R*(Date.now()/1000-T0);hv.textContent=(x<0?'−$':'$')+nf.f
 <button type="button" id="edc-notice-ok">OK</button>
 </aside>
 <style>
-#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-sizing:border-box;margin:0;padding:10px 14px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:13.5px/1.4 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
+#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:nowrap;box-sizing:border-box;margin:0;padding:6px 10px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:12px/1.3 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
 #edc-notice[hidden]{display:none!important}
-#edc-notice p{margin:0;flex:1 1 220px}
+#edc-notice p{margin:0;flex:1 1 auto;min-width:0}
 #edc-notice a{color:#5aa9ff;text-decoration:none}
-#edc-notice-ok{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:6px 12px;font-weight:650;cursor:pointer}
+#edc-notice-ok{appearance:none;flex:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 10px;font:inherit;font-weight:650;cursor:pointer}
 </style>
 <script>
 (function(){
   var n=document.getElementById("edc-notice");
   if(!n)return;
+  function pad(){if(document.body)document.body.style.paddingBottom=n.hidden?"":(n.offsetHeight+"px");}
+  function close(){n.hidden=true;pad();document.dispatchEvent(new Event("edc-notice-closed"));}
   try{if(localStorage.getItem("edc.notice")==="1")return;}catch(e){}
-  n.hidden=false;
-  if(document.body) document.body.style.paddingBottom="72px";
+  n.hidden=false;pad();
   var b=document.getElementById("edc-notice-ok");
   if(b)b.addEventListener("click",function(){
     try{localStorage.setItem("edc.notice","1")}catch(e){}
-    n.hidden=true;
-    if(document.body) document.body.style.paddingBottom="";
+    close();
   });
 })();
 </script>

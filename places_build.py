@@ -157,6 +157,7 @@ def nav_html(places, depth, current=None, cls="pl"):
     items += [(f"{up}{d}/", lab, current == k) for k, d, lab, _ in SECTIONS if k in kinds]
     if WORLD and "country" in kinds: items.append((f"{up}world/", "World", current == "world"))
     if WEALTH: items.append((f"{up}wealth/", "Wealth", current == "wealth"))
+    items.append((f"{up}debt-limit/", "Debt limit", current == "debt-limit"))
     items.append((f"{up}reports/", "Reports", current == "reports"))
     items.append((f"{up}embed/", "Embed", current == "embed"))
     return f'<nav class="{cls}">' + "".join(f'<a href="{h}"{" class=on" if on else ""}>{lab}</a>' for h, lab, on in items) + "</nav>"
@@ -182,6 +183,12 @@ def index(places, now):
     default = DEFAULT_PLACE if any(x["slug"] == DEFAULT_PLACE for x in out) else (out[0]["slug"] if out else None)
     return {"_doc": "Live place clocks on everydebtclock.com. value(t) = base + rate * (t - t0), t in Unix seconds; rate 0 = official figure, not projected. url is relative to https://everydebtclock.com/.",
             "generated": dt.datetime.fromtimestamp(now, CT).isoformat(timespec="seconds"), "default": default, "hub": "states/", "hub_label": "All " + hub_label(places), "places": out}
+
+def _site_footer(prefix, lead="Every Debt Clock"):
+    """The shared footer (terms, privacy, do-not-sell). prefix is '../' or '../../'."""
+    import site_chrome
+    return site_chrome.site_footer(prefix, lead=lead)
+
 
 def build(R, SITE, with_analytics, PAGE_CSS, ANS_CSS, og, stamp, now):
     places = load(R)
@@ -585,7 +592,7 @@ if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
     official = f'<p class="official">Official: {_usd0(c["total"])} as of {as_of}, {E(pub)}</p>'
     page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld).replace("<body>", '<body class="srclead">', 1)
             + '<main id="app">' + hero + intro + federal_html + facts_html + wc + debt_sec + comp_secs + people + hist + details + profile + method + country_faq
-            + '</main>' + header + ex.search_box("../../") + '<dialog id="dlg"></dialog>' + explore_html + links + '<footer class="site-foot">Every Debt Clock · official data, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>' + script + "</body></html>")
+            + '</main>' + header + ex.search_box("../../") + '<dialog id="dlg"></dialog>' + explore_html + links + _site_footer("../../", "Every Debt Clock · official data, projection labelled") + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))
     _cur({})
@@ -661,7 +668,7 @@ ts.sort((a,b)=>m==='name'?a.e.dataset.name.localeCompare(b.e.dataset.name):m==='
             f'with every number linked to its source. Most of these governments report their debt once a year or once a month, so the ticking numbers are labelled projections from the latest official figures. Each tile says what it counts: state clocks count state and local government debt (cities, counties, school and special districts included), and countries are shown in their own currency.{WTXT}</p>{per_person}</section>')
     rest = (f'<main id="app">{sort}{secs}' + ('<!--WEOCOUNTRIES-->' if WEO and kind == "country" else '') + '</main>'
             + explore_html +
-            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section>{state_faq}<footer class="site-foot">Every Debt Clock · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>{script}</body></html>')
+            f'<section class="answers"><ul><li><a href="../">US national debt clock</a></li>{WL1}<li><a href="../api/places.json">All places as JSON</a></li></ul></section>{state_faq}{_site_footer("../")}{script}</body></html>')
     if kind == "state":
         body = intro_html + header + ex.search_box("../") + rest
     else:

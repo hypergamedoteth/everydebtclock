@@ -277,7 +277,7 @@ def section(R, place, now, tile_html, page_url, img):
         f'<p class="src"><a href="{DEBT_URL}" rel="noopener">Debt to the Penny</a>, {E(as_of)}. '
         f'<a href="{E(place["population"]["source_url"])}" rel="noopener">Census Vintage 2025</a>, {_date(ctx["pop_as_of"])}. '
         f'<a href="{INTEREST_URL}" rel="noopener">Interest expense</a>, FY{E(interest_fy)} ended {_date(interest_asof)}, U.S. total {_usd0(interest_amt)}. '
-        f'<a href="{E(usa_url)}" rel="noopener">USAspending</a> FY{usa["fiscal_year"]} awards performed in {E(name)}, pulled {_date(usa["pulled"])}. '
+        f'<a href="{E(usa_url)}" rel="noopener">USAspending</a> FY{usa["fiscal_year"]} awards performed in {E(name)}, pulled {_date(usa["pulled"])} CT. '
         f'Not most salaries or benefit checks.</p>'
         f'<h3>If the debt-limit X-date hits</h3>'
         f'<p>The X-date is when Treasury expects to run short of cash. <a href="../../debt-limit/">Debt limit and the X-date</a>.</p><ul>'

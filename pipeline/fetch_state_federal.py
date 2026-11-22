@@ -11,19 +11,21 @@ Each row is checked: the eight benefit-type columns must add to the total,
 and every area in the table must add to the published "All areas" total.
 """
 import csv
+import datetime as dt
 import io
 import json
 import os
 import sys
 import urllib.request
 import zipfile
-from datetime import date
+from zoneinfo import ZoneInfo
 
 R = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(R, "pipeline"))
 import xlsx_min  # noqa: E402
 
 UA = "everydebtclock-research (state pages; official figures only)"
+CT = ZoneInfo("America/Chicago")
 OUT = os.path.join(R, "data", "state_federal.json")
 
 # name, total, and the eight Table 2 columns that must sum to total.
@@ -257,7 +259,7 @@ def main():
             "fiscal_year": 2026,
             "start": "2025-10-01",
             "end": "2026-09-30",
-            "pulled": date.today().isoformat(),
+            "pulled": dt.datetime.now(CT).date().isoformat(),
             "scope": "place_of_performance",
             "spending_level": "transactions",
             "measure": "Prime-award transaction amounts with a place of performance in the state during the fiscal year. Not most federal salaries. Not a full accounting of benefits paid to residents. Agencies can still file late records after the pull date.",

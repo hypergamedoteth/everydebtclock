@@ -29,10 +29,10 @@ h1.asof{font-size:15px;font-weight:650;line-height:1.45;margin:8px 2px 14px;colo
 <button type="button" id="edc-a2hs-x">Not now</button>
 </aside>
 <style>
-#edc-a2hs{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;padding:8px 16px;background:#101828;color:#c2ccda;border-bottom:1px solid #1c2533;font:13px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+#edc-a2hs{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;margin:6px 0 0;padding:6px 8px;background:#101828;color:#c2ccda;border:1px solid #1c2533;border-radius:8px;font:12px/1.3 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
 #edc-a2hs[hidden]{display:none!important}
-#edc-a2hs p{margin:0;flex:1 1 180px}
-#edc-a2hs button{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+#edc-a2hs p{margin:0;flex:1 1 auto;min-width:0}
+#edc-a2hs button{appearance:none;flex:none;white-space:nowrap;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 8px;font:inherit;cursor:pointer}
 #edc-a2hs-go{color:#9fd0ff}
 </style>
 <script>
@@ -49,10 +49,15 @@ h1.asof{font-size:15px;font-weight:650;line-height:1.45;margin:8px 2px 14px;colo
     try{localStorage.setItem(key,"1");}catch(e){}
     return;
   }
-  var deferred=null,shown=false;
-  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown)show(true);});
+  var deferred=null,shown=false,waiting=false;
+  function noticePending(){
+    try{if(localStorage.getItem("edc.notice")==="1")return false;}catch(e){}
+    var notice=document.getElementById("edc-notice");
+    return !!(notice&&!notice.hidden);
+  }
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown&&!noticePending()&&!waiting)show(true);});
   function show(install){
-    if(shown)return;shown=true;
+    if(shown||noticePending())return;shown=true;
     try{localStorage.setItem(key,"1");}catch(e){}
     if(install&&deferred){text.textContent="Add this live clock to your home screen.";go.hidden=false;}
     else if(/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)){
@@ -62,7 +67,16 @@ h1.asof{font-size:15px;font-weight:650;line-height:1.45;margin:8px 2px 14px;colo
   }
   if(go)go.addEventListener("click",function(){if(!deferred)return;deferred.prompt();deferred=null;n.hidden=true;});
   if(x)x.addEventListener("click",function(){try{localStorage.setItem(key,"1");}catch(e){}n.hidden=true;});
-  setTimeout(function(){if(!shown)show(false);},1500);
+  function arm(){
+    if(shown)return;
+    if(noticePending()){
+      if(waiting)return;waiting=true;
+      document.addEventListener("edc-notice-closed",function(){waiting=false;show(!!deferred);},{once:true});
+      return;
+    }
+    show(!!deferred);
+  }
+  setTimeout(arm,1500);
 })();
 </script>
 <!--/A2HS-->
@@ -71,31 +85,31 @@ h1.asof{font-size:15px;font-weight:650;line-height:1.45;margin:8px 2px 14px;colo
 <p>State clocks, country clocks and the world total name their own sources on those pages. The stable JSON feed is <a href="../api/daily.json">/api/daily.json</a>.</p>
 <section class="faq" id="faq"><h2>Questions</h2><h3>What is the US national debt right now?</h3><p>As of Nov 19, 2026, US federal debt is $40.71 trillion ($40,709,780,700,317.02). Source: U.S. Treasury, Debt to the Penny; the clock on this page projects forward from that close and is re-based every business day.</p><h3>How much is the US debt per person?</h3><p>US debt per person is $119,109.37 as of Nov 19, 2026, the official total divided by the Census Bureau estimate of 341,784,857 residents on Jul 1, 2025. Source: U.S. Treasury, Debt to the Penny, and the U.S. Census Bureau.</p><h3>How much interest does the US pay per day?</h3><p>Treasury&#x27;s interest-expense dataset totaled $1,371,454,499,553 in the 12 months ending Oct 31, 2026, about $3.8 billion a day on an accrual basis. Source: U.S. Treasury, Interest Expense on the Public Debt Outstanding; cash interest is paid in lumps, and the live clock instead multiplies the debt by Treasury&#x27;s average rate and divides by 365.25.</p><h3>When will the US debt hit $41 trillion?</h3><p>The debt was $40,709,780,700,317.02 as of Nov 19, 2026, $290.2 billion short of $41 trillion, per U.S. Treasury Debt to the Penny. At the homepage clock&#x27;s 90-day pace, about $8.0 billion a day, $41 trillion falls on December 26, 2026, which is a projection, not a Treasury forecast.</p><h3>How much of the national debt is held by the public?</h3><p>As of Nov 19, 2026, $32,901,459,975,089 was held by the public and $7,808,320,725,228 was intragovernmental, and debt subject to the statutory limit was $40,507,450,000,000 against a $41,103,996,000,000 limit. Source: U.S. Treasury, Debt to the Penny and the Daily Treasury Statement.</p><h3>How fast is the US national debt growing?</h3><p>About $8.0 billion a day as of Nov 19, 2026, the 90-day least-squares trend of U.S. Treasury Debt to the Penny closes. Daily changes are lumpy, and the live clock uses this trend until the next Treasury close.</p><p><b>Sources.</b> <a href="https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny" rel="noopener">Treasury, Debt to the Penny</a> · <a href="https://www.census.gov/data/tables/time-series/demo/popest/2020s-national-total.html" rel="noopener">Census Bureau, Vintage 2025 national population estimates</a> · <a href="https://fiscaldata.treasury.gov/datasets/interest-expense-debt-outstanding/interest-expense" rel="noopener">Treasury, Interest Expense on the Public Debt Outstanding</a></p></section>
 </main>
-<footer class="site-foot">Every Debt Clock · <a href="../">US clock</a> · <a href="../national-debt-per-person/">Per person</a> · <a href="../national-debt-by-year/">By year</a> · <a href="../world/">World</a> · <a href="../embed/">Embed a clock</a> · <a href="../facts/">Facts</a> · <a href="../data/">Data</a> · <a href="../reports/">Reports</a> · <a href="../press/">Press</a> · <a href="../about/">About</a> · <a href="../advertise/">Advertise</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · <a href="../contact/">Contact</a></footer>
+<footer class="site-foot">Every Debt Clock · <a href="../">US clock</a> · <a href="../national-debt-per-person/">Per person</a> · <a href="../national-debt-by-year/">By year</a> · <a href="../world/">World</a> · <a href="../embed/">Embed a clock</a> · <a href="../facts/">Facts</a> · <a href="../data/">Data</a> · <a href="../reports/">Reports</a> · <a href="../press/">Press</a> · <a href="../about/">About</a> · <a href="../advertise/">Advertise</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · <a href="../terms/">Terms</a> · <a href="../contact/">Contact</a> · <a href="../privacy/#do-not-sell">Do Not Sell or Share My Personal Information</a></footer>
 <script>(function(){var H=document.getElementById('lead'),v=document.getElementById('hv');if(!H||!v)return;var b=+H.dataset.b,r=+H.dataset.r,t0=+H.dataset.t,nf=new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
 function usd(x){return (x<0?'−$':'$')+nf.format(Math.abs(x))}function f(){v.textContent=usd(b+r*(Date.now()/1000-t0));requestAnimationFrame(f)}f()})();</script><!--NOTICE--><aside id="edc-notice" hidden role="region" aria-label="Cookies and ads">
 <p>This site uses privacy-focused analytics. If ads are shown, Google and its partners may use cookies. <a href="/privacy/">Privacy</a></p>
 <button type="button" id="edc-notice-ok">OK</button>
 </aside>
 <style>
-#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-sizing:border-box;margin:0;padding:10px 14px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:13.5px/1.4 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
+#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:nowrap;box-sizing:border-box;margin:0;padding:6px 10px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:12px/1.3 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
 #edc-notice[hidden]{display:none!important}
-#edc-notice p{margin:0;flex:1 1 220px}
+#edc-notice p{margin:0;flex:1 1 auto;min-width:0}
 #edc-notice a{color:#5aa9ff;text-decoration:none}
-#edc-notice-ok{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:6px 12px;font-weight:650;cursor:pointer}
+#edc-notice-ok{appearance:none;flex:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 10px;font:inherit;font-weight:650;cursor:pointer}
 </style>
 <script>
 (function(){
   var n=document.getElementById("edc-notice");
   if(!n)return;
+  function pad(){if(document.body)document.body.style.paddingBottom=n.hidden?"":(n.offsetHeight+"px");}
+  function close(){n.hidden=true;pad();document.dispatchEvent(new Event("edc-notice-closed"));}
   try{if(localStorage.getItem("edc.notice")==="1")return;}catch(e){}
-  n.hidden=false;
-  if(document.body) document.body.style.paddingBottom="72px";
+  n.hidden=false;pad();
   var b=document.getElementById("edc-notice-ok");
   if(b)b.addEventListener("click",function(){
     try{localStorage.setItem("edc.notice","1")}catch(e){}
-    n.hidden=true;
-    if(document.body) document.body.style.paddingBottom="";
+    close();
   });
 })();
 </script>

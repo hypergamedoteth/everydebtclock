@@ -36,10 +36,10 @@ ul.sources{padding-left:18px}ul.sources li{font-size:13.5px;margin:3px 0}</style
 <button type="button" id="edc-a2hs-x">Not now</button>
 </aside>
 <style>
-#edc-a2hs{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;padding:8px 16px;background:#101828;color:#c2ccda;border-bottom:1px solid #1c2533;font:13px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+#edc-a2hs{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;margin:6px 0 0;padding:6px 8px;background:#101828;color:#c2ccda;border:1px solid #1c2533;border-radius:8px;font:12px/1.3 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
 #edc-a2hs[hidden]{display:none!important}
-#edc-a2hs p{margin:0;flex:1 1 180px}
-#edc-a2hs button{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+#edc-a2hs p{margin:0;flex:1 1 auto;min-width:0}
+#edc-a2hs button{appearance:none;flex:none;white-space:nowrap;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 8px;font:inherit;cursor:pointer}
 #edc-a2hs-go{color:#9fd0ff}
 </style>
 <script>
@@ -56,10 +56,15 @@ ul.sources{padding-left:18px}ul.sources li{font-size:13.5px;margin:3px 0}</style
     try{localStorage.setItem(key,"1");}catch(e){}
     return;
   }
-  var deferred=null,shown=false;
-  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown)show(true);});
+  var deferred=null,shown=false,waiting=false;
+  function noticePending(){
+    try{if(localStorage.getItem("edc.notice")==="1")return false;}catch(e){}
+    var notice=document.getElementById("edc-notice");
+    return !!(notice&&!notice.hidden);
+  }
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!shown&&!noticePending()&&!waiting)show(true);});
   function show(install){
-    if(shown)return;shown=true;
+    if(shown||noticePending())return;shown=true;
     try{localStorage.setItem(key,"1");}catch(e){}
     if(install&&deferred){text.textContent="Add this live clock to your home screen.";go.hidden=false;}
     else if(/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)){
@@ -69,7 +74,16 @@ ul.sources{padding-left:18px}ul.sources li{font-size:13.5px;margin:3px 0}</style
   }
   if(go)go.addEventListener("click",function(){if(!deferred)return;deferred.prompt();deferred=null;n.hidden=true;});
   if(x)x.addEventListener("click",function(){try{localStorage.setItem(key,"1");}catch(e){}n.hidden=true;});
-  setTimeout(function(){if(!shown)show(false);},1500);
+  function arm(){
+    if(shown)return;
+    if(noticePending()){
+      if(waiting)return;waiting=true;
+      document.addEventListener("edc-notice-closed",function(){waiting=false;show(!!deferred);},{once:true});
+      return;
+    }
+    show(!!deferred);
+  }
+  setTimeout(arm,1500);
 })();
 </script>
 <!--/A2HS-->
@@ -88,30 +102,30 @@ ul.sources{padding-left:18px}ul.sources li{font-size:13.5px;margin:3px 0}</style
 </section>
 <a class="cta" href="../">Open the Colorado debt clock →</a>
 <section class="related" id="related"><h2>Related clocks</h2><div class="rg"><a href="../"><span class="rn">Colorado debt clock</span><span class="rw">The live clock for this total</span></a><a href="../../../national-debt-by-year/"><span class="rn">US national debt by year</span><span class="rw">Treasury totals, FY1790 to now</span></a><a href="../../../states/alabama/debt-by-year/"><span class="rn">Alabama debt by year</span><span class="rw">1992–2024</span></a></div></section>
-<footer>Every figure on this page is an official published number. Page built Nov 20, 2026 7:01 PM CT. · <a href="../../../embed/">Embed a clock</a> · <a href="../../../facts/">Facts</a> · <a href="../../../data/">Data</a> · <a href="../../../reports/">Reports</a> · <a href="../../../press/">Press</a> · <a href="../../../about/">About</a> · <a href="../../../advertise/">Advertise</a> · <a href="../../../methodology/">Methodology</a> · <a href="../../../privacy/">Privacy</a> · <a href="../../../contact/">Contact</a> · Independent site, not affiliated with any government. Not financial advice.</footer>
+<footer>Every figure on this page is an official published number. Page built Nov 20, 2026 7:01 PM CT. · <a href="../../../embed/">Embed a clock</a> · <a href="../../../facts/">Facts</a> · <a href="../../../data/">Data</a> · <a href="../../../reports/">Reports</a> · <a href="../../../press/">Press</a> · <a href="../../../about/">About</a> · <a href="../../../advertise/">Advertise</a> · <a href="../../../methodology/">Methodology</a> · <a href="../../../privacy/">Privacy</a> · <a href="../../../terms/">Terms</a> · <a href="../../../contact/">Contact</a> · <a href="../../../privacy/#do-not-sell">Do Not Sell or Share My Personal Information</a> · Independent site, not affiliated with any government. Not financial advice.</footer>
 </main><!--NOTICE--><aside id="edc-notice" hidden role="region" aria-label="Cookies and ads">
 <p>This site uses privacy-focused analytics. If ads are shown, Google and its partners may use cookies. <a href="/privacy/">Privacy</a></p>
 <button type="button" id="edc-notice-ok">OK</button>
 </aside>
 <style>
-#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-sizing:border-box;margin:0;padding:10px 14px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:13.5px/1.4 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
+#edc-notice{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:40;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:nowrap;box-sizing:border-box;margin:0;padding:6px 10px;background:#121925;color:#c2ccda;border-top:1px solid #1c2533;font:12px/1.3 -apple-system,BlinkMacSystemFont,Inter,Segoe UI,Roboto,sans-serif}
 #edc-notice[hidden]{display:none!important}
-#edc-notice p{margin:0;flex:1 1 220px}
+#edc-notice p{margin:0;flex:1 1 auto;min-width:0}
 #edc-notice a{color:#5aa9ff;text-decoration:none}
-#edc-notice-ok{appearance:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:6px 12px;font-weight:650;cursor:pointer}
+#edc-notice-ok{appearance:none;flex:none;border:1px solid #1c2533;background:#0e131b;color:#e8edf5;border-radius:8px;padding:4px 10px;font:inherit;font-weight:650;cursor:pointer}
 </style>
 <script>
 (function(){
   var n=document.getElementById("edc-notice");
   if(!n)return;
+  function pad(){if(document.body)document.body.style.paddingBottom=n.hidden?"":(n.offsetHeight+"px");}
+  function close(){n.hidden=true;pad();document.dispatchEvent(new Event("edc-notice-closed"));}
   try{if(localStorage.getItem("edc.notice")==="1")return;}catch(e){}
-  n.hidden=false;
-  if(document.body) document.body.style.paddingBottom="72px";
+  n.hidden=false;pad();
   var b=document.getElementById("edc-notice-ok");
   if(b)b.addEventListener("click",function(){
     try{localStorage.setItem("edc.notice","1")}catch(e){}
-    n.hidden=true;
-    if(document.body) document.body.style.paddingBottom="";
+    close();
   });
 })();
 </script>
