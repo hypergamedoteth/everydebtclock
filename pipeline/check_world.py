@@ -96,7 +96,7 @@ def main():
     page = open(os.path.join(ROOT, "world", "index.html")).read()
     if "coming soon" in page.lower():
         fail("world page contains coming soon")
-    for phrase in ("What this page counts", "FAQPage", "Source tier", "As of", "id=\"total\"", "id=\"debt-table\""):
+    for phrase in ("What this page counts", "FAQPage", "Source tier", "As of", "id=\"total\"", "id=\"debt-table\"", "id=\"table\"", "<h2>Debt clock by country</h2>"):
         if phrase not in page:
             fail(f"world page is missing {phrase}")
     if page.count('data-iso="') != len(rows):
@@ -140,6 +140,9 @@ def main():
                 dollar_minus.append(os.path.relpath(fp, ROOT))
     if dollar_minus:
         fail("$- appears in built HTML: " + ", ".join(dollar_minus[:20]))
+    # Same guard CI runs on the staged site: every row name links to a real page.
+    import check_links
+    check_links.check_world_table(ROOT)
     review = api.get("review_over_25pct") or []
     print(f"world ok: {len(rows)} economies, ${total/1e12:.2f}T latest, "
           f"{ratio:.2%} of the IMF ${weo['panel_2026_usd']/1e12:.2f}T, "
