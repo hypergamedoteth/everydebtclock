@@ -1,8 +1,8 @@
 {
  "meta": {
-  "generated_epoch": 1795498272.5846262,
-  "generated_iso": "2026-11-24T00:31:12.584626-05:00",
-  "debt_fetched_epoch": 1795498272.5846262,
+  "generated_epoch": 1795555623.3951592,
+  "generated_iso": "2026-11-24T16:27:03.395159-05:00",
+  "debt_fetched_epoch": 1795555623.3951592,
   "fy": 2027,
   "fy_start_epoch": 1790827200.0,
   "fy_end_epoch": 1822363200.0,
@@ -22,9 +22,18 @@
     "backtest_err_pct": 1.033
    }
   },
-  "dts_latest": "2026-11-20",
+  "dts_latest": "2026-11-23",
   "mts_latest": "2026-10-31",
   "recent_closes": [
+   {
+    "date": "2026-11-23",
+    "total": 40727354329919.53,
+    "public": 32902453860814.01,
+    "intragov": 7824900469105.52,
+    "d_total": 16937171239.382812,
+    "d_public": 1255159013.0429688,
+    "d_intragov": 15682012226.339844
+   },
    {
     "date": "2026-11-20",
     "total": 40710417158680.15,
@@ -105,18 +114,13 @@
     "d_total": 7045570150.7578125,
     "d_public": 848057383.03125,
     "d_intragov": 6197512767.730469
-   },
-   {
-    "date": "2026-11-06",
-    "total": 40552751019092.61,
-    "public": 32762925356629.47,
-    "intragov": 7789825662463.14,
-    "d_total": -3369765891.0390625,
-    "d_public": -3797117086.140625,
-    "d_intragov": 427351195.0996094
    }
   ],
   "debt_closes": [
+   [
+    "2026-11-23",
+    40727354329919.53
+   ],
    [
     "2026-11-20",
     40710417158680.15
@@ -292,29 +296,25 @@
    [
     "2026-09-18",
     40101500516712.09
-   ],
-   [
-    "2026-09-17",
-    40093343468150.5
    ]
   ],
   "debt_closes_stale": false,
   "debt_limit_status": {
    "at_limit": false,
    "limit": 41103996000000.0,
-   "subject_to_limit": 40508929000000.0,
-   "headroom": 595067000000.0,
-   "as_of": "2026-11-20",
-   "last5_range": 51123000000.0,
+   "subject_to_limit": 40528397000000.0,
+   "headroom": 575599000000.0,
+   "as_of": "2026-11-23",
+   "last5_range": 37308000000.0,
    "margin": 25000000000.0,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit",
-   "freeze_t": 1801767237.3387697,
+   "freeze_t": 1801601725.153169,
    "reported_status": "in_force",
    "limit_reported": 41103996000000.0,
    "components": {
-    "public": 32901199000000.0,
-    "intragov": 7809218000000.0,
-    "not_subject": 201488000000.0,
+    "public": 32902454000000.0,
+    "intragov": 7824900000000.0,
+    "not_subject": 198957000000.0,
     "other": 0.0
    },
    "extraordinary_measures": "not in use"
@@ -1516,8 +1516,8 @@
   "history_pages": {
    "stale": false,
    "series_end": {
-    "date": "2026-11-20",
-    "amount": 40710417158680.15
+    "date": "2026-11-23",
+    "amount": 40727354329919.53
    },
    "crossings": [
     5,
@@ -1579,7 +1579,9 @@
    "other_financing": 61551881267.57129
   },
   "errors": {},
-  "flags": [],
+  "flags": [
+   "rev_customs"
+  ],
   "denominators": {
    "population": "population",
    "tax_returns": "tax_returns"
@@ -1623,7 +1625,7 @@
    "kind": "count",
    "base": 134790000,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "2025",
    "source": "https://www2.census.gov/programs-surveys/demo/tables/families/time-series/households/hh1.xls",
    "source_name": "Census CPS ASEC 2025, Table HH-1",
@@ -1646,7 +1648,7 @@
    "kind": "count",
    "base": 162754810,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY2025",
    "source": "https://www.irs.gov/statistics/soi-tax-stats-numbers-of-returns-filed-by-type-of-return-irs-data-book-table-1-2",
    "source_name": "IRS Data Book FY2025, Table 1-2",
@@ -1667,148 +1669,148 @@
    "label": "US national debt",
    "group": "debt",
    "kind": "usd",
-   "base": 40710417158680.15,
-   "t0": 1795237199.0,
-   "rate": 93116.81688262083,
-   "as_of": "2026-11-20",
+   "base": 40727354329919.53,
+   "t0": 1795496399.0,
+   "rate": 96222.80915059675,
+   "as_of": "2026-11-23",
    "source": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
    "source_name": "Treasury, Debt to the Penny",
-   "method": "Starts at Treasury's official figure for 2026-11-20 (close of business). Rate: 90-day least-squares trend (62 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day. Backtested against the next Treasury close over the last 20 business days: average error 0.063%.",
+   "method": "Starts at Treasury's official figure for 2026-11-23 (close of business). Rate: 90-day least-squares trend (61 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day. Backtested against the next Treasury close over the last 20 business days: average error 0.063%.",
    "stale": false,
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-08-24 to 2026-11-20)",
-    "n": 62,
-    "slope": 93116.81688262065,
+    "window": "trailing 90 days (2026-08-26 to 2026-11-23)",
+    "n": 61,
+    "slope": 96222.80915059661,
     "first": [
-     "2026-08-24",
-     40035385103646.14
+     "2026-08-26",
+     40069751423220.72
     ],
     "last": [
-     "2026-11-20",
-     40710417158680.15
+     "2026-11-23",
+     40727354329919.53
     ],
     "context_1y": {
      "from": [
-      "2025-11-20",
-      38326967559564.53
+      "2025-11-21",
+      38333530047031.29
      ],
      "to": [
-      "2026-11-20",
-      40710417158680.15
+      "2026-11-23",
+      40727354329919.53
      ],
-     "rate": 75578.69099174332
+     "rate": 75494.00427919827
     }
    },
    "status": "ok",
    "slug": "debt_total",
    "validation": {
-    "last_error_pct": 0.0181,
-    "mean_abs_error_pct": 0.0634,
+    "last_error_pct": 0.0177,
+    "mean_abs_error_pct": 0.0628,
     "n": 20,
-    "against": "Debt to the Penny (next business day)",
+    "against": "Treasury, Debt to the Penny",
     "threshold_pct": 0.25,
     "flag": false
    },
-   "freeze_t": 1801767237.3387697
+   "freeze_t": 1801601725.153169
   },
   "debt_public": {
    "label": "Debt held by the public",
    "group": "debt",
    "kind": "usd",
-   "base": 32901198701800.97,
-   "t0": 1795237199.0,
-   "rate": 75324.24795561346,
-   "as_of": "2026-11-20",
+   "base": 32902453860814.01,
+   "t0": 1795496399.0,
+   "rate": 77176.49839782997,
+   "as_of": "2026-11-23",
    "source": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
    "source_name": "Treasury, Debt to the Penny",
-   "method": "Starts at Treasury's official figure for 2026-11-20 (close of business). Rate: 90-day least-squares trend (62 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
+   "method": "Starts at Treasury's official figure for 2026-11-23 (close of business). Rate: 90-day least-squares trend (61 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
    "stale": false,
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-08-24 to 2026-11-20)",
-    "n": 62,
-    "slope": 75324.24795561346,
+    "window": "trailing 90 days (2026-08-26 to 2026-11-23)",
+    "n": 61,
+    "slope": 77176.49839782997,
     "first": [
-     "2026-08-24",
-     32274806592449.5
+     "2026-08-26",
+     32305769839476.37
     ],
     "last": [
-     "2026-11-20",
-     32901198701800.97
+     "2026-11-23",
+     32902453860814.01
     ],
     "context_1y": {
      "from": [
-      "2025-11-20",
-      30707975239396.64
+      "2025-11-21",
+      30706639126551.86
      ],
      "to": [
-      "2026-11-20",
-      32901198701800.97
+      "2026-11-23",
+      32902453860814.01
      ],
-     "rate": 69546.65976675318
+     "rate": 69249.37980188946
     }
    },
    "status": "ok",
    "slug": "debt_public",
    "validation": {
-    "last_error_pct": 0.0203,
-    "mean_abs_error_pct": 0.0513,
+    "last_error_pct": 0.0555,
+    "mean_abs_error_pct": 0.053,
     "n": 20,
-    "against": "Debt to the Penny (next business day)",
+    "against": "Treasury, Debt to the Penny",
     "threshold_pct": 0.25,
     "flag": false
    },
-   "freeze_t": 1801767237.3387697
+   "freeze_t": 1801601725.153169
   },
   "debt_intragov": {
    "label": "Intragovernmental debt",
    "group": "debt",
    "kind": "usd",
-   "base": 7809218456879.18,
-   "t0": 1795237199.0,
-   "rate": 17792.568927007364,
-   "as_of": "2026-11-20",
+   "base": 7824900469105.52,
+   "t0": 1795496399.0,
+   "rate": 19046.310752766774,
+   "as_of": "2026-11-23",
    "source": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
    "source_name": "Treasury, Debt to the Penny",
-   "method": "Starts at Treasury's official figure for 2026-11-20 (close of business). Rate: 90-day least-squares trend (62 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
+   "method": "Starts at Treasury's official figure for 2026-11-23 (close of business). Rate: 90-day least-squares trend (61 daily records), the same window for total, public and intragovernmental debt so the parts add up to the total. Re-based every business day.",
    "stale": false,
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-08-24 to 2026-11-20)",
-    "n": 62,
-    "slope": 17792.568927007364,
+    "window": "trailing 90 days (2026-08-26 to 2026-11-23)",
+    "n": 61,
+    "slope": 19046.310752766774,
     "first": [
-     "2026-08-24",
-     7760578511196.64
+     "2026-08-26",
+     7763981583744.35
     ],
     "last": [
-     "2026-11-20",
-     7809218456879.18
+     "2026-11-23",
+     7824900469105.52
     ],
     "context_1y": {
      "from": [
-      "2025-11-20",
-      7618992320167.89
+      "2025-11-21",
+      7626890920479.43
      ],
      "to": [
-      "2026-11-20",
-      7809218456879.18
+      "2026-11-23",
+      7824900469105.52
      ],
-     "rate": 6032.031224990171
+     "rate": 6244.624477308818
     }
    },
    "status": "ok",
    "slug": "debt_intragov",
    "validation": {
-    "last_error_pct": 0.0087,
-    "mean_abs_error_pct": 0.1775,
+    "last_error_pct": -0.1415,
+    "mean_abs_error_pct": 0.1814,
     "n": 20,
-    "against": "Debt to the Penny (next business day)",
+    "against": "Treasury, Debt to the Penny",
     "threshold_pct": 1.0,
     "flag": false
    },
-   "freeze_t": 1801767237.3387697
+   "freeze_t": 1801601725.153169
   },
   "gdp": {
    "label": "GDP (annual rate)",
@@ -1816,7 +1818,7 @@
    "kind": "usd",
    "base": 33010036000000.0,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "fixed": true,
    "as_of": "2026-Q3",
    "badge": "FIXED \u00b7 BEA advance estimate, 2026-Q3",
@@ -1841,16 +1843,16 @@
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 609269864060.9993,
-   "t0": 1795237199.0,
-   "rate": 106576.34825793136,
-   "as_of": "2026-11-20",
+   "base": 637976772801.3533,
+   "t0": 1795496399.0,
+   "rate": 261851.09198308783,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 5403326758960.81,
    "ttm": 5367775957745.42,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
    "source_name": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement",
-   "method": "FY2027 to date, budget basis, re-based every business day: official MTS FYTD through 2026-10-31 + DTS cash since then \u00d7 0.8238. Ticks toward the projected close for 2026-11-23: expected cash $33.5B \u00d7 0.8238 (non-customs receipts from the same weekdays a year earlier, scaled by the trailing-year growth, plus customs duties from the same business day last month, since tariffs arrive in one monthly lump). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $5,403.3B. Resets to $0 every Oct 1.",
+   "method": "FY2027 to date, budget basis, re-based every business day: official MTS FYTD through 2026-10-31 + DTS cash since then \u00d7 0.8238. Ticks toward the projected close for 2026-11-24: expected cash $27.5B \u00d7 0.8238 (non-customs receipts from the same weekdays a year earlier, scaled by the trailing-year growth, plus customs duties from the same business day last month, since tariffs arrive in one monthly lump). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $5,403.3B. Resets to $0 every Oct 1.",
    "stale": false,
    "basis": "dts",
    "calc": {
@@ -1863,49 +1865,55 @@
      6559227000000.0
     ],
     "cash_from": [
-     "2026-08-21",
-     5773762000000.0
+     "2026-08-25",
+     5832037000000.0
     ],
     "cash_to": [
-     "2026-11-20",
-     739993000000.0
+     "2026-11-23",
+     774841000000.0
     ],
-    "cash_flow_90d": 1525458000000.0,
-    "seconds": 7866000.0,
+    "cash_flow_90d": 1502031000000.0,
+    "seconds": 7779600.0,
     "base_parts": {
      "mts_month": "2026-10-31",
      "mts_fytd": 368940118602.77,
      "dts_cash_at_month_end": 448251000000.0,
-     "dts_cash_latest": 739993000000.0
+     "dts_cash_latest": 774841000000.0
     },
-    "next_bday": "2026-11-23",
-    "cash_flow_next": 33534146867.005196,
-    "seconds_next": 259200.0,
+    "next_bday": "2026-11-24",
+    "cash_flow_next": 27463732555.35484,
+    "seconds_next": 86400.0,
     "pace_parts": {
-     "non_customs_same_window_last_year": 32950146867.005196,
-     "growth": 1.0416,
-     "customs_same_bday_last_month": 584000000.0
+     "non_customs_same_window_last_year": 8544732555.35484,
+     "growth": 1.0461,
+     "customs_same_bday_last_month": 18919000000.0
     }
    },
    "anchor": "2026-10-31",
    "status": "ok",
-   "slug": "revenue"
+   "slug": "revenue",
+   "validation": {
+    "last_error_pct": -0.1696,
+    "threshold_pct": 3.0,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement"
+   }
   },
   "spending": {
    "label": "Federal spending",
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 1223518626243.7705,
-   "t0": 1795237199.0,
-   "rate": 62649.86684491393,
-   "as_of": "2026-11-20",
+   "base": 1238605441889.6252,
+   "t0": 1795496399.0,
+   "rate": 224089.64462689572,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 7395799983313.23,
    "ttm": 7480017622395.67,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
    "source_name": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement",
-   "method": "FY2027 to date, budget basis, re-based every business day: official MTS FYTD through 2026-10-31 + DTS cash since then \u00d7 0.8972. Ticks toward the projected close for 2026-11-23: expected cash $18.1B \u00d7 0.8972 (non-interest outlays on the same weekdays a year earlier, scaled by the trailing-year growth, plus interest from the Treasury coupon calendar, which settles on the 15th and month-end rather than on a fixed weekday). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $7,395.8B. Resets to $0 every Oct 1.",
+   "method": "FY2027 to date, budget basis, re-based every business day: official MTS FYTD through 2026-10-31 + DTS cash since then \u00d7 0.8972. Ticks toward the projected close for 2026-11-24: expected cash $21.6B \u00d7 0.8972 (non-interest outlays on the same weekdays a year earlier, scaled by the trailing-year growth, plus interest from the Treasury coupon calendar, which settles on the 15th and month-end rather than on a fixed weekday). Between Treasury statements the figure is our projection; the official number replaces it every business day. FY2026 final (MTS): $7,395.8B. Resets to $0 every Oct 1.",
    "stale": false,
    "basis": "dts",
    "calc": {
@@ -1918,38 +1926,44 @@
      8243474000000.0
     ],
     "cash_from": [
-     "2026-08-21",
-     7388017000000.0
+     "2026-08-25",
+     7416376000000.0
     ],
     "cash_to": [
-     "2026-11-20",
-     1261840000000.0
+     "2026-11-23",
+     1278656000000.0
     ],
-    "cash_flow_90d": 2117297000000.0,
-    "seconds": 7866000.0,
+    "cash_flow_90d": 2105754000000.0,
+    "seconds": 7779600.0,
     "base_parts": {
      "mts_month": "2026-10-31",
      "mts_fytd": 773003666480.36,
      "dts_cash_at_month_end": 759689000000.0,
-     "dts_cash_latest": 1261840000000.0
+     "dts_cash_latest": 1278656000000.0
     },
-    "next_bday": "2026-11-23",
-    "cash_flow_next": 18100070426.127357,
-    "seconds_next": 259200.0,
+    "next_bday": "2026-11-24",
+    "cash_flow_next": 21580457409.71352,
+    "seconds_next": 86400.0,
     "pace_parts": {
-     "non_interest_same_window_last_year": 18095070426.127357,
+     "non_interest_same_window_last_year": 21575457409.71352,
      "interest_coupon_calendar": 5000000.0,
-     "growth": 1.0781
+     "growth": 1.079
     }
    },
    "anchor": "2026-10-31",
    "status": "ok",
-   "slug": "spending"
+   "slug": "spending",
+   "validation": {
+    "last_error_pct": 0.093,
+    "threshold_pct": 3.0,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement"
+   }
   },
   "rev_individual": {
    "label": "Individual income taxes",
-   "base": 311736550328.6829,
-   "rate": 52161.09047849011,
+   "base": 326926339775.8136,
+   "rate": 137313.12845629588,
    "share": 0.5244164572166549,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -1967,8 +1981,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 2845526866159.55,
    "lines": [
@@ -1980,8 +1994,8 @@
   },
   "rev_payroll": {
    "label": "Payroll / social insurance taxes",
-   "base": 201051669616.60596,
-   "rate": 33640.8236976579,
+   "base": 210848186984.39734,
+   "rate": 88558.86070244243,
    "share": 0.3382176526514696,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2001,8 +2015,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 1811794721160.9202,
    "lines": [
@@ -2016,8 +2030,8 @@
   },
   "rev_corporate": {
    "label": "Corporate income taxes",
-   "base": 42568454456.56393,
-   "rate": 7122.735534531304,
+   "base": 44642660575.8118,
+   "rate": 18750.472630871103,
    "share": 0.07161046098624829,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2035,8 +2049,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 381414689057.62,
    "lines": [
@@ -2048,10 +2062,10 @@
   },
   "rev_customs": {
    "label": "Customs duties (tariffs), gross deposits",
-   "base": 32664000000.0,
-   "rate": 10096.19341563786,
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "base": 33275000000.0,
+   "rate": 7868.827160493827,
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
@@ -2063,10 +2077,10 @@
    "stale": false,
    "share": null,
    "basis": "dts_gross",
-   "badge": "DTS GROSS \u00b7 through 2026-11-20",
+   "badge": "DTS GROSS \u00b7 through 2026-11-23",
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
    "source_name": "Treasury Daily Treasury Statement, customs deposits (gross, before refunds)",
-   "method": "FY2027 to date customs duties deposited, through 2026-11-20: $32.66B, summed from the Daily Treasury Statement lines 'DHS - Customs Duties, Taxes, and Fees' and 'DHS - Customs and Certain Excise Taxes'. This is gross cash deposited, before refunds; the Monthly Treasury Statement reports customs net of refunds, so it is lower: net customs in the latest MTS months: 2026-07 \u2212$8.5B, 2026-08 $12.8B, 2026-09 $5.9B, 2026-10 $19.2B. Ticks at the average daily deposit pace of the last 90 days. FY2026 final (MTS, net): $173.2B.",
+   "method": "FY2027 to date customs duties deposited, through 2026-11-23: $33.27B, summed from the Daily Treasury Statement lines 'DHS - Customs Duties, Taxes, and Fees' and 'DHS - Customs and Certain Excise Taxes'. This is gross cash deposited, before refunds; the Monthly Treasury Statement reports customs net of refunds, so it is lower: net customs in the latest MTS months: 2026-07 \u2212$8.5B, 2026-08 $12.8B, 2026-09 $5.9B, 2026-10 $19.2B. Ticks at the average daily deposit pace of the last 90 days. FY2026 final (MTS, net): $173.2B.",
    "calc": {
     "type": "share",
     "parent": "revenue",
@@ -2077,12 +2091,18 @@
     ]
    },
    "status": "ok",
-   "slug": "rev_customs"
+   "slug": "rev_customs",
+   "validation": {
+    "last_error_pct": 6.0283,
+    "threshold_pct": 5.0,
+    "flag": true,
+    "against": "Treasury Daily Treasury Statement, customs deposits (gross, before refunds)"
+   }
   },
   "rev_excise": {
    "label": "Excise taxes",
-   "base": 11732286081.50539,
-   "rate": 1963.0961950778521,
+   "base": 12303957754.665531,
+   "rate": 5167.815272534417,
    "share": 0.01973654964561666,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2100,8 +2120,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 105995126578.38,
    "lines": [
@@ -2113,8 +2133,8 @@
   },
   "rev_estate": {
    "label": "Estate and gift taxes",
-   "base": 4292986254.494501,
-   "rate": 718.3207878816336,
+   "base": 4502167876.721485,
+   "rate": 1890.9664984840163,
    "share": 0.007221843701318008,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2132,8 +2152,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 38720146356.13,
    "lines": [
@@ -2145,8 +2165,8 @@
   },
   "rev_misc": {
    "label": "Miscellaneous receipts (incl. Fed earnings)",
-   "base": 5223917323.14655,
-   "rate": 874.0881486546932,
+   "base": 5478459833.94341,
+   "rate": 2301.0212619661856,
    "share": 0.008787895460153112,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2164,8 +2184,8 @@
    "group": "revenue",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 46656595004.81,
    "lines": [
@@ -2177,8 +2197,8 @@
   },
   "out_socsec": {
    "label": "Social Security",
-   "base": 274088649359.64056,
-   "rate": 14034.61869542684,
+   "base": 277468348560.6287,
+   "rate": 50199.83081077381,
    "share": 0.224016736223378,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2196,8 +2216,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 1667097265194.46,
    "lines": [
@@ -2209,8 +2229,8 @@
   },
   "out_medicare": {
    "label": "Medicare",
-   "base": 178638963467.70868,
-   "rate": 9147.149078493545,
+   "base": 180841703214.53043,
+   "rate": 32718.04857020636,
    "share": 0.14600428602883986,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2228,8 +2248,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 1072626018868.53,
    "lines": [
@@ -2241,8 +2261,8 @@
   },
   "out_health": {
    "label": "Health (incl. Medicaid)",
-   "base": 168643623397.02777,
-   "rate": 8635.340993952763,
+   "base": 170723113812.1847,
+   "rate": 30887.383996475877,
    "share": 0.137834945688377,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2260,8 +2280,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 1025587234576.31,
    "lines": [
@@ -2273,8 +2293,8 @@
   },
   "out_defense": {
    "label": "National defense",
-   "base": 162609904884.81482,
-   "rate": 8326.386431871157,
+   "base": 164614995452.76044,
+   "rate": 29782.297561190884,
    "share": 0.1329034976639717,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2292,8 +2312,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 965160356821.48,
    "lines": [
@@ -2305,8 +2325,8 @@
   },
   "out_interest": {
    "label": "Net interest",
-   "base": 174033564934.43576,
-   "rate": 8911.331168828288,
+   "base": 176179516989.46692,
+   "rate": 31874.561516924066,
    "share": 0.14224022520092128,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2324,8 +2344,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 1051753969311.11,
    "lines": [
@@ -2337,8 +2357,8 @@
   },
   "out_income": {
    "label": "Income security",
-   "base": 112952963659.6075,
-   "rate": 5783.71916963601,
+   "base": 114345750416.45242,
+   "rate": 20687.53915397533,
    "share": 0.09231813986058848,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2356,8 +2376,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 694224470394.36,
    "lines": [
@@ -2369,8 +2389,8 @@
   },
   "out_veterans": {
    "label": "Veterans benefits",
-   "base": 68823955588.8146,
-   "rate": 3524.1078974145767,
+   "base": 69672601704.79132,
+   "rate": 12605.231680912666,
    "share": 0.05625084417399161,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2388,8 +2408,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 416204104589.87,
    "lines": [
@@ -2401,8 +2421,8 @@
   },
   "out_education": {
    "label": "Education, training, employment",
-   "base": 16373646752.7781,
-   "rate": 838.4071699639384,
+   "base": 16575544937.82485,
+   "rate": 2998.862954249243,
    "share": 0.013382425409448452,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2420,8 +2440,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 107551403356.47,
    "lines": [
@@ -2433,8 +2453,8 @@
   },
   "out_transport": {
    "label": "Transportation",
-   "base": 23705362239.319324,
-   "rate": 1213.8252380866588,
+   "base": 23997665455.839024,
+   "rate": 4341.67987803279,
    "share": 0.01937474569724804,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2452,8 +2472,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 142864249326.25,
    "lines": [
@@ -2465,8 +2485,8 @@
   },
   "out_agri": {
    "label": "Agriculture",
-   "base": 10689930796.960272,
-   "rate": 547.3743730955445,
+   "base": 10821744904.029331,
+   "rate": 1957.8801188594755,
    "share": 0.008737039688376955,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2484,8 +2504,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 52566167744.02,
    "lines": [
@@ -2497,8 +2517,8 @@
   },
   "out_intl": {
    "label": "International affairs",
-   "base": 8267449413.190107,
-   "rate": 423.3320145468927,
+   "base": 8369392679.5064945,
+   "rate": 1514.1982812801837,
    "share": 0.006757109565688723,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2516,8 +2536,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 48014568338.42,
    "lines": [
@@ -2529,8 +2549,8 @@
   },
   "out_justice": {
    "label": "Administration of justice",
-   "base": 18614191183.67169,
-   "rate": 953.1335069765064,
+   "base": 18843716803.274967,
+   "rate": 3409.2227105458196,
    "share": 0.015213655750233795,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2548,8 +2568,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 109915442478.9,
    "lines": [
@@ -2561,8 +2581,8 @@
   },
   "out_science": {
    "label": "Science, space and technology",
-   "base": 6540247491.72172,
-   "rate": 334.8912110533832,
+   "base": 6620893185.272616,
+   "rate": 1197.8581320754358,
    "share": 0.005345441705125835,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2580,8 +2600,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 39876759073.93,
    "lines": [
@@ -2593,8 +2613,8 @@
   },
   "out_nature": {
    "label": "Natural resources and environment",
-   "base": 9493282206.933098,
-   "rate": 486.1003775736981,
+   "base": 9610340824.152332,
+   "rate": 1738.7117698612162,
    "share": 0.007759000969260015,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2612,8 +2632,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 57098136028.25,
    "lines": [
@@ -2625,8 +2645,8 @@
   },
   "out_community": {
    "label": "Community and regional development",
-   "base": 10184105613.649065,
-   "rate": 521.4737617754373,
+   "base": 10309682552.663662,
+   "rate": 1865.2373236128428,
    "share": 0.008323621230773164,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2644,8 +2664,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 62429584486.16,
    "lines": [
@@ -2657,8 +2677,8 @@
   },
   "out_govt": {
    "label": "General government",
-   "base": 6000911079.780456,
-   "rate": 307.2746683478031,
+   "base": 6074906389.067865,
+   "rate": 1099.0776948234873,
    "share": 0.004904634021145543,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2676,8 +2696,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 32343463387.61,
    "lines": [
@@ -2689,8 +2709,8 @@
   },
   "out_energy": {
    "label": "Energy",
-   "base": 3353247399.4050884,
-   "rate": 171.70192473140727,
+   "base": 3394595217.2843127,
+   "rate": 614.1533132075392,
    "share": 0.002740659052898633,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2708,8 +2728,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 20970860009.28,
    "lines": [
@@ -2721,8 +2741,8 @@
   },
   "out_commerce": {
    "label": "Commerce and housing credit (net)",
-   "base": -2617471327.8095956,
-   "rate": -134.0267541828002,
+   "base": -2649746527.0047293,
+   "rate": -479.39459775177863,
    "share": -0.002139298308719084,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2740,8 +2760,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": -15465292145.92,
    "lines": [
@@ -2753,8 +2773,8 @@
   },
   "out_offsets": {
    "label": "Undistributed offsetting receipts",
-   "base": -26877901897.878475,
-   "rate": -1376.2740826777172,
+   "base": -27209324683.10044,
+   "rate": -4922.7362423595305,
    "share": -0.021967709621548006,
    "modeled": true,
    "source": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
@@ -2772,8 +2792,8 @@
    "group": "spending",
    "kind": "usd",
    "mode": "fytd",
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": -155018778526.26,
    "lines": [
@@ -2789,7 +2809,7 @@
    "kind": "pct",
    "base": 19.821233216359975,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "fixed": true,
    "as_of": "2026-10",
    "badge": "FIXED \u00b7 official, 12 months to 2026-10",
@@ -2813,10 +2833,10 @@
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 614248762182.7712,
-   "t0": 1795237199.0,
-   "rate": -43926.48141301743,
-   "as_of": "2026-11-20",
+   "base": 600628669088.272,
+   "t0": 1795496399.0,
+   "rate": -37761.447356192104,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 1992473224352.421,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
@@ -2833,22 +2853,28 @@
     ]
    },
    "status": "ok",
-   "slug": "deficit"
+   "slug": "deficit",
+   "validation": {
+    "last_error_pct": 0.372,
+    "threshold_pct": 10.0,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement, calibrated to the Monthly Treasury Statement"
+   }
   },
   "interest_cash": {
    "label": "Interest paid to bondholders (cash)",
    "group": "fytd",
    "kind": "usd",
    "mode": "fytd",
-   "base": 132515000000.0,
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "base": 132519000000.0,
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fy": 2027,
    "prev_fy_total": 709302000000.0,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/deposits-and-withdrawals-of-operating-cash",
    "source_name": "Treasury Daily Treasury Statement (Interest on Treasury Securities)",
    "stale": false,
-   "rate": 19.290123456790123,
+   "rate": 57.870370370370374,
    "steps": [
     [
      1796047200.0,
@@ -2885,14 +2911,20 @@
      1802811600.0,
      88020543662.39,
      "2027-02-16"
+    ],
+    [
+     1803909600.0,
+     1803934800.0,
+     25685433477.57,
+     "2027-03-01"
     ]
    ],
-   "method": "Cash interest paid on Treasury securities FY2027 to date, official through 2026-11-20 and re-based every business day. Treasury pays coupons in lumps on the 15th and at month-end (next business day if that is a holiday or weekend), so the projection follows that calendar: each upcoming payment is estimated from the payment for the same coupon date six months earlier (notes and bonds pay every six months), adjusted for half of its six-month growth; other business days add the median ordinary day ($5.0M). Next projected payment: $25.7B on 2026-11-30. Projected amounts are estimates until Treasury's statement for that day is published.",
+   "method": "Cash interest paid on Treasury securities FY2027 to date, official through 2026-11-23 and re-based every business day. Treasury pays coupons in lumps on the 15th and at month-end (next business day if that is a holiday or weekend), so the projection follows that calendar: each upcoming payment is estimated from the payment for the same coupon date six months earlier (notes and bonds pay every six months), adjusted for half of its six-month growth; other business days add the median ordinary day ($5.0M). Next projected payment: $25.7B on 2026-11-30. Projected amounts are estimates until Treasury's statement for that day is published.",
    "calc": {
     "type": "coupon_calendar",
     "drip_per_bday": 5000000.0,
-    "next_bday": "2026-11-23",
-    "seconds_next": 259200.0,
+    "next_bday": "2026-11-24",
+    "seconds_next": 86400.0,
     "coupons": [
      [
       "2026-11-30",
@@ -2935,12 +2967,25 @@
        "2027-02-15"
       ],
       88020543662.39226
+     ],
+     [
+      "2027-03-01",
+      [
+       "2027-02-28"
+      ],
+      25685433477.566795
      ]
     ],
-    "flow_90d": 188484000000.0
+    "flow_90d": 188477000000.0
    },
    "status": "ok",
-   "slug": "interest_cash"
+   "slug": "interest_cash",
+   "validation": {
+    "last_error_pct": 0.0008,
+    "threshold_pct": 10.0,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement (Interest on Treasury Securities)"
+   }
   },
   "interest_gross": {
    "label": "Gross interest expense on Treasury debt",
@@ -3021,7 +3066,7 @@
    "kind": "pct",
    "base": 3.57,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "2026-10-31",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -3045,7 +3090,7 @@
    "kind": "pct",
    "base": 3.58,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "2026-10-31",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/average-interest-rates-treasury-securities/average-interest-rates-on-u-s-treasury-securities",
@@ -3066,32 +3111,38 @@
   "debt_subject_limit": {
    "calc": {
     "type": "ols",
-    "window": "trailing 90 days (2026-08-24 to 2026-11-20)",
-    "n": 62,
-    "slope": 91127.64261535837,
+    "window": "trailing 90 days (2026-08-26 to 2026-11-23)",
+    "n": 61,
+    "slope": 94278.17377147786,
     "first": [
-     "2026-08-24",
-     39849317000000.0
+     "2026-08-26",
+     39883303000000.0
     ],
     "last": [
-     "2026-11-20",
-     40508929000000.0
+     "2026-11-23",
+     40528397000000.0
     ]
    },
    "label": "Debt subject to the limit",
    "group": "debt",
    "kind": "usd",
-   "base": 40508929000000.0,
-   "t0": 1795237199.0,
-   "rate": 91127.64261535837,
-   "as_of": "2026-11-20",
+   "base": 40528397000000.0,
+   "t0": 1795496399.0,
+   "rate": 94278.17377147786,
+   "as_of": "2026-11-23",
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit",
    "source_name": "Treasury Daily Treasury Statement, Table III-C",
-   "method": "Total debt minus debt not subject to limit (unamortized discount, FFB, other). Official close 2026-11-20; ticks at the 90-day trend (62 records).",
+   "method": "Total debt minus debt not subject to limit (unamortized discount, FFB, other). Official close 2026-11-23; ticks at the 90-day trend (61 records).",
    "stale": false,
    "status": "ok",
    "slug": "debt_subject_limit",
-   "freeze_t": 1801767237.3387697
+   "freeze_t": 1801601725.153169,
+   "validation": {
+    "last_error_pct": 0.0102,
+    "threshold_pct": 0.25,
+    "flag": false,
+    "against": "Treasury Daily Treasury Statement, Table III-C"
+   }
   },
   "debt_limit": {
    "label": "Statutory debt limit",
@@ -3099,8 +3150,8 @@
    "kind": "usd",
    "base": 41103996000000.0,
    "rate": 0,
-   "t0": 1795237199.0,
-   "as_of": "2026-11-20",
+   "t0": 1795496399.0,
+   "as_of": "2026-11-23",
    "fixed": true,
    "source": "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit",
    "source_name": "Treasury Daily Treasury Statement, Table III-C",
@@ -3111,7 +3162,7 @@
    "calc": {
     "type": "fixed",
     "base_src": [
-     "2026-11-20",
+     "2026-11-23",
      41103996000000.0,
      "https://fiscaldata.treasury.gov/datasets/daily-treasury-statement/debt-subject-to-limit"
     ]
@@ -3205,55 +3256,61 @@
     "type": "ols",
     "window": "last 6 monthly averages (mid-month anchors)",
     "n": 6,
-    "slope": 48483.952977906454,
+    "slope": 42038.00898478272,
     "first": [
-     "2026-04",
-     22728000000000.0
+     "2026-05",
+     22980800000000.0
     ],
     "last": [
-     "2026-09",
-     23413900000000.0
+     "2026-10",
+     23532800000000.0
     ],
     "points": [
      [
-      "2026-04",
-      22728000000000.0
-     ],
-     [
       "2026-05",
-      22980900000000.0
+      22980800000000.0
      ],
      [
       "2026-06",
-      23077700000000.0
+      23077600000000.0
      ],
      [
       "2026-07",
-      23177400000000.0
+      23177300000000.0
      ],
      [
       "2026-08",
-      23300900000000.0
+      23300800000000.0
      ],
      [
       "2026-09",
-      23413900000000.0
+      23414300000000.0
+     ],
+     [
+      "2026-10",
+      23532800000000.0
      ]
     ]
    },
    "label": "M2 money supply",
    "group": "money",
    "kind": "usd",
-   "base": 23413900000000.0,
-   "t0": 1789444800.0,
-   "rate": 48483.952977906454,
-   "as_of": "2026-09",
+   "base": 23532800000000.0,
+   "t0": 1792036800.0,
+   "rate": 42038.00898478272,
+   "as_of": "2026-10",
    "source": "https://www.federalreserve.gov/releases/h6/current/default.htm",
    "source_name": "Federal Reserve H.6 Money Stock (M2, seasonally adjusted)",
-   "method": "Monthly average for 2026-09 = $23.414T; ticks at the 6-month trend, anchored mid-month.",
+   "method": "Monthly average for 2026-10 = $23.533T; ticks at the 6-month trend, anchored mid-month.",
    "stale": false,
    "status": "ok",
-   "slug": "m2"
+   "slug": "m2",
+   "validation": {
+    "last_error_pct": 0.0288,
+    "threshold_pct": 5.0,
+    "flag": false,
+    "against": "Federal Reserve H.6 Money Stock (M2, seasonally adjusted)"
+   }
   },
   "tf_socsec": {
    "calc": {
@@ -3759,7 +3816,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3783,7 +3840,7 @@
    "kind": "pct",
    "base": -0.1,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY1960",
    "fixed": true,
    "historical": true,
@@ -3807,7 +3864,7 @@
    "kind": "pct",
    "base": 32.6,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3831,7 +3888,7 @@
    "kind": "pct",
    "base": 2.6,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY1980",
    "fixed": true,
    "historical": true,
@@ -3855,7 +3912,7 @@
    "kind": "pct",
    "base": 54.4,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3879,7 +3936,7 @@
    "kind": "pct",
    "base": 3.7,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY1990",
    "fixed": true,
    "historical": true,
@@ -3903,7 +3960,7 @@
    "kind": "pct",
    "base": 55.6,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3927,7 +3984,7 @@
    "kind": "pct",
    "base": -2.3,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY2000",
    "fixed": true,
    "historical": true,
@@ -3951,7 +4008,7 @@
    "kind": "pct",
    "base": 90.9,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3975,7 +4032,7 @@
    "kind": "pct",
    "base": 8.7,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY2010",
    "fixed": true,
    "historical": true,
@@ -3999,7 +4056,7 @@
    "kind": "pct",
    "base": 126.1,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -4023,7 +4080,7 @@
    "kind": "pct",
    "base": 14.5,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY2020",
    "fixed": true,
    "historical": true,
@@ -4047,7 +4104,7 @@
    "kind": "pct",
    "base": 123.3,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
@@ -4071,7 +4128,7 @@
    "kind": "pct",
    "base": 5.9,
    "rate": 0,
-   "t0": 1795498272.5846262,
+   "t0": 1795555623.3951592,
    "as_of": "FY2025",
    "fixed": true,
    "historical": true,
