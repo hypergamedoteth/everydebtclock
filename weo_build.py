@@ -314,15 +314,21 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
            [("As of", u["as_of"]), ("Debt / GDP, IMF 2026", f"{e['ratio_2026']:.2f}%")],
            _signed(rate * 86400) + "/day", "#ff4d5e", f"QPSD {sector}\n{u['as_of']} · harmonized official dataset")
     up = rate >= 0
+    fixed = not rate
     header = (f'<header class="top"><div class="topin"><a class="brand" href="../../">EVERY <b>DEBT</b> CLOCK</a>{pb.nav_html(places, 2, "country", "plnav")}'
               f'<span class="live"><span class="dot"></span><span>harmonized data through {E(u["as_of"])}</span></span></div></header>')
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span><a href="../../countries/">All country debt clocks</a>'
              '<span>·</span><a href="../../world/">World debt clock</a></div>')
+    if fixed:
+        hero_sub = (f'<div class="sub"><span>as of {E(u["as_of"])}</span> '
+                    f'<span class="note">shown fixed, not ticking. {pb.HELD_FIXED}</span></div>')
+    else:
+        hero_sub = (f'<div class="sub"><span class="badge proj">PROJECTION</span> <span class="num" id="hp">{_money0(projected)}</span> '
+                    f'<span class="note">{_signed(rate)}/sec · {E(u["trend_note"])}. Not a daily ledger.</span></div>')
     hero = (f'<div class="hero lead" id="t-total" data-b="{u["usd"]}" data-r="{rate:.12g}" data-t="{u["t0"]:.0f}" data-coarse="1">'
             f'<div class="k">As of {E(u["as_of"])}</div>'
             f'<div class="big num" id="hv">{_money0(u["usd"])}</div>'
-            f'<div class="sub"><span class="badge proj">PROJECTION</span> <span class="num" id="hp">{_money0(projected)}</span> '
-            f'<span class="note">{_signed(rate)}/sec · {E(u["trend_note"])}. Not a daily ledger.</span></div>'
+            f'{hero_sub}'
             f'<div class="trio"><div><span class="l">QPSD stock · {E(u["as_of"])}</span><span class="num">{_money0(u["usd"])}</span></div>'
             f'<div><span class="l">Debt / GDP, IMF 2026</span><span class="num">{e["ratio_2026"]:.2f}%</span></div>'
             f'<div><span class="l">IMF end-2026 stock</span><span class="num">{_money0(e["debt_2026_usd"])}</span></div></div>'
@@ -333,7 +339,7 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
              f'The stock is <b>{stock_s}</b> as of <b>{as_of_long}</b>. '
              f'Source tier: harmonized official dataset. '
              f'In {E(u["currency"])} the stock is {u["local"]:,.0f}, converted with {fx_bit} ({E(u["rate_src"])}). '
-             f'{E(u["trend_note"])}. The live number is a projection from that stock.</p>'
+             f'{E(u["trend_note"])}. {pb.HELD_FIXED if fixed else "The live number is a projection from that stock."}</p>'
              f'<p>The IMF World Economic Outlook published {cp.PUBLISHED} puts general government gross debt at '
              f'{_money0(e["debt_2026_usd"])} ({e["ratio_2026"]:.2f}% of GDP) for 2026, {gap:+.1%} from this quarterly stock. '
              + (f'This general-government stock is the <a href="../../world/">World Debt Clock</a> headline for {E(name)}.' if u.get("for_headline") else
@@ -352,7 +358,8 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
               f'<div class="tw"><table class="wt" style="min-width:0;max-width:420px"><tr class="hd"><th>Quarter-end</th><th class="num">Debt</th></tr>{hist}</table></div></section>')
     meth = (f'<section id="method"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>How it works</h2></div><div class="sk foot">'
             f'<p><b>The stock.</b> {stock_s} on {E(u["as_of"])} = {u["local"]:,.0f} {E(u["currency"])} × {u["rate"]:.8f} USD per unit.</p>'
-            f'<p><b>The live number</b> starts at that stock. {E(u["trend_note"])}. The rate is {_signed(rate)} per second.</p>'
+            f'<p><b>The live number</b> starts at that stock. {E(u["trend_note"])}. '
+            f'{pb.HELD_FIXED if fixed else f"The rate is {_signed(rate)} per second."}</p>'
             f'<p>Source tier: harmonized. As of {E(u["as_of"])}. This is not a second count of the IMF stock on the world government debt page.</p>'
             f'<p class="src"><a href="{E(u["source_url"])}" rel="noopener">{E(u["source"])}</a>.</p></div></section>')
     faq_html = '<section class="faq" id="faq"><div class="sh"><h2>Questions</h2></div>' + "".join(f"<h3>{E(q)}</h3><p>{E(a)}</p>" for q, a in faqs) + "</section>"
@@ -368,7 +375,7 @@ def _qpsd_page(R, SITE, with_analytics, og, stamp, now, e, D, places, pool, gdp,
     head = head.replace("<body>", '<body class="srclead">', 1)
     page = (head + '<main id="app">' + hero + intro + series + path + compare + meth + faq_html + '</main>' + header + ex.search_box("../../")
             + _related(pool, gdp, cur) + links
-            + '<footer class="site-foot">Every Debt Clock · harmonized source, projection labelled · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>'
+            + '<footer class="site-foot">Every Debt Clock · harmonized source, ' + ('shown fixed' if fixed else 'projection labelled') + ' · <a href="../../methodology/">Methodology</a> · <a href="../../privacy/">Privacy</a> · Independent site, not affiliated with any government. Not financial advice.</footer>'
             + TICK + "</body></html>")
     os.makedirs(f"{R}/countries/{slug}", exist_ok=True)
     open(f"{R}/countries/{slug}/index.html", "w").write(with_analytics(page))

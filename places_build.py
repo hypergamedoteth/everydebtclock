@@ -165,6 +165,89 @@ def freshness(p, today=None):
     return {"stale": stale, "age": age, "period": period, "freq": freq,
             "held": bool(p.get("hold_trend") or stale), "hold_why": why}
 
+# Shown wherever a held clock (stale, hold_trend, or no rate) would otherwise say it projects or ticks.
+HELD_FIXED = "The figure is shown fixed at the last official value until a newer official release."
+
+_PROJ_CLAUSE = re.compile(
+    r",?\s*so the live number is a straight-line projection\b.*?[.]",
+    re.I | re.S,
+)
+_CLAIM_PHRASES = re.compile(
+    r"\b(?:the clock still projects|the clock projects|live clock projects|"
+    r"the live number is a straight-line projection|the live number is a projection|"
+    r"the ticking number|the one ticking|projects forward|projects the \d)\b",
+    re.I,
+)
+_CLAIM_NEG = re.compile(
+    r"\b(?:does not|doesn't|do not|without ticking|not ticking|shown fixed|"
+    r"not a projection|not projected|is not projected|no current trend to project|no defensible trend)\b",
+    re.I,
+)
+_HELD_EXTRA = re.compile(
+    r"projection labelled|straight-line projection|live per-\w+ figure (?:rises|falls) only with the debt",
+    re.I,
+)
+
+def _sentence_end(text, i):
+    """A sentence boundary. The dot inside a decimal (6,352.9) is not one."""
+    ch = text[i]
+    if ch not in ".!?":
+        return False
+    if ch == "." and i > 0 and text[i - 1].isdigit() and i + 1 < len(text) and text[i + 1].isdigit():
+        return False
+    return True
+
+def _sentence_span(text, at):
+    i = at - 1
+    while i >= 0 and not _sentence_end(text, i):
+        i -= 1
+    start = 0 if i < 0 else i + 1
+    j = at
+    while j < len(text) and not _sentence_end(text, j):
+        j += 1
+    if j < len(text):
+        j += 1
+    return start, j
+
+def prose_for_clock(text, ticking):
+    """Keep projection copy on a clock that ticks. A held clock says the figure is fixed."""
+    if ticking or not text:
+        return text or ""
+    out = _PROJ_CLAUSE.sub(". " + HELD_FIXED, text)
+    pos = 0
+    while True:
+        m = _CLAIM_PHRASES.search(out, pos)
+        if not m:
+            break
+        start, end = _sentence_span(out, m.start())
+        if _CLAIM_NEG.search(out[start:end]):
+            pos = m.end()
+            continue
+        prefix = out[:start].rstrip()
+        gap = " " if prefix else ""
+        out = prefix + gap + HELD_FIXED + out[end:]
+        pos = len(prefix) + len(gap) + len(HELD_FIXED)
+    out = re.sub(r"\.\s*\.\s*", ". ", out)
+    out = re.sub(r"[ \t]{2,}", " ", out)
+    while (HELD_FIXED + " " + HELD_FIXED) in out:
+        out = out.replace(HELD_FIXED + " " + HELD_FIXED, HELD_FIXED)
+    return out.strip()
+
+def projection_claims(text):
+    """Phrases that say a clock projects or ticks. A negation in that sentence does not count,
+    except for labels that are never used as a denial ('projection labelled', a per-person tick)."""
+    if not text:
+        return []
+    hits = []
+    for m in _CLAIM_PHRASES.finditer(text):
+        start, end = _sentence_span(text, m.start())
+        if _CLAIM_NEG.search(text[start:end]):
+            continue
+        hits.append(m.group(0))
+    for m in _HELD_EXTRA.finditer(text):
+        hits.append(m.group(0))
+    return hits
+
 def _cv_hits(p):
     """Census coefficients of variation at or above 10%, the point a sampling-error note is shown on the page."""
     hits = []
@@ -367,7 +450,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     sec2 = p.get("secondary")  # optional: the place's own, fresher official figure on a narrower scope, shown under the headline (never added to it)
 
     def dlg(label, method, src_name, src_url, locator="", base=None, r=None, official=None):
-        return {"l": label, "m": method, "s": src_name, "u": src_url, "loc": locator, "b": base, "r": r, "t0": t0 if r else None,
+        return {"l": label, "m": prose_for_clock(method, bool(rate)), "s": src_name, "u": src_url, "loc": locator, "b": base, "r": r, "t0": t0 if r else None,
                 "o": official, "share": url, "img": f"{SITE}/{img}"}
 
     # ---- header (same as the US homepage), jump nav adapted to the place's sections
@@ -405,9 +488,9 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                     f"the official change from {_fd(cs[0]['prior_as_of'])} to {as_of}. {E(rep)} reports {E(rep_its)} debt {T['once']}, not daily, so the ticking number is a projection, not an official figure; "
                     f"it re-bases when the next {T['report']} come out." + (" " + E(recent) if recent else ""))
     elif c.get("held") and c.get("hold_why"):
-        proj_txt = (f"{E(rep)} reports {E(rep_its)} debt {T['once']}, not daily. This page shows the official figure for {as_of} and does not tick it forward, because {E(c['hold_why'])}. Earlier official years are in the What changed table.")
+        proj_txt = (f"{E(rep)} reports {E(rep_its)} debt {T['once']}, not daily. This page shows the official figure for {as_of} and does not tick it forward, because {E(c['hold_why'])}. {HELD_FIXED}")
     else:
-        proj_txt = (f"{E(rep)} reports {E(rep_its)} debt {T['once']} and only one official figure is available, so the clock shows the official figure without projecting.")
+        proj_txt = (f"{E(rep)} reports {E(rep_its)} debt {T['once']} and only one official figure is available. {HELD_FIXED}")
     others = [o for o in places if o["slug"] != p["slug"]]
     crumb = ('<div class="crumb"><a href="../../">← US national debt clock</a><span>·</span>'
              f'<a href="../../{sec_dir}/">All {"US state" if is_state else "country"} debt clocks</a>' + ('<span>·</span><a href="../../world/">World debt clock</a>' if WORLD else "") + '</div>')
@@ -445,7 +528,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
     hero += ('<div class="trio">' + f'<div><span class="l">Per {E(dem)} ({E(T["pop_tag"])}, {_fd(pop["as_of"])})</span><span class="num" data-pp="{pop["value"]}">{_usd2(c["total"] / pop["value"])}</span></div>'
              + "".join(f'<div><span class="l">{E(l)}</span><span class="num">{E(v)}</span></div>' for l, v in trio_x[:2]) + "</div>"
              + (f'<div class="sec2"><span class="l">{E(sec2["label"])} · official {E(_fd(sec2["as_of"]))}</span> <b class="num">{_usd0(sec2["value"])}</b> '
-                f'<span class="note">{E(sec2["publisher"])}. {E(sec2["scope"])}</span></div>' if sec2 else "")
+                f'<span class="note">{E(sec2["publisher"])}. {E(prose_for_clock(sec2["scope"], bool(rate)))}</span></div>' if sec2 else "")
              + f'<div class="meta" style="margin-top:10px">{proj_badge if ticks else fix_badge(c["as_of"])}{ann_badge}'
              + ('<span class="badge ann">STALE</span>' if c.get("stale") else "")
              + f'<span class="badge">source: {E(pub)}</span></div>'
@@ -455,9 +538,9 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
              f'<p>{E(T["subject"])} owed <b>{_usd0(c["total"])}</b> ({_b(c["total"])}) '
              + (f'on <b>{as_of}</b>' if T["periodic"] else f'in Census survey year {fy} (dated <b>{as_of}</b>)' if p.get("year_label") else f'at the end of fiscal year {fy} (<b>{as_of}</b>)') + ', according to '
              + " and ".join(("" if n_.startswith("Eurostat") else "the ") + f'<a href="{E(u_)}" rel="noopener">{E(n_)}</a>' for u_, n_ in dict.fromkeys((x["source_url"], x["source_name"].split(" (")[0]) for x in cs))
-             + (f': {parts}' if len(cs) > 1 else '') + f'. {E(p.get("scope_note", ""))}{" " if p.get("scope_note") else ""}That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by {E(T["pop_pos"])} estimate of {pop["value"]:,} {E(T['noun_full'])} on {_fd(pop["as_of"])}. {proj_txt}</p>'
+             + (f': {parts}' if len(cs) > 1 else '') + f'. {E(prose_for_clock(p.get("scope_note", ""), bool(rate)))}{" " if p.get("scope_note") else ""}That is <b>{_usd2(pp_off)} per {E(dem)}</b>: the debt divided by {E(T["pop_pos"])} estimate of {pop["value"]:,} {E(T['noun_full'])} on {_fd(pop["as_of"])}. {proj_txt}</p>'
              + ("" if is_state else f'<p>Source tier: {"harmonized official dataset" if ("Eurostat" in pub or p.get("source_tier") == "harmonized") else "official national series"}. As of {as_of}. Coverage: {E(p.get("world_measure") or p.get("headline_long") or T["head"])}.</p>')
-             + (f'<p>{E(p["intro_extra"])}</p>' if p.get("intro_extra") else "")
+             + (f'<p>{E(prose_for_clock(p["intro_extra"], bool(rate)))}</p>' if p.get("intro_extra") else "")
              + (_world_line(p, name, pub, as_of) if not is_state else "")
              + _debt_year_link(p["slug"], name)
              + '</section>')
@@ -480,7 +563,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         wc = (f'<section id="changed"><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>What changed</h2>'
               f'<span class="h2n">Official {T["freq"]} totals, newest first · {E(pub)} · published {T["once"]}{T["after"]}</span></div>'
               f'<div class="wc">{now_card}{cards}</div>'
-              f'<div class="legend">{E(p.get("legend", f"{name} debt is reported once a year, at fiscal year-end. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection between official reports, shown here next to the official totals."))}</div></section>')
+              f'<div class="legend">{E(prose_for_clock(p.get("legend") or f"{name} debt is reported once a year, at fiscal year-end. Real borrowing happens in lumps when bonds are sold and is repaid on schedules, so the live number is a straight-line projection between official reports, shown here next to the official totals.", bool(rate)))}</div></section>')
 
     # ---- Debt overview tiles (mirror the US "National debt" grid where Texas has an equivalent)
     tiles = [tile_html("combined", f"{name} {T['head']}", _usd0(proj if ticks else c["total"]), ACC[0], proj_badge if ticks else fix_badge(c["as_of"]), _rate_txt(rate) if ticks else f"as of {as_of}",
@@ -573,7 +656,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
             rows += f'<tr{" class=sub" if b.get("sub") else ""}><td>{E(b["label"].strip())}</td><td class="num">{_usd0(b["value"])}</td></tr>'
         return (f'<h3>{E(x["label"])}: {_usd0(x["value"])}</h3><p class="dnote">Official, {T["end"]} {_fd(x["as_of"])} · <a href="{E(x["source_url"])}" rel="noopener">{E(x["source_name"])}</a>'
                 f'{" (" + E(x.get("source_locator", "")) + ")" if x.get("source_locator") else ""}</p>'
-                f'<table class="v"><tr><th>Part</th><th>Amount</th></tr>{rows}<tr><td><b>Total</b></td><td class="num"><b>{_usd0(x["value"])}</b></td></tr></table><p class="dnote">{E(x.get("includes", ""))}</p>')
+                f'<table class="v"><tr><th>Part</th><th>Amount</th></tr>{rows}<tr><td><b>Total</b></td><td class="num"><b>{_usd0(x["value"])}</b></td></tr></table><p class="dnote">{E(prose_for_clock(x.get("includes", ""), bool(rate)))}</p>')
     details = (f'<section id="details"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>Details</h2><span class="h2n">Full official tables</span></div>'
                f'<div class="sk foot">{"".join(comp_table(x) for x in cs)}{det_hist}{comp_table(sec2) if sec2 else ""}{"".join(comp_table(x) for x in sec_parts)}</div></section>')
 
@@ -588,15 +671,22 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
                 + f'{_usd0(yr_change)} over {days} days = {_usd2(rate)} per second. {E(p.get("trend_why", "")) + " " if p.get("trend_why") else ""}The actual path is lumpy (bonds are sold in batches and repaid on schedules), so the projection will drift; '
                 f'when new {T["report"]} come out, the clock re-bases to the new official figures.</p>')
     else:
-        meth = "<p><b>Why this number doesn't tick.</b> " + (f"Earlier official years are in the history table, but {E(c['hold_why'])}, so there is no defensible trend to project. The figure shown is the official total.</p>" if c.get("held") and c.get("hold_why") else "Only one official year is available, so there is no defensible trend to project. The figure shown is the official total.</p>")
+        if c.get("held") and c.get("hold_why"):
+            why = c["hold_why"].strip().rstrip(".")
+            why = why[:1].upper() + why[1:]
+            meth = f"<p><b>Why this number doesn't tick.</b> {E(why)}. {HELD_FIXED}</p>"
+        else:
+            meth = f"<p><b>Why this number doesn't tick.</b> Only one official figure is available, so there is no trend to extend. {HELD_FIXED}</p>"
+    per_move = (f"It is not projected forward, so the live per-{E(dem)} figure {'rises' if rate >= 0 else 'falls'} only with the debt."
+                if rate else f"It is not projected forward. {HELD_FIXED}")
     meth += (f'<p><b>How often it\'s published.</b> {E(p.get("cadence", ""))} {E(p.get("next_update", ""))}</p>'
-             f'<p><b>Per {E(dem)}</b> divides by {E(T["pop_pos"])} estimate of {pop["value"]:,} {T["noun"]} on {_fd(pop["as_of"])}. It is not projected forward, so the live per-{E(dem)} figure {"rises" if (rate or 0) >= 0 else "falls"} only with the debt.</p>'
-             + "".join(f"<p><b>Note.</b> {E(n)}</p>" for n in p.get("notes", []) + [p.get("fiscal_year_end_note", "")] if n)
+             f'<p><b>Per {E(dem)}</b> divides by {E(T["pop_pos"])} estimate of {pop["value"]:,} {T["noun"]} on {_fd(pop["as_of"])}. {per_move}</p>'
+             + "".join(f"<p><b>Note.</b> {E(prose_for_clock(n, bool(rate)))}</p>" for n in p.get("notes", []) + [p.get("fiscal_year_end_note", "")] if n)
              + "<p><b>Note.</b> Figures from source tables may not add exactly because of rounding in the source.</p>"
              + "<p><b>Sources:</b> " + " · ".join(f'<a href="{E(u)}" target="_blank" rel="noopener">{E(n)}</a>' for n, u in src_list) + "</p>"
              + f"<p>Page built {E(stamp)} from the official figures above.</p>")
     method = (f'<section id="method"><div class="sh"><span class="bar" style="background:var(--mut)"></span><h2>How it works</h2>'
-              f'<span class="h2n">Official {T["freq"]} figures · projection labelled · sources linked</span></div><div class="sk foot">{meth}</div></section>')
+              f'<span class="h2n">Official {T["freq"]} figures · {"projection labelled" if rate else "shown fixed"} · sources linked</span></div><div class="sk foot">{meth}</div></section>')
 
     country_faq = ""
     if not is_state and _src_url:
@@ -658,7 +748,7 @@ if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
     official = f'<p class="official">Official: {_usd0(c["total"])} as of {as_of}, {E(pub)}</p>'
     page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld).replace("<body>", '<body class="srclead">', 1)
             + '<main id="app">' + hero + intro + federal_html + facts_html + wc + debt_sec + comp_secs + people + hist + details + profile + method + country_faq
-            + '</main>' + header + ex.search_box("../../") + '<dialog id="dlg"></dialog>' + explore_html + links + _site_footer("../../", "Every Debt Clock · official data, projection labelled") + script + "</body></html>")
+            + '</main>' + header + ex.search_box("../../") + '<dialog id="dlg"></dialog>' + explore_html + links + _site_footer("../../", "Every Debt Clock · official data, " + ("projection labelled" if rate else "shown fixed")) + script + "</body></html>")
     os.makedirs(f"{R}/{sec_dir}/{p['slug']}", exist_ok=True)
     open(f"{R}/{sec_dir}/{p['slug']}/index.html", "w").write(with_analytics(page))
     _cur({})

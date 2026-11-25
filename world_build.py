@@ -346,6 +346,20 @@ def _row_date(x):
 
 _CLOCK_SENTENCE = "The live clock projects each country forward from its figure."
 
+def held_fixed_sentence(rows):
+    """Name world-table rows whose clock is held. Empty when every row projects."""
+    fixed = [x for x in rows if x.get("trend_kind") == "fixed"]
+    if not fixed:
+        return ""
+    names = [x["name"] for x in sorted(fixed, key=lambda r: r["name"])]
+    shown = names if len(names) <= 12 else names[:12]
+    extra = f" and {len(names) - len(shown)} more" if len(names) > len(shown) else ""
+    n = len(fixed)
+    verb = "is" if n == 1 else "are"
+    noun = "economy" if n == 1 else "economies"
+    return (f" {n} {noun} {verb} held fixed at the last official value and {verb} not projected: "
+            f"{', '.join(shown)}{extra}.")
+
 def _recorded_span(dates):
     a, b = min(dates), max(dates)
     if a == b:
@@ -416,6 +430,9 @@ def _faqs(W, today=None):
     top = sorted(W["rows"], key=lambda x: -x["usd"])[:5]
     top_s = "; ".join(f"{x['name']}, {_usd0(x['usd'])}" for x in top)
     claim = lead_claim(W, today)
+    held = held_fixed_sentence(W["rows"]).strip()
+    if held:
+        claim = f"{claim} {held}"
     return [
         ("How much is world government debt?",
          f"{claim} Source: national releases, Eurostat, and the IMF World Economic Outlook; "
@@ -524,7 +541,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
              f'The sum of those stocks is <b>{_usd0(W["total"])}</b> ({_tn(W["total"])}). '
              f'<b>{c["official"]}</b> rows are a national general-government stock, <b>{c["harmonized"]}</b> are Eurostat Maastricht debt or the World Bank/IMF Quarterly Public Sector Debt general-government stock, and <b>{c["imf"]}</b> are the IMF end-2025 stock. '
              f'A central, federal or otherwise narrower official series is named under the country and is not added in. Each economy is counted once. '
-             f'The live number starts at each stock on that stock\'s date and adds only that country\'s growth since then. It is a projection.</p>'
+             f'The live number starts at each stock on that stock\'s date and adds only that country\'s growth since then. It is a projection.{E(held_fixed_sentence(rows))}</p>'
              f'<p>{gap_txt} The comparison is in the section below the table. '
              f'/world-government-debt/ and /global-debt-clock/ redirect here.</p></section>')
     hero = (f'<div class="hero lead" id="total" data-b="{big_now:.2f}" data-r="{W["rate_s"]:.6f}" data-t="{now:.0f}" data-coarse="1" style="cursor:default">'
@@ -559,7 +576,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
              f'<div class="tw"><table class="wt wstk" id="debt-table"><thead><tr class="hd">'
              f'<th data-k="name">Country</th><th class="num" data-k="debt" data-dir="desc">Debt, USD</th><th class="num" data-k="ratio">Debt / GDP</th>'
              f'<th data-k="tier">Source tier</th><th data-k="asof">As of</th><th>Measure</th></tr></thead><tbody>{body}</tbody></table></div>'
-             f'<p class="dnote">The debt column is general government gross debt. It does not tick. '
+             f'<p class="dnote">The debt column is general government gross debt. It does not tick.{E(held_fixed_sentence(rows))} '
              f'A national series listed under the country is narrower (central, federal, or a different perimeter) and is not added. '
              f'Debt / GDP uses the IMF 2026 GDP for official and harmonized rows, and the IMF 2025 debt ratio for an IMF row, matching that end-2025 stock. '
              f'A recorded stock shows its date. An IMF row is the end-2025 stock. The end-2026 estimate is the target the clock runs toward, not a closing balance on December 31.</p></section>')
@@ -627,6 +644,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
               f'At the moment this page was built the live total was {_usd0(W["now_total"])}, {_tn(abs(W["now_total"] - W["total"]))} {"above" if W["now_total"] >= W["total"] else "below"} the sum of stocks. '
               f'A country is below its own stock only when its recorded series is falling. '
               f'The combined rate is {_sgn(W["rate_s"], ",.2f", plus=False)} per second. Exchange rates are held fixed. The world total is the sum of the country clocks. '
+              f'{E(held_fixed_sentence(rows))} '
               f'The US row uses the IMF pace from the end-2025 stock, not Treasury\'s 90-day trend; Treasury Debt to the Penny is the national series under the United States.</p>'
               + (f'<p><b>GDP.</b> The economies in this table account for {cv["pct"]:.1f}% of IMF {cv["year"]} world GDP. Debt / GDP on an official or harmonized row is the USD stock divided by that economy\'s IMF 2026 GDP, not a national ratio.</p>' if cv else '')
               + review
