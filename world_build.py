@@ -474,7 +474,7 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
     ld = ('<script type="application/ld+json">' + json.dumps(faq_ld).replace("</", "<\\/") + "</script>"
           + '<script type="application/ld+json">' + json.dumps(ds_ld).replace("</", "<\\/") + "</script>")
 
-    jump = [("total", "Total"), ("table", "By country"), ("imf", "IMF comparison"), ("measures", "Measures"), ("faq", "Questions"), ("method", "Method")]
+    jump = [("total", "Total"), ("table", "Debt clock by country"), ("imf", "IMF comparison"), ("measures", "Measures"), ("faq", "Questions"), ("method", "Method")]
     header = (f'<header class="top"><div class="topin"><a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a>{pb.nav_html(places, 1, "world", "plnav")}'
               f'<span class="live"><span class="dot"></span><span>as of published stocks</span></span></div>'
               f'<nav class="jump">' + "".join(f'<a href="#{i}">{E(t)}</a>' for i, t in jump) + "</nav></header>")
@@ -526,17 +526,21 @@ def build(R, SITE, with_analytics, og, stamp, now, places, W, modified=None):
     body = ""
     for x in rows:
         ratio = f'{x["ratio"]:.1f}%' if x.get("ratio") is not None else "—"
-        link = f'<a href="../{x["url"]}">{E(x["name"])} debt clock</a>' if x["url"] else '<a href="../">United States debt clock</a>'
+        # The country name is the row's link. The US clock is the homepage (/countries/united-states/ is only a redirect).
+        # Sorting reads data-name on the row, so the link inside the cell does not change the name order.
+        href = f'../{x["url"]}' if x["url"] else '../'
+        name = f'<a href="{href}">{E(x["name"])}</a>'
+        link = f'<a href="{href}">{E(x["name"])} debt clock</a>'
         ol = x.get("official_line")
         nat = (f'<span class="nat">National series, not in the total: {E(ol["measure"])}, {E(_fd(ol["as_of"]))}, ${ol["usd"]/1e12:,.3f}tn</span>' if ol else "")
         body += (f'<tr data-name="{E(x["name"])}" data-debt="{x["usd"]:.0f}" data-ratio="{x["ratio"] if x.get("ratio") is not None else ""}" data-tier="{x["tier"]}" data-asof="{x["as_of"]}" data-iso="{E(x["iso3"] or "")}">'
-                 f'<td class="c"><b>{E(x["name"])}</b><br>{link}{nat}</td>'
+                 f'<td class="c"><b>{name}</b><br>{link}{nat}</td>'
                  f'<td class="num" data-l="Debt, USD" title="${x["usd"]:,.0f}">${x["usd"]/1e12:,.3f}tn</td>'
                  f'<td class="num" data-l="Debt / GDP">{ratio}</td>'
                  f'<td data-l="Source tier">{TIER[x["tier"]]}</td>'
                  f'<td data-l="As of">{E(_asof_cell(x, today))}</td>'
                  f'<td class="m" data-l="Measure">{E(x["measure"])}</td></tr>')
-    table = (f'<section id="table" class="wsec"><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>By country</h2><span class="h2n">Latest figure for each economy · click a column to sort · this table does not tick</span></div>'
+    table = (f'<section id="table" class="wsec"><div class="sh"><span class="bar" style="background:var(--red)"></span><h2>Debt clock by country</h2><span class="h2n">Latest figure for each economy · click a column to sort · this table does not tick</span></div>'
              f'<div class="tw"><table class="wt wstk" id="debt-table"><thead><tr class="hd">'
              f'<th data-k="name">Country</th><th class="num" data-k="debt" data-dir="desc">Debt, USD</th><th class="num" data-k="ratio">Debt / GDP</th>'
              f'<th data-k="tier">Source tier</th><th data-k="asof">As of</th><th>Measure</th></tr></thead><tbody>{body}</tbody></table></div>'

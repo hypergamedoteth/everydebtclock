@@ -149,6 +149,122 @@ def require_redirect(root, rel, canonical, refresh):
         fail(f"{rel} does not refresh to {refresh}")
 
 
+class WorldTable(HTMLParser):
+    """Name links in #debt-table. The first link in the country cell is the row link."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.in_table = False
+        self.in_row = False
+        self.in_name = False
+        self.in_link = False
+        self.rows = []
+        self._name = ""
+        self._href = None
+        self._text = ""
+        self._seen_link = False
+
+    def handle_starttag(self, tag, attrs):
+        d = {}
+        for key, value in attrs:
+            if key and value is not None:
+                d[key.lower()] = value
+        if tag == "table" and d.get("id") == "debt-table":
+            self.in_table = True
+            return
+        if not self.in_table:
+            return
+        if tag == "tr" and "data-name" in d:
+            self.in_row = True
+            self.in_name = False
+            self.in_link = False
+            self._seen_link = False
+            self._name = d.get("data-name") or ""
+            self._href = None
+            self._text = ""
+            return
+        if self.in_row and tag == "td" and "c" in (d.get("class") or "").split():
+            self.in_name = True
+            return
+        if self.in_name and tag == "a" and not self._seen_link:
+            self._seen_link = True
+            self.in_link = True
+            self._href = d.get("href") or ""
+            self._text = ""
+
+    def handle_endtag(self, tag):
+        if tag == "a" and self.in_link:
+            self.in_link = False
+        elif tag == "td" and self.in_name:
+            self.in_name = False
+        elif tag == "tr" and self.in_row:
+            self.rows.append({"name": self._name, "href": self._href, "text": " ".join(self._text.split())})
+            self.in_row = False
+            self.in_name = False
+            self.in_link = False
+        elif tag == "table" and self.in_table:
+            self.in_table = False
+
+    def handle_data(self, data):
+        if self.in_link:
+            self._text += data
+
+
+def check_world_table(root):
+    """Every By-country row links its country name to a page that exists.
+
+    The United States name links to the homepage. /countries/united-states/ is a redirect, not the clock.
+    """
+    import json
+    world_path = os.path.join(root, "world", "index.html")
+    if not os.path.isfile(world_path):
+        fail(f"missing world/index.html under {root}")
+    parser = WorldTable()
+    parser.feed(open(world_path, encoding="utf-8").read())
+    api_path = os.path.join(root, "api", "world.json")
+    if not os.path.isfile(api_path):
+        fail("missing api/world.json")
+    countries = json.load(open(api_path, encoding="utf-8")).get("countries") or []
+    by_name = {}
+    for country in countries:
+        name = country.get("name") or ""
+        if name in by_name:
+            fail(f"duplicate country name in api/world.json: {name}")
+        by_name[name] = country
+    if len(parser.rows) != len(countries):
+        fail(f"world table has {len(parser.rows)} named rows, api/world.json has {len(countries)}")
+    seen = set()
+    for row in parser.rows:
+        name = row["name"]
+        if name in seen:
+            fail(f"duplicate world table row {name}")
+        seen.add(name)
+        country = by_name.get(name)
+        if country is None:
+            fail(f"world table row {name!r} is not in api/world.json")
+        if not row["href"] or row["text"] != name:
+            fail(f"{name} name is not a link (href={row['href']!r}, text={row['text']!r})")
+        slug = country.get("slug") or ""
+        if country.get("iso3") == "USA" or slug == "united-states":
+            if row["href"] != "../":
+                fail(f"United States row links to {row['href']}, expected ../")
+        else:
+            expect = f"../countries/{slug}/"
+            if row["href"] != expect:
+                fail(f"{name} links to {row['href']}, expected {expect}")
+        if "united-states" in (row["href"] or ""):
+            fail(f"{name} links to /countries/united-states/")
+        rel = resolve(root, world_path, row["href"])
+        if rel is None or target_file(root, rel) is None:
+            fail(f"{name} link {row['href']} does not exist under {root} ({rel})")
+    missing = [c.get("name") for c in countries if c.get("name") not in seen]
+    if missing:
+        fail("world table is missing rows: " + ", ".join(missing[:12]))
+    page = open(world_path, encoding="utf-8").read()
+    if 'id="table"' not in page or '<h2>Debt clock by country</h2>' not in page:
+        fail("world table section lost id=table or the Debt clock by country heading")
+
+
 def check_legacy(root):
     require_redirect(root, "countries/united-states/index.html", "https://everydebtclock.com/", "/")
     require_redirect(root, "texas/index.html", "https://everydebtclock.com/states/texas/", "/states/texas/")
@@ -173,6 +289,7 @@ def check_legacy(root):
     for name in ("daily.json", "daily.txt", "world.json", "/data/"):
         if name not in api:
             fail(f"/api/ index does not point at {name}")
+    check_world_table(root)
     world = open(os.path.join(root, "world", "index.html"), encoding="utf-8").read()
     if 'href="../countries/united-states/"' in world or 'href="/countries/united-states/"' in world:
         fail("world page still links to /countries/united-states/")
