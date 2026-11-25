@@ -111,8 +111,19 @@ def runtime(R):
         for key in ("ssa", "opm", "dmdc"):
             if slug not in doc[key]["states"]:
                 raise SystemExit(f"state federal: {key} missing {slug}")
-        if slug not in doc["usaspending"]["states_cents"]:
+        usa = doc["usaspending"]
+        if slug not in usa["states_cents"]:
             raise SystemExit(f"state federal: USAspending missing {slug}")
+        need_cfda = ("93.770", "93.773", "93.774", "96.001", "96.002", "96.004", "96.006", "96.007")
+        missing_cfda = [c for c in need_cfda if c not in (usa.get("exclude_cfda") or [])]
+        if missing_cfda:
+            raise SystemExit("state federal: USAspending denylist missing " + " ".join(missing_cfda))
+        gross = (usa.get("states_gross_cents") or {}).get(slug)
+        excluded = (usa.get("states_excluded_cents") or {}).get(slug)
+        if gross is None or excluded is None:
+            raise SystemExit(f"state federal: USAspending gross/excluded missing {slug}")
+        if usa["states_cents"][slug] != gross - excluded:
+            raise SystemExit(f"state federal: {slug} awards are not gross minus the CFDA denylist")
         by[slug] = p
     ctx = {"debt": debt, "us_pop": us_pop, "pop_as_of": pop["as_of"],
            "pop_source": pop.get("source_name") or "U.S. Census Bureau, Vintage 2025",
@@ -180,7 +191,6 @@ def section(R, place, now, tile_html, page_url, img):
     base, rate, t0 = _debt_at(debt, now)
     pp_off = round(float(debt["base"]) / us_pop, 2)
     share_off = float(debt["base"]) * frac
-    live_pp = (base + rate * (now - t0)) / us_pop
     live_share = (base + rate * (now - t0)) * frac
     interest = ctx["interest"]
     interest_amt = float(interest["amount_usd"])
@@ -204,21 +214,21 @@ def section(R, place, now, tile_html, page_url, img):
                 "b": base_, "r": r, "t0": t0 if r else None, "o": official,
                 "share": page_url, "img": img, "cents": cents}
 
-    pp_method = (f"Treasury total public debt outstanding at the {as_of} close, divided by the Census estimate of "
-                 f"{us_pop:,} U.S. residents on {_date(ctx['pop_as_of'])}. The same per resident in every state. "
-                 f"The population is not projected. The debt ticks at the 90-day Treasury trend, about "
-                 f"${rate * 86400 / us_pop:,.2f} per resident per day. This is not {name} government debt.")
+    pp_method = (f"Site-wide basis official_census: Treasury total public debt outstanding at the {as_of} close, "
+                 f"divided by the Census estimate of {us_pop:,} U.S. residents on {_date(ctx['pop_as_of'])}. "
+                 f"The same figure as debt_per_person_official. The same per resident in every state. "
+                 f"This tile does not tick. The homepage also shows a separate projection that divides projected debt "
+                 f"by a projected population. That projection is a different figure. This is not {name} government debt.")
     share_method = (f"{name} population {state_pop:,} on {_date(place['population']['as_of'])} divided by "
                     f"{us_pop:,} U.S. residents, times the Treasury total. "
                     f"That population share is {frac * 100:.2f}%. The ticking number is a projection from the {as_of} close.")
     tiles = []
     tiles.append(tile_html(
-        "fed_pp", "Federal debt per resident", _usd2(live_pp), "var(--red)", proj,
-        f"+${rate * 86400 / us_pop:,.2f}/day" if tick else f"as of {as_of}",
-        pp=[("Official close", _usd2(pp_off), None), ("U.S. population", f"{us_pop:,}", None)],
-        tick=(float(debt["base"]) / us_pop, rate / us_pop, t0) if tick else None,
+        "fed_pp", "Federal debt per resident", _usd2(pp_off), "var(--red)", fix(as_of),
+        f"official close ÷ Census population",
+        pp=[("Basis", "official Census", None), ("U.S. population", f"{us_pop:,}", None)],
         dlg=dlg("Federal debt per resident", pp_method, "Treasury, Debt to the Penny", DEBT_URL,
-                f"{_usd2(pp_off)} at the {as_of} close", float(debt["base"]) / us_pop, rate / us_pop if tick else None, True)))
+                f"{_usd2(pp_off)} at the {as_of} close")))
     share_rate = f"+${_short(rate * frac)}/sec · +${_short(rate * frac * 86400)}/day" if tick else f"as of {as_of}"
     tiles.append(tile_html(
         "fed_share", f"{name}'s share of the federal debt", _usd0(live_share), "var(--red)", proj, share_rate,
@@ -226,12 +236,13 @@ def section(R, place, now, tile_html, page_url, img):
         tick=(share_off, rate * frac, t0) if tick else None,
         dlg=dlg(f"{name}'s share of the federal debt", share_method, "Treasury, Debt to the Penny", DEBT_URL,
                 f"{_usd0(share_off)} at the {as_of} close", share_off, rate * frac if tick else None)))
-    i_method = (f"Treasury interest expense on the public debt outstanding for fiscal year {interest_fy}, "
+    i_method = (f"Treasury gross interest expense on the public debt outstanding for fiscal year {interest_fy}, "
                 f"the year ended {_date(interest_asof)}: {_usd0(interest_amt)}. "
+                f"Gross interest includes interest credited to government accounts. It is not net interest outlays. "
                 f"{name}'s figure is that total times its Census population share ({frac * 100:.2f}%). "
                 f"A finished year. It does not tick.")
     tiles.append(tile_html(
-        "fed_interest", f"Share of FY{interest_fy} interest", _usd0(share_i), "var(--orange)", fix(f"FY{interest_fy}"),
+        "fed_interest", f"Share of FY{interest_fy} gross interest", _usd0(share_i), "var(--orange)", fix(f"FY{interest_fy}"),
         "does not tick",
         pp=[("Per resident", _usd2(pp_i), None), ("U.S. total", "$" + _short(interest_amt), None)],
         dlg=dlg(f"{name}'s share of federal interest", i_method,
@@ -239,11 +250,22 @@ def section(R, place, now, tile_html, page_url, img):
                 f"{_usd0(share_i)} for FY{interest_fy}")))
     usa = doc["usaspending"]
     usa_url = f"https://www.usaspending.gov/state/{slug}/2026"
+    gross = usa.get("states_gross_cents", {}).get(slug)
+    medicare = usa.get("states_medicare_cents", {}).get(slug, 0)
+    excluded = usa.get("states_excluded_cents", {}).get(slug, 0)
+    med_share = (medicare / gross) if gross else 0
     a_method = (f"Prime-award transaction amounts with a place of performance in {name}, "
                 f"FY{usa['fiscal_year']} ({_date(usa['start'])}–{_date(usa['end'])}), "
                 f"as reported by USAspending on {_date(usa['pulled'])}. "
+                f"Excludes Medicare fee-for-service (CFDA 93.770, 93.773, 93.774) and Social Security benefit payments "
+                f"(CFDA 96.001, 96.002, 96.004, 96.006, 96.007). "
+                f"USAspending books many of those payments to a contractor's place of performance, not to where beneficiaries live. "
+                f"Federal salaries are mostly not in this total. Grants and contracts performed in the state are included. "
                 f"Per resident uses the July 1, 2025 Census estimate, not USAspending's population. "
-                f"Not most federal salaries, and not a resident's benefit check. Late reports can still change it.")
+                f"Late reports can still change it.")
+    if gross and med_share >= 0.25:
+        a_method += (f" Medicare fee-for-service alone is {med_share:.0%} of the unfiltered place-of-performance total "
+                     f"({_usd0(gross / 100)} before the exclusion, {_usd0(excluded / 100)} excluded).")
     tiles.append(tile_html(
         "fed_awards", f"Federal awards in {name}, FY{usa['fiscal_year']}", _usd0(awards), "var(--blue)",
         fix(f"FY{usa['fiscal_year']}"), "does not tick",
@@ -270,21 +292,26 @@ def section(R, place, now, tile_html, page_url, img):
         f'<section id="federal"><div class="sh"><span class="bar" style="background:var(--red)"></span>'
         f'<h2>Federal debt in {E(name)}</h2><span class="h2n">Updated {_date(debt["as_of"])}</span></div>'
         f'<p>{E(name)}\'s share is its Census population times U.S. debt per resident. '
-        f'Per resident, states match. Not {E(plain)} government debt. Debt figures tick. The rest do not. {E(rank)}</p>'
+        f'Per resident, states match the official Census basis and that figure does not tick. '
+        f'The dollar share of the federal debt ticks. The rest do not. Not {E(plain)} government debt. {E(rank)}</p>'
         '<div class="grid dense">',
         "".join(tiles),
         '</div>'
         f'<p class="src"><a href="{DEBT_URL}" rel="noopener">Debt to the Penny</a>, {E(as_of)}. '
         f'<a href="{E(place["population"]["source_url"])}" rel="noopener">Census Vintage 2025</a>, {_date(ctx["pop_as_of"])}. '
-        f'<a href="{INTEREST_URL}" rel="noopener">Interest expense</a>, FY{E(interest_fy)} ended {_date(interest_asof)}, U.S. total {_usd0(interest_amt)}. '
+        f'<a href="{INTEREST_URL}" rel="noopener">Gross interest expense</a>, FY{E(interest_fy)} ended {_date(interest_asof)}, U.S. total {_usd0(interest_amt)}. '
         f'<a href="{E(usa_url)}" rel="noopener">USAspending</a> FY{usa["fiscal_year"]} awards performed in {E(name)}, pulled {_date(usa["pulled"])} CT. '
-        f'Not most salaries or benefit checks.</p>'
+        f'Excludes Medicare fee-for-service (CFDA 93.770, 93.773, 93.774) and Social Security benefit payments '
+        f'(CFDA 96.001, 96.002, 96.004, 96.006, 96.007). '
+        f'Federal salaries are mostly not in this total.'
+        + (f' Medicare fee-for-service is booked to a contractor\'s place of performance in {E(name)} and is excluded here ({med_share:.0%} of the unfiltered total).' if gross and med_share >= 0.25 else "")
+        + '</p>'
         f'<h3>If the debt-limit X-date hits</h3>'
         f'<p>The X-date is when Treasury expects to run short of cash. <a href="../../debt-limit/">Debt limit and the X-date</a>.</p><ul>'
         f'<li><b>{ssa_n:,}</b> Social Security beneficiaries, {E(ssa["label"])}. '
         f'<a href="{E(ssa["source_url"])}" rel="noopener" title="{E(ssa["source_name"])}">SSA Table 2</a>.</li>'
         f'<li><b>{opm_n:,}</b> federal civilian employees, {E(opm["label"])}'
-        f'{" (preliminary)" if opm.get("preliminary") else ""}. No Postal Service or intelligence agencies.{opm_note} '
+        f'{" (preliminary)" if opm.get("preliminary") else ""}, dated before the 2025 workforce cuts. No Postal Service or intelligence agencies.{opm_note} '
         f'{opm["redacted"]:,} redacted, in no state. '
         f'<a href="{E(opm["source_url"])}" rel="noopener" title="{E(opm["source_name"])}">OPM FedScope</a>.</li>'
         f'<li><b>{mil_n:,}</b> active duty, {E(mil["label"])}. Not Guard or reserve. Not all who are deployed. '
@@ -328,7 +355,7 @@ def check(R):
             if bit not in text:
                 missing.append(f"{slug}: missing {bit[:80]}")
         # Yearly figures must not tick. The two debt figures must.
-        for tid, should_tick in (("t-fed_pp", True), ("t-fed_share", True), ("t-fed_interest", False), ("t-fed_awards", False)):
+        for tid, should_tick in (("t-fed_pp", False), ("t-fed_share", True), ("t-fed_interest", False), ("t-fed_awards", False)):
             start = text.find(f'id="{tid}"')
             chunk = text[start:start + 400]
             has_rate = "data-r=" in chunk

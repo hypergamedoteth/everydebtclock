@@ -128,5 +128,8 @@
  ],
  "iso3": "NOR",
  "source_tier": "harmonized",
- "world_measure": "General government, gross"
+ "world_measure": "General government, gross",
+ "hold_trend": true,
+ "hold_why": "Eurostat's latest quarters swing from kr2,996.1 billion (Dec 2025) to kr2,711.0 billion (Mar 2026) to kr3,427.4 billion (Jun 2026), and the stock is more than 25% above the IMF end-2026 figure, so a straight line from that jump is not a defensible trend",
+ "imf_explain": "Eurostat's Maastricht stock includes a large loan component, so it sits above the IMF general-government estimate. Both figures are general government. This page shows the official quarter-end stock and does not tick that gap forward."
 }

@@ -43,20 +43,16 @@
    "key": "cgdebt",
    "label": "Egypt budget sector debt",
    "short": "Budget sector debt",
-   "value": 17850712000000,
-   "as_of": "2026-03-31",
-   "prior_value": 14686262000000,
-   "prior_as_of": "2025-03-31",
+   "value": 17633900000000,
+   "as_of": "2026-06-30",
+   "prior_value": 14964314000000,
+   "prior_as_of": "2025-06-30",
    "source_name": "Ministry of Finance of Egypt, Budget Sector Statistical Debt Bulletin, Total Budget Sector Debt Outstanding, EGP million",
-   "source_url": "https://media.mof.gov.eg/mof-prd/Budget_Sector_Statistical_Debt_Bulletin_March_2026_d781c16aad.pdf",
+   "source_url": "https://media.mof.gov.eg/mof-prd/Budget_Sector_Statistical_Debt_Bulletin_June_2026_bcbe8594d4.pdf",
    "source_locator": "Quarterly bulletin PDF, rows Total Budget Sector Debt Outstanding, Total Domestic Budget Sector Debt, Total External Budget Sector Debt",
    "includes": "State budget sector debt in pounds, domestic and external, gross. Excludes economic public authorities, state-owned companies and the Central Bank.",
    "facts": [],
    "history": [
-    [
-     "2025-03-31",
-     14686262000000
-    ],
     [
      "2025-06-30",
      14964314000000
@@ -72,17 +68,21 @@
     [
      "2026-03-31",
      17850712000000
+    ],
+    [
+     "2026-06-30",
+     17633900000000
     ]
    ],
    "breakdown": [
     {
      "label": "Domestic budget sector debt (includes foreign-currency debt owed to Egyptian residents)",
-     "value": 13675849000000,
+     "value": 13890400000000,
      "group": "Domestic"
     },
     {
      "label": "External budget sector debt (foreign-currency debt held by non-residents)",
-     "value": 4174863000000,
+     "value": 3743500000000,
      "group": "External"
     }
    ]

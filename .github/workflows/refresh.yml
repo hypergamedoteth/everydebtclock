@@ -2,16 +2,16 @@ name: Refresh data and deploy
 
 on:
   schedule:
-    # Cron is UTC. Times below are CDT (UTC-5, until Nov 1, 2026) / CST (UTC-6, after). GitHub can start scheduled runs late.
-    # 11:30 UTC daily = 6:30 AM CDT / 5:30 AM CST: full morning recalibration (Census, BEA, MTS, OMB, Canada, Mexico, Singapore, UK). Always runs.
+    # Cron is UTC. America/Chicago is CST (UTC-6) from November through the second Sunday in March, then CDT (UTC-5). GitHub can start scheduled runs late.
+    # 11:30 UTC daily = 5:30 AM CST / 6:30 AM CDT: full morning recalibration (Census, BEA, MTS, OMB, Canada, Mexico, Singapore, UK). Always runs.
     - cron: "30 11 * * *"
     # Weekday checks every 15 min, 19:00-21:00 UTC = 2:00-4:00 PM CDT / 1:00-3:00 PM CST, so Treasury's afternoon
     # Debt to the Penny release reaches the site before the ~3:45 PM CT X post. Each check fetches + deploys only if
     # Treasury has a newer record_date than the committed data; otherwise it ends green with no commit or deploy.
     - cron: "*/15 19-20 * * 1-5"
     - cron: "0 21 * * 1-5"
-    # Backup checks at 3:30 PM CT, in case GitHub starts or skips the checks above late: 20:30 UTC = 3:30 PM CDT (until Nov 1, 2026),
-    # 21:30 UTC = 3:30 PM CST (after). Gated like the other checks: no new Treasury record means no fetch, commit or deploy.
+    # Backup checks at 3:30 PM CT, in case GitHub starts or skips the checks above late: 21:30 UTC = 3:30 PM CST,
+    # and 20:30 UTC = 3:30 PM CDT while daylight time is in effect. Gated like the other checks: no new Treasury record means no fetch, commit or deploy.
     - cron: "30 20 * * 1-5"
     - cron: "30 21 * * 1-5"
     # 21:45 UTC weekdays = 4:45 PM CDT / 3:45 PM CST: full end-of-day refresh (also picks up late DTS tables). Always runs.
@@ -80,60 +80,69 @@ jobs:
         if: github.event_name != 'push'
         run: |
           python3 pipeline/fetch.py
+          # Each country fetcher is optional and must not hang the 20-minute job. 90s, then keep the last good file.
+          run_fetch() {
+            local label="$1"
+            shift
+            if timeout 90 "$@"; then
+              return 0
+            fi
+            echo "$label fetch skipped"
+          }
           # Canada: re-base places/canada.json to the Bank of Canada's latest month-end figure (Valet API, keyless). Never fails the run.
-          python3 pipeline/fetch_canada.py || echo "canada fetch skipped"
+          run_fetch canada python3 pipeline/fetch_canada.py
           # Mexico: Banco de Mexico SIE table CG7 (net public sector debt, keyless CSV export). Never fails the run.
-          python3 pipeline/fetch_mexico.py || echo "mexico fetch skipped"
+          run_fetch "mexico" python3 pipeline/fetch_mexico.py
           # Singapore: SingStat Table Builder M130181 (Total Government Debt, quarterly; AGD and MAS data). Never fails the run.
-          python3 pipeline/fetch_singapore.py || echo "singapore fetch skipped"
+          run_fetch "singapore" python3 pipeline/fetch_singapore.py
           # United Kingdom: ONS public sector finances series BKPX / HF6W / CPPH (keyless JSON). Never fails the run.
-          python3 pipeline/fetch_united_kingdom.py || echo "united-kingdom fetch skipped"
+          run_fetch "united-kingdom" python3 pipeline/fetch_united_kingdom.py
           # Germany, France, Italy, Spain, Netherlands, Belgium, Austria, Ireland, Poland, Sweden, Denmark, Czechia, Romania, Portugal, Finland, Hungary: Eurostat gov_10q_ggdebt (central government Maastricht debt, quarterly) and demo_pjan. Never fails the run.
-          python3 pipeline/fetch_eurostat.py || echo "eurostat fetch skipped"
+          run_fetch "eurostat" python3 pipeline/fetch_eurostat.py
           # Japan: Ministry of Finance Central Government Debt pages (quarterly). Never fails the run.
-          python3 pipeline/fetch_japan.py || echo "japan fetch skipped"
+          run_fetch "japan" python3 pipeline/fetch_japan.py
           # China: Ministry of Finance Central Government Operations And Debt PDF (SDDS, quarterly; needs pdftotext). Never fails the run.
-          python3 pipeline/fetch_china.py || echo "china fetch skipped"
+          run_fetch "china" python3 pipeline/fetch_china.py
           # India: DEA Quarterly Report on Public Debt Management PDFs (needs pdftotext). Falls back to the committed figure. Never fails the run.
-          python3 pipeline/fetch_india.py || echo "india fetch skipped"
+          run_fetch "india" python3 pipeline/fetch_india.py
           # Russia: Minfin internal debt page (monthly). Falls back to the committed figure. Never fails the run.
-          python3 pipeline/fetch_russia.py || echo "russia fetch skipped"
+          run_fetch "russia" python3 pipeline/fetch_russia.py
           # Brazil: Banco Central do Brasil SGS 13761 / 13762 (DBGG, monthly). Never fails the run.
-          python3 pipeline/fetch_brazil.py || echo "brazil fetch skipped"
+          run_fetch "brazil" python3 pipeline/fetch_brazil.py
           # Batch 3 (Spain, Netherlands, Belgium, Austria, Ireland, Poland, Sweden are in fetch_eurostat.py above)
           # Turkey: Ministry of Treasury and Finance monthly central government debt stock release. Never fails the run.
-          python3 pipeline/fetch_turkey.py || echo "turkey fetch skipped"
+          run_fetch "turkey" python3 pipeline/fetch_turkey.py
           # Switzerland: Federal Finance Administration GFS quarterly workbooks. Never fails the run.
-          python3 pipeline/fetch_switzerland.py || echo "switzerland fetch skipped"
+          run_fetch "switzerland" python3 pipeline/fetch_switzerland.py
           # Taiwan: National Treasury Administration open dataset D3-12F (weekly). Never fails the run.
-          python3 pipeline/fetch_taiwan.py || echo "taiwan fetch skipped"
+          run_fetch "taiwan" python3 pipeline/fetch_taiwan.py
           # South Korea: Ministry of Planning and Budget Monthly Fiscal Trends PDF (needs pypdf). Never fails the run.
-          python3 pipeline/fetch_korea.py || echo "south-korea fetch skipped"
+          run_fetch "south-korea" python3 pipeline/fetch_korea.py
           # Australia: AOFM Data Hub portfolio aggregate workbook (monthly). Never fails the run.
-          python3 pipeline/fetch_australia.py || echo "australia fetch skipped"
+          run_fetch "australia" python3 pipeline/fetch_australia.py
           # Indonesia: DJPPR home page debt position (quarterly). Never fails the run.
-          python3 pipeline/fetch_indonesia.py || echo "indonesia fetch skipped"
+          run_fetch "indonesia" python3 pipeline/fetch_indonesia.py
           # Saudi Arabia: National Debt Management Center Reports & Statistics (quarterly). Never fails the run.
-          python3 pipeline/fetch_saudi_arabia.py || echo "saudi-arabia fetch skipped"
-          python3 pipeline/fetch_qatar.py || echo "qatar fetch skipped"
-          python3 pipeline/fetch_nigeria.py || echo "nigeria fetch skipped"
-          python3 pipeline/fetch_ghana.py || echo "ghana fetch skipped"
-          python3 pipeline/fetch_argentina.py || echo "argentina fetch skipped"
-          python3 pipeline/fetch_malaysia.py || echo "malaysia fetch skipped"
-          python3 pipeline/fetch_peru.py || echo "peru fetch skipped"
-          python3 pipeline/fetch_chile.py || echo "chile fetch skipped"
-          python3 pipeline/fetch_thailand.py || echo "thailand fetch skipped"
-          python3 pipeline/fetch_bangladesh.py || echo "bangladesh fetch skipped"
-          python3 pipeline/fetch_kenya.py || echo "kenya fetch skipped"
-          python3 pipeline/fetch_egypt.py || echo "egypt fetch skipped"
-          python3 pipeline/fetch_south_africa.py || echo "south-africa fetch skipped"
+          run_fetch "saudi-arabia" python3 pipeline/fetch_saudi_arabia.py
+          run_fetch "qatar" python3 pipeline/fetch_qatar.py
+          run_fetch "nigeria" python3 pipeline/fetch_nigeria.py
+          run_fetch "ghana" python3 pipeline/fetch_ghana.py
+          run_fetch "argentina" python3 pipeline/fetch_argentina.py
+          run_fetch "malaysia" python3 pipeline/fetch_malaysia.py
+          run_fetch "peru" python3 pipeline/fetch_peru.py
+          run_fetch "chile" python3 pipeline/fetch_chile.py
+          run_fetch "thailand" python3 pipeline/fetch_thailand.py
+          run_fetch "bangladesh" python3 pipeline/fetch_bangladesh.py
+          run_fetch "kenya" python3 pipeline/fetch_kenya.py
+          run_fetch "egypt" python3 pipeline/fetch_egypt.py
+          run_fetch "south-africa" python3 pipeline/fetch_south_africa.py
           # World Debt Clock inputs: ECB + Bank of Russia daily FX, IMF WEO GDP weights, and the IMF general-government debt panel
           # (GGXWDG_NGDP x NGDPD -> data/world_weo_debt.json). Keeps the last good file on any failure. Never fails the run.
-          python3 pipeline/fetch_world.py || echo "world fetch skipped"
+          run_fetch "world" python3 pipeline/fetch_world.py
           # Quarterly public-sector debt (World Bank / IMF QPSD, keyless). Keeps the last good file on failure.
-          python3 pipeline/fetch_qpsd.py || echo "qpsd fetch skipped"
+          run_fetch "qpsd" python3 pipeline/fetch_qpsd.py
           # BEA current-dollar GDP by state (SAGDP2). Used for debt-to-GDP on the state pages. Keeps the last file on failure.
-          python3 pipeline/fetch_state_gdp.py || echo "state gdp fetch skipped"
+          run_fetch "state gdp" python3 pipeline/fetch_state_gdp.py
 
       - name: Build site
         env:
@@ -145,6 +154,9 @@ jobs:
 
       - name: Check the best-source world debt clock
         run: python3 pipeline/check_world.py
+
+      - name: Check accuracy guards
+        run: python3 pipeline/check_guards.py
 
       - name: Guard against placeholder URLs
         run: |
@@ -161,7 +173,17 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A data cache places
           git diff --cached --quiet || git commit -m "data: refresh $(date -u +%Y-%m-%dT%H:%MZ)"
-          git push
+          # The build leaves generated pages unstaged. Stash them so rebase can run, then restore them for the deploy.
+          stashed=0
+          if ! git diff --quiet; then
+            git stash push -m "refresh-build-output"
+            stashed=1
+          fi
+          git pull --rebase origin main
+          git push || { git pull --rebase origin main && git push; }
+          if [ "$stashed" = 1 ]; then
+            git stash pop
+          fi
 
       - uses: actions/configure-pages@v5
 
@@ -182,6 +204,11 @@ jobs:
           path: _site
 
       - id: deploy
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: Retry deploy-pages once
+        if: steps.deploy.outcome == 'failure'
         uses: actions/deploy-pages@v4
 
       # Bing (Copilot and ChatGPT search) recrawls URLs whose figures changed: the homepage,

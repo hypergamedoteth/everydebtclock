@@ -1,0 +1,23 @@
+name: Alert cancelled refresh
+
+# A scheduled refresh that is cancelled (a hung country fetch used to hit the 20-minute job limit)
+# does not email anyone by itself. This workflow fails when that happens so GitHub notifies the owner.
+# It does not change the refresh-deploy concurrency group.
+on:
+  workflow_run:
+    workflows: ["Refresh data and deploy"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  alert:
+    if: github.event.workflow_run.conclusion == 'cancelled' && github.event.workflow_run.event == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Scheduled refresh was cancelled
+        run: |
+          echo "::error::Scheduled refresh was cancelled: ${{ github.event.workflow_run.html_url }}"
+          exit 1

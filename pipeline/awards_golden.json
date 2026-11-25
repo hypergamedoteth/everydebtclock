@@ -1,0 +1,10 @@
+{
+ "north-dakota": {
+  "cents": 631687484772,
+  "medicare_share_min": 0.5
+ },
+ "minnesota": {
+  "cents": 3191169470423,
+  "medicare_share_min": 0.5
+ }
+}

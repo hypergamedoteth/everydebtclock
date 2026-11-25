@@ -41,6 +41,9 @@ jobs:
       - name: Check the best-source world debt clock
         run: python3 pipeline/check_world.py
 
+      - name: Check accuracy guards
+        run: python3 pipeline/check_guards.py
+
       - name: Guard against placeholder URLs
         run: |
           if grep -rIlE "example[.]com" --exclude-dir=.git --exclude-dir=.github . ; then

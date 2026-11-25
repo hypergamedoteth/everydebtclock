@@ -148,5 +148,6 @@
  ],
  "iso3": "BGR",
  "source_tier": "harmonized",
- "world_measure": "General government, gross"
+ "world_measure": "General government, gross",
+ "imf_explain": "Both figures are general government gross debt. This page uses Eurostat's latest Maastricht quarter, at nominal value. The IMF figure is an end-2026 estimate, so the two are not the same ledger and are not expected to match."
 }
