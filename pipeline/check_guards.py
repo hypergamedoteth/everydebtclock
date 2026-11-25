@@ -3,10 +3,12 @@
 
 Each check matches a fix: awards filter, stale clocks, Norway's hold, the IMF gap
 note, one per-person basis, visible Census sampling error, projection copy, and labels.
+A held clock (stale, fixed, or no rate) must not say that it projects or ticks.
 """
 import html
 import json
 import os
+import re
 import sys
 import urllib.request
 
@@ -212,6 +214,50 @@ def check_sampling_and_copy(places_api):
             fail(f"{p['slug']}: OPM federal civilian count is not dated before the 2025 workforce cuts")
 
 
+def held_page_text(raw):
+    """Visible copy plus attribute text. Scripts, styles, and the IMF comparison profile are set aside."""
+    raw = re.sub(r'<section[^>]*\bid="profile"[\s\S]*?</section>', " ", raw)
+    raw = re.sub(r"<script\b[^>]*>.*?</script>", " ", raw, flags=re.S | re.I)
+    raw = re.sub(r"<style\b[^>]*>.*?</style>", " ", raw, flags=re.S | re.I)
+    text = html.unescape(re.sub(r"<[^>]+>", " ", raw))
+    return re.sub(r"\s+", " ", text)
+
+
+def check_held_copy():
+    """A held clock must not say it projects or ticks. The world table must say which rows are held."""
+    for fn in sorted(os.listdir(os.path.join(ROOT, "places"))):
+        if not fn.endswith(".json"):
+            continue
+        place = json.load(open(os.path.join(ROOT, "places", fn), encoding="utf-8"))
+        if place.get("status") != "live":
+            continue
+        if places_build.calc(place)["rate"]:
+            continue
+        sec = "states" if place.get("kind") == "state" else "countries"
+        raw = page(f"{sec}/{place['slug']}/index.html")
+        if not raw:
+            continue
+        hits = places_build.projection_claims(held_page_text(raw))
+        if hits:
+            fail(f"{place['slug']}: held clock still says it projects or ticks ({hits[0]})")
+        embed = f"embed/{sec}/{place['slug']}/index.html"
+        embed_raw = page(embed) if os.path.exists(os.path.join(ROOT, embed)) else ""
+        embed_hits = places_build.projection_claims(held_page_text(embed_raw)) if embed_raw else []
+        if embed_hits:
+            fail(f"{place['slug']}: held embed still says it projects or ticks ({embed_hits[0]})")
+    world_path = os.path.join(ROOT, "api", "world.json")
+    if not os.path.exists(world_path):
+        fail("api/world.json is missing")
+        return
+    world = json.load(open(world_path, encoding="utf-8"))
+    fixed = [r for r in (world.get("countries") or []) if r.get("trend") == "fixed"]
+    if not fixed:
+        return
+    html_world = page("world/index.html")
+    if "held fixed at the last official value" not in html_world or "not projected" not in html_world:
+        fail("world table has held rows but does not say they stay fixed and are not projected")
+
+
 def check_egypt_source():
     import fetch_egypt
     import fetch_taiwan
@@ -242,6 +288,7 @@ def main():
     check_imf_explain()
     check_per_person()
     check_sampling_and_copy(places_api)
+    check_held_copy()
     check_egypt_source()
     if ERRORS:
         print(f"check_guards: {len(ERRORS)} failure(s)", file=sys.stderr)
