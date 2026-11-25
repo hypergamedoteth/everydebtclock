@@ -88,7 +88,7 @@ def build(ctx):
 
     checked = fdate(measures["checked"])
     h1_plain, h1_html = ctx["quotable"].asof_pair(
-        "Treasury has not posted an X-date for the current debt limit",
+        "Treasury has not posted an X-date for the current debt ceiling",
         checked,
         [("U.S. Department of the Treasury", debt_limit.TREASURY_PAGE)],
     )
@@ -106,22 +106,46 @@ def build(ctx):
 var b=+H.dataset.b,r=+H.dataset.r,t0=+H.dataset.t,nf=new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 function go(){var x=b+r*(Date.now()/1000-t0);v.textContent=(x<0?'−$':'$')+nf.format(Math.abs(x));requestAnimationFrame(go)}go()})();</script>"""
 
-    record = fdate(summary["as_of"]) if summary else ""
-    if summary and summary["status"] == "suspended":
-        status_p = (f"<p class=\"status\"><b>Suspended, as printed.</b> The Statutory Debt Limit line on the {E(record)} statement is "
-                    f"{usd0(summary['limit_reported'])}. There is no separate ticker for that line. "
-                    f"<a href=\"{debt_limit.DSL_URL}\" rel=\"noopener\">Daily Treasury Statement, Table III-C</a>.</p>")
-    elif summary and summary["status"] == "unreported":
-        status_p = (f"<p class=\"status\"><b>No dollar ceiling on the {E(record)} statement.</b> Table III-C has no Statutory Debt Limit amount. "
-                    f"<a href=\"{debt_limit.DSL_URL}\" rel=\"noopener\">Daily Treasury Statement, Table III-C</a>.</p>")
-    elif summary and summary["status"] == "ambiguous":
-        status_p = (f"<p class=\"status\"><b>Ambiguous on {E(record)}.</b> The limit lines on this statement do not agree. "
-                    f"The tickers are not used while that is true. <a href=\"{debt_limit.DSL_URL}\" rel=\"noopener\">Daily Treasury Statement, Table III-C</a>.</p>")
-    elif summary:
-        status_p = (f"<p class=\"status\"><b>Limit in force</b> on the {E(record)} statement. Treasury printed one dollar ceiling. "
-                    "The live figures are the tickers linked here.</p>")
+    feed_path = os.path.join(R, "api", "daily.json")
+    feed = json.load(open(feed_path, encoding="utf-8")) if os.path.exists(feed_path) else {}
+    status = feed.get("debt_limit_reported_status")
+    dts = feed.get("dts_record_date")
+    subject_n = feed.get("debt_subject_to_limit")
+    ceiling_n = feed.get("statutory_limit")
+    headroom_n = feed.get("debt_limit_headroom")
+    measures_label = feed.get("extraordinary_measures")
+    record = fdate(dts) if dts else ""
+
+    def shown(v):
+        return usd0(v) if isinstance(v, (int, float)) else None
+
+    status_words = {
+        "in_force": "in force",
+        "suspended": "suspended",
+        "unreported": "not reported on the statement",
+        "ambiguous": "ambiguous",
+    }
+    if status in status_words and record:
+        status_p = (f"<p class=\"status\"><b>Debt ceiling status: {E(status_words[status])}.</b> "
+                    f"The daily feed field debt_limit_reported_status is {E(status)} for the {E(record)} Daily Treasury Statement. "
+                    f"<a href=\"{debt_limit.DSL_URL}\" rel=\"noopener\">Table III-C</a>.</p>")
+    elif status:
+        status_p = (f"<p class=\"status\"><b>Reported status: {E(str(status))}.</b> "
+                    f"This page does not turn that value into a debt-ceiling claim. "
+                    f"<a href=\"{debt_limit.DSL_URL}\" rel=\"noopener\">Table III-C</a>.</p>")
     else:
-        status_p = "<p class=\"status\"><b>The Daily Treasury Statement table is not in this build.</b></p>"
+        status_p = "<p class=\"status\"><b>The daily feed has no debt_limit_reported_status.</b> No debt ceiling is stated from it.</p>"
+
+    figure_rows = []
+    if record:
+        figure_rows.append(f"<li>Daily Treasury Statement date: {E(record)}.</li>")
+    figure_rows.append(f"<li>Statutory limit, the debt ceiling: {shown(ceiling_n) if shown(ceiling_n) else 'not in this feed, so no dollar ceiling is shown'}.</li>")
+    figure_rows.append(f"<li>Debt subject to the limit: {shown(subject_n) if shown(subject_n) else 'not in this feed'}.</li>")
+    figure_rows.append(f"<li>Headroom: {shown(headroom_n) if shown(headroom_n) else 'not in this feed'}.</li>")
+    figures = ("<ul class=\"lean\">" + "".join(figure_rows) + "</ul>"
+               f"<p>Those lines are the fields in <a href=\"../api/daily.json\">/api/daily.json</a> "
+               f"(statutory_limit, debt_subject_to_limit, debt_limit_headroom, dts_record_date). "
+               f"Source: <a href=\"{debt_limit.DSL_URL}\" rel=\"noopener\">Daily Treasury Statement, Table III-C</a>.</p>")
 
     links = f"""<ul class="lean">
 <li><a href="../t/debt_subject_limit.html">Debt subject to the limit</a>, the live ticker.</li>
@@ -130,15 +154,15 @@ function go(){var x=b+r*(Date.now()/1000-t0);v.textContent=(x<0?'−$':'$')+nf.f
 <li><a href="../41-trillion/">$41 trillion countdown</a>. That page has the projection for when the ceiling would bind, from the same debt-subject-to-limit trend.</li>
 <li><a href="../how-much-is-the-national-debt/">How much is the national debt?</a></li>
 </ul>
-<p>Those pages already show the dollars. This page does not copy them.</p>"""
+<p>The tickers move between statements. The amounts above are the statement figures in the feed.</p>"""
 
-    if measures["in_use"] and measures.get("announcement"):
-        em_html = (f"<p class=\"status\"><b>In use.</b> Treasury has announced extraordinary measures. "
-                   f"<a href=\"{E(measures['announcement'])}\" rel=\"noopener\">Announcement</a>.</p>")
+    label = measures_label.strip() if isinstance(measures_label, str) else ""
+    if label:
+        em_html = (f"<p class=\"status\"><b>{E(label)}.</b> That is the extraordinary_measures value in the daily feed, checked {E(checked)}. "
+                   f"Source: <a href=\"{measures['page']}\" rel=\"noopener\">U.S. Treasury, Debt Limit</a>.</p>")
     else:
-        em_html = (f"<p class=\"status\"><b>Not in use.</b> Treasury's debt-limit page lists no extraordinary-measures announcement after the "
-                   f"debt issuance suspension period that ended July 4, 2025. Checked {E(checked)}. "
-                   f"This line stays \"not in use\" until <a href=\"{measures['page']}\" rel=\"noopener\">that page</a> lists a new announcement.</p>")
+        em_html = (f"<p class=\"status\"><b>Not reported by the feed.</b> extraordinary_measures is empty, so this page does not say whether extraordinary measures are in use. "
+                   f"Checked {E(checked)}. <a href=\"{measures['page']}\" rel=\"noopener\">U.S. Treasury, Debt Limit</a>.</p>")
     em_html += (f"<p>Extraordinary measures are accounting steps Treasury can take after the limit binds, so it can keep paying bills for a while without new borrowing. "
                 f"The January 17, 2025 description lists the Civil Service Retirement and Disability Fund, the Postal Service Retiree Health Benefits Fund, "
                 f"the G Fund, the Exchange Stabilization Fund, a pause in State and Local Government Series sales, and a Federal Financing Bank swap. "
@@ -173,8 +197,8 @@ function go(){var x=b+r*(Date.now()/1000-t0);v.textContent=(x<0?'−$':'$')+nf.f
             f"<a href=\"{SITE}/debt-limit/\">{SITE.replace('https://', '')}/debt-limit/</a>.</p>"
             f"<p>X-date forecasts: the linked CBO, Bipartisan Policy Center, and National Taxpayers Union pages. "
             f"Whether the limit is in force: <a href=\"{debt_limit.DSL_URL}\" rel=\"noopener\">Daily Treasury Statement Table III-C</a>"
-            + (f", record date {E(summary['as_of'])}." if summary else ".")
-            + " The dollar figures are on the linked tickers.</p></aside>")
+            + (f", record date {E(dts)}." if dts else ".")
+            + " The debt-ceiling amounts on this page are the daily.json fields from that statement.</p></aside>")
 
     faqs = [
         (
@@ -190,13 +214,23 @@ function go(){var x=b+r*(Date.now()/1000-t0);v.textContent=(x<0?'−$':'$')+nf.f
         ),
         (
             "Are extraordinary measures in use?",
-            "Not in use. Treasury's debt-limit page lists no extraordinary-measures announcement after the debt issuance suspension period that ended July 4, 2025. "
-            "Source: U.S. Department of the Treasury." if not measures["in_use"] else
-            "Treasury has announced that extraordinary measures are in use. Source: U.S. Department of the Treasury.",
+            (f"The daily feed says extraordinary measures are {label}, as of {checked}. Source: U.S. Department of the Treasury."
+             if label else
+             f"The daily feed does not say whether extraordinary measures are in use, as of {checked}. This page does not fill that in. Source: U.S. Department of the Treasury."),
         ),
         (
-            "Where are the live debt-limit figures?",
-            "On the tickers for the statutory limit, debt subject to the limit, and room left under the limit, and on the $41 trillion countdown, which includes when this site projects the ceiling would bind. This page links to those and does not repeat the dollars.",
+            "What is the debt ceiling right now?",
+            (
+                (f"As of {record}, " if record else "")
+                + " ".join(p for p in (
+                    f"the statutory limit, the debt ceiling, is {shown(ceiling_n)}." if shown(ceiling_n) else "",
+                    f"Debt subject to the limit is {shown(subject_n)}." if shown(subject_n) else "",
+                    f"Headroom is {shown(headroom_n)}." if shown(headroom_n) else "",
+                ) if p)
+                + " Source: U.S. Treasury, Daily Treasury Statement Table III-C."
+            ).strip()
+            if shown(ceiling_n) or shown(subject_n) or shown(headroom_n) else
+            "The daily feed does not include a debt-ceiling dollar amount for this build, so none is stated. Source: U.S. Treasury, Daily Treasury Statement Table III-C.",
         ),
         (
             "What happens if the X-date hits?",
@@ -208,15 +242,11 @@ function go(){var x=b+r*(Date.now()/1000-t0);v.textContent=(x<0?'−$':'$')+nf.f
     if not 3 <= len(faqs) <= 6:
         raise SystemExit(f"debt-limit FAQ has {len(faqs)} questions")
 
-    # Guard: the hub must not restate the ticker bases. The countdown page owns that projection.
-    body_check_later = []
-    if summary and summary.get("status") == "in_force":
-        body_check_later = [usd0(summary["subject"]), usd0(summary["limit"]), usd0(summary["headroom"])]
-
     body = f"""<style>{PAGE_STYLE}</style>
 <p class="answer">{answer}</p>
-<h2>Live figures</h2>
+<h2>Debt ceiling</h2>
 {status_p}
+{figures}
 {links}
 <h2>X-date forecasts</h2>
 <p>Only forecasts read at the linked page are listed.</p>
@@ -229,14 +259,11 @@ function go(){var x=b+r*(Date.now()/1000-t0);v.textContent=(x<0?'−$':'$')+nf.f
 {episodes}
 {cite}
 {tick}"""
-    for banned in body_check_later:
-        if banned in body:
-            raise SystemExit("debt-limit page repeats a ticker figure: " + banned)
 
     answer_page(
         "debt-limit",
-        "US X-Date and the Debt Limit",
-        "X-date forecasts from CBO, the Bipartisan Policy Center, and the National Taxpayers Union. Extraordinary measures are not in use. Live limit and headroom figures are linked, not repeated.",
+        "US Debt Ceiling and the Debt Limit",
+        "The debt ceiling: statutory limit, debt subject to the limit, and headroom from the Daily Treasury Statement, plus X-date forecasts. Extraordinary measures follow the daily feed.",
         h1_plain,
         body,
         faqs=faqs,

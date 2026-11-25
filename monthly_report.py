@@ -150,7 +150,9 @@ def compute(R):
 
 def lastmods(R, today=None):
     """Sitemap dates: the month's last Debt to the Penny close, which is not after today."""
-    today = today or dt.date.today()
+    if today is None:
+        import clocktime
+        today = clocktime.chicago_today()
     out = {}
     try:
         months = compute(R)

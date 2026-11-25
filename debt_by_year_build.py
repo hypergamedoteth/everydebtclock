@@ -456,7 +456,7 @@ def _page(R, SITE, with_analytics, stamp, modified, m, models_all):
              "name": f"{m['name']} debt by year",
              "description": desc, "url": url, "isAccessibleForFree": True,
              "creator": {"@type": "Organization", "name": "Every Debt Clock", "url": SITE + "/"},
-             "dateModified": modified or dt.date.today().isoformat(),
+             "dateModified": modified or __import__("clocktime").chicago_today().isoformat(),
              "spatialCoverage": {"@type": "Place", "name": m["name"]},
              "temporalCoverage": f"{m['y0']}/{m['y1']}",
              "isBasedOn": [u for _, u in m["sources"]],
@@ -464,7 +464,7 @@ def _page(R, SITE, with_analytics, stamp, modified, m, models_all):
              "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json",
                                "contentUrl": f"{SITE}/data/debt_by_year.json"}]}
     ld_faq = {"@context": "https://schema.org", "@type": "FAQPage",
-              "dateModified": modified or dt.date.today().isoformat(),
+              "dateModified": modified or __import__("clocktime").chicago_today().isoformat(),
               "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faqs]}
     if m.get("dc"):
         heads = "<th>Year</th><th>Date</th><th>District debt</th><th>Change</th>"
@@ -613,7 +613,7 @@ def patch_sitemap(R, site, urls):
     if not os.path.exists(path):
         return
     text = open(path).read()
-    lm = (re.search(r"<lastmod>([^<]+)</lastmod>", text) or [None, dt.date.today().isoformat()])[1]
+    lm = (re.search(r"<lastmod>([^<]+)</lastmod>", text) or [None, __import__("clocktime").chicago_today().isoformat()])[1]
     for u in urls:
         if f"<loc>{u}</loc>" in text:
             continue
@@ -687,8 +687,9 @@ def check(R, site):
 
 def main():
     site = os.environ.get("DEBTCLOCK_SITE_URL", "https://everydebtclock.com").rstrip("/")
-    stamp = dt.datetime.now().strftime("%b %-d, %Y")
-    modified = load().get("fetched") or dt.date.today().isoformat()
+    import clocktime
+    stamp = clocktime.chicago_now().strftime("%b %-d, %Y")
+    modified = load().get("fetched") or clocktime.chicago_today().isoformat()
     urls = build(ROOT, site, _analytics(ROOT), stamp, modified)
     patch_clocks(ROOT)
     patch_sitemap(ROOT, site, urls)

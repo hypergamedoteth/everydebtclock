@@ -41,7 +41,7 @@ POP_SOURCES = [
         "id": "vintage-2020",
         "name": "Census Bureau, Vintage 2020 national population estimates, July 1",
         "url": "https://www2.census.gov/programs-surveys/popest/datasets/2010-2020/national/totals/nst-est2020-alldata.csv",
-        "page": "https://www.census.gov/data/tables/time-series/demo/popest/2010s-national-total.html",
+        "page": "https://www.census.gov/programs-surveys/popest/technical-documentation/research/evaluation-estimates/2020-evaluation-estimates/2010s-totals-national.html",
         "years": (2011, 2019),
     },
     {

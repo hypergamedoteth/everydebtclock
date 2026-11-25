@@ -11,6 +11,7 @@ those clocks win.
 import calendar, json, os, sys, time, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
 OUT = os.path.join(ROOT, "data", "world_qpsd.json")
 API = "https://api.worldbank.org/v2/country/all/indicator/{code}?format=json&date=2024Q1:2026Q4&per_page=20000"
 UA = {"User-Agent": "Mozilla/5.0 (compatible; everydebtclock.com data refresh)", "Accept": "application/json"}
@@ -95,7 +96,7 @@ def main():
         "source_url": "https://www.worldbank.org/en/programs/debt-statistics/qpsd",
         "feed": "https://api.worldbank.org/v2/country/all/indicator/DP.DOD.DECT.CR.GG",
         "indicators": INDS,
-        "fetched": time.strftime("%Y-%m-%d", time.gmtime()),
+        "fetched": __import__("clocktime").chicago_today().isoformat(),
         "countries": countries,
     }
     os.makedirs(os.path.dirname(OUT), exist_ok=True)

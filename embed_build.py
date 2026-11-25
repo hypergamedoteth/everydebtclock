@@ -586,7 +586,7 @@ def _patch_sitemap(R, site):
     text = open(path).read()
     if f"{site}/embed/</loc>" in text:
         return
-    lm = (re.search(r"<lastmod>([^<]+)</lastmod>", text) or [None, time.strftime("%Y-%m-%d")])[1]
+    lm = (re.search(r"<lastmod>([^<]+)</lastmod>", text) or [None, __import__("clocktime").chicago_today().isoformat()])[1]
     row = f"<url><loc>{site}/embed/</loc><lastmod>{lm}</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url>\n"
     if "</url>\n" not in text:
         raise RuntimeError("sitemap.xml has no url to insert /embed/ after")

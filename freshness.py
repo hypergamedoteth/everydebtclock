@@ -171,7 +171,9 @@ def _data_date(path, today):
 
 def collect(R, off_d, world=None, today=None):
     """Map a site path ('/states/texas/') to a lastmod string."""
-    today = today or dt.date.today()
+    if today is None:
+        import clocktime
+        today = clocktime.chicago_today()
     out = {}
     debt = parse(off_d, today)
     D = json.load(open(os.path.join(R, "data", "data.json")))

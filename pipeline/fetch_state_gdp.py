@@ -11,10 +11,12 @@ import csv
 import io
 import json
 import os
+import sys
 import time
 import zipfile
 import urllib.request
 from datetime import datetime, timezone
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "data", "state_gdp.json")
@@ -107,7 +109,7 @@ def parse(blob):
         "download_url": ZIP_URL,
         "file_name": name,
         "file_date": file_date,
-        "fetched": datetime.now(timezone.utc).date().isoformat(),
+        "fetched": __import__("clocktime").chicago_today().isoformat(),
         "states_without_2024": no_2024,
         "states": states,
     }

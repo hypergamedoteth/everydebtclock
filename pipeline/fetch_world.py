@@ -18,6 +18,7 @@
 Rule: never invent a number. Each source is fetched and checked on its own; any error, an unreadable or implausible file,
 or a date older than what is stored leaves that file untouched (exit 0 so the rest of the daily run continues)."""
 import csv, glob, io, json, math, os, re, sys, time, unicodedata, urllib.request, datetime as dt
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import xml.etree.ElementTree as ET
 from zoneinfo import ZoneInfo
 
@@ -141,7 +142,7 @@ def imf(year):
     if not all(k in countries for k in ("USA", "CHN", "DEU", "JPN", "IND")): raise RuntimeError("IMF: major economies missing for " + y)
     return {"year": year, "unit": "billions of current US dollars", "world": world, "countries": countries,
             "source": "IMF World Economic Outlook, NGDPD (GDP, current prices, US dollars), DataMapper API", "source_url": "https://www.imf.org/external/datamapper/NGDPD@WEO", "feed": IMF,
-            "fetched": dt.datetime.now(dt.timezone.utc).date().isoformat()}
+            "fetched": __import__("clocktime").chicago_today().isoformat()}
 
 # --- World Government Debt Clock: GGXWDG_NGDP x NGDPD ---------------------------------
 IMF_RATIO = "https://www.imf.org/external/datamapper/api/v1/GGXWDG_NGDP"
@@ -363,7 +364,7 @@ def _assemble(rows, source, world=None):
         "feed_ratio": IMF_RATIO,
         "feed_gdp": IMF_GDP,
         "fallback_feed": WB_WEO,
-        "fetched": dt.datetime.now(dt.timezone.utc).date().isoformat(),
+        "fetched": __import__("clocktime").chicago_today().isoformat(),
         "anchor": ANCHOR,
         "seconds_2026": SECONDS_2026,
         "panel_count": len(economies),
@@ -517,7 +518,7 @@ def refresh_history():
         "population_indicator": "LP", "population_unit": "persons",
         "population_source_url": "https://www.imf.org/external/datamapper/LP@WEO",
         "history_through": 2025, "estimate_year": 2026, "projection_from": 2027,
-        "fetched": dt.datetime.now(dt.timezone.utc).date().isoformat(),
+        "fetched": __import__("clocktime").chicago_today().isoformat(),
         "economies": {code: {"ratio": ratio.get(code) or {}, "population": pop.get(code) or {}} for code in want},
     }
     path = os.path.join(ROOT, "data", "world_weo_history.json")

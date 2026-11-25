@@ -1,6 +1,6 @@
 {
  "_doc": "Live place clocks on everydebtclock.com. value(t) = base + rate * (t - t0), t in Unix seconds; rate 0 = official figure, not projected. url is relative to https://everydebtclock.com/.",
- "generated": "2026-11-22T13:49:49-06:00",
+ "generated": "2026-11-25T13:22:51-06:00",
  "default": "texas",
  "hub": "states/",
  "hub_label": "All state & country debt clocks",
@@ -852,10 +852,10 @@
    "currency": "SGD",
    "sym": "S$",
    "frequency": "quarterly",
-   "base": 1326895100000,
-   "base_date": "2026-06-30",
-   "t0": 1782881999.0,
-   "rate": 1295.208650431253,
+   "base": 1344227300000,
+   "base_date": "2026-09-30",
+   "t0": 1790830799.0,
+   "rate": 1283.2033231862,
    "population": 6208523,
    "publisher": "SingStat (Accountant-General's Department and MAS data)",
    "url": "countries/singapore/"

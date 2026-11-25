@@ -356,7 +356,9 @@ def _recorded_span(dates):
 
 def _stock_sentence(W, today=None):
     """The sum of published stocks. No projection in this sentence."""
-    today = today or dt.date.today()
+    if today is None:
+        import clocktime
+        today = clocktime.chicago_today()
     rows = W["rows"]
     real, imf_years, future_other = [], set(), 0
     for x in rows:
