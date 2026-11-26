@@ -61,7 +61,7 @@ FIP gotcha: requesting a `fields=` subset makes the API collapse identical rows.
 
 **Share and SEO** (build.py):
 - `og/<slug>.png` + `og/home.png` (1200×630, Pillow, DejaVu fonts).
-- Real indexable `t/<slug>.html` pages: snapshot value in the HTML, live ticking via `core.js`, method, source, daily check, related links, canonical, OG/Twitter, JSON-LD Dataset.
+- `t/<slug>.html` pages are noindex snapshots (method, source, daily check, canonical to `/`). They are not in `sitemap.xml`.
 - `index.html` meta block refreshed each build with today's numbers.
 - `sitemap.xml` and `robots.txt`.
 - The modal adds "Post on X" (intent link the visitor clicks) and "Share image".
@@ -78,7 +78,7 @@ FIP gotcha: requesting a `fields=` subset makes the API collapse identical rows.
 Static files only: Cloudflare Pages or GitHub Pages (free), Cloudflare CDN in front. Approx. cost: $0 plus a domain (~$10–15/yr). Treasury APIs are free and keyless.
 
 ## Traffic plan (nothing has been posted)
-- **One URL per ticker** (`/t/<slug>`, 57 today) with its own title/description → long-tail search ("US interest on debt today", "Social Security spending 2027").
+- Ticker URLs (`/t/<slug>.html`) are noindex and left out of the sitemap. Long-tail answers live on the topic pages (`/how-much-is-the-national-debt/`, `/national-debt-per-person/`, and the rest).
 - **Embeds:** `/embed/` lists a paste-in clock for the US, every state and DC, every country, and the world. The snippet is an iframe plus a plain link back. Clock pages are noindex and carry no analytics.
 - **Milestone auto-posts to X** (e.g. debt crosses $40.5T, interest passes defense FYTD): the pipeline can detect crossings and queue a draft post + share image. Needs an approval step; not built and nothing posted.
 - **Daily "debt today" share card** (OG image per ticker), weekly email digest, and a "verified vs Treasury" track record page as the trust differentiator vs usdebtclock.

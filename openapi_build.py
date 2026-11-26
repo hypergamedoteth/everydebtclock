@@ -328,6 +328,8 @@ def write(root, site):
     text = json.dumps(spec, indent=1) + "\n"
     json.loads(text)
     open(os.path.join(root, "openapi.json"), "w", encoding="utf-8").write(text)
+    # /swagger.json is the same document. Crawlers request that name; GitHub Pages has no HTTP redirect.
+    open(os.path.join(root, "swagger.json"), "w", encoding="utf-8").write(text)
     folder = os.path.join(root, ".well-known")
     os.makedirs(folder, exist_ok=True)
     plug = plugin(site)

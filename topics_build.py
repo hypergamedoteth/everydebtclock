@@ -487,7 +487,8 @@ def _president_page(ctx, H):
     body = f"""<div class="tw"><table><tr><th>President</th><th>Term</th><th>Debt at start</th><th>Debt at end</th><th>Change</th><th>Change %</th></tr>{''.join(rows)}</table></div>
 <p>A dash means there are not two different Treasury records to subtract. That happens when the annual series has only one reading in the term, or no record on or before the start. Debt to the Penny's latest row in this extract is {fdate(end['date'])}, {usd2(end['amount'])}.</p>
 {ctx['src']([("Treasury, Debt to the Penny", ctx['DTP']), ("Treasury, Historical Debt Outstanding", H['sources']['debt_outstanding'])])}"""
-    desc = f"US national debt at the start and end of each presidential term. Daily Treasury closes from {fdate(H['series_start']['date'])}; annual Historical Debt Outstanding before that."
+    desc = (f"US national debt by president: {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}, Treasury Debt to the Penny. "
+            f"Start and end of each term from daily closes since {fdate(H['series_start']['date'])}, and annual Historical Debt Outstanding before that.")
     faqs = [
         ("Is this the debt on inauguration day?",
          f"Where Debt to the Penny has a record, yes: the last close on or before the date. Before {fdate(H['series_start']['date'])}, the table uses Treasury's annual Historical Debt Outstanding record on or before the date, which is not inauguration day."),

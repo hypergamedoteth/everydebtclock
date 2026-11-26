@@ -280,6 +280,141 @@ def check_egypt_source():
     fail("Egypt bulletin URLs failed: " + "; ".join(errors))
 
 
+# A URL token ending in an encoded quote. Crawlers that unescape &quot; request that path.
+QUOTE_GLUE = re.compile(
+    r"https?://[^\s<>\"']*(?:&quot;|&#34;|&#x22;|%22)(?=$|[\s<>\"'])",
+    re.I,
+)
+LD_RE = re.compile(r'<script[^>]*type="application/ld\+json"[^>]*>(.*?)</script>', re.I | re.S)
+SKIP_WALK = {".git", "cache", "pipeline", "__pycache__", "node_modules", ".venv", "venv", "wealth_src"}
+AGENT_PAGES = (
+    "index.html",
+    "national-debt-by-year/index.html",
+    "world/index.html",
+    "countries/india/index.html",
+    "how-much-is-the-national-debt/index.html",
+    "countries/japan/index.html",
+    "countries/egypt/index.html",
+    "countries/russia/index.html",
+    "national-debt-by-president/index.html",
+    "national-debt-per-person/index.html",
+)
+
+
+def _walk_generated():
+    for dirpath, dirs, files in os.walk(ROOT):
+        dirs[:] = [d for d in dirs if d not in SKIP_WALK and not d.startswith(".")]
+        for name in files:
+            if name.endswith((".html", ".xml", ".txt", ".json")):
+                yield os.path.join(dirpath, name)
+
+
+def check_stray_quotes():
+    """Fail if a generated href, src, or url ends with a stray quote."""
+    from html.parser import HTMLParser
+
+    class Attrs(HTMLParser):
+        def __init__(self):
+            super().__init__(convert_charrefs=True)
+            self.bad = []
+
+        def handle_starttag(self, tag, attrs):
+            d = {}
+            for key, value in attrs:
+                if key and value is not None:
+                    d[key.lower()] = value
+            for key in ("href", "src", "url"):
+                value = d.get(key) or ""
+                if value.endswith('"') or value.endswith("%22") or value.endswith("&quot;"):
+                    self.bad.append(f"{tag} {key}={value[:160]}")
+            prop = (d.get("property") or d.get("name") or "").lower()
+            if prop in ("og:image", "og:url", "twitter:image") and d.get("content"):
+                value = d["content"]
+                if value.endswith('"') or value.endswith("%22") or value.endswith("&quot;"):
+                    self.bad.append(f"{prop}={value[:160]}")
+
+    for path in _walk_generated():
+        rel = os.path.relpath(path, ROOT)
+        # Daily snapshots are archives, not the pages crawlers read for links.
+        if rel.startswith("data/data-"):
+            continue
+        text = open(path, encoding="utf-8", errors="replace").read()
+        for glue in QUOTE_GLUE.finditer(text):
+            pre = text[max(0, glue.start() - 80):glue.start()]
+            # Percent-encoded SVG favicons contain xmlns=%22http://www.w3.org/2000/svg%22.
+            if "data:" in pre or "%3C" in pre or "xmlns=" in pre:
+                continue
+            fail(f"{rel}: URL ends with a stray quote ({glue.group(0)[:140]})")
+            return
+        if not rel.endswith(".html"):
+            continue
+        parser = Attrs()
+        try:
+            parser.feed(text)
+        except Exception as exc:
+            fail(f"{rel}: could not read attributes ({exc})")
+            return
+        if parser.bad:
+            fail(f"{rel}: {parser.bad[0]}")
+            return
+
+
+def check_jsonld():
+    """Every JSON-LD block must parse. The pages agents quote must carry a figure, a date, and a source."""
+    for path in _walk_generated():
+        if not path.endswith(".html"):
+            continue
+        rel = os.path.relpath(path, ROOT)
+        text = open(path, encoding="utf-8", errors="replace").read()
+        for block in LD_RE.findall(text):
+            try:
+                json.loads(block)
+            except Exception as exc:
+                fail(f"{rel}: JSON-LD does not parse ({exc})")
+                return
+    for rel in AGENT_PAGES:
+        text = page(rel)
+        if not text:
+            continue
+        if 'rel="canonical"' not in text:
+            fail(f"{rel}: missing canonical")
+        desc = re.search(r'<meta name="description" content="([^"]*)"', text)
+        if not desc or not re.search(r"\d", html.unescape(desc.group(1))):
+            fail(f"{rel}: meta description has no figure")
+        blocks = LD_RE.findall(text)
+        if not blocks:
+            fail(f"{rel}: missing JSON-LD")
+            continue
+        kinds = []
+        for block in blocks:
+            try:
+                kinds.append(json.loads(block).get("@type"))
+            except Exception:
+                kinds.append(None)
+        if not any(k in ("Dataset", "FAQPage") for k in kinds):
+            fail(f"{rel}: JSON-LD is not Dataset or FAQPage")
+        visible = re.sub(r"<script\b[^>]*>.*?</script>", " ", text, flags=re.S | re.I)
+        visible = re.sub(r"<style\b[^>]*>.*?</style>", " ", visible, flags=re.S | re.I)
+        visible = html.unescape(re.sub(r"<[^>]+>", " ", visible))
+        if not re.search(r"\bas of\b", visible, re.I):
+            fail(f"{rel}: no as-of date in server-rendered text")
+        if not re.search(r"\b(source|treasury|imf|census)\b", visible, re.I):
+            fail(f"{rel}: no source in server-rendered text")
+    for rel in (
+        "national-debt-by-year/index.html",
+        "national-debt-by-president/index.html",
+    ):
+        text = page(rel)
+        if text and "Dataset" not in text:
+            fail(f"{rel}: missing Dataset JSON-LD")
+    pres_dir = os.path.join(ROOT, "national-debt-by-president")
+    if os.path.isdir(pres_dir):
+        for name in os.listdir(pres_dir):
+            path = os.path.join(pres_dir, name, "index.html")
+            if os.path.isfile(path) and "Dataset" not in open(path, encoding="utf-8").read():
+                fail(f"national-debt-by-president/{name}/: missing Dataset JSON-LD")
+
+
 def main():
     places_api = load("api/places.json")
     check_awards()
@@ -290,6 +425,8 @@ def main():
     check_sampling_and_copy(places_api)
     check_held_copy()
     check_egypt_source()
+    check_stray_quotes()
+    check_jsonld()
     if ERRORS:
         print(f"check_guards: {len(ERRORS)} failure(s)", file=sys.stderr)
         for msg in ERRORS[:40]:

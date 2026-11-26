@@ -17,6 +17,16 @@ DEFAULT_PLACE = "texas"
 ACC = ["var(--red)", "var(--blue)", "var(--violet)", "var(--amber)", "var(--teal)"]
 E = html.escape
 
+def _json_attr(obj):
+    """JSON for a single-quoted attribute.
+
+    html.escape(quote=True) turns the closing quote into &quot; glued to the URL.
+    Crawlers then request /states/wisconsin/" and /og/places/new-york.png%22.
+    Keep the JSON quotes. Escape only characters that would break the attribute.
+    """
+    raw = json.dumps(obj, separators=(",", ":")).replace("</", "<\\/")
+    return raw.replace("&", "&amp;").replace("'", "&#39;").replace("<", "&lt;")
+
 def load(R):
     out = []
     for f in sorted(glob.glob(f"{R}/places/*.json")):
@@ -371,7 +381,7 @@ def tile_html(tid, label, value_txt, acc, badge, rate_txt="fixed", pp=None, tick
     """One tile in the US homepage style. tick = (base, rate, t0) makes the value tick; dlg = dict for the tap dialog."""
     data = ""
     if tick: data += f' data-b="{tick[0]}" data-r="{tick[1]}" data-t="{tick[2]}"'
-    if dlg: data += f" data-d='{E(json.dumps(dlg), quote=True)}'"
+    if dlg: data += f" data-d='{_json_attr(dlg)}'"
     pph = ""
     if pp:
         pph = '<div class="pp">' + "".join(f'<div><span class="l">{E(l)}</span><span class="num"{f" data-pp={chr(34)}{dv}{chr(34)}" if dv else ""}>{E(v)}</span></div>' for l, v, dv in pp) + "</div>"
@@ -412,8 +422,17 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         _h1_plain, h1_html = quotable.asof_pair(_claim, as_of, [(pub.split(" (")[0], _src_url)])
     h1 = _h1_plain
     _dn = p.get("seo_desc_noun")  # optional: full noun phrase for the description's opening
-    desc = ((f"{_dn[0].upper() + _dn[1:]}: {_b(c['total'])}, " if _dn else f"{name} {'state and local debt' if is_state else 'national debt'}: {_b(c['total'])} {'state and local debt' if is_state else T['head']}, ") + f"{'' if T['end'].startswith('as of') else 'at '}{T['end']} {as_of}. "
-            f"{'Official ' if coarse or not rate else 'Live '}{name} debt clock, {_usd2(pp_off)} per {dem}{' (official stock)' if coarse or not rate else ' (projected)'}, with sources.")
+    src_short = pub.split(" (")[0]
+    if len(src_short) > 60:
+        src_short = src_short[:57].rsplit(" ", 1)[0]
+    if _dn:
+        lead = _dn[0].upper() + _dn[1:]
+    else:
+        noun = "state and local debt" if is_state else (T["head"] or "national debt")
+        lead = f"{name} {noun}"
+    desc = f"{lead}: {_b(c['total'])} as of {as_of}. Source: {src_short}."
+    if len(desc) > 170:
+        desc = f"{lead}: {_b(c['total'])} as of {as_of}."
     img = f"og/places/{p['slug']}.png"
     if og:
         og_total = proj if ticks else c["total"]
@@ -510,7 +529,7 @@ def place_page(R, SITE, with_analytics, og, stamp, now, p, sec_dir, places):
         kicker = f"As of {as_of}"
         live_attr = ""
     coarse_attr = ' data-coarse="1"' if coarse else ""
-    hero = (f'<div class="hero lead" id="t-total" data-b="{c["total"]}" data-r="{rate or 0}" data-t="{t0}"{coarse_attr} data-d=\'{E(json.dumps(hero_d), quote=True)}\'>'
+    hero = (f'<div class="hero lead" id="t-total" data-b="{c["total"]}" data-r="{rate or 0}" data-t="{t0}"{coarse_attr} data-d=\'{_json_attr(hero_d)}\'>'
             f'<div class="k"{live_attr}>{E(kicker)}</div><div class="big num" id="hv">{_usd0(c["total"] if coarse or not rate else proj)}</div>')
     if coarse and rate:
         hero += (f'<div class="sub"><span class="badge proj">PROJECTION</span> <span class="num" id="hp">{_usd0(proj)}</span> '
@@ -745,7 +764,6 @@ if(mt)mt(t);requestAnimationFrame(f)}})()}})()</script>"""
     if not is_state:
         import country_profile as cp
         profile = cp.official_section(R, p)
-    official = f'<p class="official">Official: {_usd0(c["total"])} as of {as_of}, {E(pub)}</p>'
     page = (meta_head(SITE, url, title, desc, img, 2, PL_CSS, ld).replace("<body>", '<body class="srclead">', 1)
             + '<main id="app">' + hero + intro + federal_html + facts_html + wc + debt_sec + comp_secs + people + hist + details + profile + method + country_faq
             + '</main>' + header + ex.search_box("../../") + '<dialog id="dlg"></dialog>' + explore_html + links + _site_footer("../../", "Every Debt Clock · official data, " + ("projection labelled" if rate else "shown fixed")) + script + "</body></html>")

@@ -78,12 +78,17 @@ def _rate(sym, r):
     return ("−" if r < 0 else "+") + sym + f"{abs(r):,.2f}/sec"
 
 def snippet(site, embed_path, page_url, title, anchor, theme=None):
-    """iframe plus a plain backlink. The backlink is outside the iframe so it counts when the frame is not crawled."""
+    """iframe plus a plain backlink. The backlink is outside the iframe so it counts when the frame is not crawled.
+
+    src and href are unquoted, and a space follows each URL. This snippet is HTML-escaped
+    into a textarea. Escaping the old quoted form left `&quot;` glued to the URL, and
+    crawlers requested /embed/countries/kenya/" and /countries/norway/".
+    """
     src = f"{site}/{embed_path}"
     if theme:
         src += "?theme=" + theme
-    return (f'<iframe src="{src}" width="100%" height="160" style="border:0" title="{E(title, quote=True)}"></iframe>\n'
-            f'<a href="{page_url}">{E(anchor)}</a>')
+    return (f'<iframe src={src} width=100% height=160 style=border:0 title="{E(title, quote=True)}"></iframe>\n'
+            f'<a href={page_url} >{E(anchor)}</a>')
 
 def panel_html(code, preview, title):
     """Visible offer: live preview of this page's /embed/ URL, the snippet, and Copy code."""
