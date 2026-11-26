@@ -298,9 +298,19 @@ def check_legacy(root):
         if name not in api:
             fail(f"/api/ index does not point at {name}")
     for rel in ("your-share.html", "your-share/born/index.html", "country-series/index.html",
-                "openapi.json", ".well-known/ai-plugin.json"):
+                "openapi.json", "swagger.json", ".well-known/ai-plugin.json"):
         if not os.path.isfile(os.path.join(root, rel)):
             fail(f"missing {rel}")
+    spec_text = open(os.path.join(root, "openapi.json"), encoding="utf-8").read()
+    if open(os.path.join(root, "swagger.json"), encoding="utf-8").read() != spec_text:
+        fail("swagger.json is not a copy of openapi.json")
+    home = open(os.path.join(root, "index.html"), encoding="utf-8").read()
+    if 'rel="canonical" href="https://everydebtclock.com/"' not in home:
+        fail("index.html canonical is not https://everydebtclock.com/")
+    if "/index.html" in home.split('rel="canonical"', 1)[1][:80]:
+        fail("index.html canonical still points at /index.html")
+    if "index\\.html" not in home and "index.html" not in home.split("<title>", 1)[0]:
+        fail("index.html does not redirect /index.html to /")
     require_redirect(root, "your-share.html", "https://everydebtclock.com/your-share/", "/your-share/")
     spec = json.load(open(os.path.join(root, "openapi.json"), encoding="utf-8"))
     if not str(spec.get("openapi", "")).startswith("3."):

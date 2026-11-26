@@ -2,7 +2,7 @@
 """Build step (no bundler):
  1) index.html <head> meta refreshed with today's official numbers (title/description/OG/Twitter/canonical)
  2) og/<slug>.png + og/home.png share cards (1200x630, Pillow)
- 3) t/<slug>.html noindex snapshot pages (one per ticker; not in the sitemap)
+ 3) t/<slug>.html noindex snapshot pages, one per ticker. They are not listed in sitemap.xml.
  4) sitemap.xml + robots.txt
  5) dist/debtclock-standalone.html (everything inlined, works offline)
  6) embed/ widgets (one noindex page per US, state, DC, country and world clock) and the indexable /embed/ directory
@@ -214,8 +214,13 @@ for slug, i in ALL.items():
 # Crawlers still request URLs removed from git: taxpayers.png was renamed to tax_returns.png,
 # and the 14 historical-ratio cards were folded into /national-debt-by-year/ (og/debt_total.png).
 shutil.copyfile(f"{R}/og/tax_returns.png", f"{R}/og/taxpayers.png")
+# Historical ratio cards were folded into /national-debt-by-year/. The homepage modal
+# still links og/<slug>.png (for example /og/hist_debt_gdp_2020.png). Those files are
+# copies of the debt-total card so the old URL does not 404.
 for _h in sorted(HIST):
     shutil.copyfile(f"{R}/og/debt_total.png", f"{R}/og/{_h}.png")
+if not os.path.isfile(f"{R}/og/hist_debt_gdp_2020.png"):
+    raise SystemExit("og/hist_debt_gdp_2020.png was not written")
 
 # ---------------------------------------------------------------- index.html meta + build-time text (readable without JS)
 idx = open(f"{R}/index.html").read()
@@ -268,7 +273,10 @@ if not held:
     ))
 if not 3 <= len(HOME_FAQS) <= 6:
     raise SystemExit(f"homepage FAQ has {len(HOME_FAQS)} questions")
-meta = f"""<!--META--><title>{HOME_TITLE}</title>
+# /index.html is this same file. Send that path to / so the canonical URL is the one crawlers store.
+_INDEX_CANON = '<script>if(/\\/index\\.html$/i.test(location.pathname))location.replace(location.pathname.replace(/index\\.html$/i,"")+location.search+location.hash);</script>'
+meta = f"""<!--META-->{_INDEX_CANON}
+<title>{HOME_TITLE}</title>
 <meta name="description" content="{html.escape(desc)}">
 <link rel="canonical" href="{SITE}/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Every Debt Clock"><meta property="og:url" content="{SITE}/">
@@ -493,7 +501,7 @@ for slug, i in ALL.items():
 <meta name="twitter:description" content="{html.escape(d1)}"><meta name="twitter:image" content="{SITE}/og/{slug}.png">
 <meta name="theme-color" content="#07090d"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><style>{PAGE_CSS}</style>
 {ld}</head><body><main>
-<a class="brand" href="../index.html">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
+<a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
 <h1>{html.escape(lab)}</h1>
 <div class="v" id="v">{html.escape(fmt(i, x))}</div>
 {f'<div class="pp"><div><span class="l" title="Debt ÷ US population projected to now from Census Vintage 2025 (Jul 1, 2025 estimate) at the Census Bureau&#39;s stated growth rate">Per person (projected population)*</span><span class="n" id="p1">{ppf(x/POP)}</span></div><div><span class="l">Per tax return filed</span><span class="n" id="p2">{ppf(x/TAX)}</span></div></div>' if usdpp else ''}
@@ -502,7 +510,7 @@ for slug, i in ALL.items():
 {f'<p><b>Source.</b> <a href="{html.escape(i["source"])}" rel="noopener">{html.escape(i.get("source_name") or i["source"])}</a>, {"daily total as of" if i.get("modeled") else "official as of"} {fdate(i.get("as_of"))}.</p>' if i.get('source') else ''}
 {check}
 <p><b>* Per person (projected population)</b> divides by the US population projected to now: the official Census Vintage 2025 estimate for July 1, 2025 ({POP_OFF:,.0f}), projected forward at Census's stated growth rate ({POP:,.0f} at build time).{pp_off} <b>Per tax return filed</b> divides by {TAX:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2); a joint return counts once and returns with zero tax liability are included.</p>
-<a class="cta" href="../index.html#t={slug}">Open the full live clock →</a>
+<a class="cta" href="../#t={slug}">Open the full live clock →</a>
 <div class="rel"><b>Related:</b><br>{''.join(f'<a href="{s}.html">{html.escape(ALL[s].get("label", s))}</a>' for s in rel)}</div>
 <footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser. · <a href="../embed/">Embed a clock</a> · <a href="../data/">Data</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main><script>window.DEBTCLOCK_DATA={data};</script><script src="../core.js"></script>
@@ -717,11 +725,14 @@ if OFF_V:
 <a href="../">live clock</a> are rebuilt after each release.</p>
 <p>Headroom, extraordinary measures, and X-date forecasts are on the <a href="../debt-limit/">debt limit page</a>.</p>
 {src_links([SRC_DTP, SRC_DSL, SRC_POP])}"""
+    _hm_plain, _hm_html = quotable.asof_pair(
+        f"the US national debt is {tril(OFF_V)} ({usd2(OFF_V)})", fdate(OFF_D),
+        [("U.S. Treasury, Debt to the Penny", DTP_URL)])
     answer_page("how-much-is-the-national-debt",
                 f"How Much Is the National Debt? {tril(OFF_V)} (Treasury, {fdate(OFF_D)})",
                 f"The US national debt was {usd2(OFF_V)} ({tril(OFF_V)}) at Treasury's {fdate(OFF_D)} close: {usd0(DP.get('base'))} held by the public and "
                 f"{usd0(DI.get('base'))} intragovernmental. Daily changes, the debt limit and recent official closes.",
-                "How much is the national debt?", body,
+                _hm_plain, body, h1_html=f'<h1 class="quote asof">{_hm_html}</h1>',
                 ld=dataset_ld("US national debt, latest official close", f"Total public debt outstanding, debt held by the public and intragovernmental holdings from Treasury's Debt to the Penny, latest close {fdate(OFF_D)}.",
                               f"{SITE}/how-much-is-the-national-debt/", temporal=f"{CLOSES[-1][0]}/{CLOSES[0][0]}" if CLOSES else None)
                     + faq_ld([
@@ -1145,6 +1156,8 @@ def _lastmod(url):
     if not found:
         raise SystemExit(f"no data date for {url}")
     return found
+# /t/ ticker pages are noindex. Drop them here even if a later list starts offering them.
+urls = [row for row in urls if "/t/" not in row[0]]
 _sitemap_xml = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     "".join(f"<url><loc>{u}</loc><lastmod>{_lastmod(u)}</lastmod><changefreq>{c}</changefreq><priority>{p}</priority></url>\n" for u, p, c in urls) + "</urlset>\n")
 for _banned in ("/t/", "/texas/", "/uk/", "/world-government-debt/", "/global-debt-clock/", "/countries/united-states/"):

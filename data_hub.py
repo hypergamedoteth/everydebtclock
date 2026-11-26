@@ -832,8 +832,10 @@ def _page(R, SITE, with_analytics, files, charts, modified, lead):
         png = f"charts/{slug}.png"
         svg = f"charts/{slug}.svg"
         cite = f"Source: EveryDebtClock.com ({credit_href})"
-        snippet = (f'<img src="{SITE}/data/{png}" alt="{meta["alt"]}">\n'
-                   f'<a href="{credit_href}">Source: EveryDebtClock.com</a>')
+        # Unquoted src/href with a space after the URL. Escaping a quoted URL into
+        # <pre> left &quot; glued on, and crawlers requested the image with a trailing quote.
+        snippet = (f'<img src={SITE}/data/{png} alt="{meta["alt"]}">\n'
+                   f'<a href={credit_href} >Source: EveryDebtClock.com</a>')
         figures.append(f'''<figure id="{E(slug)}">
 <h2>{E(meta["title"])}</h2>
 <img src="{E(png)}" alt="{E(meta["alt"])}" width="1200">
