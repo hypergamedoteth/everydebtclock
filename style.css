@@ -210,3 +210,19 @@ p.updated{margin:2px 0 8px;color:var(--mut);font-size:12.5px}
 p.official{margin:0 2px 14px;color:var(--mut);font-size:13.5px;line-height:1.45}
 .embcard iframe{display:block;width:100%;height:160px;border:0;border-radius:10px;background:#0e131b}
 .embcard textarea{max-width:none}
+/* Homepage hero: the server-rendered clock and the live clock share one box.
+   Min-heights and fixed sizes keep that box from growing while the page loads. */
+#t-debt_total.hero.lead{min-height:292px}
+#t-debt_total .big{font-family:var(--mono);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;line-height:1.15;min-height:1.15em;font-size:40px}
+#t-debt_total .sub{min-height:3.2em}
+#t-debt_total .trio{min-height:78px}
+#t-debt_total .trio .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;font-size:18px;min-height:1.2em}
+#t-debt_total .trio .l{font-size:11px;line-height:1.25;min-height:2.5em}
+@media (max-width:640px){
+#t-debt_total.hero.lead{min-height:348px}
+#t-debt_total .big{font-size:25px;max-width:100%}
+#t-debt_total .sub{min-height:4.8em}
+#t-debt_total .trio{min-height:108px}
+#t-debt_total .trio .num{font-size:13px}
+#t-debt_total .trio .l{font-size:9.5px;letter-spacing:.04em;min-height:2.7em}
+}

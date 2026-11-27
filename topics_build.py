@@ -64,17 +64,18 @@ COUNT_JS = r"""
   const usd2 = n => (n == null || !isFinite(n)) ? '—' : (n < 0 ? '−$' : '$') + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
   function tick(){
     const t = Date.now() / 1000;
-    if (mode === 'debt' || mode === 'person' || mode === 'interest') {
+    if (mode === 'debt' || mode === 'interest') {
       if (k.dataset.live) k.textContent = k.dataset.live;
     }
     if (mode === 'debt') {
       v.textContent = usd0(C.val('debt_total', t));
     } else if (mode === 'person') {
-      const d = C.val('debt_total', t), pop = C.pop(t), per = usd2(d / pop);
+      const people = C.popOfficial();
+      const per = usd2(C.T.debt_total.base / people);
       v.textContent = per;
       const h = document.getElementById('pp-h'), r = document.getElementById('pp-r');
-      if (h) h.textContent = usd2(d / C.T.households.base);
-      if (r) r.textContent = usd2(d / C.tax);
+      if (h) h.textContent = usd2(C.T.debt_total.base / C.T.households.base);
+      if (r) r.textContent = usd2(C.T.debt_total.base / C.tax);
     } else if (mode === 'interest') {
       v.textContent = usd0(C.val('interest_cash', t));
     } else if (mode === 'count') {
@@ -371,7 +372,14 @@ def _milestone_pages(ctx, H):
 </div>
 <p class="official">Official: {usd2(ctx['OFF_V'])} as of {fdate(ctx['OFF_D'])}, Treasury Debt to the Penny</p>
 {banner}"""
-        intro = f"<h1>{html.escape(h1)}</h1><p class=\"answer\">{summary} Source: <a href=\"{ctx['DTP']}\" rel=\"noopener\">Treasury, Debt to the Penny</a>.</p>"
+        lag_html = ""
+        if n == 41 and goal_ts and not official:
+            day = dt.datetime.fromtimestamp(goal_ts, CT)
+            if day.weekday() >= 5:
+                lag_html = (f'<p class="note">{html.escape(day.strftime("%B %-d, %Y"))} is a {day.strftime("%A")}, '
+                            f'so Treasury will not post an official Debt to the Penny close that day. '
+                            f'Official confirmation will lag the live clock. The date is a projection, not a Treasury forecast.</p>')
+        intro = f"<h1>{html.escape(h1)}</h1><p class=\"answer\">{summary} Source: <a href=\"{ctx['DTP']}\" rel=\"noopener\">Treasury, Debt to the Penny</a>.</p>{lag_html}"
         rows = []
         for c in reversed(H["crossings"]):
             rows.append(f"<tr><td>${c['trillion']} trillion</td><td>{fdate(c['date'])}</td><td class=\"num\">{usd2(c['amount'])}</td>"
@@ -525,14 +533,11 @@ def _president_page(ctx, H):
 def _person_page(ctx, H):
     fdate, usd0, usd2, bil = ctx["fdate"], ctx["usd0"], ctx["usd2"], ctx["bil"]
     pp = ctx["OFF_V"] / ctx["POP_OFF"]
-    debt_now = ctx["val"]("debt_total", ctx["NOW"])
-    pop_now = ctx["val"]("population", ctx["NOW"])
-    live = debt_now / pop_now if debt_now and pop_now else pp
     hh, tax = ctx["HH"], ctx["TAX"]
     hero = f"""<div class="hero lead" id="lead" data-mode="person">
-<div class="k" id="lead-k" data-live="Live projection · per person">Official · {html.escape(fdate(ctx['OFF_D']))} · Treasury Debt to the Penny ÷ Census {html.escape(fdate(ctx['POP_OFF_DATE']))}</div>
+<div class="k" id="lead-k">Official · {html.escape(fdate(ctx['OFF_D']))} · Treasury Debt to the Penny ÷ Census {html.escape(fdate(ctx['POP_OFF_DATE']))}</div>
 <div class="big num" id="lead-v">{usd2(pp)}</div>
-<div class="sub" id="lead-sub">Official per person is {usd2(pp)}: Treasury's {fdate(ctx['OFF_D'])} close divided by {ctx['POP_OFF']:,.0f} Census residents on {fdate(ctx['POP_OFF_DATE'])}. That figure is not projected.</div>
+<div class="sub" id="lead-sub">Official per person is {usd2(pp)}: Treasury's {fdate(ctx['OFF_D'])} close divided by {ctx['POP_OFF']:,.0f} Census residents on {fdate(ctx['POP_OFF_DATE'])}. That population is not projected, and this figure does not tick.</div>
 <div class="trio"><div><span class="l">Official per person</span><span class="n">{usd2(pp)}</span></div>
 <div><span class="l">Per household</span><span class="n" id="pp-h">{usd2(ctx['OFF_V'] / hh)}</span></div>
 <div><span class="l">Per tax return filed</span><span class="n" id="pp-r">{usd2(ctx['OFF_V'] / tax)}</span></div></div>
@@ -544,7 +549,7 @@ def _person_page(ctx, H):
         [("U.S. Treasury, Debt to the Penny", ctx["DTP"]), ("U.S. Census Bureau", _census)])
     intro = (f'<h1 class="asof">{_pp_html}</h1>'
              f"<p class=\"answer\">That is Treasury's total of {usd2(ctx['OFF_V'])} divided by the Census Bureau's {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])} (Vintage 2025), with no projection. "
-             f"The live estimate above moves with the debt clock and with Census's stated population growth. "
+             f"The figure above is that same official number. It does not use a projected population. "
              f"Per household is {usd2(ctx['OFF_V'] / hh)} ({hh:,.0f} households). "
              f"Per tax return filed is {usd2(ctx['OFF_V'] / tax)} ({tax:,.0f} individual returns in FY2025). A joint return counts once. "
              f'Sources: <a href="{ctx["DTP"]}" rel="noopener">Treasury, Debt to the Penny</a> and '
@@ -592,17 +597,17 @@ def _person_page(ctx, H):
          f"US debt per person is {usd2(pp)} as of {fdate(ctx['OFF_D'])}, Treasury's total of {usd2(ctx['OFF_V'])} divided by {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}. "
          f"Source: U.S. Treasury, Debt to the Penny, and the U.S. Census Bureau, Vintage 2025."),
         ("What population is used?",
-         f"The official per-person figure uses the Census Vintage 2025 estimate of {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}, with no projection. "
-         f"Source: U.S. Census Bureau; the live estimate above that figure projects population at the rate Census states."),
+         f"Debt per person uses the Census Vintage 2025 estimate of {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}, with no projection. "
+         f"Source: U.S. Census Bureau. A separate population clock on the homepage projects headcount forward. That projection is not the denominator."),
         ("How much is the national debt per household?",
          f"National debt per household is {usd2(ctx['OFF_V'] / hh)} as of {fdate(ctx['OFF_D'])}, Treasury's total divided by {hh:,.0f} households. "
          f"Source: U.S. Treasury, Debt to the Penny, and Census CPS ASEC 2025."),
         ("How much is the national debt per tax return?",
          f"National debt per tax return filed is {usd2(ctx['OFF_V'] / tax)} as of {fdate(ctx['OFF_D'])}, Treasury's total divided by {tax:,.0f} individual returns in FY2025. "
          f"Source: U.S. Treasury, Debt to the Penny, and IRS Data Book Table 1-2; a joint return counts once."),
-        ("Why is the live estimate different from the official per-person figure?",
-         f"The live estimate divides the moving debt clock by population projected from the Census estimate for {fdate(ctx['POP_OFF_DATE'])}. "
-         f"The official {usd2(pp)} divides the {fdate(ctx['OFF_D'])} Treasury close by {ctx['POP_OFF']:,.0f} residents, with no projection."),
+        ("Does the per-person figure use a projected population?",
+         f"No. The official {usd2(pp)} divides the {fdate(ctx['OFF_D'])} Treasury close by {ctx['POP_OFF']:,.0f} residents on {fdate(ctx['POP_OFF_DATE'])}. "
+         f"The site does not divide the debt by a population projected past that Census date."),
     ]
     ld = ctx["dataset_ld"]("US national debt per person", desc, f"{ctx['SITE']}/national-debt-per-person/",
                            based=[ctx["DTP"], H["population_sources"][-1]["page"]],

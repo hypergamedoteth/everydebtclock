@@ -80,6 +80,8 @@ def _schema():
                 "households_official": {"type": "integer", "nullable": True},
                 "households_source": {"type": "string", "nullable": True},
                 "per_person_basis": {"type": "string"},
+                "displayed_per_person": {"type": "string", "description": "Which per-person field the site displays. Currently debt_per_person_official."},
+                "displayed_per_person_note": {"type": "string"},
                 "stale": {"type": "boolean"},
                 "source_url": {"type": "string"},
                 "source_api": {"type": "string"},
