@@ -200,13 +200,13 @@ for f in os.listdir(f"{R}/og"):   # drop share images for tickers that no longer
     if f.endswith(".png") and f[:-4] != "home" and (f[:-4] not in ALL or f[:-4] in HIST): os.remove(f"{R}/og/{f}")
 home_debt = val("debt_total")
 og(f"{R}/og/home.png", "US national debt · ticking live", fmt({"kind": "usd"}, home_debt),
-   [("Per person (projected pop.)", ppf(home_debt / POP)), ("Per tax return filed", ppf(home_debt / TAX))],
+   [("Per person", ppf(OFF_V / POP_OFF)), ("Per tax return filed", ppf(OFF_V / TAX))],
    f"+{fmt({'kind':'usd'}, T['debt_total']['rate'] * 86400, True)}/day", "#ff4d5e",
    f"Treasury Debt to the Penny, {fdate(T['debt_total']['as_of'])} close\nprojected at the 90-day trend · checked daily")
 for slug, i in ALL.items():
     x = get(slug)
     if x is None or slug in HIST: continue
-    lines = [("Per person (projected pop.)", ppf(x / POP)), ("Per tax return filed", ppf(x / TAX))] if i.get("kind") == "usd" and slug != "debt_per_household" else \
+    lines = [("Per person" if slug == "debt_total" or i.get("fixed") else "Per person · projection", ppf((i.get("base") if slug == "debt_total" else x) / POP_OFF)), ("Per tax return filed", ppf(x / TAX))] if i.get("kind") == "usd" and slug != "debt_per_household" else \
             [("As of", fdate(i.get("as_of")) or "live"), ("Source", (i.get("source_name") or "Computed from official tickers")[:34])]
     mt = mode_txt(i).split(" · ")
     og(f"{R}/og/{slug}.png", label(slug, i), fmt(i, x), lines, mt[0], GROUP_COL.get(i.get("group"), "#5aa9ff"),
@@ -336,11 +336,15 @@ def row(slug):
             v = usd0(i["base"]) if i.get("kind") == "usd" else fmt(i, i["base"])
             asof = (i["basis_txt"] if i.get("basis_txt") else f"official, {fdate(i.get('as_of'))}")
     return f'<tr><td><a href="t/{slug}.html">{html.escape(label(slug, i))}</a></td><td class="num">{v}</td><td>{html.escape(asof)}</td></tr>'
-ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead"><div class="big num">{usd2(OFF_V)}</div></div>
-<section class="intro" id="intro">{intro}</section>
-<section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
+_latest = (f"""<section><div class="sh"><h2>Latest figures</h2></div><table class="v"><tr><th>Figure</th><th>Amount</th><th>Basis</th></tr>
 {''.join(row(s_) for s_ in ["debt_total", "debt_public", "debt_intragov", "debt_subject_limit", "debt_limit", "limit_headroom", "deficit", "spending", "revenue", "gdp"])}</table>
-<noscript><p>Turn on JavaScript to watch these figures tick in real time.</p></noscript></section></div><!--/SSR-->""")
+<p>Turn on JavaScript to watch the debt total tick. Debt per person on this page is the official figure and does not tick.</p></section>""")
+ssr = (f"""<!--SSR--><div class="ssr"><div class="hero lead" id="t-debt_total"><div class="k">Live estimate · US national debt</div><div class="big num" id="hv">{usd2(OFF_V)}</div>
+<div class="sub"><span>about {bil(rate_day)} a day</span> <span class="note">90-day least-squares trend. The total ticks. Debt per person does not.</span> <span>Since you opened this page: <span class="num" id="hs">$0</span> more debt · <span class="num" id="hi">$0</span> in interest</span></div>
+<div class="trio"><div><span class="l" title="Treasury close divided by the official Census estimate for July 1, 2025.">Debt per person</span><span class="num" id="pp-person">{usd2(PP_OFF)}</span><span class="note">Official · Census {fdate(POP_OFF_DATE)}</span></div><div><span class="l">Per tax return · projection</span><span class="num" id="pp-return">{ppf(OFF_V / TAX)}</span></div><div><span class="l">Per household · projection</span><span class="num" id="pp-house">{usd2(OFF_V / HH)}</span></div></div>
+<div class="meta" style="margin-top:10px"><span class="badge proj">PROJECTED · from {fdate(OFF_D)}</span><span class="badge">source: Treasury Debt to the Penny</span></div></div>
+<section class="intro" id="intro">{intro}</section></div>
+<noscript>{_latest}</noscript><!--/SSR-->""")
 import places_build
 PLACES_LIVE = places_build.load(R) if os.path.isdir(f"{R}/places") else []
 # World Debt Clock: US national debt + every live country, in USD (world_build.py). None when there is no live country or no inputs.
@@ -472,7 +476,7 @@ for slug, i in ALL.items():
     if x is None or slug in HIST: continue
     lab = label(slug, i); url = f"{SITE}/t/{slug}.html"
     usdpp = i.get("kind") == "usd" and slug != "debt_per_household"
-    d1 = (f"{lab}: {fmt(i, x, True)}" + ("" if i.get("fixed") else f" projected to {build_ct.strftime('%b %-d, %Y')}") + (f" ({ppf(x/POP)} per person on projected population, {ppf(x/TAX)} per tax return filed)" if usdpp else "") +
+    d1 = (f"{lab}: {fmt(i, x, True)}" + ("" if i.get("fixed") else f" projected to {build_ct.strftime('%b %-d, %Y')}") + (f" ({ppf((i.get('base') if slug == 'debt_total' else x)/POP_OFF)} per person on the official Census population, {ppf(x/TAX)} per tax return filed)" if usdpp else "") +
           (f". Official figure ({i.get('source_name')}), updated when the source publishes." if i.get("fixed") else
            f". Modeled estimate, not an official published figure: {i.get('source_name')}. Recalibrated daily." if i.get("modeled") else
            f". Counter from official data ({i.get('source_name') or 'computed from official Treasury tickers'}), recalibrated and checked daily."))
@@ -484,8 +488,6 @@ for slug, i in ALL.items():
     data = json.dumps({"tickers": sub, "meta": {k: M[k] for k in ("fy_end_epoch", "fy")}, "derived": {slug: DV[slug]} if i.get("derived") else {}},
                       separators=(",", ":")).replace("</", "<\\/")
     rel = [s for s in RELATED.get(i.get("group"), []) if s != slug][:10]
-    pp_off = (f" Official basis, no projection: {ppf(i['base'] / POP_OFF)} per person = Treasury's {fdate(i.get('as_of'))} close ÷ the {POP_OFF:,.0f} Census estimate for {fdate(POP_OFF_DATE)}."
-              if slug == "debt_total" and i.get("base") and POP_OFF else "")
     v = i.get("validation") or {}
     check = (f"<p><b>Daily check.</b> Yesterday's projection vs {html.escape(v.get('against',''))}: {v['last_error_pct']:+.3f}% (threshold ±{v.get('threshold_pct')}%)"
              + (f"; average |error| over {v['n']} days {v['mean_abs_error_pct']:.3f}%" if v.get("mean_abs_error_pct") is not None else "") + "." + (" " + html.escape(v["note"]) if v.get("note") else "") + "</p>") if v.get("last_error_pct") is not None else ""
@@ -504,18 +506,18 @@ for slug, i in ALL.items():
 <a class="brand" href="../">EVERY <b>DEBT</b> CLOCK</a><a class="navembed" href="../embed/" style="margin-left:12px;font-size:13px;font-weight:650">Embed</a>
 <h1>{html.escape(lab)}</h1>
 <div class="v" id="v">{html.escape(fmt(i, x))}</div>
-{f'<div class="pp"><div><span class="l" title="Debt ÷ US population projected to now from Census Vintage 2025 (Jul 1, 2025 estimate) at the Census Bureau&#39;s stated growth rate">Per person (projected population)*</span><span class="n" id="p1">{ppf(x/POP)}</span></div><div><span class="l">Per tax return filed</span><span class="n" id="p2">{ppf(x/TAX)}</span></div></div>' if usdpp else ''}
+{f'<div class="pp"><div><span class="l" title="Divides by the official Census Vintage 2025 estimate for July 1, 2025 ({POP_OFF:,.0f}). That population is not projected.">{"Per person · official" if slug == "debt_total" else ("Per person" if i.get("fixed") else "Per person · projection")}</span><span class="n" id="p1">{ppf((i.get("base") if slug == "debt_total" else x)/POP_OFF)}</span></div><div><span class="l">Per tax return filed</span><span class="n" id="p2">{ppf(x/TAX)}</span></div></div>' if usdpp else ''}
 <span class="b">{html.escape(mode_txt(i))}</span>{'<span class="b">official source cached (last run failed)</span>' if i.get('stale') else ''}
 <p><b>How it's calculated.</b> {html.escape(i.get('method') or '')}</p>
 {f'<p><b>Source.</b> <a href="{html.escape(i["source"])}" rel="noopener">{html.escape(i.get("source_name") or i["source"])}</a>, {"daily total as of" if i.get("modeled") else "official as of"} {fdate(i.get("as_of"))}.</p>' if i.get('source') else ''}
 {check}
-<p><b>* Per person (projected population)</b> divides by the US population projected to now: the official Census Vintage 2025 estimate for July 1, 2025 ({POP_OFF:,.0f}), projected forward at Census's stated growth rate ({POP:,.0f} at build time).{pp_off} <b>Per tax return filed</b> divides by {TAX:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2); a joint return counts once and returns with zero tax liability are included.</p>
+<p><b>* Per person</b> divides by the official Census Vintage 2025 estimate for July 1, 2025 ({POP_OFF:,.0f}). That population is not projected. On the national debt page the figure is Treasury's close divided by that estimate and does not tick. On other pages, a projected dollar total divided by the same estimate is labelled a projection. <b>Per tax return filed</b> divides by {TAX:,.0f} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2); a joint return counts once and returns with zero tax liability are included.</p>
 <a class="cta" href="../#t={slug}">Open the full live clock →</a>
 <div class="rel"><b>Related:</b><br>{''.join(f'<a href="{s}.html">{html.escape(ALL[s].get("label", s))}</a>' for s in rel)}</div>
 <footer>The value in this page's text is projected to {STAMP} from the official figure above (data fetched {gen_ct.strftime('%b %-d, %Y %-I:%M %p')} CT). The number above ticks live in your browser. · <a href="../embed/">Embed a clock</a> · <a href="../data/">Data</a> · <a href="../methodology/">Methodology</a> · <a href="../privacy/">Privacy</a> · Independent site, not affiliated with the U.S. government. Not financial advice.</footer>
 </main><script>window.DEBTCLOCK_DATA={data};</script><script src="../core.js"></script>
 <script>(function(){{const C=DC(window.DEBTCLOCK_DATA),i=C.info({json.dumps(slug)}),v=document.getElementById('v'),p1=document.getElementById('p1'),p2=document.getElementById('p2');
-(function f(){{const t=Date.now()/1000,x=C.get({json.dumps(slug)},t);v.textContent=C.fmt(i,x);if(p1){{p1.textContent=C.ppf(x/C.pop(t));p2.textContent=C.ppf(x/C.tax)}}requestAnimationFrame(f)}})()}})()</script>
+(function f(){{const t=Date.now()/1000,x=C.get({json.dumps(slug)},t);v.textContent=C.fmt(i,x);if(p1){{const off=C.popOfficial();const per={json.dumps(slug)}==="debt_total"?C.T.debt_total.base/off:x/off;p1.textContent=C.ppf(per);p2.textContent=C.ppf(x/C.tax)}}requestAnimationFrame(f)}})()}})()</script>
 </body></html>"""
     open(f"{R}/t/{slug}.html", "w").write(with_analytics(page))
 
@@ -605,8 +607,10 @@ def build_api():
         "debt_per_household_projected_now": round(proj / hh, 2) if proj and hh else None,
         "households_official": int(hh) if hh else None,
         "households_source": "Census CPS ASEC 2025" if hh else None,
-        "per_person_basis": "_official = Treasury close / official Census estimate (no projection); _projected_now = projected debt / population projected at Census's stated rate",
+        "per_person_basis": "_official = Treasury close / official Census estimate (no projection); _projected_now = projected debt / population projected at Census's stated rate. Pages quote _official.",
         "per_person_basis_code": "official_census",
+        "displayed_per_person": "debt_per_person_official",
+        "displayed_per_person_note": "The figure the site displays. Treasury close divided by the official Census estimate. debt_per_person_projected_now divides a debt projection by a population projection and is not shown as debt per person.",
         "stale": bool(td.get("stale") or M.get("debt_closes_stale")),
         "source_url": td.get("source") or "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/debt-to-the-penny",
         "source_api": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/debt_to_penny",
@@ -754,7 +758,7 @@ at the close of business on {fdate(OFF_D)}, divided by the Census Bureau's offic
 <tr><td>Per person, debt held by the public only</td><td class="num">{usd2((DP.get('base') or 0) / POP_OFF)}</td><td>{usd0(DP.get('base'))} ÷ the same population</td></tr>
 <tr><td>Per household</td><td class="num">{usd2(OFF_V / HH)}</td><td>Total debt ÷ {HH:,.0f} households (Census CPS ASEC 2025)</td></tr>
 <tr><td>Per individual income tax return filed</td><td class="num">{usd2(OFF_V / TAX)}</td><td>Total debt ÷ {TAX:,.0f} returns filed in FY2025 (IRS Data Book, Table 1-2)</td></tr>
-<tr><td>Per person, projected to {STAMP}</td><td class="num">{usd2(proj_now / pop_now) if proj_now and pop_now else '—'}</td><td>Projection: debt at its 90-day trend ÷ population projected at Census's stated growth rate ({pop_now:,.0f})</td></tr></table>
+</table>
 <h2>Per person at recent official closes</h2><p>Same Census population for every row, so the change reflects the debt only.</p>{closes_table(10, per_person=True)}
 <h2>What this number does and doesn't mean</h2>
 <p>It is a way to scale a very large number, not a bill: no individual owes it. The population counts every resident, including children. The debt figure
@@ -918,7 +922,7 @@ if OFF_V:
 <tr><td>Debt subject to the limit, statutory limit</td><td><a href="{SRC_DSL[1]}" rel="noopener">Treasury, Daily Treasury Statement, Table III-C</a></td><td>Same method; headroom is the limit minus debt subject to the limit.</td></tr>
 <tr><td>Federal spending, revenue, deficit (fiscal year to date)</td><td>Treasury Monthly Treasury Statement (MTS) and Daily Treasury Statement (DTS)</td><td>Anchored to the latest MTS; days after it are added from DTS cash figures converted to budget basis with last year's MTS÷DTS ratio. Revenue is within roughly ±4% of the official total on that basis, which is why those tiles say so.</td></tr>
 <tr><td>Interest on the debt</td><td>Treasury, Average Interest Rates on Treasury Securities, and the MTS/DTS interest lines</td><td>Annual interest = live debt × the average rate on interest-bearing debt. It is a calculation, labelled as such.</td></tr>
-<tr><td>Per person</td><td><a href="{SRC_POP[1]}" rel="noopener">Census Bureau, Vintage 2025 population estimates</a></td><td>{POP_OFF:,.0f} residents on {fdate(POP_OFF_DATE)}, grown at the rate Census states for its population clock. Updated once a year when Census publishes a new vintage.</td></tr>
+<tr><td>Per person</td><td><a href="{SRC_POP[1]}" rel="noopener">Census Bureau, Vintage 2025 population estimates</a></td><td>{POP_OFF:,.0f} residents on {fdate(POP_OFF_DATE)}, the official estimate. Debt per person is the Treasury close divided by that count. It is not grown forward. The population clock elsewhere on the site is a separate projection of headcount.</td></tr>
 <tr><td>Per household</td><td><a href="{SRC_HH[1]}" rel="noopener">Census Bureau, CPS ASEC 2025, Table HH-1</a></td><td>{HH:,.0f} households, a fixed constant until the next release.</td></tr>
 <tr><td>Per tax return filed</td><td><a href="{SRC_IRS[1]}" rel="noopener">IRS Data Book FY2025, Table 1-2</a></td><td>{TAX:,.0f} individual returns filed in FY2025, fixed. It includes zero-liability returns, and a joint return counts once.</td></tr>
 <tr><td>GDP, debt-to-GDP</td><td>Bureau of Economic Analysis, NIPA Table 1.1.5 (read through the DBnomics mirror)</td><td>Latest quarter, ticking at the four-quarter trend.</td></tr>
@@ -1193,7 +1197,7 @@ open(f"{R}/llms.txt", "w").write("\n".join([
     "- /how-much-is-the-national-debt/ : Plain answer and a breakdown of the official total, public vs intragovernmental debt, and the statutory limit.",
     "- /debt-limit/ : Debt ceiling and X-date. Statutory limit, debt subject to the limit, and headroom are the daily.json figures, with the Daily Treasury Statement date. Extraordinary measures follow that feed's label and are not stated when the feed has none.",
     f"- /national-debt-per-person/ : Official total divided by the Census Vintage 2025 population ({usd2(PP_OFF)} per person).",
-    "- /your-share/ : One equal share of the official total, the live national debt clock divided by population. No calculator.",
+    "- /your-share/ : One equal share of the official total: Treasury's close divided by the official Census population. No calculator. The population is not projected.",
     "- /national-debt-by-year/ : Treasury fiscal-year-end totals and OMB debt-to-GDP ratios, FY1940 to the latest year.",
     "- /41-trillion/ : Live countdown to the next trillion, using the homepage clock's Debt to the Penny base and per-second rate, plus each trillion crossing in that daily series.",
     "- /press/ : Press kit for the $41 trillion crossing. Exact projected time from the homepage 90-day pace, 12-month and 3-year comparisons, and the countdown embed.",
@@ -1424,8 +1428,15 @@ def check_quotable():
         if not 3 <= nq <= 6 or visible.count("<h3>") != nq:
             raise SystemExit(f"{name}: {nq} JSON-LD questions, {visible.count('<h3>')} visible")
     home = open(f"{R}/index.html").read()
-    if f'<div class="big num">{usd2(OFF_V)}</div>' not in home:
+    if f'<div class="big num" id="hv">{usd2(OFF_V)}</div>' not in home:
         raise SystemExit("homepage hero total changed")
+    if "Per person (projected population)" in home or "on projected population" in home or "Live projection per person" in home:
+        raise SystemExit("homepage still quotes a projected-population per-person figure")
+    debt_page = open(f"{R}/t/debt_total.html").read()
+    if "projected population" in debt_page.lower() or "Per person (projected population)" in debt_page:
+        raise SystemExit("t/debt_total.html still quotes a projected population")
+    if usd2(PP_OFF) not in debt_page:
+        raise SystemExit("t/debt_total.html is missing the official per-person figure")
     official_pp = usd2(PP_OFF)
     person = open(f"{R}/national-debt-per-person/index.html").read()
     facts = open(f"{R}/facts/index.html").read()
@@ -1467,7 +1478,7 @@ def check_quotable():
               "households_source", "per_person_basis", "stale", "source_url", "source_api", "site_url"}
     added = {"debt_subject_to_limit", "statutory_limit", "dts_record_date", "debt_limit_headroom",
              "debt_limit_reported_status", "days_to_limit_estimate", "extraordinary_measures",
-             "per_person_basis_code"}
+             "per_person_basis_code", "displayed_per_person", "displayed_per_person_note"}
     extra = set(api) - expect - added
     missing = expect - set(api)
     if missing or extra or api.get("schema_version") != 2:

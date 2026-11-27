@@ -1,17 +1,11 @@
-/* Live per-person share: projected national debt ÷ projected population. */
+/* Debt per person: Treasury close ÷ the official Census estimate. Not a projected population. */
 (function () {
   var box = document.getElementById("share-clock");
   var el = document.getElementById("share-num");
   if (!box || !el) return;
-  var b = +box.dataset.b, r = +box.dataset.r, t0 = +box.dataset.t0;
-  var pop = +box.dataset.pop, pr = +box.dataset.pr, pt = +box.dataset.pt;
+  var b = +box.dataset.b, pop = +box.dataset.pop;
+  if (!(pop > 0)) return;
   var nf = new Intl.NumberFormat("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
-  function frame() {
-    var t = Date.now() / 1000;
-    var debt = b + r * (t - t0);
-    var people = pop + pr * (t - pt);
-    el.textContent = (debt < 0 ? "−$" : "$") + nf.format(Math.abs(debt / people));
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
+  var share = b / pop;
+  el.textContent = (share < 0 ? "−$" : "$") + nf.format(Math.abs(share));
 })();

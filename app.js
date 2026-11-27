@@ -75,13 +75,12 @@
   const app = document.getElementById('app');
   const intro = document.getElementById('intro');
   const official = document.getElementById('official');
-  if (intro) intro.remove();   // summary returns under the lead ticker
-  if (official) official.remove();   // dated official line stays directly under the ticker
-  app.querySelectorAll('.ssr').forEach(e => e.remove());   // build-time static fallback (for crawlers / no-JS); replaced by the live clock
+  // The server-rendered hero and summary stay put. Replacing them was the homepage layout shift.
   const DLS = M.debt_limit_status || {};
   const live = []; // {el, fn}
   const pop = t => val('population', t), tax = () => T.tax_returns?.base;
-  const PPB = `Debt ÷ US population projected to now from the Census Vintage 2025 estimate (${nf0.format(T.population?.base || 0)} on Jul 1, 2025) at Census's stated growth rate. Official-basis figure: debt ÷ that Jul 1, 2025 estimate.`;
+  const popOff = () => T.population?.base || 1;
+  const PPB = `Official debt per person: Treasury's latest close divided by the Census Vintage 2025 estimate of ${nf0.format(popOff())} residents on ${fmtDate(T.population?.as_of)}. That population is not projected, and this figure does not tick.`;
   const isUSD = i => (i.kind === 'usd');
   const NOPP = new Set(['debt_per_household']);
 
@@ -122,14 +121,14 @@
     const stale = i.stale || i.status === 'stale';
     el.innerHTML = `<div class="lab"><span>${esc(lbl)}</span>${fy}</div>
       <div class="val num">—</div>
-      ${isUSD(i) && !NOPP.has(slug) ? `<div class="pp"><div><span class="l" title="${esc(PPB)}">Per person (proj. pop.)</span><span class="num pp1">—</span></div><div><span class="l">Per tax return filed</span><span class="num pp2">—</span></div></div>` : ''}
+      ${isUSD(i) && !NOPP.has(slug) ? `<div class="pp"><div><span class="l" title="${esc(PPB)}">${i.fixed ? 'Per person' : 'Per person · projection'}</span><span class="num pp1">—</span></div><div><span class="l">Per tax return filed</span><span class="num pp2">—</span></div></div>` : ''}
       <div class="meta"><span class="rate ${stale ? '' : /^(debt|deficit|interest|out_interest)/.test(slug) ? (rate > 0 ? 'up' : rate < 0 ? 'dn' : '') : ''}">${stale ? 'held at last release' : i.kind === 'count' && rate ? '+' + (rate * 86400).toFixed(0) + ' people/day' : i.kind === 'usd' && rate != null ? rateTxt(rate) : i.derived ? 'live ratio' : 'fixed'}</span>${badges(i, {short: 1})}</div>${slug === 'limit_headroom' ? '<div class="sub2" id="htl"></div>' : ''}`;
     const v = el.querySelector('.val'), p1 = el.querySelector('.pp1'), p2 = el.querySelector('.pp2');
     const kind = i.kind;
     live.push(t => {
       const x = get(slug, t);
       v.textContent = kind === 'pct' ? pct(x, i.fixed ? 3 : 5) : kind === 'count' ? nf0.format(x) : usd(x);
-      if (p1) { p1.textContent = ppf(x / pop(t)); p2.textContent = ppf(x / tax()); }
+      if (p1) { p1.textContent = ppf(x / popOff()); p2.textContent = ppf(x / tax()); }
     });
     if (slug === 'limit_headroom') { const h = el.querySelector('#htl'), r = T.debt_subject_limit?.rate;
       live.push(t => { const x = get(slug, t); h.textContent = x > 0 && r > 0 ? `At the 90-day pace, the limit is reached in about ${Math.round(x / r / 86400)} days (projection, not a Treasury estimate; extraordinary measures can extend it)` : x <= 0 ? 'Projected at or above the limit' : ''; }); }
@@ -147,36 +146,43 @@
   if (DLS.at_limit) banners.push(`<div class="banner">At the debt limit: Treasury is using extraordinary measures. Debt subject to the limit was ${usd(DLS.subject_to_limit)} on ${fmtDate(DLS.as_of)}, ${usd(DLS.headroom)} under the ${usd(DLS.limit)} limit, so the debt counters hold at Treasury's latest official figures instead of projecting growth.</div>`);
   if ((M.flags || []).length) banners.push(`<div class="banner">Drift alert: ${M.flags.join(', ')} exceeded the validation threshold on the last check.</div>`);
 
-  // lead hero: live clock card first (labels inside the card so they wrap), then the short official line
+  // lead hero: the server-rendered clock stays first. Digits update in place.
   const d = info('debt_total');
-  const hero = document.createElement('div'); hero.className = 'hero lead'; hero.id = 't-debt_total';
+  let hero = document.getElementById('t-debt_total');
   if (d.status === 'ok') {
     const tNow = now();
     const xNow = val('debt_total', tNow);
-    const peopleNow = pop(tNow) || T.population?.base || 1;
-    hero.innerHTML = `<div class="k">Live estimate · US national debt${d.held_at_limit ? ' · held at the debt limit' : ''}</div>
-    <div class="big num" id="hv">${usd(xNow)}</div>
-    <div class="sub"><span>${rateTxt(d.rate)}</span> <span class="note">rate: 90-day least-squares trend (${d.calc?.n || '—'} daily closes), backtested vs next Treasury close, avg error ${d.validation?.mean_abs_error_pct != null ? d.validation.mean_abs_error_pct.toFixed(3) + '%' : 'n/a'}</span> <span>Since you opened this page: <span class="num" id="hs">$0</span> more debt · <span class="num" id="hi">$0</span> in interest</span></div>
-    <div class="trio"><div><span class="l" title="${esc(PPB)}">Live projection per person</span><span class="num" id="pp-person">${usd(xNow / peopleNow, 2)}</span><span class="note">Official ${usd((T.debt_total?.base || 0) / (T.population?.base || 1), 2)} · Census ${esc(fmtDate(T.population?.as_of))}</span></div><div><span class="l">Per tax return filed</span><span class="num" id="pp-return">${usd(xNow / (T.tax_returns?.base || 1), 2)}</span></div><div><span class="l">Per household</span><span class="num" id="pp-house">${usd(xNow / T.households.base, 2)}</span></div></div>
-    <div class="meta" style="margin-top:10px">${badges(d)}<span class="badge">source: Treasury Debt to the Penny</span></div>`;
+    const officialPp = usd((T.debt_total?.base || 0) / popOff(), 2);
+    if (!hero) {
+      hero = document.createElement('div'); hero.className = 'hero lead'; hero.id = 't-debt_total';
+      if (intro) intro.before(hero); else app.prepend(hero);
+    }
+    if (!hero.querySelector('#hv')) {
+      hero.innerHTML = `<div class="k">Live estimate · US national debt${d.held_at_limit ? ' · held at the debt limit' : ''}</div>
+      <div class="big num" id="hv">${usd(xNow)}</div>
+      <div class="sub"><span>${rateTxt(d.rate)}</span> <span class="note">rate: 90-day least-squares trend (${d.calc?.n || '—'} daily closes), backtested vs next Treasury close, avg error ${d.validation?.mean_abs_error_pct != null ? d.validation.mean_abs_error_pct.toFixed(3) + '%' : 'n/a'}</span> <span>Since you opened this page: <span class="num" id="hs">$0</span> more debt · <span class="num" id="hi">$0</span> in interest</span></div>
+      <div class="trio"><div><span class="l" title="${esc(PPB)}">Debt per person</span><span class="num" id="pp-person">${officialPp}</span><span class="note">Official · Census ${esc(fmtDate(T.population?.as_of))}</span></div><div><span class="l">Per tax return · projection</span><span class="num" id="pp-return">${usd(xNow / (T.tax_returns?.base || 1), 2)}</span></div><div><span class="l">Per household · projection</span><span class="num" id="pp-house">${usd(xNow / T.households.base, 2)}</span></div></div>
+      <div class="meta" style="margin-top:10px">${badges(d)}<span class="badge">source: Treasury Debt to the Penny</span></div>`;
+    }
     const hv = hero.querySelector('#hv'), hs = hero.querySelector('#hs'), hi = hero.querySelector('#hi');
-    const pp = hero.querySelector('#pp-person'), pr = hero.querySelector('#pp-return'), ph = hero.querySelector('#pp-house');
+    const pr = hero.querySelector('#pp-return'), ph = hero.querySelector('#pp-house');
+    const pp = hero.querySelector('#pp-person');
+    if (pp) pp.textContent = officialPp;
     live.push(t => {
       const x = val('debt_total', t);
-      if (hv) hv.textContent = usd(x);
+      if (hv) hv.textContent = usd(x, 2);
       if (hs) hs.textContent = '+' + usd(x - val('debt_total', OPENED), 0);
       if (hi) hi.textContent = usd(DER.interest_since_open(t), 0);
-      const people = pop(t);
-      if (pp && people) pp.textContent = usd(x / people, 2);
       if (pr && tax()) pr.textContent = usd(x / tax(), 2);
       if (ph && T.households?.base) ph.textContent = usd(x / T.households.base, 2);
     });
     hero.onclick = () => openModal('debt_total');
-  } else hero.innerHTML = `<div class="big">source unavailable</div>`;
-  app.appendChild(hero);
-  if (official) app.appendChild(official);
-  if (banners.length) app.insertAdjacentHTML('beforeend', banners.join(''));
-  if (intro) app.appendChild(intro);
+  } else if (hero) hero.innerHTML = `<div class="big">source unavailable</div>`;
+  if (banners.length) {
+    const where = intro || hero;
+    if (where) where.insertAdjacentHTML('afterend', banners.join(''));
+    else app.insertAdjacentHTML('beforeend', banners.join(''));
+  }
   const cross41 = document.getElementById('cross41');
   if (cross41) (intro || official || hero).after(cross41);
 
@@ -227,12 +233,12 @@
     const wc = document.createElement('section'); wc.id = 'changed';
     const dl = (v, cls = 1) => `<span class="${cls ? (v > 0 ? 'up' : v < 0 ? 'dn' : '') : ''}">${v >= 0 ? '+' : '−'}${short(Math.abs(v)).replace('$', '$')}</span>`;
     wc.innerHTML = `<div class="sh"><span class="bar" style="background:var(--red)"></span><h2>What changed</h2><span class="h2n">Official Debt to the Penny closes, newest first · Treasury publishes each business day around 3 p.m. ET</span></div>
-    <div class="wc"><div class="wcc now" id="t-wc_now"><div class="d">NOW · projected</div><div class="v num" id="wcn">—</div><div class="x">vs last close <span class="num" id="wcd">—</span></div><div class="x">per person <span class="num" id="wcp">—</span></div></div>
-    ${RC.map(r => `<div class="wcc"><div class="d">${esc(fmtDate(r.date))}</div><div class="v num">$${(r.total / 1e12).toFixed(3)}T</div><div class="x">day ${dl(r.d_total)}</div><div class="x">public ${dl(r.d_public)}</div><div class="x">intragov ${dl(r.d_intragov)}</div><div class="x">per person <span class="${r.d_total > 0 ? 'up' : 'dn'}">${r.d_total >= 0 ? '+' : '−'}${ppf(Math.abs(r.d_total / val('population', eodTs(r.date))))}</span></div></div>`).join('')}</div>
+    <div class="wc"><div class="wcc now" id="t-wc_now"><div class="d">NOW · projected</div><div class="v num" id="wcn">—</div><div class="x">vs last close <span class="num" id="wcd">—</span></div><div class="x">per person, official <span class="num" id="wcp">—</span></div></div>
+    ${RC.map(r => `<div class="wcc"><div class="d">${esc(fmtDate(r.date))}</div><div class="v num">$${(r.total / 1e12).toFixed(3)}T</div><div class="x">day ${dl(r.d_total)}</div><div class="x">public ${dl(r.d_public)}</div><div class="x">intragov ${dl(r.d_intragov)}</div><div class="x">per person <span class="${r.d_total > 0 ? 'up' : 'dn'}">${r.d_total >= 0 ? '+' : '−'}${ppf(Math.abs(r.d_total / popOff()))}</span></div></div>`).join('')}</div>
     <div class="legend">Daily moves are lumpy: debt jumps on auction settlement days (often the 15th and month-end) and dips when trust-fund securities mature. That is why we tick at the 90-day trend and show the official closes here.</div>`;
     app.appendChild(wc);
     const wcn = wc.querySelector('#wcn'), wcd = wc.querySelector('#wcd'), wcp = wc.querySelector('#wcp');
-    live.push(t => { const x = val('debt_total', t); wcn.textContent = '$' + (x / 1e12).toFixed(6) + 'T'; const dd = x - RC[0].total; wcd.textContent = (dd >= 0 ? '+' : '−') + usd(Math.abs(dd)); wcp.textContent = ppf(x / pop(t)); });
+    live.push(t => { const x = val('debt_total', t); wcn.textContent = '$' + (x / 1e12).toFixed(6) + 'T'; const dd = x - RC[0].total; wcd.textContent = (dd >= 0 ? '+' : '−') + usd(Math.abs(dd)); wcp.textContent = ppf((T.debt_total?.base || 0) / popOff()); });
   }
 
   const secEls = {};
@@ -289,7 +295,7 @@
   <p><b>Every number</b> = latest official figure + (official trend per second × seconds since that figure). The pipeline re-bases every ticker each morning and after Treasury's afternoon release, then compares yesterday's projection with the new official figure. If the gap exceeds the threshold (0.25% for total and public debt, 0.5% for intragovernmental debt, 3% for the DTS-rebased fiscal-year totals, 5% for monthly figures), the ticker is flagged.</p>
   <p><b>Fiscal-year totals</b> use the Daily Treasury Statement every business day. Cash deposits and withdrawals, excluding debt issues and redemptions, are converted to the official budget basis with last year's ratio: revenue ×${(M.dts_ratio?.revenue?.ratio_prev_fy || 0).toFixed(4)}, spending ×${(M.dts_ratio?.spending?.ratio_prev_fy || 0).toFixed(4)}. Backtest: applying the year-before ratio to last year's cash missed the official total by ${(M.dts_ratio?.revenue?.backtest_err_pct ?? 0).toFixed(2)}% for revenue and ${(M.dts_ratio?.spending?.backtest_err_pct ?? 0).toFixed(2)}% for spending. Once a monthly statement for the current year exists, it becomes the anchor and DTS only fills in the days since.</p>
   <table class="v"><tr><th>Ticker</th><th>Last check</th><th>Avg |error| (20 days)</th><th>Checked against</th><th></th></tr>${vrows}</table>
-  <p><b>Per person</b> uses one Census population figure everywhere on the site (${nf0.format(val('population') || 0)} now): the Vintage 2025 official estimate for July 1, 2025, projected forward at Census's own stated growth rate. <b>Per tax return filed</b> divides by ${nf0.format(T.tax_returns?.base || 0)} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2). That counts returns, not people: a joint return counts once, and returns with zero tax liability are included.</p>
+  <p><b>Per person</b> is the Treasury close divided by the Census Vintage 2025 estimate of ${nf0.format(popOff())} residents on ${esc(fmtDate(T.population?.as_of))}. That population is not projected, and the per-person figure does not tick. The population tile farther down is a separate projection of headcount. <b>Per tax return filed</b> divides by ${nf0.format(T.tax_returns?.base || 0)} individual income tax returns filed in FY2025 (IRS Data Book, Table 1-2). That counts returns, not people: a joint return counts once, and returns with zero tax liability are included.</p>
   <p><b>Sources:</b> ${srcs.map(([u, n]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join(' · ')}</p>
   ${Object.keys(M.errors || {}).length ? `<p style="color:var(--amber)">Source problems on last run: ${esc(Object.keys(M.errors).join(', '))}</p>` : ''}
   <p>Prototype · data generated ${esc(M.generated_iso)}</p></div>`;
@@ -374,7 +380,7 @@
     const v = i.validation;
     dlg.innerHTML = `<h3>${esc(i.label)}</h3><div class="big num" id="mv">—</div>
       <div class="meta">${badges(i)}</div>
-      ${isUSD(i) && !NOPP.has(slug) ? `<div class="pp"><div><span class="l" title="${esc(PPB)}">Per person (proj. pop.)</span><span class="num" id="m1"></span></div><div><span class="l">Per tax return filed</span><span class="num" id="m2"></span></div></div>` : ''}
+      ${isUSD(i) && !NOPP.has(slug) ? `<div class="pp"><div><span class="l" title="${esc(PPB)}">${i.fixed ? 'Per person' : 'Per person · projection'}</span><span class="num" id="m1"></span></div><div><span class="l">Per tax return filed</span><span class="num" id="m2"></span></div></div>` : ''}
       <p><b>Method.</b> ${esc(i.method || '')}</p>
       ${mathHTML(slug, i)}
       ${i.rate ? `<p><b>Rate.</b> ${rateTxt(i.rate)}</p>` : ''}
@@ -386,7 +392,7 @@
       <p><button id="cl">Close</button></p>`;
     const mv = dlg.querySelector('#mv'), m1 = dlg.querySelector('#m1'), m2 = dlg.querySelector('#m2');
     modalTick = t => { const x = get(slug, t); mv.textContent = i.kind === 'pct' ? pct(x, 5) : i.kind === 'count' ? nf0.format(x) : usd(x, 2);
-      if (m1) { m1.textContent = ppf(x / pop(t)); m2.textContent = ppf(x / tax()); }
+      if (m1) { m1.textContent = ppf(x / popOff()); m2.textContent = ppf(x / tax()); }
       const mf = dlg.querySelector('#mf');
       if (mf && !i.derived) { const dtt = Math.min(t, i.freeze_t || Infinity) - i.t0; const stp = (i.steps || []).reduce((s, q) => s + q[2] * Math.min(1, Math.max(0, (Math.min(t, i.freeze_t || Infinity) - q[0]) / (q[1] - q[0]))), 0); mf.textContent = `${fv(i, i.base)} + ${i.kind === 'count' ? (+i.rate).toFixed(6) : usd(i.rate, 4)} × ${nf0.format(Math.round(dtt))} s${i.steps ? ` + ${fv(i, stp)} scheduled payments so far` : ''} = ${fv(i, i.base + i.rate * dtt + stp)}`; }
       if (i.derived) { dlg.querySelectorAll('[data-c]').forEach(e => { const c = e.dataset.c; e.textContent = fv(T[c] || {}, val(c, t)); });

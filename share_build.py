@@ -248,11 +248,11 @@ def page_html(site, root, asset, title, desc, canonical, og_image, og_alt, robot
 <main>
 <a class="brand" href="{root}">EVERY <b>DEBT</b> CLOCK</a>
 <section class="result" id="share-clock" data-b="{c['b']}" data-r="{c['r']}" data-t0="{c['t0']}" data-pop="{c['pop']}" data-pr="{c['pr']}" data-pt="{c['pt']}">
-<p class="k">Your share · live</p>
+<p class="k">Debt per person · official</p>
 <p class="big" id="share-num">{usd2(share)}</p>
 </section>
 <h1>{E(lead)}</h1>
-<p>One equal share is the Treasury Debt to the Penny total divided by the Census resident population. The official figure is <b>{usd2(share)}</b> on <b>{fdate(src['debtDate'])}</b>: {money_exact(src['debt'])} ÷ {src['population']:,.0f} residents on {fdate(src['populationDate'])}. The number above is that national debt clock, projected forward, divided by the projected population.</p>
+<p>One equal share is the Treasury Debt to the Penny total divided by the Census resident population. The figure above is <b>{usd2(share)}</b> on <b>{fdate(src['debtDate'])}</b>: {money_exact(src['debt'])} ÷ {src['population']:,.0f} residents on {fdate(src['populationDate'])}. That population is the official Census estimate. It is not projected forward.</p>
 <p>Birth-year addresses, from 1930 on, are listed at <a href="born/">/your-share/born/</a>. Each one opens this page.</p>
 <p class="rel"><a href="{root}national-debt-per-person/">National debt per person</a> · <a href="{root}">Live debt clock</a></p>
 {site_chrome.site_footer(root, lead=f"Treasury close {fdate(data['debtDate'])}. Page built {E(stamp)}.")}
@@ -295,7 +295,7 @@ def build(root, site, with_analytics, stamp, off_d, off_v, pop, pop_date, househ
     base_notes = [
         f"Treasury Debt to the Penny, {fdate(off_d)}",
         f"÷ {pop:,.0f} Census residents, {fdate(pop_date)}",
-        "Live clock ÷ projected population",
+        "Official Census population, not projected",
     ]
     render_card(os.path.join(og_dir, "default.png"), "Your share of the US debt", share_txt,
                 [("TOTAL PUBLIC DEBT", money_exact(off_v)), ("US RESIDENTS", f"{pop:,.0f}")], base_notes, False)

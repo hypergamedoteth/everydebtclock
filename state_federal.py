@@ -217,8 +217,8 @@ def section(R, place, now, tile_html, page_url, img):
     pp_method = (f"Site-wide basis official_census: Treasury total public debt outstanding at the {as_of} close, "
                  f"divided by the Census estimate of {us_pop:,} U.S. residents on {_date(ctx['pop_as_of'])}. "
                  f"The same figure as debt_per_person_official. The same per resident in every state. "
-                 f"This tile does not tick. The homepage also shows a separate projection that divides projected debt "
-                 f"by a projected population. That projection is a different figure. This is not {name} government debt.")
+                 f"This tile does not tick. The homepage debt-per-person figure is this same official Census basis and does not tick. "
+                 f"This is not {name} government debt.")
     share_method = (f"{name} population {state_pop:,} on {_date(place['population']['as_of'])} divided by "
                     f"{us_pop:,} U.S. residents, times the Treasury total. "
                     f"That population share is {frac * 100:.2f}%. The ticking number is a projection from the {as_of} close.")

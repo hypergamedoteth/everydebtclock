@@ -198,6 +198,24 @@ def _long_date(day):
     return day.strftime("%B %-d, %Y")
 
 
+def _zone_sentence(when):
+    """Say whether the projected instant is the same calendar day in Central and Eastern time."""
+    if when["ct_date"] == when["et_date"]:
+        return "The least-squares instant falls on the same calendar day in Central time and Eastern time."
+    return (f"The least-squares instant is {when['ct_day']} in Central time and {when['et_day']} in Eastern time, "
+            "so the calendar date depends on the time zone.")
+
+
+def _lag_note(when):
+    """Treasury does not publish a Debt to the Penny close on Saturday or Sunday."""
+    day = when["ct_date"]
+    if day.weekday() < 5:
+        return ""
+    return (f'<p class="note">{_long_date(day)} is a {day.strftime("%A")}, so Treasury will not post an official '
+            f'Debt to the Penny close that day. Official confirmation will lag the live clock. '
+            f'The date is a projection, not a Treasury forecast.</p>')
+
+
 def next_business_publish(record_day):
     """Next day that is not a weekend and not January 1. Used only to say when a Dec 31 close would normally be posted."""
     d = record_day + dt.timedelta(days=1)
@@ -377,7 +395,9 @@ def write_clock(path, facts):
     lines = [
         f"Homepage clock, 90-day pace: {_per_day(facts['rate'])} a day, {_per_sec(facts['rate'])} a second.",
         f"From Treasury's {_fdate(facts['as_of'])} Debt to the Penny close of {_money_float(facts['base'])}.",
-        "A projection. Not a Treasury forecast. The Eastern-time date is the next calendar day.",
+        ("A projection. Not a Treasury forecast. Central and Eastern time share this calendar day."
+         if when["ct_date"] == when["et_date"] else
+         "A projection. Not a Treasury forecast. The Eastern-time date is the next calendar day."),
     ]
     y = 500
     for line in lines:
@@ -573,6 +593,7 @@ code{{font-family:ui-monospace,Menlo,monospace;font-size:13px}}
 {crossing_banner.HTML}
 <h1>Press kit: the US debt and $41 trillion</h1>
 <p>At the same 90-day pace as the <a href="../">homepage clock</a>, the projection reaches $41 trillion on <b id="exact-ct">{E(when['ct'])}</b> (<b id="exact-et">{E(when['et'])}</b>). That instant is computed from Treasury's <b>{_fdate(as_of)}</b> Debt to the Penny close and the homepage per-second rate. It is a projection, not a Treasury forecast. The Central-time date window from the two fits of that same 90-day stretch is <b>{E(window)}</b>.</p>
+{_lag_note(when)}
 <div class="hero" id="lead">
 <p class="k">Exact projected time · 90-day pace</p>
 <p class="big" id="exact-ct-2">{E(when['ct'])}</p>
@@ -586,7 +607,7 @@ code{{font-family:ui-monospace,Menlo,monospace;font-size:13px}}
 </div>
 <h2>The date window</h2>
 <p>Both ends use the closes in the homepage's 90-day window ({E(facts['calc_window'])}, {facts['calc_n']} closes). The least-squares slope is the rate the clock ticks at, {E(_per_day(rate))} a day. {E(match)} A straight line from the first close in that window ({_fdate(facts['p90']['first'])}, {E(_money_dec(facts['p90']['first_amount']))}) to the last ({_fdate(facts['p90']['last'])}, {E(_money_dec(facts['p90']['last_amount']))}) is {E(_per_day(facts['straight']))} a day and reaches $41 trillion on <b>{E(sw['ct'])}</b> ({E(sw['et'])}).</p>
-<p class="note">The window is those two fits, {E(window)}. It is not a confidence interval. The least-squares instant is late on December 31 in Central time and already January 1 in Eastern time, so the calendar date reporters print depends on the time zone, and the next Debt to the Penny closes can move it.</p>
+<p class="note">The window is those two fits, {E(window)}. It is not a confidence interval. {E(_zone_sentence(when))} The next Debt to the Penny closes can still move it.</p>
 <h2>Three paces, side by side</h2>
 <p>Each row starts from the same official close, {E(_money_float(facts['base']))} on {_fdate(as_of)}, and runs forward at its own per-second rate. Only the 90-day row is the homepage clock. The 12-month row is the trailing 365 days. The 3-year row is the trailing 1,095 days. All three are least-squares slopes of Debt to the Penny closes, the same method as the 90-day rate.</p>
 <div class="tw"><table>

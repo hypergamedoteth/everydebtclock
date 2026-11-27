@@ -20,9 +20,11 @@ window.DC = function (D) {
   const get = (s, t) => DER[s] ? DER[s](t) : val(s, t);
   const info = s => DER[s] ? Object.assign({status: 'ok', derived: true}, D.derived[s]) : T[s];
   const pop = t => val('population', t), tax = T.tax_returns && T.tax_returns.base;
+  // Debt per person uses this count: the Census estimate, not the population projection.
+  const popOfficial = () => T.population && T.population.base;
   const nf0 = new Intl.NumberFormat('en-US', {maximumFractionDigits: 0});
   const usd = (v, d = 0) => v == null ? '—' : (v < 0 ? '−$' : '$') + new Intl.NumberFormat('en-US', {minimumFractionDigits: d, maximumFractionDigits: d}).format(Math.abs(v));
   const ppf = v => { if (v == null || !isFinite(v)) return '—'; const a = Math.abs(v), s = v < 0 ? '−$' : '$'; return a < 0.01 ? s + a.toFixed(6) : usd(v, 2); };
   const fmt = (i, x) => i.kind === 'pct' ? x.toFixed(i.fixed ? 3 : 5) + '%' : i.kind === 'count' ? nf0.format(x) : usd(x);
-  return {T, M, val, get, info, pop, tax, usd, ppf, fmt};
+  return {T, M, val, get, info, pop, popOfficial, tax, usd, ppf, fmt};
 };
