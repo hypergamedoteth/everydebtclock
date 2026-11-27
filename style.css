@@ -220,7 +220,7 @@ p.official{margin:0 2px 14px;color:var(--mut);font-size:13.5px;line-height:1.45}
 #t-debt_total .trio .l{font-size:11px;line-height:1.25;min-height:2.5em}
 @media (max-width:640px){
 #t-debt_total.hero.lead{min-height:348px}
-#t-debt_total .big{font-size:28px}
+#t-debt_total .big{font-size:25px;max-width:100%}
 #t-debt_total .sub{min-height:4.8em}
 #t-debt_total .trio{min-height:108px}
 #t-debt_total .trio .num{font-size:13px}
